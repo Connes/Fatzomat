@@ -31,3 +31,5 @@ jobs:
           git add pubspec.lock
           git commit -m "build: refresh Flutter lockfile"
           git push
+
+# One-time bootstrap workflow; remove after lockfile refresh.
