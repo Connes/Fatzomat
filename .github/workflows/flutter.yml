@@ -32,8 +32,14 @@ jobs:
         run: flutter test
       - name: Repair Android SDK toolchain
         run: |
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager --install "cmake;3.22.1"
+          export PATH="\${ANDROID_HOME:-\${ANDROID_SDK_ROOT}}/cmdline-tools/latest/bin:\${ANDROID_HOME:-\${ANDROID_SDK_ROOT}}/cmdline-tools/bin:\${ANDROID_HOME:-\${ANDROID_SDK_ROOT}}/platform-tools:\$PATH"
+          SDKMANAGER="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager not found in Android SDK command-line tools" >&2
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" --install "cmake;3.22.1"
       - name: Build Android debug artifact
         run: flutter build apk --debug
       - name: Configure temporary CI release signing
