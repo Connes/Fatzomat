@@ -19,7 +19,7 @@ jobs:
           channel: stable
           cache: true
       - name: Verify repository hygiene
-        run: ./scripts/check_repository.sh
+        run: bash scripts/check_repository.sh
       - name: Verify reproducible dependency state
         run: flutter pub get --enforce-lockfile
       - name: Analyze
