@@ -8,7 +8,7 @@ void main() {
     final page = File('lib/features/settings/notifications_page.dart').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.33+245'));
+    expect(pubspec, contains('version: 1.13.34+246'));
     expect(profile, contains('settings-notifications-'));
     expect(profile, contains('PostgresChangeEvent.all'));
     expect(profile, contains('unreadNotifications'));
