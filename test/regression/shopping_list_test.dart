@@ -8,7 +8,7 @@ void main() {
     final pubspec = File('pubspec.yaml').readAsStringSync();
     final entry = File('lib/features/shared/shopping_list_page.dart').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.31+243'));
+    expect(pubspec, contains('version: 1.13.32+244'));
     expect(source, contains('class ShoppingPage'));
     expect(source, contains("table: 'shopping_items'"));
     expect(source, contains('Artikel hinzufügen'));
