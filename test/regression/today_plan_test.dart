@@ -10,7 +10,7 @@ void main() {
     final migration = File('supabase/migrations/202609160001_v81_today_plan_editing.sql').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.30+242'));
+    expect(pubspec, contains('version: 1.13.31+243'));
     expect(source, contains('class TodayPage'));
     // Today is intentionally a minimal decision surface now. The underlying
     // plan-editing/synchronization functions remain in the page for existing
