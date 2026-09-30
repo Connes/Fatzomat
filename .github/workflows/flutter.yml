@@ -2,7 +2,7 @@ name: Flutter quality gate
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "ci/quality-gates"]
   pull_request:
 
 permissions:
@@ -30,7 +30,15 @@ jobs:
         run: flutter build apk --debug
       - name: Configure temporary CI release signing
         run: |
-          keytool -genkeypair -v             -keystore android/ci-upload.jks             -storepass changeit             -keypass changeit             -alias ci-upload             -keyalg RSA             -keysize 2048             -validity 1             -dname "CN=Schmackofatz CI, OU=CI, O=Schmackofatz, C=DE"
+          keytool -genkeypair -v \
+            -keystore android/ci-upload.jks \
+            -storepass changeit \
+            -keypass changeit \
+            -alias ci-upload \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 1 \
+            -dname "CN=Schmackofatz CI, OU=CI, O=Schmackofatz, C=DE"
           cat > android/key.properties <<'EOF'
           storeFile=ci-upload.jks
           storePassword=changeit
