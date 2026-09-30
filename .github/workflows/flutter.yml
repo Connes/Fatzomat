@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: flutter-quality-${{ github.ref }}
+  group: flutter-quality
   cancel-in-progress: true
 
 permissions:
