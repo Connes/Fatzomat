@@ -1,4 +1,8 @@
 -- v13: deterministic weekly shopping rebuild.
+-- The previous legacy function returned integer. Drop it first because
+-- PostgreSQL cannot change a function's return type via CREATE OR REPLACE.
+drop function if exists public.rebuild_household_shopping_list(uuid);
+
 -- Replaces the previous row-by-row conflict behavior, which could fail to aggregate
 -- identical ingredients coming from different meal plans.
 create or replace function public.rebuild_household_shopping_list(p_household_id uuid)
