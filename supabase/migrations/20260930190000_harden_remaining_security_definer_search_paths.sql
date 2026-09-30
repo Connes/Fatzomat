@@ -10,7 +10,7 @@ alter function public.push_notifications_webhook()
   set search_path = public;
 alter function public.cancel_personal_today_plan(uuid)
   set search_path = public;
-alter function public.send_decision_message(text)
+alter function public.send_decision_message(text, text, text, text, text, uuid, integer)
   set search_path = public;
 alter function public.set_personal_today_plan(uuid, integer)
   set search_path = public;
