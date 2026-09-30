@@ -1,0 +1,36 @@
+name: Supabase quality gate
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        run: supabase start
+
+      - name: Replay all migrations from scratch
+        run: supabase db reset --local
+
+      - name: Database tests
+        run: supabase test db --local
+
+      - name: Database lint
+        run: supabase db lint --local
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop
