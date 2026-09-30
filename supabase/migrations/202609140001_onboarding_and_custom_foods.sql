@@ -28,7 +28,7 @@ insert into public.foods (id,name,category,default_unit) values
 ('asparagus','Spargel','Gemüse','g'),('lettuce','Salat','Gemüse','g'),('rocket','Rucola','Gemüse','g'),('avocado','Avocado','Gemüse','Stück'),('ginger','Ingwer','Gemüse','g'),
 ('pear','Birne','Obst','Stück'),('orange','Orange','Obst','Stück'),('mandarin','Mandarine','Obst','Stück'),('lemon','Zitrone','Obst','Stück'),
 ('lime','Limette','Obst','Stück'),('strawberry','Erdbeeren','Obst','g'),('raspberry','Himbeeren','Obst','g'),('blueberry','Heidelbeeren','Obst','g'),
-('grapes','Trauben','Obst','g'),('pineapple','Ananas','Obst','g'),('mango','Mango','Stück'),('peach','Pfirsich','Stück'),('kiwi','Kiwi','Stück'),
+('grapes','Trauben','Obst','g'),('pineapple','Ananas','Obst','g'),('mango','Mango','Obst','Stück'),('peach','Pfirsich','Stück'),('kiwi','Kiwi','Stück'),
 ('yogurt','Naturjoghurt','Milchprodukte','g'),('greek_yogurt','Griechischer Joghurt','Milchprodukte','g'),('quark','Quark','Milchprodukte','g'),
 ('cream_cheese','Frischkäse','Milchprodukte','g'),('creme_fraiche','Crème fraîche','Milchprodukte','g'),('butter','Butter','Milchprodukte','g'),
 ('gouda','Gouda','Milchprodukte','g'),('cheddar','Cheddar','Milchprodukte','g'),('feta','Feta','Milchprodukte','g'),('mascarpone','Mascarpone','Milchprodukte','g'),
