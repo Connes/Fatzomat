@@ -496,6 +496,9 @@ alter table public.shared_recipe_plans
   alter column servings set default 2;
 
 alter table public.shared_recipe_plans
+  drop constraint if exists shared_recipe_plans_servings_check;
+
+alter table public.shared_recipe_plans
   add constraint shared_recipe_plans_servings_check check (servings between 1 and 12);
 
 create or replace function public.update_shared_recipe_plan_servings(p_plan_id uuid, p_servings integer)
