@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: supabase-quality-${{ github.ref }}
+  group: supabase-quality
   cancel-in-progress: true
 
 permissions:
