@@ -2,7 +2,7 @@ name: Supabase quality gate
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: ["main", "develop", "ci/quality-gates"]
   pull_request:
 
 permissions:
