@@ -21,8 +21,9 @@ void main() {
     ).readAsStringSync();
 
     expect(repo, contains("select('image_path')"));
-    expect(repo, contains("storage.from(RecipeImageService.bucket).remove([imagePath])"));
     expect(repo, contains('if (removed) {'));
+    expect(repo, contains('_deleteImageIfUnreferenced(imagePath)'));
+    expect(repo, contains('RecipeImageService(client: client).delete(normalized)'));
   });
 
   test('delete UI handles a protected recipe without pretending it was deleted', () {
