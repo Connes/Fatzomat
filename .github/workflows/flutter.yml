@@ -30,6 +30,10 @@ jobs:
         run: flutter analyze
       - name: Test
         run: flutter test
+      - name: Repair Android SDK toolchain
+        run: |
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager --install "cmake;3.22.1"
       - name: Build Android debug artifact
         run: flutter build apk --debug
       - name: Configure temporary CI release signing
