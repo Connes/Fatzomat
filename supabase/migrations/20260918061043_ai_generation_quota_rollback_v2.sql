@@ -1,4 +1,7 @@
 -- Reserve AI generation quota with a server-generated event id so failed
+-- The preceding security migration changed this function's return type;
+-- PostgreSQL requires an explicit drop before replacing it with bigint.
+drop function if exists public.consume_ai_generation_quota();
 -- generations can release the reservation again. Limits remain server-owned.
 
 create or replace function public.consume_ai_generation_quota()
