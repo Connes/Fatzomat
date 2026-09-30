@@ -1,3 +1,5 @@
+select plan(1);
+
 -- Run against a disposable Supabase database after migrations.
 -- No test users are created. Checks current schema/security invariants.
 
@@ -102,3 +104,7 @@ begin
     raise exception 'Missing personal_today_plans.recipe_id index';
   end if;
 end $$;
+
+
+select pass(1, 'schema and security invariants hold');
+select * from finish();
