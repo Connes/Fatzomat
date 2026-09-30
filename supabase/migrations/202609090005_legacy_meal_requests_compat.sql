@@ -5,6 +5,18 @@
 -- This table is intentionally retired later by
 -- 202609140002_remove_household_legacy_and_normalize_food_categories.sql.
 
+-- The legacy shopping-list chain also expects an active/archived status.
+-- Later product migrations retire this table family entirely.
+alter table public.shopping_lists
+  add column if not exists status text not null default 'active';
+
+alter table public.shopping_lists
+  drop constraint if exists shopping_lists_status_check;
+
+alter table public.shopping_lists
+  add constraint shopping_lists_status_check
+  check (status in ('active', 'archived'));
+
 create table if not exists public.meal_requests (
   id uuid primary key default gen_random_uuid(),
   household_id uuid not null references public.households(id) on delete cascade,
