@@ -7,7 +7,16 @@ create unique index if not exists shared_recipe_plans_one_active_per_connection_
   on public.shared_recipe_plans(connection_id, plan_date)
   where status <> 'cancelled';
 -- v51: keep connection status in sync on both devices.
-alter publication supabase_realtime add table public.connection_members;
+do 'begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = ''supabase_realtime''
+      and schemaname = ''public''
+      and tablename = ''connection_members''
+  ) then
+    execute ''alter publication supabase_realtime add table public.connection_members'';
+  end if;
+end';
 -- V54: editable shopping list. Manual items never modify the source recipe.
 alter table public.shopping_items
   add column if not exists source text not null default 'recipe';
@@ -137,7 +146,16 @@ $$;
 revoke all on function public.create_decision_request(uuid) from public, anon;
 grant execute on function public.create_decision_request(uuid) to authenticated;
 
-alter publication supabase_realtime add table public.decision_requests;
+do 'begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = ''supabase_realtime''
+      and schemaname = ''public''
+      and tablename = ''decision_requests''
+  ) then
+    execute ''alter publication supabase_realtime add table public.decision_requests'';
+  end if;
+end';
 -- V57 / Part 2: safe participant actions for decision requests.
 
 -- State changes happen only through the RPCs below. This keeps clients from
