@@ -32,7 +32,7 @@ jobs:
         run: flutter test
       - name: Repair Android SDK toolchain
         run: |
-          export PATH="\${ANDROID_HOME:-\${ANDROID_SDK_ROOT}}/cmdline-tools/latest/bin:\${ANDROID_HOME:-\${ANDROID_SDK_ROOT}}/cmdline-tools/bin:\${ANDROID_HOME:-\${ANDROID_SDK_ROOT}}/platform-tools:\$PATH"
+          export PATH="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}/cmdline-tools/latest/bin:${ANDROID_HOME:-${ANDROID_SDK_ROOT}}/cmdline-tools/bin:${ANDROID_HOME:-${ANDROID_SDK_ROOT}}/platform-tools:$PATH"
           SDKMANAGER="$(command -v sdkmanager || true)"
           if [ -z "$SDKMANAGER" ]; then
             echo "sdkmanager not found in Android SDK command-line tools" >&2
