@@ -1,0 +1,26 @@
+name: Source package 1.13.36+248
+
+on:
+  push:
+    branches: ["tmp/source-package-1.13.36-248"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create source ZIP
+        run: |
+          mkdir -p package
+          zip -r package/Schmackofatz_v1.13.36+248.zip .             -x '.git/*' '.dart_tool/*' 'build/*' 'package/*'                'android/ci-upload.jks' 'android/key.properties'                '**/__pycache__/*' '*.pyc' '*.pyo'
+      - name: Upload source ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: schmackofatz-source-v1.13.36-248
+          path: package/Schmackofatz_v1.13.36+248.zip
+          if-no-files-found: error
+          retention-days: 7
