@@ -1,0 +1,36 @@
+# Flutter/Dart generated files
+.dart_tool/
+.packages
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Local configuration
+.env.local
+.env.*.local
+
+# Generated platform/build files
+android/local.properties
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local diagnostic reports
+reports/
+
+# Python generated files
+__pycache__/
+*.py[cod]

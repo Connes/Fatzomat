@@ -1,0 +1,30 @@
+V1.4 release manifest
+
+Required tracked files:
+- pubspec.yaml
+- pubspec.lock
+- android/app/src/main/AndroidManifest.xml
+- ios/Runner/Info.plist
+
+Required release scripts:
+- setup.sh
+- scripts/bootstrap.sh
+- scripts/check_repository.sh
+- scripts/check_architecture.sh
+- scripts/verify_release.sh
+
+Forbidden repository artifacts:
+- .env.local
+- .env.production
+- .env.prod
+- .github/workflows/ci.yml
+- start_setup.sh
+
+Release gate:
+- repository hygiene
+- architecture audit
+- flutter pub get --enforce-lockfile
+- flutter analyze
+- flutter test
+- flutter build apk --debug
+- flutter build apk --release

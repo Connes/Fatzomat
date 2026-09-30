@@ -1,0 +1,12 @@
+{
+  "name": "Schmackofatz Flutter Autonomous Development",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind"
+  ],
+  "postCreateCommand": "flutter pub get --enforce-lockfile",
+  "remoteUser": "root"
+}

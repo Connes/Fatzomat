@@ -1,0 +1,4 @@
+storeFile=/absolute/path/to/schmackofatz-upload.jks
+storePassword=REPLACE_ME
+keyAlias=schmackofatz
+keyPassword=REPLACE_ME

@@ -1,0 +1,3 @@
+
+[functions.restaurant-discovery]
+verify_jwt = false

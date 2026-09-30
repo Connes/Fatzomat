@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 92">
+  <g transform="translate(4 8)">
+    <path d="M28 4C10 13 5 31 14 48c6 12 17 20 30 27 3-17 2-32-5-45C34 18 31 10 28 4Z" fill="#4CAF7F"/>
+    <path d="M48 4c18 9 23 27 14 44-6 12-17 20-30 27-3-17-2-32 5-45 5-12 8-20 11-26Z" fill="#F6B45D"/>
+    <path d="M48 5c-8 13-9 29-6 47" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+  </g>
+  <text x="96" y="45" font-family="Inter, sans-serif" font-size="38" font-weight="700" fill="#1F2937">together</text>
+  <text x="97" y="72" font-family="Inter, sans-serif" font-size="15" font-weight="500" fill="#59636D">Gutes Essen. Gemeinsam einfacher.</text>
+</svg>

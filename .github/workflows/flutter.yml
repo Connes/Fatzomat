@@ -1,0 +1,55 @@
+name: Flutter quality gate
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - name: Verify repository hygiene
+        run: ./scripts/check_repository.sh
+      - name: Verify reproducible dependency state
+        run: flutter pub get --enforce-lockfile
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Build Android debug artifact
+        run: flutter build apk --debug
+      - name: Configure temporary CI release signing
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/ci-upload.jks \
+            -storepass changeit \
+            -keypass changeit \
+            -alias ci-upload \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 1 \
+            -dname "CN=Schmackofatz CI, OU=CI, O=Schmackofatz, C=DE"
+          cat > android/key.properties <<'EOF'
+storeFile=ci-upload.jks
+storePassword=changeit
+keyAlias=ci-upload
+keyPassword=changeit
+EOF
+      - name: Build Android release configuration check
+        env:
+          SUPABASE_URL: https://ci.invalid.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+        run: >-
+          flutter build apk --release
+          --dart-define=SUPABASE_URL=$SUPABASE_URL
+          --dart-define=SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY

@@ -1,0 +1,51 @@
+name: food_app_mvp
+description: Personal recipe app MVP.
+publish_to: "none"
+version: 1.13.30+242
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.17.2
+  cupertino_icons: ^1.0.9
+  url_launcher: 6.3.2
+  connectivity_plus: 7.3.1
+  shared_preferences: 2.5.5
+  file_picker: ^13.1.0
+  image_picker: ^1.2.3
+  share_plus: ^13.3.0
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
+  flutter_local_notifications: ^22.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 5.0.0
+  flutter_launcher_icons: 0.14.4
+  shared_preferences_platform_interface: 2.4.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/branding/
+    - assets/icons/
+    - assets/together/clean/icons/
+    - assets/together/clean/background/
+    - assets/food_choices/cooking/
+    - assets/food_choices/delivery/
+    - assets/food_choices/restaurant/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.otf
+          weight: 700

@@ -1,0 +1,18 @@
+{
+  "format": "together_recipe",
+  "version": 1,
+  "recipe": {
+    "title": "Rinderstreifen mit Süßkartoffeln",
+    "description": "Herzhaftes Pfannengericht.",
+    "servings": 2,
+    "prep_time_minutes": 10,
+    "cook_time_minutes": 20,
+    "difficulty": "Einfach",
+    "ingredients": [
+      {"food_id": null, "name": "Rindfleisch", "amount": 300, "unit": "g", "is_user_selected": false, "is_additional": true},
+      {"food_id": null, "name": "Süßkartoffeln", "amount": 400, "unit": "g", "is_user_selected": true, "is_additional": false},
+      {"food_id": null, "name": "Salz", "amount": null, "unit": "Prise", "is_user_selected": false, "is_additional": true}
+    ],
+    "steps": ["Schneiden.", "Braten."]
+  }
+}
