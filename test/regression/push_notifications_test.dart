@@ -44,8 +44,12 @@ void main() {
     expect(common, contains("printf 'n\\n' | flutterfire configure"));
     expect(runApp, contains('configure_firebase_if_needed'));
     expect(firebaseOptions, contains('class DefaultFirebaseOptions'));
-    expect(firebaseOptions, contains("String.fromEnvironment('FIREBASE_PROJECT_ID')"));
-    expect(firebaseOptions, contains("String.fromEnvironment('FIREBASE_API_KEY')"));
+    expect(firebaseOptions, contains("apiKey: '"));
+    expect(firebaseOptions, contains("appId: '"));
+    expect(firebaseOptions, contains("messagingSenderId: '"));
+    expect(firebaseOptions, contains("projectId: 'schmackofatz-25cce'"));
+    expect(firebaseOptions, isNot(contains("String.fromEnvironment('FIREBASE_PROJECT_ID')")));
+    expect(firebaseOptions, isNot(contains("String.fromEnvironment('FIREBASE_API_KEY')")));
     expect(pushRepo, contains("register_push_device"));
     expect(pushRpc, contains('create or replace function public.register_push_device'));
   });
