@@ -1,4 +1,5 @@
-select plan(1);
+\echo 1..1
+\set QUIET on
 
 -- Run against a disposable Supabase database after migrations.
 -- No test users are created. Checks current schema/security invariants.
@@ -106,5 +107,5 @@ begin
 end $$;
 
 
-select pass(1, 'schema and security invariants hold');
-select * from finish();
+\set QUIET off
+\echo ok 1 - schema and security invariants hold
