@@ -1,0 +1,28 @@
+name: Temporary source package
+
+on:
+  push:
+    branches: ["tmp/source-package-2f371369"]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create source archive
+        run: |
+          rm -rf package && mkdir package
+          zip -r package/Schmackofatz_v1.13.35+247.zip . \
+            -x '.git/*' '.dart_tool/*' 'build/*' 'package/*' \
+               'android/ci-upload.jks' 'android/key.properties' \
+               '**/__pycache__/*' '*.pyc' '*.pyo'
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: schmackofatz-source-v1.13.35-247
+          path: package/Schmackofatz_v1.13.35+247.zip
+          if-no-files-found: error
+          retention-days: 1
