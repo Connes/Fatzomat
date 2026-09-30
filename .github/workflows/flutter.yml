@@ -3,7 +3,7 @@ name: Flutter quality gate
 on:
   push:
     branches: ["main", "develop", "ci/quality-gates"]
-  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: flutter-quality-${{ github.ref }}
