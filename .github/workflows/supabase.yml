@@ -5,6 +5,10 @@ on:
     branches: ["main", "develop", "ci/quality-gates"]
   pull_request:
 
+concurrency:
+  group: supabase-quality-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
