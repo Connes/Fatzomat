@@ -60,9 +60,13 @@ create unique index if not exists decision_requests_one_pending_per_connection
 
 alter table public.decision_requests enable row level security;
 
+drop policy if exists "decision requests connection members can read" on public.decision_requests;
+
 create policy "decision requests connection members can read"
 on public.decision_requests for select to authenticated
 using (public.is_connection_member(connection_id));
+
+drop policy if exists "decision requests sender insert" on public.decision_requests;
 
 create policy "decision requests sender insert"
 on public.decision_requests for insert to authenticated
@@ -72,6 +76,8 @@ with check (
   and public.is_connection_member(connection_id, assigned_to)
   and assigned_to <> (select auth.uid())
 );
+
+drop policy if exists "decision requests participants update" on public.decision_requests;
 
 create policy "decision requests participants update"
 on public.decision_requests for update to authenticated
@@ -83,6 +89,8 @@ with check (
   public.is_connection_member(connection_id)
   and (created_by = (select auth.uid()) or assigned_to = (select auth.uid()))
 );
+
+drop policy if exists "decision requests sender delete" on public.decision_requests;
 
 create policy "decision requests sender delete"
 on public.decision_requests for delete to authenticated
