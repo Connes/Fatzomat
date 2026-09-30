@@ -25,9 +25,9 @@ begin
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
       and p.prosecdef = true
-      and coalesce(p.proconfig::text, '') <> '{search_path=public}'
+      and not (coalesce(p.proconfig, ARRAY[]::text[]) @> ARRAY['search_path=public'])
   ) then
-    raise exception 'Found SECURITY DEFINER function without search_path=public';
+    raise exception 'Found SECURITY DEFINER function without search_path=public: %', (select string_agg(n.nspname || '.' || p.proname || '/' || p.oid::text, ', ') from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.prosecdef = true and not (coalesce(p.proconfig, ARRAY[]::text[]) @> ARRAY['search_path=public']));
   end if;
 
   if exists (
