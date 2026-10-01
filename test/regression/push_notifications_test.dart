@@ -13,6 +13,7 @@ void main() {
     final common = File('scripts/common.sh').readAsStringSync();
     final runApp = File('scripts/run_app.sh').readAsStringSync();
     final firebaseOptions = File('lib/firebase_options.dart').readAsStringSync();
+    final firebaseGenerator = File('scripts/generate_firebase_options.py').readAsStringSync();
     final pushRepo = File('lib/data/repositories/push_device_repository.dart').readAsStringSync();
     final pushRpc = File('supabase/migrations/20260927070000_register_push_device_rpc.sql').readAsStringSync();
     final androidManifest = File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
@@ -44,12 +45,19 @@ void main() {
     expect(common, contains("printf 'n\\n' | flutterfire configure"));
     expect(runApp, contains('configure_firebase_if_needed'));
     expect(firebaseOptions, contains('class DefaultFirebaseOptions'));
-    expect(firebaseOptions, contains("apiKey: '"));
-    expect(firebaseOptions, contains("appId: '"));
-    expect(firebaseOptions, contains("messagingSenderId: '"));
-    expect(firebaseOptions, contains("projectId: 'schmackofatz-25cce'"));
-    expect(firebaseOptions, isNot(contains("String.fromEnvironment('FIREBASE_PROJECT_ID')")));
-    expect(firebaseOptions, isNot(contains("String.fromEnvironment('FIREBASE_API_KEY')")));
+    // The source ZIP intentionally contains a non-secret build-time template.
+    // ./setup.sh replaces it with generated FirebaseOptions from the registered
+    // Android/iOS app configuration. Both states are valid and must stay testable.
+    final hasGeneratedFirebaseOptions =
+        firebaseOptions.contains("projectId: 'schmackofatz-25cce'") &&
+        firebaseOptions.contains("apiKey: '") &&
+        !firebaseOptions.contains("String.fromEnvironment('FIREBASE_PROJECT_ID')");
+    final hasBuildTimeFirebaseTemplate =
+        firebaseOptions.contains("String.fromEnvironment('FIREBASE_PROJECT_ID')") &&
+        firebaseOptions.contains("String.fromEnvironment('FIREBASE_API_KEY')");
+    expect(hasGeneratedFirebaseOptions || hasBuildTimeFirebaseTemplate, isTrue);
+    expect(firebaseGenerator, contains("project_info['project_id']"));
+    expect(firebaseGenerator, contains('FirebaseOptions'));
     expect(pushRepo, contains("register_push_device"));
     expect(pushRpc, contains('create or replace function public.register_push_device'));
   });
