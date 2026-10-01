@@ -55,7 +55,7 @@ class RestaurantDiscoveryResult {
       deliveryStatus: switch (map['delivery_status']?.toString()) {
         'verified' => 'verified',
         'not_available' => 'not_available',
-        _ => 'unknown',
+        _ => map['delivery_available'] == true ? 'verified' : 'unknown',
       },
       cuisine: _nullable(map['cuisine']),
     );
@@ -66,7 +66,7 @@ class RestaurantDiscoveryResult {
     return text.isEmpty ? null : text;
   }
 
-  bool get deliveryVerified => deliveryStatus == 'verified';
+  bool get deliveryVerified => deliveryAvailable || deliveryStatus == 'verified';
   bool get deliveryUnknown => deliveryStatus == 'unknown';
 
   String get locationLabel {
