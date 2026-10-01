@@ -1,7 +1,7 @@
 name: source-package-1.13.44
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   package:
