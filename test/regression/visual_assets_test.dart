@@ -1,4 +1,5 @@
-import 'dart:async';\nimport 'dart:io';
+import 'dart:async';
+import 'dart:io';\nimport 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -65,6 +66,19 @@ void main() {
     minimum.complete();
     await future;
     expect(completed, isTrue);
+  });
+
+  test('Schmackofatz launcher icon is the approved branding asset', () async {
+    final data = await rootBundle.load('assets/branding/app_icon.png');
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final frame = await codec.getNextFrame();
+    expect(frame.image.width, 1024);
+    expect(frame.image.height, 1024);
+    frame.image.dispose();
+    codec.dispose();
+
+    final launcherConfig = await File('flutter_launcher_icons.yaml').readAsString();
+    expect(launcherConfig, contains('image_path: assets/branding/app_icon.png'));
   });
 
   test('approved home background is a valid image', () async {
