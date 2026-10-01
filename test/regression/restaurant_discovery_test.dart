@@ -132,6 +132,10 @@ void main() {
     expect(functionSource, contains("return { available: false, status: 'unknown'"));
     expect(functionSource, isNot(contains('deliveryRequested')));
     expect(functionSource, contains("deliveryOnly ? 'delivery' : 'all'"));
+    expect(functionSource, contains('function normalizeSearchText'));
+    expect(functionSource, contains('function cuisineMatches'));
+    expect(functionSource, contains('const matchingFeatures = features.filter'));
+    expect(functionSource, contains('terms.some((term) => searchable.includes(term))'));
     expect(functionSource, contains("return json({\n        error: 'Die Restaurantdaten konnten gerade nicht geladen werden. Bitte versuche es erneut.',\n      }, 503);"));
   });
 
