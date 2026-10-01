@@ -11,6 +11,7 @@ class RestaurantDiscoveryResult {
   final Uri? orderUri;
   final String? openingHours;
   final bool deliveryAvailable;
+  final String deliveryStatus;
   final String? cuisine;
 
   const RestaurantDiscoveryResult({
@@ -26,6 +27,7 @@ class RestaurantDiscoveryResult {
     this.orderUri,
     this.openingHours,
     this.deliveryAvailable = false,
+    this.deliveryStatus = 'unknown',
     this.cuisine,
   });
 
@@ -50,6 +52,11 @@ class RestaurantDiscoveryResult {
       orderUri: parseUri(map['order_url']),
       openingHours: _nullable(map['opening_hours']),
       deliveryAvailable: map['delivery_available'] == true,
+      deliveryStatus: switch (map['delivery_status']?.toString()) {
+        'verified' => 'verified',
+        'not_available' => 'not_available',
+        _ => 'unknown',
+      },
       cuisine: _nullable(map['cuisine']),
     );
   }
@@ -58,6 +65,9 @@ class RestaurantDiscoveryResult {
     final text = value?.toString().trim() ?? '';
     return text.isEmpty ? null : text;
   }
+
+  bool get deliveryVerified => deliveryStatus == 'verified';
+  bool get deliveryUnknown => deliveryStatus == 'unknown';
 
   String get locationLabel {
     final parts = <String>[];
