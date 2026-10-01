@@ -57,7 +57,7 @@ class RestaurantDetailPage extends StatelessWidget {
                   Text(result.formattedDistance),
                   if (order && result.deliveryVerified) ...[
                     const SizedBox(height: 8),
-                    const Chip(avatar: Icon(Icons.check_rounded, size: 18), label: Text('Lieferung laut Datenquelle verfügbar')),
+                    const Chip(avatar: Icon(Icons.check_rounded, size: 18), label: Text('Lieferung verfügbar')),
                   ] else if (order && result.deliveryUnknown) ...[
                     const SizedBox(height: 8),
                     const Chip(avatar: Icon(Icons.help_outline_rounded, size: 18), label: Text('Lieferung nicht verifiziert')),
