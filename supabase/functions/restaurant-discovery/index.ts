@@ -63,6 +63,22 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): num
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function deliveryMetadata(properties: Record<string, any>): { available: boolean; status: 'verified' | 'unknown' | 'not_available'; orderUrl: string | null } {
+  const rawDelivery = String(properties.delivery ?? '').trim().toLowerCase();
+  const orderUrl = normalizeUrl(properties['delivery:website']);
+  if (/^(yes|only)$/.test(rawDelivery) || Boolean(orderUrl)) {
+    return { available: true, status: 'verified', orderUrl };
+  }
+  if (rawDelivery === 'no') {
+    return { available: false, status: 'not_available', orderUrl: null };
+  }
+  return { available: false, status: 'unknown', orderUrl: null };
+}
+
+function deliveryRank(value: unknown): number {
+  return value === 'verified' ? 0 : value === 'unknown' ? 1 : 2;
+}
+
 function cacheKey(latitude: number, longitude: number, cuisine: string, deliveryOnly: boolean): string {
   return [latitude.toFixed(4), longitude.toFixed(4), cuisine.toLowerCase(), deliveryOnly ? 'delivery' : 'all'].join('|');
 }
@@ -148,9 +164,8 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
     if (seen.has(key)) continue;
     seen.add(key);
 
-    const deliveryAvailable = /^(yes|only)$/i.test(String(properties.delivery ?? '')) ||
-        Boolean(properties['delivery:website']);
-    if (deliveryOnly && !deliveryAvailable) continue;
+    const delivery = deliveryMetadata(properties);
+    if (deliveryOnly && delivery.status === 'not_available') continue;
 
     results.push({
       id: `${String(properties.osm_type ?? 'N')}/${String(properties.osm_id ?? feature?.id ?? '')}`,
@@ -162,14 +177,15 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
       longitude: lon,
       phone: String(properties.phone ?? properties['contact:phone'] ?? '').trim() || null,
       website: normalizeUrl(properties.website ?? properties['contact:website']),
-      order_url: normalizeUrl(properties['delivery:website'] ?? properties['website:orders']),
+      order_url: delivery.orderUrl ?? normalizeUrl(properties['website:orders']),
       opening_hours: properties.opening_hours ?? null,
-      delivery_available: deliveryAvailable,
+      delivery_available: delivery.available,
+      delivery_status: delivery.status,
       cuisine: properties.cuisine ?? properties.osm_value ?? null,
     });
   }
 
-  results.sort((a, b) => Number(a.distance_km) - Number(b.distance_km));
+  results.sort((a, b) => deliveryRank(a.delivery_status) - deliveryRank(b.delivery_status) || Number(a.distance_km) - Number(b.distance_km));
   return results.slice(0, limit);
 }
 
@@ -215,8 +231,8 @@ function buildResultsFromOverpass(payload: any, latitude: number, longitude: num
     const key = [name.toLowerCase(), String(address ?? '').toLowerCase(), String(city ?? '').toLowerCase()].join('|');
     if (seen.has(key)) continue;
     seen.add(key);
-    const deliveryAvailable = /^(yes|only)$/i.test(String(tags.delivery ?? '')) || Boolean(tags['delivery:website']);
-    if (deliveryOnly && !deliveryAvailable) continue;
+    const delivery = deliveryMetadata(tags);
+    if (deliveryOnly && delivery.status === 'not_available') continue;
     results.push({
       id: `${element.type}/${element.id}`,
       name,
@@ -227,9 +243,10 @@ function buildResultsFromOverpass(payload: any, latitude: number, longitude: num
       longitude: lon,
       phone: String(tags.phone ?? tags['contact:phone'] ?? '').trim() || null,
       website: normalizeUrl(tags.website ?? tags['contact:website']),
-      order_url: normalizeUrl(tags['delivery:website'] ?? tags['website:orders']),
+      order_url: delivery.orderUrl ?? normalizeUrl(tags['website:orders']),
       opening_hours: tags.opening_hours ?? null,
-      delivery_available: deliveryAvailable,
+      delivery_available: delivery.available,
+      delivery_status: delivery.status,
       cuisine: tags.cuisine ?? null,
     });
   }
@@ -266,9 +283,10 @@ Deno.serve(async (req: Request) => {
     const cached = resultCache.get(key);
     if (cached && cached.expiresAt > Date.now()) return json(cached.payload);
 
-    // In delivery mode, only explicitly supported delivery metadata is accepted.
-    // Unknown delivery capability must remain unknown rather than being presented
-    // as a confirmed delivery option.
+    // In delivery mode, explicitly unavailable delivery is excluded. Unknown delivery
+    // capability remains visible, but is clearly marked as unverified. This prevents
+    // incomplete OpenStreetMap delivery metadata from turning a useful search into
+    // an empty result set.
     try {
       const results = buildResultsFromPhoton(await queryPhoton(latitude, longitude, cuisine), latitude, longitude, limit, deliveryOnly);
       if (results.length) {
@@ -276,7 +294,7 @@ Deno.serve(async (req: Request) => {
           source: 'OpenStreetMap/Photon',
           radius_km: 20,
           results,
-          delivery_filter: deliveryOnly ? 'verified_only' : 'not_requested',
+          delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested',
         };
         resultCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
         console.log('restaurant-discovery success: photon results=', results.length, 'delivery=', deliveryOnly);
@@ -299,7 +317,7 @@ Deno.serve(async (req: Request) => {
         source: 'OpenStreetMap/Overpass',
         radius_km: 20,
         results,
-        delivery_filter: deliveryOnly ? 'verified_only' : 'not_requested',
+        delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested',
       };
       resultCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
       console.log('restaurant-discovery success: overpass results=', results.length, 'delivery=', deliveryOnly);
