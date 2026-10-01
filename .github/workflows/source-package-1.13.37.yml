@@ -1,0 +1,31 @@
+name: Source package 1.13.37+249
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create clean source ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .git .dart_tool build package
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type f \( -name '*.pyc' -o -name 'ci-upload.jks' -o -name 'key.properties' \) -delete
+          find .github/workflows -maxdepth 1 -type f -name '*source-package*' -delete
+          mkdir -p package
+          zip -qr "package/Schmackofatz_v1.13.37+249_FINAL.zip" . \
+            -x "package/*" ".git/*" ".dart_tool/*" "build/*"
+          unzip -tq "package/Schmackofatz_v1.13.37+249_FINAL.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schmackofatz-source-v1.13.37-249-final
+          path: package/Schmackofatz_v1.13.37+249_FINAL.zip
+          if-no-files-found: error
+          retention-days: 7
