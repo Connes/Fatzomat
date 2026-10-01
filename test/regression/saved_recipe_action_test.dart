@@ -7,7 +7,7 @@ void main() {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.41+253'));
+    expect(pubspec, contains('version: 1.13.42+254'));
     expect(source, contains("Zur Einkaufsliste hinzufügen"));
     expect(source, contains("shareRecipeForToday"));
     expect(source, contains("_ServingsDialog"));
