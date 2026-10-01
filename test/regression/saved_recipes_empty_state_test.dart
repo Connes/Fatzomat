@@ -16,6 +16,7 @@ void main() {
 
     final emptyState = find.byKey(const ValueKey<String>('my_recipes_empty_state'));
     expect(emptyState, findsOneWidget);
+    expect(find.text('Meine Rezepte'), findsNothing);
     expect(find.text('Noch keine Rezepte in deiner Sammlung'), findsOneWidget);
     expect(
       find.text('Finde ein Rezept oder füge ein Lieblingsrezept hinzu.'),
@@ -50,5 +51,8 @@ void main() {
       source,
       contains("'Kein passendes Rezept gefunden.'"),
     );
+    expect(source, contains("title: const Text('Meine Rezepte')"));
+    expect(source, contains('if (recipes.isNotEmpty)'));
+    expect(source, contains("hintText: 'Rezepte suchen'"));
   });
 }
