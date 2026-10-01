@@ -122,25 +122,31 @@ async function authenticateUser(req: Request) {
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const dy = 20 / 111.32;
   const dx = 20 / Math.max(111.32 * Math.cos(latitude * Math.PI / 180), 1);
-  const params = new URLSearchParams({
-    q: photonQuery(cuisine),
-    lat: String(latitude),
-    lon: String(longitude),
-    bbox: `${longitude - dx},${latitude - dy},${longitude + dx},${latitude + dy}`,
-    limit: '50',
-    lang: 'de',
-  });
-  const response = await fetch(`${PHOTON_ENDPOINT}?${params.toString()}`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'User-Agent': 'Schmackofatz/1.13 restaurant-discovery',
-    },
-    signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
-  });
-  if (!response.ok) throw new Error(`Photon HTTP ${response.status}`);
-  const payload = await response.json();
-  return Array.isArray(payload?.features) ? payload.features : [];
+  const queries = [...new Set([photonQuery(cuisine), 'restaurant'])];
+
+  for (const query of queries) {
+    const params = new URLSearchParams({
+      q: query,
+      lat: String(latitude),
+      lon: String(longitude),
+      bbox: `${longitude - dx},${latitude - dy},${longitude + dx},${latitude + dy}`,
+      limit: '50',
+      lang: 'de',
+    });
+    const response = await fetch(`${PHOTON_ENDPOINT}?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Schmackofatz/1.13 restaurant-discovery',
+      },
+      signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
+    });
+    if (!response.ok) throw new Error(`Photon HTTP ${response.status}`);
+    const payload = await response.json();
+    const features = Array.isArray(payload?.features) ? payload.features : [];
+    if (features.length) return features;
+  }
+  return [];
 }
 
 function buildResultsFromPhoton(features: any[], latitude: number, longitude: number, limit: number, deliveryOnly: boolean) {
@@ -192,7 +198,11 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
 function overpassQuery(latitude: number, longitude: number, cuisine: string): string {
   const pattern = CUISINE_PATTERNS[cuisine];
   const cuisineFilter = pattern ? `[cuisine~"${pattern}",i]` : '';
-  return `[out:json][timeout:8];nwr[amenity~"^(restaurant|fast_food)$",i][name]${cuisineFilter}(around:20000,${latitude},${longitude});out center tags qt 100;`;
+  const nameFilter = pattern ? `[name~"${pattern}",i]` : '';
+  const selector = pattern
+      ? `(nwr[amenity~"^(restaurant|fast_food)$",i][name]${cuisineFilter}(around:20000,${latitude},${longitude});nwr[amenity~"^(restaurant|fast_food)$",i][name]${nameFilter}(around:20000,${latitude},${longitude}););`
+      : `nwr[amenity~"^(restaurant|fast_food)$",i][name](around:20000,${latitude},${longitude});`;
+  return `[out:json][timeout:12];${selector}out center tags;`;
 }
 
 async function queryOverpass(query: string): Promise<any> {
@@ -324,16 +334,9 @@ Deno.serve(async (req: Request) => {
       return json(payload);
     } catch (overpassError) {
       console.error('All restaurant discovery sources failed:', String(overpassError));
-      // Discovery is not a reason to turn the whole screen into a server error.
-      // Returning an empty, valid result lets Flutter show its normal empty state
-      // and retry button instead of the misleading "external search unavailable" error.
-      const payload = {
-        source: 'OpenStreetMap',
-        radius_km: 20,
-        results: [],
-        delivery_filter: deliveryOnly ? 'verified_only' : 'not_requested',
-      };
-      return json(payload, 200);
+      return json({
+        error: 'Die Restaurantdaten konnten gerade nicht geladen werden. Bitte versuche es erneut.',
+      }, 503);
     }
   } catch (error) {
     console.error('restaurant-discovery request failed:', error);
