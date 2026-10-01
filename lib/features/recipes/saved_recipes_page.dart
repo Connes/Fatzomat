@@ -550,14 +550,27 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                               padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 58,
-                                    height: 58,
-                                    decoration: BoxDecoration(
-                                      color: AppDesign.softSurface,
-                                      borderRadius: BorderRadius.circular(18),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(18),
+                                    child: SizedBox(
+                                      width: 58,
+                                      height: 58,
+                                      child: recipe.imageUrl?.trim().isNotEmpty == true
+                                          ? Image.network(
+                                              recipe.imageUrl!,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) => Container(
+                                                color: AppDesign.softSurface,
+                                                alignment: Alignment.center,
+                                                child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+                                              ),
+                                            )
+                                          : Container(
+                                              color: AppDesign.softSurface,
+                                              alignment: Alignment.center,
+                                              child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+                                            ),
                                     ),
-                                    child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
                                   ),
                                   const SizedBox(width: 14),
                                   Expanded(
