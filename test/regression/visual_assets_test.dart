@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:food_app_mvp/core/launch_page.dart';
+import 'package:food_app_mvp/core/widgets/together_background.dart';
 import 'package:food_app_mvp/features/home/home_page.dart';
 import 'package:food_app_mvp/core/startup_page.dart';
 
@@ -79,6 +80,15 @@ void main() {
 
     final launcherConfig = await File('flutter_launcher_icons.yaml').readAsString();
     expect(launcherConfig, contains('image_path: assets/branding/app_icon.png'));
+  });
+
+  test('shared background enables the readability overlay by default', () {
+    const background = TogetherBackground(
+      type: TogetherBackgroundType.today,
+      child: SizedBox.shrink(),
+    );
+    expect(background.showOverlay, isTrue);
+    expect(background.overlayOpacity, greaterThanOrEqualTo(.16));
   });
 
   test('approved home background is a valid image', () async {

@@ -9,7 +9,7 @@ void main() {
     final model = File('lib/data/models/recipe.dart').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.43+255'));
+    expect(pubspec, contains('version: 1.13.44+256'));
     expect(service, contains('Future<bool> saveRecipe(Recipe recipe'));
     expect(service, contains("allowedExtensions: const ['json']"));
     expect(service, contains('toTogetherRecipeJson()'));

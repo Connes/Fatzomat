@@ -987,7 +987,14 @@ class _ShoppingPageState extends State<ShoppingPage> {
                       ),
                     ),
                   if (openItems.isNotEmpty) ...[
-                    Text('NOCH OFFEN', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark)),
+                    Container(
+  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+  decoration: BoxDecoration(
+    color: AppDesign.primarySoft.withValues(alpha: .96),
+    borderRadius: BorderRadius.circular(AppDesign.radiusPill),
+  ),
+  child: Text('NOCH OFFEN', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark)),
+),
                     const SizedBox(height: 8),
                     ...openGrouped.entries.map((entry) => _ShoppingGroup(category: entry.key, items: entry.value, itemLabel: itemLabel, onToggle: toggleItem, onEdit: editItem, onDelete: deleteItem)),
                   ],
@@ -995,7 +1002,19 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Expanded(child: Text('ERLEDIGT', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.mutedText))),
+                        Expanded(
+  child: Align(
+    alignment: Alignment.centerLeft,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppDesign.surface.withValues(alpha: .96),
+        borderRadius: BorderRadius.circular(AppDesign.radiusPill),
+      ),
+      child: Text('ERLEDIGT', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.mutedText)),
+    ),
+  ),
+),
                         TextButton.icon(onPressed: clearCompleted, icon: const Icon(Icons.delete_sweep_outlined, size: 18), label: const Text('Leeren')),
                       ],
                     ),

@@ -8,7 +8,7 @@ void main() {
     final notifications = File('lib/features/settings/notifications_page.dart').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.43+255'));
+    expect(pubspec, contains('version: 1.13.44+256'));
     expect(home, contains("sendDecisionMessage(type: 'ask')"));
     expect(home, contains("label: FittedBox"));
     expect(home, contains("'Entscheide Du'"));
