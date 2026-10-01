@@ -132,7 +132,7 @@ void main() {
     expect(functionSource, contains("return { available: false, status: 'unknown'"));
     expect(functionSource, isNot(contains('deliveryRequested')));
     expect(functionSource, contains("deliveryOnly ? 'delivery' : 'all'"));
-    expect(functionSource, contains('return json(payload, 200);'));
+    expect(functionSource, contains("return json({\n        error: 'Die Restaurantdaten konnten gerade nicht geladen werden. Bitte versuche es erneut.',\n      }, 503);"));
   });
 
 }
