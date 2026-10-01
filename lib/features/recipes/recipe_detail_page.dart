@@ -290,17 +290,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .72),
-                    borderRadius: BorderRadius.circular(17),
-                  ),
-                  child: const Icon(Icons.soup_kitchen_rounded, color: Color(0xFFB85A16), size: 28),
+                Text(
+                  recipe!.name,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
-                const SizedBox(height: 18),
-                Text(recipe!.name, style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
