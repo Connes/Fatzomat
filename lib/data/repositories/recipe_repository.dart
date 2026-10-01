@@ -212,6 +212,11 @@ class RecipeRepository {
     }
   }
 
+  bool canManageRecipeImage(Recipe recipe) {
+    final userId = client.auth.currentUser?.id;
+    return userId != null && recipe.createdBy == userId;
+  }
+
   Future<Recipe> setRecipeImage(String recipeId, RecipeImageUpload upload) async {
     await AuthSessionService.ensureValidSession(client: client);
     final current = await client
