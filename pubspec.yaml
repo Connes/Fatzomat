@@ -1,7 +1,7 @@
 name: food_app_mvp
 description: Personal recipe app MVP.
 publish_to: "none"
-version: 1.13.36+248
+version: 1.13.37+249
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
