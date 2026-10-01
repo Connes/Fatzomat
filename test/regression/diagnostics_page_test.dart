@@ -7,6 +7,6 @@ void main() {
     // Keep this regression intentionally file-based so it does not require
     // a live Supabase connection.
     final pubspec = File('pubspec.yaml').readAsStringSync();
-    expect(pubspec, contains('version: 1.13.39+251'));
+    expect(pubspec, contains('version: 1.13.40+252'));
   });
 }
