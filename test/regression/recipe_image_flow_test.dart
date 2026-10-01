@@ -16,6 +16,8 @@ void main() {
     expect(service, contains('runWithRefresh'));
     expect(repo, contains('resolveSignedUrl(path)'));
     expect(repo, contains('imageUrl: signedUrl ?? recipe.imageUrl'));
+    expect(repo, contains('canManageRecipeImage(Recipe recipe)'));
+    expect(detail, contains('repo.canManageRecipeImage(recipe!)'));
     expect(detail, contains('Rezeptbild verwalten'));
     expect(detail, contains('Image.network('));
     expect(detail, contains("recipe!.imageUrl?.trim().isNotEmpty == true"));
