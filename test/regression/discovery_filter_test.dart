@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../lib/core/food_mode.dart';
+import '../../lib/core/app_design.dart';
 import '../../lib/core/services/location_service.dart';
 import '../../lib/data/models/restaurant_discovery.dart';
 import '../../lib/data/repositories/restaurant_discovery_repository.dart';
@@ -60,6 +61,22 @@ void main() {
     );
     expect(find.text('Anbieter 9'), findsOneWidget);
     expect(find.text('Anbieter 10'), findsNothing);
+  });
+
+  testWidgets('Leerer Restaurantzustand bleibt auf dem Bildhintergrund vollständig lesbar', (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: DiscoveryPage(
+        mode: FoodMode.order,
+        preference: 'Pizza',
+        locationService: _Location(),
+        discoveryRepository: _Repository(const []),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AppSurface), findsOneWidget);
+    expect(find.text('Keine passenden Restaurants zum Bestellen gefunden'), findsOneWidget);
+    expect(find.text('Erneut suchen'), findsOneWidget);
   });
 
   testWidgets('Restaurant-Detail zeigt Telefon und Webseite, wenn vorhanden', (tester) async {
