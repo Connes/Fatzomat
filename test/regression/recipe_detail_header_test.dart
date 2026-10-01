@@ -8,6 +8,6 @@ void main() {
 
     expect(source, contains('textAlign: TextAlign.center'));
     expect(source, isNot(contains('Icons.soup_kitchen_rounded')));
-    expect(source, isNot(contains('width: 52,\n                  height: 52,')));
+    expect(source, isNot(contains('width: 52,\n                  height: 52,')));\n\n    final pubspec = File('pubspec.yaml').readAsStringSync();\n    expect(pubspec, contains('version: 1.13.45+257'));
   });
 }
