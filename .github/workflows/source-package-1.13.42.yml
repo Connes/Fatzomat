@@ -1,0 +1,28 @@
+name: Source package 1.13.42
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create source ZIP
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          test "$VERSION" = "1.13.42+254"
+          git archive --format=zip --output="Schmackofatz_v1.13.42+254_FINAL.zip" HEAD
+          unzip -tq "Schmackofatz_v1.13.42+254_FINAL.zip"
+          unzip -l "Schmackofatz_v1.13.42+254_FINAL.zip" | grep -q 'pubspec.yaml'
+          unzip -l "Schmackofatz_v1.13.42+254_FINAL.zip" | grep -q 'supabase/migrations/20261001120000_fix_recipe_image_storage_policy_and_timestamp.sql'
+          if unzip -l "Schmackofatz_v1.13.42+254_FINAL.zip" | grep -E '(^|/)(\.git|\.dart_tool|build|ci-upload\.jks|key\.properties)(/|$)' ; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schmackofatz-source-1.13.42-final
+          path: Schmackofatz_v1.13.42+254_FINAL.zip
+          if-no-files-found: error
+          retention-days: 7
