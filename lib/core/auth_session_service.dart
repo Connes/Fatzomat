@@ -17,9 +17,14 @@ class AuthSessionService {
     if (existing != null) return existing;
     final future = _doRefreshSession(supabase);
     _refreshInFlight = future;
-    future.whenComplete(() {
-      if (identical(_refreshInFlight, future)) _refreshInFlight = null;
-    });
+    future.then<void>(
+      (_) {
+        if (identical(_refreshInFlight, future)) _refreshInFlight = null;
+      },
+      onError: (Object _, StackTrace __) {
+        if (identical(_refreshInFlight, future)) _refreshInFlight = null;
+      },
+    );
     return future;
   }
 
