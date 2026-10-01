@@ -119,6 +119,27 @@ async function authenticateUser(req: Request) {
   return error || !data.user ? null : data.user;
 }
 
+function normalizeSearchText(value: unknown): string {
+  return String(value ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\\u0300-\\u036f]/g, '');
+}
+
+function cuisineMatches(properties: Record<string, any>, cuisine: string): boolean {
+  const pattern = CUISINE_PATTERNS[cuisine];
+  if (!pattern) return true;
+  const terms = pattern.split('|').map((term) => normalizeSearchText(term)).filter(Boolean);
+  const searchable = [
+    properties.cuisine,
+    properties['cuisine:en'],
+    properties['cuisine:de'],
+    properties.osm_value,
+    properties.name,
+  ].map(normalizeSearchText).filter(Boolean).join(' ');
+  return terms.some((term) => searchable.includes(term));
+}
+
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const dy = 20 / 111.32;
   const dx = 20 / Math.max(111.32 * Math.cos(latitude * Math.PI / 180), 1);
@@ -144,7 +165,10 @@ async function queryPhoton(latitude: number, longitude: number, cuisine: string)
     if (!response.ok) throw new Error(`Photon HTTP ${response.status}`);
     const payload = await response.json();
     const features = Array.isArray(payload?.features) ? payload.features : [];
-    if (features.length) return features;
+    const matchingFeatures = features.filter((feature) =>
+      cuisineMatches((feature?.properties ?? {}) as Record<string, any>, cuisine),
+    );
+    if (matchingFeatures.length) return matchingFeatures;
   }
   return [];
 }
