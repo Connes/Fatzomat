@@ -11,7 +11,7 @@ void main() {
     final fixMigration = File('supabase/migrations/20260925120000_fix_decision_share_rpc.sql').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.37+249'));
+    expect(pubspec, contains('version: 1.13.38+250'));
     expect(home, contains("sendDecisionMessage(type: 'ask')"));
     expect(home, contains("'Entscheide Du'"));
     expect(home, isNot(contains("sendDecisionMessage(type: 'share')")));
