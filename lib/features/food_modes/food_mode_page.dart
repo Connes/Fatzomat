@@ -545,19 +545,39 @@ class _DiscoveryError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.location_off_rounded, size: 52),
-            const SizedBox(height: 16),
-            const Text('Suche nicht möglich', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 18),
-            FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Erneut versuchen')),
-          ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: AppSurface(
+            color: AppDesign.surface,
+            bordered: true,
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.location_off_rounded, size: 52),
+                const SizedBox(height: 16),
+                const Text(
+                  'Suche nicht möglich',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, height: 1.45),
+                ),
+                const SizedBox(height: 20),
+                FilledButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Erneut versuchen'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -574,19 +594,48 @@ class _DiscoveryEmpty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded, size: 52),
-            const SizedBox(height: 16),
-            Text('Keine passenden ${order ? 'Restaurants zum Bestellen' : 'Restaurants'} gefunden', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text('Für „$cuisine“ wurden innerhalb von 20 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.', textAlign: TextAlign.center),
-            const SizedBox(height: 18),
-            OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Erneut suchen')),
-          ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: AppSurface(
+            color: AppDesign.surface,
+            bordered: true,
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded,
+                  size: 52,
+                  color: AppDesign.primaryDark,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Keine passenden ${order ? 'Restaurants zum Bestellen' : 'Restaurants'} gefunden',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    height: 1.2,
+                    fontWeight: FontWeight.w800,
+                    color: AppDesign.text,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Für „$cuisine“ wurden innerhalb von 20 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.',
+                  style: const TextStyle(fontSize: 16, height: 1.45, color: AppDesign.text),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                OutlinedButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Erneut suchen'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
