@@ -126,8 +126,11 @@ void main() {
     final functionSource = File('supabase/functions/restaurant-discovery/index.ts').readAsStringSync();
     expect(functionSource, contains('PHOTON'));
     expect(functionSource, contains('delivery_filter'));
-    expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_only' : 'not_requested'"));
-    expect(functionSource, contains('if (deliveryOnly && !deliveryAvailable) continue;'));
+    expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested'"));
+    expect(functionSource, contains("if (deliveryOnly && delivery.status === 'not_available') continue;"));
+    expect(functionSource, contains("delivery_status: delivery.status"));
+    expect(functionSource, contains("return { available: false, status: 'unknown'"));
+    expect(functionSource, isNot(contains('deliveryRequested')));
     expect(functionSource, contains("deliveryOnly ? 'delivery' : 'all'"));
     expect(functionSource, contains('return json(payload, 200);'));
   });
