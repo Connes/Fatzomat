@@ -428,7 +428,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   Widget build(BuildContext context) {
     return TogetherScaffold(backgroundType: TogetherBackgroundType.recipes, 
       appBar: TogetherAppBar(
-        title: const Text('Unsere Rezepte'),
+        title: const Text('Meine Rezepte'),
         actions: [
           IconButton(
             tooltip: 'Rezept hinzufügen',
@@ -492,26 +492,27 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                       ),
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (value) => setState(() => query = value),
-                    decoration: InputDecoration(
-                      hintText: 'Rezepte suchen',
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      suffixIcon: query.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                searchController.clear();
-                                setState(() => query = '');
-                              },
-                              icon: const Icon(Icons.clear_rounded),
-                            ),
+                if (recipes.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) => setState(() => query = value),
+                      decoration: InputDecoration(
+                        hintText: 'Rezepte suchen',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        suffixIcon: query.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  searchController.clear();
+                                  setState(() => query = '');
+                                },
+                                icon: const Icon(Icons.clear_rounded),
+                              ),
+                      ),
                     ),
                   ),
-                ),
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: load,
