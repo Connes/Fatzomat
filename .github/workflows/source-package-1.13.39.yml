@@ -1,0 +1,32 @@
+name: Source package 1.13.39+251
+
+on:
+  push:
+    branches: ["tmp/package-1.13.39-251"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare source tree
+        run: |
+          rm -rf .git .dart_tool build package __pycache__
+          find . -type f \( -name '*.pyc' -o -name 'ci-upload.jks' -o -name 'key.properties' \) -delete
+          rm -f .github/workflows/source-package-1.13.39.yml
+          mkdir -p package
+      - name: Create and validate source ZIP
+        run: |
+          zip -qr package/Schmackofatz_v1.13.39+251_FINAL.zip . -x 'package/*'
+          unzip -tq package/Schmackofatz_v1.13.39+251_FINAL.zip
+          sha256sum package/Schmackofatz_v1.13.39+251_FINAL.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schmackofatz-source-v1.13.39-251-final
+          path: package/Schmackofatz_v1.13.39+251_FINAL.zip
+          if-no-files-found: error
+          retention-days: 7
