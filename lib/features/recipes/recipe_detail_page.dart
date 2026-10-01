@@ -125,6 +125,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
   Future<void> manageRecipeImage() async {
     if (recipe == null || working) return;
+    if (!repo.canManageRecipeImage(recipe!)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Das Rezeptbild kann nur von der Person geändert werden, die das Rezept erstellt hat.')),
+      );
+      return;
+    }
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -250,11 +256,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             onPressed: working ? null : exportRecipe,
             icon: const Icon(Icons.file_download_outlined),
           ),
-          IconButton(
-            tooltip: 'Rezeptbild verwalten',
-            onPressed: working ? null : manageRecipeImage,
-            icon: const Icon(Icons.add_photo_alternate_outlined),
-          ),
+          if (repo.canManageRecipeImage(recipe!))
+            IconButton(
+              tooltip: 'Rezeptbild verwalten',
+              onPressed: working ? null : manageRecipeImage,
+              icon: const Icon(Icons.add_photo_alternate_outlined),
+            ),
           IconButton(
             tooltip: 'Rezept bearbeiten',
             onPressed: working ? null : editRecipe,
