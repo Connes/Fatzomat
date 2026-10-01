@@ -8,7 +8,7 @@ void main() {
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
-    expect(pubspec, contains('version: 1.13.44+256'));
+    expect(pubspec, contains('version: 1.13.45+257'));
     expect(shell, contains('int index = 0;'));
     expect(shell, contains("NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'Heute')"));
     expect(shell, contains('const TodayPage()'));
