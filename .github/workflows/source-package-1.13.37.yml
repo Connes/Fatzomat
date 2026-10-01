@@ -1,6 +1,8 @@
 name: Source package 1.13.37+249
 
 on:
+  push:
+    branches: ["tmp/package-1.13.37-249"]
   workflow_dispatch:
 
 permissions:
