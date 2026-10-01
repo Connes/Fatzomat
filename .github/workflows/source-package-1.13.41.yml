@@ -1,0 +1,37 @@
+name: Source package 1.13.41+253
+
+on:
+  push:
+    branches: ["ci/quality-gates"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare source tree
+        run: |
+          rm -rf .git .dart_tool build package __pycache__
+          find . -type f \( -name '*.pyc' -o -name 'ci-upload.jks' -o -name 'key.properties' \) -delete
+          rm -f .github/workflows/source-package-1.13.41.yml
+          mkdir -p package
+      - name: Create and validate source ZIP
+        run: |
+          zip -qr package/Schmackofatz_v1.13.41+253_FINAL.zip . -x 'package/*'
+          unzip -tq package/Schmackofatz_v1.13.41+253_FINAL.zip
+          unzip -Z1 package/Schmackofatz_v1.13.41+253_FINAL.zip | grep -E '\.dart$|pubspec\.yaml|pubspec\.lock|supabase/functions/restaurant-discovery/index\.ts' | head -n 20
+          if unzip -Z1 package/Schmackofatz_v1.13.41+253_FINAL.zip | grep -E '(^|/)(\.dart_tool|build|__pycache__)(/|$)|\.pyc$|(^|/)(ci-upload\.jks|key\.properties)$'; then
+            echo "Forbidden generated or secret file found in ZIP" >&2
+            exit 1
+          fi
+          sha256sum package/Schmackofatz_v1.13.41+253_FINAL.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schmackofatz-source-v1.13.41-253-final
+          path: package/Schmackofatz_v1.13.41+253_FINAL.zip
+          if-no-files-found: error
+          retention-days: 7
