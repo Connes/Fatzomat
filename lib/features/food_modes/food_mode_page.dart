@@ -523,8 +523,10 @@ class _RestaurantListCard extends StatelessWidget {
             children: [
               if (result.city != null) Text(result.city!),
               Text(result.formattedDistance),
-              if (order && result.deliveryAvailable)
-                const Text('Lieferung laut Datenquelle verfügbar'),
+              if (order && result.deliveryVerified)
+                const Text('Lieferung laut Datenquelle verfügbar')
+              else if (order && result.deliveryUnknown)
+                const Text('Lieferung nicht verifiziert'),
             ],
           ),
         ),
