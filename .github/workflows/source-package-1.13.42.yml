@@ -1,6 +1,8 @@
 name: Source package 1.13.42
 
 on:
+  push:
+    branches: ["ci/quality-gates"]
   workflow_dispatch:
 
 permissions:
