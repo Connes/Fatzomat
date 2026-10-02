@@ -21,7 +21,9 @@ void main() {
     ).readAsStringSync();
 
     expect(repo, contains("select('image_path')"));
-    expect(repo, contains("storage.from(RecipeImageService.bucket).remove([imagePath])"));
+    expect(repo, contains('Future<void> _deleteImageIfUnreferenced(String path) async'));
+    expect(repo, contains('RecipeImageService(client: client).delete(normalized)'));
+    expect(repo, contains(".eq('image_path', normalized).limit(2)"));
     expect(repo, contains('if (removed) {'));
   });
 
