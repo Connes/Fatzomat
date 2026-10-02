@@ -45,7 +45,7 @@ void main() {
     expect(runApp, contains('configure_firebase_if_needed'));
     expect(firebaseOptions, contains('class DefaultFirebaseOptions'));
     expect(firebaseOptions, contains("projectId: String.fromEnvironment('FIREBASE_PROJECT_ID')"));
-    expect(firebaseOptions, contains("apiKey: '"));
+    expect(firebaseOptions, contains("apiKey: String.fromEnvironment('FIREBASE_API_KEY')"));
     expect(pushRepo, contains("register_push_device"));
     expect(pushRpc, contains('create or replace function public.register_push_device'));
   });
