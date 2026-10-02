@@ -7,17 +7,17 @@ const corsHeaders = {
 };
 
 const CUISINE_PATTERNS: Record<string, string> = {
-  Italienisch: 'italian|pizza',
-  Griechisch: 'greek',
-  Asiatisch: 'asian|chinese|thai|vietnamese|korean|japanese',
-  Indisch: 'indian',
-  Burger: 'burger|hamburger',
-  Mexikanisch: 'mexican',
-  Vegetarisch: 'vegetarian',
-  Sushi: 'sushi|japanese',
-  Pizza: 'pizza|italian',
-  Döner: 'kebab|doner|turkish',
-  Steak: 'steak|grill|beef',
+  Italienisch: 'italian|italienisch|pizza|pizzeria|pasta|trattoria|ristorante|osteria',
+  Griechisch: 'greek|griechisch|taverna|taverne',
+  Asiatisch: 'asian|asiatisch|chinese|chinesisch|thai|thailand|vietnamese|vietnamesisch|korean|koreanisch|japanese|japanisch|indonesian|indonesisch',
+  Indisch: 'indian|indisch',
+  Burger: 'burger|hamburger|american|diner|smashburger|smash burger',
+  Mexikanisch: 'mexican|mexikanisch|taco|tacos|burrito|enchilada|fajita|quesadilla|tex-mex|tex mex',
+  Vegetarisch: 'vegetarian|vegetarisch|veggie|vegan|plant-based|plant based|pflanzenbasiert',
+  Sushi: 'sushi|japanese|japanisch|sushibar|sushi bar|maki|nigiri',
+  Pizza: 'pizza|pizzeria|italian|italienisch',
+  Döner: 'kebab|doner|döner|turkish|türkisch',
+  Steak: 'steak|steakhouse|steak house|steakhaus|grill|grillhouse|grillhaus|beef',
 };
 
 const PHOTON_ENDPOINT = 'https://photon.komoot.io/api/';
@@ -83,21 +83,21 @@ function cacheKey(latitude: number, longitude: number, cuisine: string, delivery
   return [latitude.toFixed(4), longitude.toFixed(4), cuisine.toLowerCase(), deliveryOnly ? 'delivery' : 'all'].join('|');
 }
 
-function photonQuery(cuisine: string): string {
-  const queries: Record<string, string> = {
-    Pizza: 'pizza restaurant',
-    Burger: 'burger restaurant',
-    Asiatisch: 'asian restaurant',
-    Döner: 'kebab restaurant',
-    Sushi: 'sushi restaurant',
-    Indisch: 'indian restaurant',
-    Italienisch: 'italian restaurant',
-    Griechisch: 'greek restaurant',
-    Mexikanisch: 'mexican restaurant',
-    Vegetarisch: 'vegetarian restaurant',
-    Steak: 'steak restaurant',
+function photonQueries(cuisine: string): string[] {
+  const queries: Record<string, string[]> = {
+    Pizza: ['pizza restaurant', 'pizzeria'],
+    Burger: ['burger restaurant', 'hamburger restaurant', 'american diner'],
+    Asiatisch: ['asian restaurant', 'chinese restaurant', 'thai restaurant', 'vietnamese restaurant', 'korean restaurant', 'japanese restaurant'],
+    Döner: ['kebab restaurant', 'doner restaurant', 'turkish restaurant'],
+    Sushi: ['sushi restaurant', 'japanese restaurant'],
+    Indisch: ['indian restaurant'],
+    Italienisch: ['italian restaurant', 'pizzeria', 'trattoria', 'ristorante'],
+    Griechisch: ['greek restaurant', 'taverna'],
+    Mexikanisch: ['mexican restaurant', 'taco restaurant', 'burrito restaurant'],
+    Vegetarisch: ['vegetarian restaurant', 'vegan restaurant', 'veggie restaurant'],
+    Steak: ['steak restaurant', 'steakhouse', 'grill restaurant'],
   };
-  return queries[cuisine] ?? 'restaurant';
+  return queries[cuisine] ?? ['restaurant'];
 }
 
 async function authenticateUser(req: Request) {
@@ -143,7 +143,9 @@ function cuisineMatches(properties: Record<string, any>, cuisine: string): boole
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const dy = 20 / 111.32;
   const dx = 20 / Math.max(111.32 * Math.cos(latitude * Math.PI / 180), 1);
-  const queries = [...new Set([photonQuery(cuisine), 'restaurant'])];
+  const queries = [...new Set([...photonQueries(cuisine), 'restaurant'])];
+  const collected: any[] = [];
+  const seen = new Set<string>();
 
   for (const query of queries) {
     const params = new URLSearchParams({
@@ -165,12 +167,18 @@ async function queryPhoton(latitude: number, longitude: number, cuisine: string)
     if (!response.ok) throw new Error(`Photon HTTP ${response.status}`);
     const payload = await response.json();
     const features = Array.isArray(payload?.features) ? payload.features : [];
-    const matchingFeatures = features.filter((feature) =>
-      cuisineMatches((feature?.properties ?? {}) as Record<string, any>, cuisine),
-    );
-    if (matchingFeatures.length) return matchingFeatures;
+    for (const feature of features) {
+      if (!cuisineMatches((feature?.properties ?? {}) as Record<string, any>, cuisine)) continue;
+      const properties = (feature?.properties ?? {}) as Record<string, any>;
+      const coordinates = feature?.geometry?.coordinates;
+      const key = [String(properties.name ?? '').trim().toLowerCase(), String(coordinates?.[0] ?? ''), String(coordinates?.[1] ?? '')].join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      collected.push(feature);
+    }
+    if (collected.length >= 50) break;
   }
-  return [];
+  return collected;
 }
 
 function buildResultsFromPhoton(features: any[], latitude: number, longitude: number, limit: number, deliveryOnly: boolean) {
@@ -221,8 +229,8 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
 
 function overpassQuery(latitude: number, longitude: number, cuisine: string): string {
   const pattern = CUISINE_PATTERNS[cuisine];
-  const cuisineFilter = pattern ? `[cuisine~"${pattern}",i]` : '';
-  const nameFilter = pattern ? `[name~"${pattern}",i]` : '';
+  const cuisineFilter = pattern ? `[cuisine~"^(${pattern})$",i]` : '';
+  const nameFilter = pattern ? `[name~"(${pattern})",i]` : '';
   const selector = pattern
       ? `(nwr[amenity~"^(restaurant|fast_food)$",i][name]${cuisineFilter}(around:20000,${latitude},${longitude});nwr[amenity~"^(restaurant|fast_food)$",i][name]${nameFilter}(around:20000,${latitude},${longitude}););`
       : `nwr[amenity~"^(restaurant|fast_food)$",i][name](around:20000,${latitude},${longitude});`;
