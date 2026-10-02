@@ -70,3 +70,5 @@ jobs:
           name: Fatzomat-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
+
+# CI lockfile is synchronized on main.
