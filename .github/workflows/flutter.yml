@@ -2,7 +2,9 @@ name: Flutter quality gate
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches:
+      - main
+      - develop
   pull_request:
 
 permissions:
@@ -11,57 +13,60 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.47.2'
+          flutter-version: "3.47.2"
           channel: stable
           cache: true
-      - name: Verify repository hygiene
+
+      - name: Repository hygiene
         run: ./scripts/check_repository.sh
-      - name: Verify reproducible dependency state
+
+      - name: Dependencies
         run: flutter pub get --enforce-lockfile
+
       - name: Analyze
         run: flutter analyze
+
       - name: Test
         run: flutter test
-      - name: Build Android debug artifact
+
+      - name: Build debug APK
         run: flutter build apk --debug
 
-      - name: Upload Android debug APK
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Fatzomat-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+
       - name: Configure temporary CI release signing
         run: |
-          keytool -genkeypair -v \
-            -keystore android/ci-upload.jks \
-            -storepass changeit \
-            -keypass changeit \
-            -alias ci-upload \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 1 \
-            -dname "CN=Schmackofatz CI, OU=CI, O=Schmackofatz, C=DE"
+          keytool -genkeypair -v             -keystore android/ci-upload.jks             -storepass changeit             -keypass changeit             -alias ci-upload             -keyalg RSA             -keysize 2048             -validity 1             -dname "CN=Schmackofatz CI, OU=CI, O=Schmackofatz, C=DE"
           cat > android/key.properties <<'EOF'
-storeFile=ci-upload.jks
-storePassword=changeit
-keyAlias=ci-upload
-keyPassword=changeit
-EOF
-      - name: Upload Android release APK
+          storeFile=ci-upload.jks
+          storePassword=changeit
+          keyAlias=ci-upload
+          keyPassword=changeit
+          EOF
+
+      - name: Build release APK
+        env:
+          SUPABASE_URL: https://ci.invalid.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+        run: |
+          flutter build apk --release             --dart-define=SUPABASE_URL=$SUPABASE_URL             --dart-define=SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY
+
+      - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
           name: Fatzomat-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Build Android release configuration check
-        env:
-          SUPABASE_URL: https://ci.invalid.supabase.co
-          SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
-        run: >-
-          flutter build apk --release
-          --dart-define=SUPABASE_URL=$SUPABASE_URL
-          --dart-define=SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY
+          if-no-files-found: error
