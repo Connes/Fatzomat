@@ -130,6 +130,10 @@ void main() {
     expect(functionSource, contains('if (deliveryOnly && !deliveryAvailable) continue;'));
     expect(functionSource, contains("deliveryOnly ? 'delivery' : 'all'"));
     expect(functionSource, contains('return json(payload, 200);'));
+    expect(functionSource, contains('Prefer Overpass for the actual result payload'));
+    expect(functionSource.indexOf('buildResultsFromOverpass('), lessThan(functionSource.indexOf('buildResultsFromPhoton(')));
+    expect(functionSource, contains("tags.phone ?? tags['contact:phone']"));
+    expect(functionSource, contains("tags.website ?? tags['contact:website']"));
   });
 
 }
