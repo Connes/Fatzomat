@@ -7,8 +7,9 @@ void main() {
     final source = File('lib/features/recipes/recipe_detail_page.dart').readAsStringSync();
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
 
-    expect(source, contains('if (personalTodaySelected) ...['));
     expect(source, contains('bool get canWorkOnPreparation => personalTodaySelected;'));
+    expect(source, contains('initiallyExpanded: ingredientsExpanded'));
+    expect(source, contains('initiallyExpanded: preparationExpanded'));
     expect(source, contains('if (!canWorkOnPreparation) return false;'));
     expect(source, contains('return index == completedSteps.length;'));
     expect(source, contains('if (done) return index == completedSteps.length - 1;'));

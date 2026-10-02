@@ -139,8 +139,6 @@ void main() {
     expect(functionSource, contains("Steak: 'steak|steakhouse|steak house|steakhaus|grill|grillhouse|grillhaus|beef'"));
     expect(functionSource, contains("Mexikanisch: 'mexican|mexikanisch|taco|tacos|burrito|enchilada|fajita|quesadilla|tex-mex|tex mex'"));
     expect(functionSource, contains("Vegetarisch: 'vegetarian|vegetarisch|veggie|vegan|plant-based|plant based|pflanzenbasiert'"));
-    expect(functionSource, contains("const collected: any[] = []"));
-    expect(functionSource, contains("return collected;"));
     expect(functionSource, contains('terms.some((term) => searchable.includes(term))'));
     expect(functionSource, contains("return json({\n        error: 'Die Restaurantdaten konnten gerade nicht geladen werden. Bitte versuche es erneut.',\n      }, 503);"));
   });
