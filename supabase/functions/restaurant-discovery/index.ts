@@ -133,6 +133,15 @@ function normalizeSearchText(value: unknown): string {
 }
 
 function cuisineMatches(properties: Record<string, any>, cuisine: string): boolean {
+  // OSM models dietary suitability independently from cuisine. For the
+  // vegetarian category, a positive vegetarian or vegan diet tag is therefore
+  // a first-class match and not merely a name/cuisine keyword.
+  if (cuisine === 'Vegetarisch') {
+    const vegetarian = normalizeSearchText(properties['diet:vegetarian']);
+    const vegan = normalizeSearchText(properties['diet:vegan']);
+    if (/^(yes|only)$/.test(vegetarian) || /^(yes|only)$/.test(vegan)) return true;
+  }
+
   const pattern = CUISINE_PATTERNS[cuisine];
   if (!pattern) return true;
   const terms = pattern.split('|').map((term) => normalizeSearchText(term)).filter(Boolean);
@@ -252,9 +261,20 @@ function overpassQuery(latitude: number, longitude: number, cuisine: string): st
   const pattern = CUISINE_PATTERNS[cuisine];
   const cuisineFilter = pattern ? `[cuisine~"${pattern}",i]` : '';
   const nameFilter = pattern ? `[name~"${pattern}",i]` : '';
+  const base = `nwr[amenity~"^(restaurant|fast_food)$",i][name]`;
+  const around = `(around:20000,${latitude},${longitude})`;
+
+  if (cuisine === 'Vegetarisch') {
+    // Include restaurants explicitly tagged as vegetarian/vegan even when
+    // neither cuisine nor name contains a vegetarian keyword.
+    const dietFilter = `[diet:vegetarian~"^(yes|only)$",i]`;
+    const veganFilter = `[diet:vegan~"^(yes|only)$",i]`;
+    return `[out:json][timeout:12];(${base}${cuisineFilter}${around};${base}${nameFilter}${around};${base}${dietFilter}${around};${base}${veganFilter}${around};);out center tags;`;
+  }
+
   const selector = pattern
-      ? `(nwr[amenity~"^(restaurant|fast_food)$",i][name]${cuisineFilter}(around:20000,${latitude},${longitude});nwr[amenity~"^(restaurant|fast_food)$",i][name]${nameFilter}(around:20000,${latitude},${longitude}););`
-      : `nwr[amenity~"^(restaurant|fast_food)$",i][name](around:20000,${latitude},${longitude});`;
+      ? `(${base}${cuisineFilter}${around};${base}${nameFilter}${around};);`
+      : `${base}${around};`;
   return `[out:json][timeout:12];${selector}out center tags;`;
 }
 
