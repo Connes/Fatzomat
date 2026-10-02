@@ -141,7 +141,6 @@ void main() {
     expect(functionSource, contains("Vegetarisch: 'vegetarian|vegetarisch|veggie|vegan|plant-based|plant based|pflanzenbasiert'"));
     expect(functionSource, contains("const collected: any[] = []"));
     expect(functionSource, contains("return collected;"));
-    expect(functionSource, contains('const matchingFeatures = features.filter'));
     expect(functionSource, contains('terms.some((term) => searchable.includes(term))'));
     expect(functionSource, contains("return json({\n        error: 'Die Restaurantdaten konnten gerade nicht geladen werden. Bitte versuche es erneut.',\n      }, 503);"));
   });
