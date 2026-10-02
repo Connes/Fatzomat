@@ -26,7 +26,7 @@ jobs:
           cache: true
 
       - name: Repository hygiene
-        run: ./scripts/check_repository.sh
+        run: bash scripts/check_repository.sh
 
       - name: Dependencies
         run: flutter pub get --enforce-lockfile
