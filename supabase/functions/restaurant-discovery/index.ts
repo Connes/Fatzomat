@@ -7,17 +7,19 @@ const corsHeaders = {
 };
 
 const CUISINE_PATTERNS: Record<string, string> = {
-  Italienisch: 'italian|pizza',
-  Griechisch: 'greek',
-  Asiatisch: 'asian|chinese|thai|vietnamese|korean|japanese',
-  Indisch: 'indian',
-  Burger: 'burger|hamburger',
-  Mexikanisch: 'mexican',
-  Vegetarisch: 'vegetarian',
-  Sushi: 'sushi|japanese',
-  Pizza: 'pizza|italian',
-  Döner: 'kebab|doner|turkish',
-  Steak: 'steak|grill|beef',
+  // Match established OSM cuisine values plus common dish/style terms that
+  // frequently appear in cuisine tags or restaurant names.
+  Italienisch: 'italian|italian_pizza|pizza|pasta|pizzeria|piadina|risotto|lasagne|gnocchi|trattoria|ristorante',
+  Griechisch: 'greek|gyros|souvlaki|tzatziki|moussaka|meze|mezze|taverna',
+  Asiatisch: 'asian|chinese|thai|vietnamese|korean|japanese|indonesian|malaysian|indian|ramen|udon|soba|noodle|rice_noodle|dumpling|hotpot|wok',
+  Indisch: 'indian|curry|tandoori|naan|masala|biryani|samosa|dal|vindaloo',
+  Burger: 'burger|hamburger|cheeseburger|smashburger|burgerhouse|burgerrestaurant',
+  Mexikanisch: 'mexican|taco|tacos|burrito|quesadilla|enchilada|nachos|fajita|guacamole|salsa|chili',
+  Vegetarisch: 'vegetarian|vegan|plant_based|veggie|vegetarian_restaurant|vegan_restaurant',
+  Sushi: 'sushi|japanese|sashimi|maki|nigiri|ramen|udon|soba|yakitori|takoyaki|poke',
+  Pizza: 'pizza|italian_pizza|pizzeria|margherita|calzone|focaccia',
+  Döner: 'kebab|doner|döner|turkish|gyro|gyros|shawarma|dürüm|durum|falafel|lahmacun|pide|kofte|köfte',
+  Steak: 'steak|steak_house|grill|beef|bbq|barbecue|roast|churrasco',
 };
 
 const PHOTON_ENDPOINT = 'https://photon.komoot.io/';
@@ -98,8 +100,8 @@ function photonQuery(cuisine: string): string {
     Italienisch: 'italian restaurant',
     Griechisch: 'greek restaurant',
     Mexikanisch: 'mexican restaurant',
-    Vegetarisch: 'vegetarian restaurant',
-    Steak: 'steak restaurant',
+    Vegetarisch: 'vegetarian vegan restaurant',
+    Steak: 'steak grill restaurant',
   };
   return queries[cuisine] ?? 'restaurant';
 }
