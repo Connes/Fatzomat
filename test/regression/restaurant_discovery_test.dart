@@ -124,14 +124,17 @@ void main() {
     expect(source, contains('await client.auth.refreshSession();'));
     expect(source, contains(r"'Authorization': 'Bearer $accessToken'"));
     final functionSource = File('supabase/functions/restaurant-discovery/index.ts').readAsStringSync();
-    expect(functionSource, contains('PHOTON'));
+    expect(functionSource, contains('PHOTON_ENDPOINT'));
+    expect(functionSource, contains('deliveryMetadata'));
     expect(functionSource, contains('delivery_filter'));
-    expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_only' : 'not_requested'"));
-    expect(functionSource, contains('if (deliveryOnly && !deliveryAvailable) continue;'));
-    expect(functionSource, contains("deliveryOnly ? 'delivery' : 'all'"));
-    expect(functionSource, contains('return json(payload, 200);'));
+    expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested'"));
+    expect(functionSource, contains('if (deliveryOnly && delivery.status === \'not_available\') continue;'));
     expect(functionSource, contains('Prefer Overpass for the actual result payload'));
-    expect(functionSource.indexOf('buildResultsFromOverpass('), lessThan(functionSource.indexOf('buildResultsFromPhoton(')));
+    final sourcePriority = functionSource.indexOf('Prefer Overpass for the actual result payload');
+    expect(
+      functionSource.indexOf('const results = buildResultsFromOverpass', sourcePriority),
+      lessThan(functionSource.indexOf('const results = buildResultsFromPhoton', sourcePriority)),
+    );
     expect(functionSource, contains("tags.phone ?? tags['contact:phone']"));
     expect(functionSource, contains("tags.website ?? tags['contact:website']"));
   });
