@@ -10,7 +10,8 @@ void main() {
   test('personal Today repository carries the optional recipe image and history', () {
     final repo = read('lib/data/repositories/personal_today_repository.dart');
     expect(repo, contains('personal_decision_history'));
-    expect(repo, contains('recipes(name,description,servings,image_url)'));
+    expect(repo, contains('recipes(name,description,servings,image_url,image_path)'));
+    expect(repo, contains('recipes(name,image_url,image_path)'));
   });
 
   test('personal Today RLS requires owned or saved recipe access', () {
