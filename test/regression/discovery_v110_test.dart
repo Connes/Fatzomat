@@ -38,6 +38,7 @@ class _Repository implements RestaurantDiscoveryRepository {
         latitude: 48.90,
         longitude: 8.70,
         deliveryAvailable: delivery,
+        deliveryStatus: delivery ? 'verified' : 'unknown',
         phone: '+497231123',
         website: Uri.parse('https://example.com'),
         orderUri: delivery ? Uri.parse('https://example.com/order') : null,
