@@ -12,7 +12,10 @@ void main() {
     expect(source, contains('return index == completedSteps.length;'));
     expect(source, contains('if (done) return index == completedSteps.length - 1;'));
     expect(source, contains('onTap: working || markingCooked || !enabled ? null : () => toggleStep(i)'));
-    expect(source, contains('ExpansionTile('));
+    expect(source, contains("Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const TodayPage()), (route) => route.isFirst)"));
+    expect(source, isNot(contains("title: 'Portionen'")));
+    expect(source, isNot(contains('Schritten erledigt')));
+    expect(source, contains("status == 'cooked'"));
     expect(source, contains("title: const Text('Zutaten'"));
     expect(source, contains("title: const Text('Zubereitung'"));
   });

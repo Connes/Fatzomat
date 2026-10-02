@@ -137,7 +137,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       }
       await personalToday.updateStatus(plan.id, 'cooked');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Als gekocht markiert. Guten Appetit!')));
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const TodayPage()), (route) => route.isFirst);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
     } finally {
@@ -354,12 +354,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
           const SizedBox(height: 24),
           AppSurface(
-            color: AppDesign.background.withValues(alpha: .94),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: SectionHeader(title: 'Portionen', subtitle: 'Die Mengen passen sich automatisch an.'),
-          ),
-          const SizedBox(height: 10),
-          AppSurface(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             child: Row(
               children: [
@@ -454,11 +448,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     ),
                   );
                 }),
-                if (steps.isNotEmpty)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('${completedSteps.length} von ${steps.length} Schritten erledigt', style: Theme.of(context).textTheme.bodySmall),
-                  ),
               ],
             ),
           ),

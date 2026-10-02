@@ -564,6 +564,23 @@ class _TodayResultCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+            if (plan.status == 'cooked')
+              Container(
+                margin: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppDesign.secondarySurface,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle_rounded, size: 20),
+                    SizedBox(width: 8),
+                    Text('Gekocht', style: TextStyle(fontWeight: FontWeight.w800)),
+                  ],
+                ),
+              ),
             if (plan.isSharedAccepted)
               SizedBox(
                 width: double.infinity,
