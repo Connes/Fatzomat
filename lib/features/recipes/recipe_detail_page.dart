@@ -111,7 +111,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   bool canToggleStep(int index) {
     if (!canWorkOnPreparation) return false;
     final done = completedSteps.contains(index);
-    if (done) return completedSteps.every((step) => step <= index);
+    if (done) return index == completedSteps.length - 1;
     return index == completedSteps.length;
   }
 
