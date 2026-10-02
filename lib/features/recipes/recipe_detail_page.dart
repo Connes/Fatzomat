@@ -40,6 +40,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   int servings = 2;
   final Set<int> completedSteps = <int>{};
   bool markingCooked = false;
+  bool ingredientsExpanded = false;
+  bool preparationExpanded = false;
 
   @override void initState() { super.initState(); load(); }
   Future<void> load() async {
@@ -102,6 +104,26 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     } finally {
       if (mounted) setState(() => working = false);
     }
+  }
+
+  bool get canWorkOnPreparation => personalTodaySelected;
+
+  bool canToggleStep(int index) {
+    if (!canWorkOnPreparation) return false;
+    final done = completedSteps.contains(index);
+    if (done) return completedSteps.every((step) => step <= index);
+    return index == completedSteps.length;
+  }
+
+  void toggleStep(int index) {
+    if (!canToggleStep(index)) return;
+    setState(() {
+      if (completedSteps.contains(index)) {
+        completedSteps.remove(index);
+      } else {
+        completedSteps.add(index);
+      }
+    });
   }
 
   Future<void> markCooked() async {
@@ -347,30 +369,33 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               ],
             ),
           ),
-          const SizedBox(height: 26),
+          const SizedBox(height: 18),
           AppSurface(
-            color: AppDesign.background.withValues(alpha: .94),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: const SectionHeader(title: 'Zutaten'),
-          ),
-          const SizedBox(height: 10),
-          AppSurface(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
+            padding: EdgeInsets.zero,
+            child: ExpansionTile(
+              initiallyExpanded: ingredientsExpanded,
+              onExpansionChanged: (expanded) => setState(() => ingredientsExpanded = expanded),
+              tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+              title: const Text('Zutaten', style: TextStyle(fontWeight: FontWeight.w800)),
+              subtitle: const Text('Mengen für die aktuelle Portionszahl'),
               children: [
                 ..._groupIngredients(ingredients).expand((group) => [
                   if (group.$1 != null) Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 4),
-                    child: Text(group.$1!, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                    padding: const EdgeInsets.only(top: 4, bottom: 2),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(group.$1!, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                    ),
                   ),
                   ...group.$2.map((i) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(padding: EdgeInsets.only(top: 7), child: Icon(Icons.circle, size: 7, color: AppDesign.primary)),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text('${i.isQualitative ? '' : '${formatQuantity(scaled(i.quantity))} '}${i.unit} ${i.name}', style: Theme.of(context).textTheme.bodyLarge)),
+                        const Padding(padding: EdgeInsets.only(top: 6), child: Icon(Icons.circle, size: 6, color: AppDesign.primary)),
+                        const SizedBox(width: 10),
+                        Expanded(child: Text('${i.isQualitative ? '' : '${formatQuantity(scaled(i.quantity))} '}${i.unit} ${i.name}', style: Theme.of(context).textTheme.bodyMedium)),
                       ],
                     ),
                   )),
@@ -378,60 +403,65 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               ],
             ),
           ),
-          const SizedBox(height: 26),
+          const SizedBox(height: 12),
           AppSurface(
-            color: AppDesign.background.withValues(alpha: .94),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: SectionHeader(title: 'Zubereitung', subtitle: 'Tippe auf einen Schritt, wenn er erledigt ist.'),
-          ),
-          const SizedBox(height: 10),
-          if (steps.isNotEmpty) ...[
-            ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: completedSteps.length / steps.length, minHeight: 7)),
-            const SizedBox(height: 12),
-          ],
-          ...List.generate(steps.length, (i) {
-            final done = completedSteps.contains(i);
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Material(
-                color: done ? AppDesign.secondarySurface : AppDesign.surface,
-                borderRadius: BorderRadius.circular(18),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: working || markingCooked ? null : () => setState(() {
-                    if (done) {
-                      completedSteps.remove(i);
-                    } else {
-                      completedSteps.add(i);
-                    }
-                  }),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: done ? AppDesign.secondarySurface : AppDesign.divider)),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(color: done ? AppDesign.primary : AppDesign.softSurface, shape: BoxShape.circle),
-                          child: Center(child: done ? const Icon(Icons.check_rounded, color: Colors.white, size: 19) : Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w700))),
+            padding: EdgeInsets.zero,
+            child: ExpansionTile(
+              initiallyExpanded: preparationExpanded,
+              onExpansionChanged: (expanded) => setState(() => preparationExpanded = expanded),
+              tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              title: const Text('Zubereitung', style: TextStyle(fontWeight: FontWeight.w800)),
+              subtitle: Text(canWorkOnPreparation ? 'Schritte nur in Reihenfolge abstreichen' : 'Nur möglich, wenn das Rezept für heute ausgewählt ist'),
+              children: [
+                if (steps.isNotEmpty) ...[
+                  ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: completedSteps.length / steps.length, minHeight: 6)),
+                  const SizedBox(height: 10),
+                ],
+                ...List.generate(steps.length, (i) {
+                  final done = completedSteps.contains(i);
+                  final enabled = canToggleStep(i);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Material(
+                      color: done ? AppDesign.secondarySurface : AppDesign.surface,
+                      borderRadius: BorderRadius.circular(14),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: working || markingCooked || !enabled ? null : () => toggleStep(i),
+                        child: Opacity(
+                          opacity: enabled || done ? 1 : .5,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: done ? AppDesign.secondarySurface : AppDesign.divider)),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  width: 30,
+                                  height: 30,
+                                  decoration: BoxDecoration(color: done ? AppDesign.primary : AppDesign.softSurface, shape: BoxShape.circle),
+                                  child: Center(child: done ? const Icon(Icons.check_rounded, color: Colors.white, size: 18) : Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w700))),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(child: Text(steps[i].toString(), style: Theme.of(context).textTheme.bodyMedium?.copyWith(decoration: done ? TextDecoration.lineThrough : null, color: done ? AppDesign.secondaryText : AppDesign.text))),
+                              ],
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text(steps[i].toString(), style: Theme.of(context).textTheme.bodyLarge?.copyWith(decoration: done ? TextDecoration.lineThrough : null, color: done ? AppDesign.secondaryText : AppDesign.text))),
-                      ],
+                      ),
                     ),
+                  );
+                }),
+                if (steps.isNotEmpty)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('${completedSteps.length} von ${steps.length} Schritten erledigt', style: Theme.of(context).textTheme.bodySmall),
                   ),
-                ),
-              ),
-            );
-          }),
-          if (steps.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text('${completedSteps.length} von ${steps.length} Schritten erledigt', style: Theme.of(context).textTheme.bodyMedium),
+              ],
             ),
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -460,8 +490,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       )
                     else
                       SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: working ? null : selectPersonalToday, icon: const Icon(Icons.today_rounded), label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen'))),
-                    const SizedBox(height: 8),
-                    SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: markingCooked ? null : markCooked, icon: markingCooked ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_circle_outline), label: Text(markingCooked ? 'Wird gespeichert …' : 'Als gekocht markieren'))),
+                    if (personalTodaySelected) ...[
+                      const SizedBox(height: 8),
+                      SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: markingCooked ? null : markCooked, icon: markingCooked ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_circle_outline), label: Text(markingCooked ? 'Wird gespeichert …' : 'Als gekocht markieren'))),
+                    ],
                   ],
                 ),
               ),
