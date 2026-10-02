@@ -7,7 +7,7 @@ String source(String path) => File(path).readAsStringSync();
 void main() {
   test('V85 bumps the app version and covers the critical flow surfaces', () {
     final pubspec = source('pubspec.yaml');
-    expect(pubspec, contains('version: 1.13.46+261'));
+    expect(pubspec, contains('version: 1.13.46+262'));
 
     final criticalPages = <String, String>{
       'lib/features/home/home_page.dart': 'Home',
