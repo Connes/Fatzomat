@@ -145,6 +145,7 @@ void main() {
     expect(functionSource, isNot(contains("const nameFilter")));
     expect(functionSource, isNot(contains("const searchable =")));
     expect(functionSource, contains("PHOTON_ENDPOINT + 'api/?'"));
+    expect(functionSource, isNot(contains("radius: '10'")));
     expect(functionSource, contains("[cuisine~\"(' + cuisinePattern + ')\",i]"));
     expect(functionSource, contains('cuisineSearchFallbackMatches'));
     expect(functionSource, contains('Never inspect the name here'));
