@@ -113,9 +113,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dieses Rezept ist heute nicht eingeplant.')));
         return;
       }
-      await personalToday.updateStatus(plan.id, 'cooked');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Als gekocht markiert. Guten Appetit!')));
+      final updated = await personalToday.updateStatus(plan.id, 'cooked');
+      if (!updated || !mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const TodayPage()),
+      );
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
     } finally {
@@ -329,23 +332,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Text(recipe!.description, style: Theme.of(context).textTheme.bodyLarge),
           ),
-          const SizedBox(height: 24),
-          AppSurface(
-            color: AppDesign.background.withValues(alpha: .94),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: SectionHeader(title: 'Portionen', subtitle: 'Die Mengen passen sich automatisch an.'),
-          ),
-          const SizedBox(height: 10),
-          AppSurface(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            child: Row(
-              children: [
-                IconButton(tooltip: 'Weniger Portionen', onPressed: servings > 1 ? () => setState(() => servings--) : null, icon: const Icon(Icons.remove_circle_outline)),
-                Expanded(child: Text('$servings Personen', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium)),
-                IconButton(tooltip: 'Mehr Portionen', onPressed: servings < 12 ? () => setState(() => servings++) : null, icon: const Icon(Icons.add_circle_outline)),
-              ],
-            ),
-          ),
           const SizedBox(height: 26),
           AppSurface(
             color: AppDesign.background.withValues(alpha: .94),
@@ -426,11 +412,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               ),
             );
           }),
-          if (steps.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text('${completedSteps.length} von ${steps.length} Schritten erledigt', style: Theme.of(context).textTheme.bodyMedium),
-            ),
         ],
       ),
       bottomNavigationBar: SafeArea(
