@@ -196,7 +196,7 @@ function cuisineSearchFallbackMatches(properties: Record<string, any>, cuisine: 
 
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const params = new URLSearchParams({
-    q: photonQuery(cuisine), lat: String(latitude), lon: String(longitude), radius: '10', limit: '50', lang: 'de',
+    q: photonQuery(cuisine), lat: String(latitude), lon: String(longitude), limit: '50', lang: 'de',
   });
   const response = await fetch(PHOTON_ENDPOINT + 'api/?' + params.toString(), {
     method: 'GET',
