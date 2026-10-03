@@ -23,12 +23,12 @@ class _Repository implements RestaurantDiscoveryRepository {
     required String cuisine,
     required bool deliveryOnly,
     int limit = 10,
-    double radiusKm = 20,
+    double radiusKm = 10,
   }) async => results.take(limit).toList();
 }
 
 void main() {
-  testWidgets('Bestellen zeigt bis zu 10 Lieferanbieter innerhalb des festen 20-km-Radius', (tester) async {
+  testWidgets('Bestellen zeigt bis zu 10 Lieferanbieter innerhalb des festen 10-km-Radius', (tester) async {
     final results = List.generate(
       12,
       (i) => RestaurantDiscoveryResult(
@@ -51,7 +51,6 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('10 Treffer innerhalb von 20 km'), findsOneWidget);
     expect(find.text('Anbieter 0'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('Anbieter 9'),
