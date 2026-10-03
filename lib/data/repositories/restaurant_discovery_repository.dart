@@ -16,7 +16,7 @@ abstract class RestaurantDiscoveryRepository {
     required String cuisine,
     required bool deliveryOnly,
     int limit = 10,
-    double radiusKm = 20,
+    double radiusKm = 10,
   });
 }
 
@@ -33,13 +33,13 @@ class SupabaseRestaurantDiscoveryRepository implements RestaurantDiscoveryReposi
     required String cuisine,
     required bool deliveryOnly,
     int limit = 10,
-    double radiusKm = 20,
+    double radiusKm = 10,
   }) async {
     if (client.auth.currentUser == null) {
       throw const RestaurantDiscoveryException('Keine persönliche Sitzung verfügbar.');
     }
-    if (radiusKm != 20) {
-      throw const RestaurantDiscoveryException('Die Restaurantsuche unterstützt derzeit ausschließlich den 20-km-Radius.');
+    if (radiusKm != 10) {
+      throw const RestaurantDiscoveryException('Die Restaurantsuche unterstützt derzeit ausschließlich den 10-km-Radius.');
     }
 
     try {
@@ -71,7 +71,7 @@ class SupabaseRestaurantDiscoveryRepository implements RestaurantDiscoveryReposi
           'cuisine': cuisine,
           'delivery_only': deliveryOnly,
           'limit': limit.clamp(1, 10),
-          'radius_km': 20,
+          'radius_km': 10,
         },
       );
 
@@ -90,7 +90,7 @@ class SupabaseRestaurantDiscoveryRepository implements RestaurantDiscoveryReposi
       return results
           .whereType<Map>()
           .map((row) => RestaurantDiscoveryResult.fromMap(Map<String, dynamic>.from(row)))
-          .where((item) => item.name.trim().isNotEmpty && item.distanceKm <= 20.0001)
+          .where((item) => item.name.trim().isNotEmpty && item.distanceKm <= 10.0001)
           .take(10)
           .toList(growable: false);
     } on FunctionException catch (e) {
