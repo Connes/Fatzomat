@@ -144,6 +144,10 @@ void main() {
     );
     expect(functionSource, contains("tags.phone ?? tags['contact:phone']"));
     expect(functionSource, contains("tags.website ?? tags['contact:website']"));
+
+    final configSource = File('supabase/config.toml').readAsStringSync();
+    expect(configSource, contains('[functions.restaurant-discovery]'));
+    expect(configSource, contains('verify_jwt = false'));
   });
 
 }
