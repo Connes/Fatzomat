@@ -69,6 +69,34 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): num
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function contactPhone(properties: Record<string, any>): string | null {
+  const candidates = [
+    properties.phone,
+    properties['contact:phone'],
+    properties['contact:mobile'],
+    properties['phone:mobile'],
+  ];
+  for (const value of candidates) {
+    const text = String(value ?? '').trim();
+    if (text) return text;
+  }
+  return null;
+}
+
+function contactWebsite(properties: Record<string, any>): string | null {
+  const candidates = [
+    properties.website,
+    properties['contact:website'],
+    properties['website:homepage'],
+    properties['website:official'],
+  ];
+  for (const value of candidates) {
+    const normalized = normalizeUrl(value);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
 function deliveryMetadata(properties: Record<string, any>): { available: boolean; status: 'verified' | 'unknown' | 'not_available'; orderUrl: string | null } {
   const rawDelivery = String(properties.delivery ?? '').trim().toLowerCase();
   const orderUrl = normalizeUrl(properties['delivery:website']);
@@ -157,7 +185,7 @@ function cuisineMatches(properties: Record<string, any>, cuisine: string): boole
 
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const params = new URLSearchParams({
-    lat: String(latitude), lon: String(longitude), radius: '20', limit: '50', lang: 'de',
+    lat: String(latitude), lon: String(longitude), radius: '10', limit: '50', lang: 'de',
     osm_tag: 'amenity:restaurant',
   });
   const response = await fetch(PHOTON_ENDPOINT + 'reverse?' + params.toString(), {
@@ -183,7 +211,7 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
     if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
 
     const distance = distanceKm(latitude, longitude, lat, lon);
-    if (distance > 20.0001) continue;
+    if (distance > 10.0001) continue;
 
     const street = [properties.street, properties.housenumber].filter(Boolean).join(' ') || null;
     const city = properties.city ?? properties.town ?? properties.village ?? properties.locality ?? null;
@@ -202,8 +230,8 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
       distance_km: Math.round(distance * 100) / 100,
       latitude: lat,
       longitude: lon,
-      phone: String(properties.phone ?? properties['contact:phone'] ?? '').trim() || null,
-      website: normalizeUrl(properties.website ?? properties['contact:website']),
+      phone: contactPhone(properties),
+      website: contactWebsite(properties),
       order_url: delivery.orderUrl ?? normalizeUrl(properties['website:orders']),
       opening_hours: properties.opening_hours ?? null,
       delivery_available: delivery.available,
@@ -217,8 +245,8 @@ function buildResultsFromPhoton(features: any[], latitude: number, longitude: nu
 }
 
 async function queryNominatim(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
-  const dy = 20 / 111.32;
-  const dx = 20 / Math.max(111.32 * Math.cos(latitude * Math.PI / 180), 1);
+  const dy = 10 / 111.32;
+  const dx = 10 / Math.max(111.32 * Math.cos(latitude * Math.PI / 180), 1);
   const params = new URLSearchParams({
     q: photonQuery(cuisine), format: 'jsonv2', addressdetails: '1', limit: '50', bounded: '1',
     viewbox: [longitude + dx, latitude + dy, longitude - dx, latitude - dy].join(','),
@@ -242,7 +270,7 @@ function buildResultsFromNominatim(items: any[], latitude: number, longitude: nu
     const name = String(item?.name ?? item?.display_name?.split(',')?.[0] ?? '').trim();
     const lat = number(item?.lat, NaN); const lon = number(item?.lon, NaN);
     if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
-    const distance = distanceKm(latitude, longitude, lat, lon); if (distance > 20.0001) continue;
+    const distance = distanceKm(latitude, longitude, lat, lon); if (distance > 10.0001) continue;
     const a = (item?.address ?? {}) as Record<string, any>;
     const address = [a.road, a.house_number].filter(Boolean).join(' ') || null;
     const city = a.city ?? a.town ?? a.village ?? a.municipality ?? null;
@@ -262,7 +290,7 @@ function overpassQuery(latitude: number, longitude: number, cuisine: string): st
   const cuisineFilter = pattern ? `[cuisine~"${pattern}",i]` : '';
   const nameFilter = pattern ? `[name~"${pattern}",i]` : '';
   const base = `nwr[amenity~"^(restaurant|fast_food)$",i][name]`;
-  const around = `(around:20000,${latitude},${longitude})`;
+  const around = `(around:10000,${latitude},${longitude})`;
 
   if (cuisine === 'Vegetarisch') {
     // Include restaurants explicitly tagged as vegetarian/vegan even when
@@ -308,7 +336,7 @@ function buildResultsFromOverpass(payload: any, latitude: number, longitude: num
     const lon = number(element.lon ?? element.center?.lon, NaN);
     if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
     const distance = distanceKm(latitude, longitude, lat, lon);
-    if (distance > 20.0001) continue;
+    if (distance > 10.0001) continue;
     const address = [tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' ') || null;
     const city = tags['addr:city'] ?? tags['addr:town'] ?? tags['addr:village'] ?? null;
     const key = [name.toLowerCase(), String(address ?? '').toLowerCase(), String(city ?? '').toLowerCase()].join('|');
@@ -324,8 +352,8 @@ function buildResultsFromOverpass(payload: any, latitude: number, longitude: num
       distance_km: Math.round(distance * 100) / 100,
       latitude: lat,
       longitude: lon,
-      phone: String(tags.phone ?? tags['contact:phone'] ?? '').trim() || null,
-      website: normalizeUrl(tags.website ?? tags['contact:website']),
+      phone: contactPhone(tags),
+      website: contactWebsite(tags),
       order_url: delivery.orderUrl ?? normalizeUrl(tags['website:orders']),
       opening_hours: tags.opening_hours ?? null,
       delivery_available: delivery.available,
@@ -350,14 +378,14 @@ Deno.serve(async (req: Request) => {
     const longitude = number(body?.longitude, NaN);
     const cuisine = String(body?.cuisine ?? '').trim();
     const deliveryOnly = body?.delivery_only === true;
-    const radiusKm = number(body?.radius_km, 20);
+    const radiusKm = number(body?.radius_km, 10);
     const limit = Math.min(Math.max(Math.floor(number(body?.limit, 10)), 1), 10);
 
     if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
         !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
       return json({ error: 'Ungültiger Standort.' }, 400);
     }
-    if (radiusKm !== 20) return json({ error: 'Die Suche ist fest auf 20 km begrenzt.' }, 400);
+    if (radiusKm !== 10) return json({ error: 'Die Suche ist fest auf 10 km begrenzt.' }, 400);
     if (cuisine && !CUISINE_PATTERNS[cuisine]) {
       return json({ error: `Die Küche „${cuisine}“ wird derzeit nicht unterstützt.` }, 400);
     }
@@ -381,7 +409,7 @@ Deno.serve(async (req: Request) => {
       );
       const payload = {
         source: 'OpenStreetMap/Overpass',
-        radius_km: 20,
+        radius_km: 10,
         results,
         delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested',
       };
@@ -397,7 +425,7 @@ Deno.serve(async (req: Request) => {
       if (results.length) {
         const payload = {
           source: 'OpenStreetMap/Photon',
-          radius_km: 20,
+          radius_km: 10,
           results,
           delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested',
         };
@@ -412,7 +440,7 @@ Deno.serve(async (req: Request) => {
 
     try {
       const results = buildResultsFromNominatim(await queryNominatim(latitude, longitude, cuisine), latitude, longitude, limit, deliveryOnly);
-      const payload = { source: 'OpenStreetMap/Nominatim', radius_km: 20, results, delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested' };
+      const payload = { source: 'OpenStreetMap/Nominatim', radius_km: 10, results, delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested' };
       resultCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
       console.log('restaurant-discovery success: nominatim results=', results.length, 'delivery=', deliveryOnly);
       return json(payload);
