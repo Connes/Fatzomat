@@ -6,20 +6,20 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-const CUISINE_PATTERNS: Record<string, string> = {
-  // Match established OSM cuisine values plus common dish/style terms that
-  // frequently appear in cuisine tags or restaurant names.
-  Italienisch: 'italian|italian_pizza|pizza|pasta|pizzeria|piadina|risotto|lasagne|gnocchi|trattoria|ristorante',
-  Griechisch: 'greek|gyros|souvlaki|tzatziki|moussaka|meze|mezze|taverna',
-  Asiatisch: 'asian|chinese|thai|vietnamese|korean|japanese|indonesian|malaysian|indian|ramen|udon|soba|noodle|rice_noodle|dumpling|hotpot|wok',
-  Indisch: 'indian|curry|tandoori|naan|masala|biryani|samosa|dal|vindaloo',
-  Burger: 'burger|hamburger|cheeseburger|smashburger|burgerhouse|burgerrestaurant',
-  Mexikanisch: 'mexican|taco|tacos|burrito|quesadilla|enchilada|nachos|fajita|guacamole|salsa|chili',
-  Vegetarisch: 'vegetarian|vegan|plant_based|veggie|vegetarian_restaurant|vegan_restaurant',
-  Sushi: 'sushi|japanese|sashimi|maki|nigiri|ramen|udon|soba|yakitori|takoyaki|poke',
-  Pizza: 'pizza|italian_pizza|pizzeria|margherita|calzone|focaccia',
-  Döner: 'kebab|doner|döner|turkish|gyro|gyros|shawarma|dürüm|durum|falafel|lahmacun|pide|kofte|köfte',
-  Steak: 'steak|steak_house|grill|beef|bbq|barbecue|roast|churrasco',
+const CUISINE_VALUES: Record<string, string[]> = {
+  // Strict primary cuisine values. Do not infer a category from names or
+  // broad terms such as "grill", "japanese" or "beef".
+  Italienisch: ['italian'],
+  Griechisch: ['greek'],
+  Asiatisch: ['asian', 'chinese', 'thai', 'vietnamese', 'korean', 'indonesian', 'malaysian'],
+  Indisch: ['indian'],
+  Burger: ['burger'],
+  Mexikanisch: ['mexican'],
+  Vegetarisch: ['vegetarian'],
+  Sushi: ['sushi'],
+  Pizza: ['pizza', 'italian_pizza'],
+  Döner: ['kebab', 'doner', 'döner'],
+  Steak: ['steak', 'steak_house'],
 };
 
 const PHOTON_ENDPOINT = 'https://photon.komoot.io/';
@@ -160,27 +160,29 @@ function normalizeSearchText(value: unknown): string {
       .replace(/[\\u0300-\\u036f]/g, '');
 }
 
+function cuisineValues(properties: Record<string, any>): string[] {
+  return String(properties.cuisine ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\\u0300-\\u036f]/g, '')
+      .split(';')
+      .map((value) => value.trim())
+      .filter(Boolean);
+}
+
 function cuisineMatches(properties: Record<string, any>, cuisine: string): boolean {
-  // OSM models dietary suitability independently from cuisine. For the
-  // vegetarian category, a positive vegetarian or vegan diet tag is therefore
-  // a first-class match and not merely a name/cuisine keyword.
+  const requested = CUISINE_VALUES[cuisine] ?? [];
+  if (!requested.length) return false;
+
   if (cuisine === 'Vegetarisch') {
     const vegetarian = normalizeSearchText(properties['diet:vegetarian']);
     const vegan = normalizeSearchText(properties['diet:vegan']);
     if (/^(yes|only)$/.test(vegetarian) || /^(yes|only)$/.test(vegan)) return true;
   }
 
-  const pattern = CUISINE_PATTERNS[cuisine];
-  if (!pattern) return true;
-  const terms = pattern.split('|').map((term) => normalizeSearchText(term)).filter(Boolean);
-  const searchable = [
-    properties.cuisine,
-    properties['cuisine:en'],
-    properties['cuisine:de'],
-    properties.osm_value,
-    properties.name,
-  ].map(normalizeSearchText).filter(Boolean).join(' ');
-  return terms.some((term) => searchable.includes(term));
+  const values = cuisineValues(properties);
+  if (!values.length) return false;
+  return requested.some((value) => values.includes(normalizeSearchText(value)));
 }
 
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
@@ -251,6 +253,7 @@ async function queryNominatim(latitude: number, longitude: number, cuisine: stri
     q: photonQuery(cuisine), format: 'jsonv2', addressdetails: '1', limit: '50', bounded: '1',
     viewbox: [longitude + dx, latitude + dy, longitude - dx, latitude - dy].join(','),
     'accept-language': 'de',
+    extratags: '1',
   });
   const response = await fetch(NOMINATIM_ENDPOINT + '?' + params.toString(), {
     method: 'GET',
@@ -263,13 +266,15 @@ async function queryNominatim(latitude: number, longitude: number, cuisine: stri
   return payload;
 }
 
-function buildResultsFromNominatim(items: any[], latitude: number, longitude: number, limit: number, deliveryOnly: boolean) {
+function buildResultsFromNominatim(items: any[], latitude: number, longitude: number, limit: number, deliveryOnly: boolean, cuisine: string) {
   const seen = new Set<string>();
   const results: Array<Record<string, unknown>> = [];
   for (const item of items) {
     const name = String(item?.name ?? item?.display_name?.split(',')?.[0] ?? '').trim();
     const lat = number(item?.lat, NaN); const lon = number(item?.lon, NaN);
     if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const properties = (item?.extratags ?? {}) as Record<string, any>;
+    if (!cuisineMatches(properties, cuisine)) continue;
     const distance = distanceKm(latitude, longitude, lat, lon); if (distance > 10.0001) continue;
     const a = (item?.address ?? {}) as Record<string, any>;
     const address = [a.road, a.house_number].filter(Boolean).join(' ') || null;
@@ -280,30 +285,27 @@ function buildResultsFromNominatim(items: any[], latitude: number, longitude: nu
     if (deliveryOnly && deliveryStatus === 'not_available') continue;
     results.push({ id: String(item?.osm_type ?? 'N') + '/' + String(item?.osm_id ?? ''), name, address, city,
       distance_km: Math.round(distance * 100) / 100, latitude: lat, longitude: lon, phone: null, website: null,
-      order_url: null, opening_hours: null, delivery_available: false, delivery_status: deliveryStatus, cuisine: null });
+      order_url: null, opening_hours: null, delivery_available: false, delivery_status: deliveryStatus, cuisine: properties.cuisine ?? null });
   }
   results.sort((a, b) => Number(a.distance_km) - Number(b.distance_km));
   return results.slice(0, limit);
 }
 function overpassQuery(latitude: number, longitude: number, cuisine: string): string {
-  const pattern = CUISINE_PATTERNS[cuisine];
-  const cuisineFilter = pattern ? `[cuisine~"${pattern}",i]` : '';
-  const nameFilter = pattern ? `[name~"${pattern}",i]` : '';
-  const base = `nwr[amenity~"^(restaurant|fast_food)$",i][name]`;
+  const values = CUISINE_VALUES[cuisine] ?? [];
+  const cuisinePattern = values.join('|');
+  const cuisineFilter = cuisinePattern
+      ? '[cuisine~"(^|;)(' + cuisinePattern + ')(;|$)",i]'
+      : '';
+  const base = 'nwr[amenity~"^(restaurant|fast_food)$",i][name]';
   const around = `(around:10000,${latitude},${longitude})`;
 
   if (cuisine === 'Vegetarisch') {
-    // Include restaurants explicitly tagged as vegetarian/vegan even when
-    // neither cuisine nor name contains a vegetarian keyword.
-    const dietFilter = `[diet:vegetarian~"^(yes|only)$",i]`;
-    const veganFilter = `[diet:vegan~"^(yes|only)$",i]`;
-    return `[out:json][timeout:12];(${base}${cuisineFilter}${around};${base}${nameFilter}${around};${base}${dietFilter}${around};${base}${veganFilter}${around};);out center tags;`;
+    const dietFilter = '[diet:vegetarian~"^(yes|only)$",i]';
+    const veganFilter = '[diet:vegan~"^(yes|only)$",i]';
+    return `[out:json][timeout:12];(${base}${cuisineFilter}${around};${base}${dietFilter}${around};${base}${veganFilter}${around};);out center tags;`;
   }
 
-  const selector = pattern
-      ? `(${base}${cuisineFilter}${around};${base}${nameFilter}${around};);`
-      : `${base}${around};`;
-  return `[out:json][timeout:12];${selector}out center tags;`;
+  return `[out:json][timeout:12];${base}${cuisineFilter}${around};out center tags;`;
 }
 
 async function queryOverpass(query: string): Promise<any> {
@@ -386,7 +388,7 @@ Deno.serve(async (req: Request) => {
       return json({ error: 'Ungültiger Standort.' }, 400);
     }
     if (radiusKm !== 10) return json({ error: 'Die Suche ist fest auf 10 km begrenzt.' }, 400);
-    if (cuisine && !CUISINE_PATTERNS[cuisine]) {
+    if (cuisine && !CUISINE_VALUES[cuisine]) {
       return json({ error: `Die Küche „${cuisine}“ wird derzeit nicht unterstützt.` }, 400);
     }
 
@@ -439,7 +441,7 @@ Deno.serve(async (req: Request) => {
     }
 
     try {
-      const results = buildResultsFromNominatim(await queryNominatim(latitude, longitude, cuisine), latitude, longitude, limit, deliveryOnly);
+      const results = buildResultsFromNominatim(await queryNominatim(latitude, longitude, cuisine), latitude, longitude, limit, deliveryOnly, cuisine);
       const payload = { source: 'OpenStreetMap/Nominatim', radius_km: 10, results, delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested' };
       resultCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
       console.log('restaurant-discovery success: nominatim results=', results.length, 'delivery=', deliveryOnly);
