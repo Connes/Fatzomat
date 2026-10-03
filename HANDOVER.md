@@ -6,7 +6,7 @@ Dieses Dokument ist der dauerhafte Übergabepunkt zwischen Chat-Sitzungen.
 
 Wenn der Nutzer in einem neuen Chat nur schreibt:
 
-> Fazzomat weiterentwickeln.
+> Fatzomat weiterentwickeln.
 
 dann gilt:
 
@@ -22,6 +22,7 @@ Der Text in diesem Dokument ist ein Arbeitsgedächtnis, aber niemals Beweis für
 ## Projekt
 
 - Repository: `Connes/Fatzomat`
+- Projektname: **Fatzomat**
 - Hauptbranch: `main`
 - App: Flutter
 - Flutter in CI: 3.47.2 stable
@@ -153,7 +154,7 @@ Die sichere, wenig invasive Lösung ist:
 
 Wenn ein Chat wegen Kontextlänge endet, soll der nächste Chat nur den Satz
 
-**„Fazzomat weiterentwickeln.“**
+**„Fatzomat weiterentwickeln.“**
 
 benötigen.
 
