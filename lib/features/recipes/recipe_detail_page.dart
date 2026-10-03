@@ -50,7 +50,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       bool selectedForToday = false;
       try {
         final today = await personalToday.todayPlan();
-        selectedForToday = today?.isRecipe == true && today?.recipeId == widget.recipeId;
+        selectedForToday = today?.isRecipe == true &&
+            today?.recipeId == widget.recipeId &&
+            today?.status != 'cooked';
       } catch (_) {
         // Personal Today state is optional metadata for recipe rendering.
       }
@@ -387,9 +389,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                 ...List.generate(steps.length, (i) {
                   final done = completedSteps.contains(i);
                   final nextStep = i == completedSteps.length;
-                  final canToggle =
+                  final canToggle = personalTodaySelected &&
                       (done && i == completedSteps.length - 1) ||
-                      (!done && nextStep);
+                      (personalTodaySelected && !done && nextStep);
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Material(
