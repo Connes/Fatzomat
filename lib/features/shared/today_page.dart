@@ -170,7 +170,7 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> _shareTodayDecision() async {
-    if (_loadingDecisionMessage || plan == null) return;
+    if (_loadingDecisionMessage || plan == null || plan!.status == 'cooked') return;
     setState(() => _loadingDecisionMessage = true);
     try {
       final connection = await _collaborationRepository.connectionInfo();
@@ -234,6 +234,12 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> removeTodayPlan() async {
     if (plan == null) return;
+    if (plan!.status == 'cooked') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Für heute ist schon alles erledigt. Deine Entscheidung ist abgeschlossen.')),
+      );
+      return;
+    }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -327,9 +333,15 @@ class _TodayPageState extends State<TodayPage> {
                       : _TodayResultCard(
                           plan: plan!,
                           onCancel: removeTodayPlan,
-                          onShare: plan!.isShared ? null : _shareTodayDecision,
+                          onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
                           onOpenRecipe: plan!.isRecipe
                               ? () async {
+                                  if (plan!.status == 'cooked') {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Für heute ist schon alles erledigt. Deine Entscheidung ist abgeschlossen.')),
+                                    );
+                                    return;
+                                  }
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -582,53 +594,76 @@ class _TodayResultCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            if (plan.isSharedAccepted)
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: onShare,
-                  icon: const Icon(Icons.people_alt_rounded),
-                  label: const Text('Gemeinsame Tagesentscheidung'),
-                ),
-              )
-            else if (plan.isShared)
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: onShare,
-                  icon: const Icon(Icons.ios_share_rounded),
-                  label: const Text('Entscheidung bereits geteilt'),
-                ),
-              )
-            else
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: onShare,
-                  icon: const Icon(Icons.ios_share_rounded),
-                  label: const Text('Entscheidung teilen'),
-                ),
-              ),
-            if (plan.isSharedAccepted) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Entscheidung übernommen',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppDesign.primaryDark,
+            if (plan.status == 'cooked')
+              AppSurface(
+                color: AppDesign.secondarySurface,
+                child: Column(
+                  children: [
+                    const Icon(Icons.check_circle_rounded, size: 32),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Für heute ist alles erledigt.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Deine Entscheidung ist abgeschlossen.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              if (plan.isSharedAccepted)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onShare,
+                    icon: const Icon(Icons.people_alt_rounded),
+                    label: const Text('Gemeinsame Tagesentscheidung'),
+                  ),
+                )
+              else if (plan.isShared)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onShare,
+                    icon: const Icon(Icons.ios_share_rounded),
+                    label: const Text('Entscheidung bereits geteilt'),
+                  ),
+                )
+              else
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onShare,
+                    icon: const Icon(Icons.ios_share_rounded),
+                    label: const Text('Entscheidung teilen'),
+                  ),
+                ),
+              if (plan.isSharedAccepted) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Entscheidung übernommen',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppDesign.primaryDark,
+                      ),
+                ),
+              ],
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: onCancel,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  label: const Text('Entscheidung entfernen'),
+                ),
               ),
             ],
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: onCancel,
-                icon: const Icon(Icons.delete_outline_rounded),
-                label: const Text('Entscheidung entfernen'),
-              ),
-            ),
           ],
         ),
       ),
