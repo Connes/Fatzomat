@@ -119,6 +119,66 @@ function cacheKey(latitude: number, longitude: number, cuisine: string, delivery
   return [latitude.toFixed(4), longitude.toFixed(4), cuisine.toLowerCase(), deliveryOnly ? 'delivery' : 'all'].join('|');
 }
 
+function authenticateUser(req: Request) {
+  const authorization = req.headers.get('Authorization') ?? '';
+  if (!authorization.toLowerCase().startsWith('bearer ')) return null;
+  const token = authorization.slice(7).trim();
+  if (!token) return null;
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ??
+      Deno.env.get('SUPABASE_ANON_KEY') ??
+      Deno.env.get('SUPABASE_PUBLISHABLE_KEY');
+  if (!supabaseUrl || !supabaseKey) throw new Error('Supabase Auth ist serverseitig nicht konfiguriert.');
+
+  const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await supabase.auth.getUser(token);
+  return error || !data.user ? null : data.user;
+}
+
+function normalizeSearchText(value: unknown): string {
+  return String(value ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+}
+
+function cuisineValues(properties: Record<string, any>): string[] {
+  return String(properties.cuisine ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(';')
+      .map((value) => value.trim())
+      .filter(Boolean);
+}
+
+function cuisineMatches(properties: Record<string, any>, cuisine: string): boolean {
+  const requested = CUISINE_VALUES[cuisine] ?? [];
+  if (!requested.length) return false;
+
+  if (cuisine === 'Vegetarisch') {
+    const vegetarian = normalizeSearchText(properties['diet:vegetarian']);
+    const vegan = normalizeSearchText(properties['diet:vegan']);
+    if (/^(yes|only)$/.test(vegetarian) || /^(yes|only)$/.test(vegan)) return true;
+  }
+
+  const values = cuisineValues(properties);
+  if (!values.length) return false;
+  return requested.some((value) => values.includes(normalizeSearchText(value)));
+}
+
+function cuisineSearchFallbackMatches(properties: Record<string, any>, cuisine: string): boolean {
+  if (cuisineMatches(properties, cuisine)) return true;
+  // Provider-specific fallback: the provider already received a
+  // category-specific query. If OSM omitted cuisine=, retain the result
+  // instead of making the missing tag an automatic exclusion.
+  // Never inspect the name here, which would recreate old false positives.
+  return cuisineValues(properties).length === 0 && Boolean(String(properties.name ?? '').trim());
+}
+
 function photonQuery(cuisine: string): string {
   const queries: Record<string, string> = {
     Pizza: 'pizza',
