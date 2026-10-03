@@ -9,7 +9,7 @@ void main() {
     final migration = File('supabase/migrations/202610030001_cooked_clears_personal_shopping.sql').readAsStringSync();
 
     expect(repository, contains("client.rpc('update_personal_today_status'"));
-    expect(repository, isNot(contains("delete()")));
+    expect(repository, contains("client.from('shopping_items').delete().eq('id', itemId)"));
     expect(migration, contains("if p_status = 'cooked' then"));
     expect(migration, contains('delete from public.shopping_items'));
     expect(migration, contains('where personal_today_plan_id = p_plan_id'));
