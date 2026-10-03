@@ -132,6 +132,20 @@ void main() {
     expect(functionSource, contains('PHOTON_ENDPOINT'));
     expect(functionSource, contains('deliveryMetadata'));
     expect(functionSource, contains('delivery_filter'));
+    expect(functionSource, contains("Italienisch: ['italian']"));
+    expect(functionSource, contains("Burger: ['burger']"));
+    expect(functionSource, contains("Sushi: ['sushi']"));
+    expect(functionSource, contains("Pizza: ['pizza', 'italian_pizza']"));
+    expect(functionSource, contains("Steak: ['steak', 'steak_house']"));
+    expect(functionSource, contains("Döner: ['kebab', 'doner', 'döner']"));
+    expect(functionSource, contains("Indisch: ['indian']"));
+    expect(functionSource, contains("Mexikanisch: ['mexican']"));
+    expect(functionSource, contains("Asiatisch: ['asian', 'chinese', 'thai', 'vietnamese', 'korean', 'indonesian', 'malaysian']"));
+    expect(functionSource, contains("return requested.some((value) => values.includes(normalizeSearchText(value)));"));
+    expect(functionSource, isNot(contains("properties.name,"));
+    expect(functionSource, isNot(contains("properties.osm_value")));
+    expect(functionSource, isNot(contains("const nameFilter")));
+
     expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested'"));
     expect(functionSource, contains('if (deliveryOnly && delivery.status === \'not_available\') continue;'));
     expect(functionSource, contains('Prefer Overpass for the actual result payload'));
