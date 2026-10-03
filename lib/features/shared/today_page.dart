@@ -548,6 +548,24 @@ class _TodayResultCard extends StatelessWidget {
                               ),
                       ),
                       const SizedBox(height: 20),
+                      if (plan.status == 'cooked') ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                          decoration: BoxDecoration(
+                            color: AppDesign.secondarySurface,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle_rounded, size: 20),
+                              SizedBox(width: 8),
+                              Text('Gekocht', style: TextStyle(fontWeight: FontWeight.w800)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       Text(
                         plan.displayTitle,
                         textAlign: TextAlign.center,
