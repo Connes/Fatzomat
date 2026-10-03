@@ -206,7 +206,7 @@ async function queryPhoton(latitude: number, longitude: number, cuisine: string)
     limit: '50',
     lang: 'de',
   });
-  params.append('include', 'osm.amenity.restaurant,osm.amenity.fast_food');
+  params.append('include', photonCuisineCategories(cuisine).join(','));
 
 
   const request = async (queryParams: URLSearchParams) => {
