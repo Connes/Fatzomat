@@ -37,7 +37,7 @@ class _FakeDiscoveryRepository implements RestaurantDiscoveryRepository {
     requestedLocation = location;
     requestedCuisine = cuisine;
     requestedDeliveryOnly = deliveryOnly;
-    expect(radiusKm, 20);
+    expect(radiusKm, 10);
     expect(limit, 10);
     return results.take(limit).toList();
   }
@@ -57,7 +57,7 @@ RestaurantDiscoveryResult _result(String id, double distance, {bool delivery = f
     );
 
 void main() {
-  testWidgets('Wir gehen essen nutzt Küche, Standort, 20 km und maximal 10 Ergebnisse', (tester) async {
+  testWidgets('Wir gehen essen nutzt Küche, Standort, 10 km und maximal 10 Ergebnisse', (tester) async {
     final repository = _FakeDiscoveryRepository(List.generate(12, (i) => _result('$i', i + .2)));
     await tester.pumpWidget(MaterialApp(
       home: DiscoveryPage(
@@ -81,6 +81,7 @@ void main() {
     expect(repository.requestedCuisine, 'Italienisch');
     expect(repository.requestedDeliveryOnly, isFalse);
     expect(repository.requestedLocation?.latitude, 48.89);
+    expect(repository.results.every((item) => item.distanceKm <= 10), isTrue);
   });
 
   testWidgets('Wir bestellen fordert ausschließlich Lieferanbieter an', (tester) async {
@@ -126,6 +127,10 @@ void main() {
     expect(source, contains('await client.auth.refreshSession();'));
     expect(source, contains(r"'Authorization': 'Bearer $accessToken'"));
     final functionSource = File('supabase/functions/restaurant-discovery/index.ts').readAsStringSync();
+    expect(functionSource, contains("radiusKm !== 10"));
+    expect(functionSource, contains('(around:10000,'));
+    expect(functionSource, contains('contactPhone'));
+    expect(functionSource, contains('contactWebsite'));
     expect(functionSource, contains('PHOTON_ENDPOINT'));
     expect(functionSource, contains('deliveryMetadata'));
     expect(functionSource, contains('delivery_filter'));
