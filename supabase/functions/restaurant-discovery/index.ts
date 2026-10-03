@@ -157,14 +157,14 @@ function normalizeSearchText(value: unknown): string {
   return String(value ?? '')
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\\u0300-\\u036f]/g, '');
+      .replace(/[\u0300-\u036f]/g, '');
 }
 
 function cuisineValues(properties: Record<string, any>): string[] {
   return String(properties.cuisine ?? '')
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\\u0300-\\u036f]/g, '')
+      .replace(/[\u0300-\u036f]/g, '')
       .split(';')
       .map((value) => value.trim())
       .filter(Boolean);
@@ -206,7 +206,7 @@ async function queryPhoton(latitude: number, longitude: number, cuisine: string)
   if (!response.ok) throw new Error('Photon reverse HTTP ' + response.status);
   const payload = await response.json();
   const features = Array.isArray(payload?.features) ? payload.features : [];
-  return features.filter((feature) => cuisineMatches((feature?.properties ?? {}) as Record<string, any>, cuisine));
+  return features.filter((feature) => cuisineSearchFallbackMatches((feature?.properties ?? {}) as Record<string, any>, cuisine));
 }
 function buildResultsFromPhoton(features: any[], latitude: number, longitude: number, limit: number, deliveryOnly: boolean) {
   const seen = new Set<string>();
@@ -282,7 +282,7 @@ function buildResultsFromNominatim(items: any[], latitude: number, longitude: nu
     const lat = number(item?.lat, NaN); const lon = number(item?.lon, NaN);
     if (!name || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
     const properties = (item?.extratags ?? {}) as Record<string, any>;
-    if (!cuisineMatches(properties, cuisine)) continue;
+    if (!cuisineSearchFallbackMatches(properties, cuisine)) continue;
     const distance = distanceKm(latitude, longitude, lat, lon); if (distance > 10.0001) continue;
     const a = (item?.address ?? {}) as Record<string, any>;
     const address = [a.road, a.house_number].filter(Boolean).join(' ') || null;
@@ -421,15 +421,18 @@ Deno.serve(async (req: Request) => {
         limit,
         deliveryOnly,
       );
-      const payload = {
-        source: 'OpenStreetMap/Overpass',
-        radius_km: 10,
-        results,
-        delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested',
-      };
-      resultCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
-      console.log('restaurant-discovery success: overpass results=', results.length, 'delivery=', deliveryOnly);
-      return json(payload);
+      if (results.length > 0) {
+        const payload = {
+          source: 'OpenStreetMap/Overpass',
+          radius_km: 10,
+          results,
+          delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested',
+        };
+        resultCache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, payload });
+        console.log('restaurant-discovery success: overpass results=', results.length, 'delivery=', deliveryOnly);
+        return json(payload);
+      }
+      console.warn('Overpass returned no strict matches; trying Photon.');
     } catch (overpassError) {
       console.warn('Overpass failed; trying Photon:', String(overpassError));
     }
