@@ -463,7 +463,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                 ),
               ),
             ],
-          )
+          );
         },
       ),
     );
