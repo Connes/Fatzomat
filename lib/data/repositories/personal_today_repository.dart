@@ -147,12 +147,6 @@ class PersonalTodayRepository {
   }
 
   Future<bool> updateStatus(String planId, String status) async {
-    if (status == 'cooked') {
-      await client
-          .from('shopping_items')
-          .delete()
-          .eq('personal_today_plan_id', planId);
-    }
     final result = await client.rpc('update_personal_today_status', params: {
       'p_plan_id': planId,
       'p_status': status,
