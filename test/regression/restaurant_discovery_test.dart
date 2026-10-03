@@ -147,7 +147,7 @@ void main() {
     expect(functionSource, contains("PHOTON_ENDPOINT + 'api/?'"));
     expect(functionSource, contains("[cuisine~\"(' + cuisinePattern + ')\",i]"));
     expect(functionSource, contains('cuisineSearchFallbackMatches'));
-    expect(functionSource, contains('provider_category_fallback'));
+    expect(functionSource, contains("cuisineValues(properties).length === 0 && Boolean(String(properties.name ?? '').trim())"));
     expect(functionSource, contains('Never inspect the name here'));
     expect(functionSource, contains('return features.filter((feature) => cuisineSearchFallbackMatches'));
     expect(functionSource, contains('if (results.length > 0)'));
