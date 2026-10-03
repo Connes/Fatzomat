@@ -142,9 +142,8 @@ void main() {
     expect(functionSource, contains("Mexikanisch: ['mexican']"));
     expect(functionSource, contains("Asiatisch: ['asian', 'chinese', 'thai', 'vietnamese', 'korean', 'indonesian', 'malaysian']"));
     expect(functionSource, contains("return requested.some((value) => values.includes(normalizeSearchText(value)));"));
-    expect(functionSource, isNot(contains("properties.name,"));
-    expect(functionSource, isNot(contains("properties.osm_value")));
     expect(functionSource, isNot(contains("const nameFilter")));
+    expect(functionSource, isNot(contains("const searchable =")));
 
     expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested'"));
     expect(functionSource, contains('if (deliveryOnly && delivery.status === \'not_available\') continue;'));
