@@ -144,6 +144,8 @@ void main() {
     expect(functionSource, contains("return requested.some((value) => values.includes(normalizeSearchText(value)));"));
     expect(functionSource, isNot(contains("const nameFilter")));
     expect(functionSource, isNot(contains("const searchable =")));
+    expect(functionSource, contains("PHOTON_ENDPOINT + 'api/?'"));
+    expect(functionSource, contains("[cuisine~\"(' + cuisinePattern + ')\",i]"));
 
     expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested'"));
     expect(functionSource, contains('if (deliveryOnly && delivery.status === \'not_available\') continue;'));
