@@ -119,7 +119,7 @@ function cacheKey(latitude: number, longitude: number, cuisine: string, delivery
   return [latitude.toFixed(4), longitude.toFixed(4), cuisine.toLowerCase(), deliveryOnly ? 'delivery' : 'all'].join('|');
 }
 
-function authenticateUser(req: Request) {
+async function authenticateUser(req: Request) {
   const authorization = req.headers.get('Authorization') ?? '';
   if (!authorization.toLowerCase().startsWith('bearer ')) return null;
   const token = authorization.slice(7).trim();
