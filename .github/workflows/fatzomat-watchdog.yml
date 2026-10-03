@@ -1,0 +1,65 @@
+name: Fatzomat five-minute watchdog
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  issues: write
+
+concurrency:
+  group: fatzomat-watchdog
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect repository state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          repo="${GITHUB_REPOSITORY}"
+          default_branch="${GITHUB_REF_NAME}"
+
+          prs="$(gh pr list --repo "$repo" --state open --json number,title,headRefName,baseRefName,url,isDraft)"
+          runs="$(gh run list --repo "$repo" --branch "$default_branch" --limit 10 --json databaseId,name,status,conclusion,headSha,url)"
+
+          echo "## Fatzomat watchdog" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checked: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Open pull requests" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$(echo "$prs" | jq 'length')" -eq 0 ]; then
+            echo "None." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "$prs" | jq -r '.[] | "- PR #(.number): (.title) [(.headRefName) -> (.baseRefName)] (.url)"' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Recent workflow runs" >> "$GITHUB_STEP_SUMMARY"
+          echo "$runs" | jq -r '.[] | "- (.name): (.status)/(.conclusion // "running") (.headSha[0:7]) (.url)"' >> "$GITHUB_STEP_SUMMARY"
+
+          failing="$(echo "$runs" | jq '[.[] | select(.status == "completed" and .conclusion == "failure")] | length')"
+          open_prs="$(echo "$prs" | jq 'length')"
+
+          if [ "$failing" -gt 0 ] || [ "$open_prs" -gt 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Action needed" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$open_prs" -gt 0 ]; then
+              echo "Open development work exists." >> "$GITHUB_STEP_SUMMARY"
+            fi
+            if [ "$failing" -gt 0 ]; then
+              echo "At least one recent workflow run failed." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### State" >> "$GITHUB_STEP_SUMMARY"
+            echo "No open PRs and no recent failed workflow runs detected." >> "$GITHUB_STEP_SUMMARY"
+          fi
