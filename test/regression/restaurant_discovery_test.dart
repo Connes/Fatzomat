@@ -96,7 +96,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Pizza'), findsOneWidget);
-    expect(find.text('3 Treffer innerhalb von 20 km'), findsOneWidget);
+    expect(find.text('Restaurants zum Bestellen'), findsNothing);
+    expect(find.text('3 Treffer innerhalb von 20 km'), findsNothing);
+    expect(find.textContaining('Bis zu 10 passende Restaurants'), findsNothing);
     expect(repository.requestedCuisine, 'Pizza');
     expect(repository.requestedDeliveryOnly, isTrue);
     expect(find.text('Lieferung laut Datenquelle verfügbar'), findsNWidgets(3));
