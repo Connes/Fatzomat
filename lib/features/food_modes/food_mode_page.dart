@@ -367,7 +367,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       location: location,
       cuisine: widget.preference,
       deliveryOnly: order,
-      radiusKm: 20,
+      radiusKm: 10,
       limit: 10,
     );
   }
@@ -553,7 +553,7 @@ class _DiscoveryEmpty extends StatelessWidget {
             const SizedBox(height: 16),
             Text('Keine passenden ${order ? 'Restaurants zum Bestellen' : 'Restaurants'} gefunden', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
             const SizedBox(height: 8),
-            Text('Für „$cuisine“ wurden innerhalb von 20 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.', textAlign: TextAlign.center),
+            Text('Für „$cuisine“ wurden innerhalb von 10 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.', textAlign: TextAlign.center),
             const SizedBox(height: 18),
             OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Erneut suchen')),
           ],
