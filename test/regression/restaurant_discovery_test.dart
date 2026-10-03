@@ -58,7 +58,7 @@ RestaurantDiscoveryResult _result(String id, double distance, {bool delivery = f
 
 void main() {
   testWidgets('Wir gehen essen nutzt Küche, Standort, 10 km und maximal 10 Ergebnisse', (tester) async {
-    final repository = _FakeDiscoveryRepository(List.generate(12, (i) => _result('$i', i + .2)));
+    final repository = _FakeDiscoveryRepository(List.generate(12, (i) => _result('$i', i < 10 ? i + .2 : 10.2 + i)));
     await tester.pumpWidget(MaterialApp(
       home: DiscoveryPage(
         mode: FoodMode.dineOut,
