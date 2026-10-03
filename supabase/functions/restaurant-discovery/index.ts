@@ -187,10 +187,9 @@ function cuisineMatches(properties: Record<string, any>, cuisine: string): boole
 
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const params = new URLSearchParams({
-    lat: String(latitude), lon: String(longitude), radius: '10', limit: '50', lang: 'de',
-    osm_tag: 'amenity:restaurant',
+    q: photonQuery(cuisine), lat: String(latitude), lon: String(longitude), radius: '10', limit: '50', lang: 'de',
   });
-  const response = await fetch(PHOTON_ENDPOINT + 'reverse?' + params.toString(), {
+  const response = await fetch(PHOTON_ENDPOINT + 'api/?' + params.toString(), {
     method: 'GET',
     headers: { 'Accept': 'application/json', 'User-Agent': 'Schmackofatz/1.13 restaurant-discovery' },
     signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
@@ -292,9 +291,13 @@ function buildResultsFromNominatim(items: any[], latitude: number, longitude: nu
 }
 function overpassQuery(latitude: number, longitude: number, cuisine: string): string {
   const values = CUISINE_VALUES[cuisine] ?? [];
+  // Query broadly enough to include multi-value cuisine tags such as
+  // cuisine=italian;pizza. The final exact-token decision is made in
+  // cuisineMatches(), so the Overpass query never becomes the source of
+  // false-positive category matches.
   const cuisinePattern = values.join('|');
   const cuisineFilter = cuisinePattern
-      ? '[cuisine~"(^|;)(' + cuisinePattern + ')(;|$)",i]'
+      ? '[cuisine~"(' + cuisinePattern + ')",i]'
       : '';
   const base = 'nwr[amenity~"^(restaurant|fast_food)$",i][name]';
   const around = `(around:10000,${latitude},${longitude})`;
