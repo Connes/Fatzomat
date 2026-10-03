@@ -27,13 +27,13 @@ class _FakeDiscoveryRepository implements RestaurantDiscoveryRepository {
     required String cuisine,
     required bool deliveryOnly,
     int limit = 10,
-    double radiusKm = 20,
+    double radiusKm = 10,
   }) async {
     this.cuisine = cuisine;
     this.deliveryOnly = deliveryOnly;
     expect(location.latitude, 48.89);
     expect(location.longitude, 8.70);
-    expect(radiusKm, 20);
+    expect(radiusKm, 10);
     expect(limit, 10);
     return results;
   }
