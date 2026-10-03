@@ -22,12 +22,12 @@ class _Repository implements RestaurantDiscoveryRepository {
     required String cuisine,
     required bool deliveryOnly,
     int limit = 10,
-    double radiusKm = 20,
+    double radiusKm = 10,
   }) async {
     expect(location.latitude, 48.89);
     expect(cuisine, delivery ? 'Pizza' : 'Italienisch');
     expect(deliveryOnly, delivery);
-    expect(radiusKm, 20);
+    expect(radiusKm, 10);
     expect(limit, 10);
     return [
       RestaurantDiscoveryResult(
