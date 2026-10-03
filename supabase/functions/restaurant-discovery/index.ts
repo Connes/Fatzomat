@@ -185,6 +185,15 @@ function cuisineMatches(properties: Record<string, any>, cuisine: string): boole
   return requested.some((value) => values.includes(normalizeSearchText(value)));
 }
 
+function cuisineSearchFallbackMatches(properties: Record<string, any>, cuisine: string): boolean {
+  if (cuisineMatches(properties, cuisine)) return true;
+  // Provider-specific fallback: Photon/Nominatim already received a
+  // category-specific query. If OSM omitted cuisine=, retain the restaurant
+  // instead of making the missing tag an automatic exclusion.
+  // Never inspect the name here, which would recreate old false positives.
+  return cuisineValues(properties).length === 0 && Boolean(String(properties.name ?? '').trim());
+}
+
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const params = new URLSearchParams({
     q: photonQuery(cuisine), lat: String(latitude), lon: String(longitude), radius: '10', limit: '50', lang: 'de',
