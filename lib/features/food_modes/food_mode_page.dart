@@ -450,34 +450,11 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
             children: [
-              if (widget.surprised)
-                Card(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: const ListTile(
-                    leading: Icon(Icons.casino_rounded),
-                    title: Text('Die Überraschung steht fest!'),
-                    subtitle: Text('Wir haben die Richtung für dich ausgewählt.'),
-                  ),
-                ),
               Text(
                 widget.preference,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
               ),
-              const SizedBox(height: 6),
-              Text(
-                order
-                    ? 'Bis zu 10 passende Restaurants im Umkreis von 20 km. Eine tatsächliche Lieferverfügbarkeit wird nur angezeigt, wenn die Datenquelle sie ausdrücklich ausweist.'
-                    : 'Bis zu 10 passende Restaurants im Umkreis von 20 km, sortiert nach Entfernung.',
-              ),
-              const SizedBox(height: 18),
-              Card(
-                child: ListTile(
-                  leading: Icon(order ? Icons.delivery_dining_rounded : Icons.location_on_rounded),
-                  title: Text(order ? 'Restaurants zum Bestellen' : 'Restaurants'),
-                  subtitle: Text('${results.length} Treffer innerhalb von 20 km'),
-                ),
-              ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 14),
               ...results.map(
                 (result) => _RestaurantListCard(
                   result: result,
@@ -485,13 +462,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   onTap: () => _openDetails(result),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Die Ergebnisse stammen aus OpenStreetMap. Eine Lieferverfügbarkeit ist nicht bei jedem Anbieter verifiziert. Schmackofatz speichert die externen Anbieter nicht dauerhaft.',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
             ],
-          );
+          )
         },
       ),
     );
