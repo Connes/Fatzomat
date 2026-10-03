@@ -331,7 +331,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               initiallyExpanded: false,
               onExpansionChanged: (expanded) => setState(() => ingredientsExpanded = expanded),
               title: const Text('Zutaten', style: TextStyle(fontWeight: FontWeight.w800)),
-              subtitle: Text('\${ingredients.length} Zutaten'),
+              subtitle: Text('${ingredients.length} Zutaten'),
               trailing: Icon(ingredientsExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded),
               childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               children: [
@@ -345,9 +345,25 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(padding: EdgeInsets.only(top: 7), child: Icon(Icons.circle, size: 7, color: AppDesign.primary)),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 7),
+                          child: Icon(Icons.circle, size: 7, color: AppDesign.primary),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: Text('${i.isQualitative ? '' : '${formatQuantity(scaled(i.quantity))} '}${i.unit} ${i.name}', style          const SizedBox(height: 18),
+                        Expanded(
+                          child: Text(
+                            '${i.isQualitative ? '' : '${formatQuantity(scaled(i.quantity))} '}${i.unit} ${i.name}',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                ]),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
           AppSurface(
             padding: EdgeInsets.zero,
             child: ExpansionTile(
@@ -359,13 +375,21 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               children: [
                 if (steps.isNotEmpty) ...[
-                  ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(value: completedSteps.length / steps.length, minHeight: 7)),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: completedSteps.length / steps.length,
+                      minHeight: 7,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                 ],
                 ...List.generate(steps.length, (i) {
                   final done = completedSteps.contains(i);
                   final nextStep = i == completedSteps.length;
-                  final canToggle = (done && i == completedSteps.length - 1) || (!done && nextStep);
+                  final canToggle =
+                      (done && i == completedSteps.length - 1) ||
+                      (!done && nextStep);
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Material(
@@ -373,18 +397,22 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       borderRadius: BorderRadius.circular(18),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(18),
-                        onTap: working || markingCooked || !canToggle ? null : () => setState(() {
-                          if (done) {
-                            completedSteps.remove(i);
-                          } else {
-                            completedSteps.add(i);
-                          }
-                        }),
+                        onTap: working || markingCooked || !canToggle
+                            ? null
+                            : () => setState(() {
+                                  if (done) {
+                                    completedSteps.remove(i);
+                                  } else {
+                                    completedSteps.add(i);
+                                  }
+                                }),
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: done ? AppDesign.secondarySurface : AppDesign.divider),
+                            border: Border.all(
+                              color: done ? AppDesign.secondarySurface : AppDesign.divider,
+                            ),
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,7 +428,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                 child: Center(
                                   child: done
                                       ? const Icon(Icons.check_rounded, color: Colors.white, size: 19)
-                                      : Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w700)),
+                                      : Text(
+                                          '${i + 1}',
+                                          style: const TextStyle(fontWeight: FontWeight.w700),
+                                        ),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -408,9 +439,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                 child: Text(
                                   steps[i].toString(),
                                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    decoration: done ? TextDecoration.lineThrough : null,
-                                    color: done ? AppDesign.secondaryText : AppDesign.text,
-                                  ),
+                                        decoration: done ? TextDecoration.lineThrough : null,
+                                        color: done ? AppDesign.secondaryText : AppDesign.text,
+                                      ),
                                 ),
                               ),
                             ],
