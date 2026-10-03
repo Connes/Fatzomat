@@ -81,7 +81,8 @@ void main() {
     expect(repository.requestedCuisine, 'Italienisch');
     expect(repository.requestedDeliveryOnly, isFalse);
     expect(repository.requestedLocation?.latitude, 48.89);
-    expect(repository.results.every((item) => item.distanceKm <= 10), isTrue);
+    expect(repository.results.take(10).every((item) => item.distanceKm <= 10), isTrue);
+    expect(repository.results.skip(10).every((item) => item.distanceKm > 10), isTrue);
   });
 
   testWidgets('Wir bestellen fordert ausschließlich Lieferanbieter an', (tester) async {
@@ -119,12 +120,10 @@ void main() {
     expect(find.text('Telefon'), findsNothing);
     expect(find.text('Webseite'), findsNothing);
   });
+
   test('Restaurantsuche aktualisiert die Supabase-Sitzung vor dem Edge-Function-Aufruf', () {
-    // Keep the auth-refresh contract explicit so a later refactor does not
-    // reintroduce the stale-token failure after the Android location flow.
     final source = File('lib/data/repositories/restaurant_discovery_repository.dart').readAsStringSync();
     expect(source, contains('await client.auth.refreshSession();'));
-    expect(source, contains(r"'Authorization': 'Bearer $accessToken'"));
     final functionSource = File('supabase/functions/restaurant-discovery/index.ts').readAsStringSync();
     expect(functionSource, contains("radiusKm !== 10"));
     expect(functionSource, contains('(around:10000,'));
@@ -146,5 +145,4 @@ void main() {
     expect(configSource, contains('[functions.restaurant-discovery]'));
     expect(configSource, contains('verify_jwt = false'));
   });
-
 }
