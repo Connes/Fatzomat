@@ -995,12 +995,19 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.recipeName, style: theme.textTheme.headlineSmall),
+                        Text(
+                          widget.recipeName,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: AppDesign.primaryDark,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                         const SizedBox(height: 8),
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             MetaPill(icon: Icons.people_outline_rounded, label: '${widget.servings} Personen'),
-                            const SizedBox(width: 8),
                             MetaPill(icon: Icons.check_circle_outline_rounded, label: '$checked von ${items.length} erledigt'),
                           ],
                         ),
@@ -1012,7 +1019,10 @@ class _ShoppingPageState extends State<ShoppingPage> {
                         const SizedBox(height: 12),
                         Text(
                           'Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert. Manuelle Artikel bleiben erhalten.${widget.shared ? ' Änderungen werden bei beiden verbundenen Personen synchronisiert.' : ''}',
-                          style: theme.textTheme.bodySmall,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppDesign.secondaryText,
+                            height: 1.35,
+                          ),
                         ),
                       ],
                     ),
@@ -1026,6 +1036,43 @@ class _ShoppingPageState extends State<ShoppingPage> {
                       label: const Text('Artikel hinzufügen'),
                     ),
                   ),
+                  const SizedBox(height: 18),
+                  if (items.isNotEmpty && checked == items.length)
+                    AppSurface(
+                      color: AppDesign.secondarySurface,
+                      child: Column(
+                        children: [
+                          const Icon(Icons.check_circle_rounded, size: 34),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Einkaufsliste vollständig erledigt',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppDesign.primaryDark,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Alle Artikel sind abgehakt. Du kannst die Liste jetzt abschließen.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppDesign.text,
+                              height: 1.3,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton.icon(
+                              onPressed: clearCompleted,
+                              icon: const Icon(Icons.done_all_rounded),
+                              label: const Text('Einkaufsliste erledigt'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: 24),
                   if (items.isEmpty)
                     AppSurface(
@@ -1040,7 +1087,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                       ),
                     ),
                   if (openItems.isNotEmpty) ...[
-                    Text('NOCH OFFEN', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark)),
+                    Text('NOCH OFFEN', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 8),
                     ...openGrouped.entries.map((entry) => _ShoppingGroup(category: entry.key, items: entry.value, itemLabel: itemLabel, onToggle: toggleItem, onEdit: editItem, onDelete: deleteItem)),
                   ],
@@ -1048,7 +1095,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Expanded(child: Text('ERLEDIGT', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.mutedText))),
+                        Expanded(child: Text('ERLEDIGT', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark, fontWeight: FontWeight.w800))),
                         TextButton.icon(onPressed: clearCompleted, icon: const Icon(Icons.delete_sweep_outlined, size: 18), label: const Text('Leeren')),
                       ],
                     ),
