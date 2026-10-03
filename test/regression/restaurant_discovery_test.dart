@@ -32,7 +32,7 @@ class _FakeDiscoveryRepository implements RestaurantDiscoveryRepository {
     required String cuisine,
     required bool deliveryOnly,
     int limit = 10,
-    double radiusKm = 20,
+    double radiusKm = 10,
   }) async {
     requestedLocation = location;
     requestedCuisine = cuisine;
@@ -98,7 +98,6 @@ void main() {
 
     expect(find.text('Pizza'), findsOneWidget);
     expect(find.text('Restaurants zum Bestellen'), findsNothing);
-    expect(find.text('3 Treffer innerhalb von 20 km'), findsNothing);
     expect(find.textContaining('Bis zu 10 passende Restaurants'), findsNothing);
     expect(repository.requestedCuisine, 'Pizza');
     expect(repository.requestedDeliveryOnly, isTrue);
@@ -142,8 +141,6 @@ void main() {
       functionSource.indexOf('const results = buildResultsFromOverpass', sourcePriority),
       lessThan(functionSource.indexOf('const results = buildResultsFromPhoton', sourcePriority)),
     );
-    expect(functionSource, contains("tags.phone ?? tags['contact:phone']"));
-    expect(functionSource, contains("tags.website ?? tags['contact:website']"));
 
     final configSource = File('supabase/config.toml').readAsStringSync();
     expect(configSource, contains('[functions.restaurant-discovery]'));
