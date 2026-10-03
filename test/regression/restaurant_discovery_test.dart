@@ -145,8 +145,8 @@ void main() {
     expect(functionSource, isNot(contains("const nameFilter")));
     expect(functionSource, isNot(contains("const searchable =")));
     expect(functionSource, contains("PHOTON_ENDPOINT + 'api/?'"));
-    expect(functionSource, contains("osm.amenity.restaurant,osm.amenity.fast_food"));
-    expect(functionSource, contains("osm.cuisine."));
+    expect(functionSource, contains("params.append('include', photonCuisineCategories(cuisine).join(','));"));
+    expect(functionSource, isNot(contains("for (const category of photonCuisineCategories(cuisine))")));
     expect(functionSource, isNot(contains("radius: '10'")));
     expect(functionSource, contains("[cuisine~\"(' + cuisinePattern + ')\",i]"));
     expect(functionSource, contains('cuisineSearchFallbackMatches'));
