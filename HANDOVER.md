@@ -61,7 +61,7 @@ Für den aktuellen Stand ist über die GitHub-Workflow-Run-Abfrage noch kein bes
 
 - Projekt: `oidxezjdwqktpxuypbfb`
 - Edge Function: `restaurant-discovery`
-- Live-Version: **38**
+- Live-Version: **39**
 - Status: ACTIVE
 - `verify_jwt=false`
 - Import Map aktiv
@@ -74,9 +74,15 @@ Version 37 lieferte am 2026-10-03 wiederholt HTTP 503. Die Logs zeigten:
 - Nominatim: HTTP 403.
 - Danach 503 an den Client.
 
-Die Photon-400-Ursache wurde identifiziert: Bei `/api` wurde `radius=10` gesendet. Photon unterstützt `radius` für `/reverse`, nicht für die Vorwärtssuche. Version 38 wurde mit diesem Fix deployed.
+Die Photon-400-Ursache wurde identifiziert: Bei `/api` wurde `radius=10` gesendet. Photon unterstützt `radius` für `/reverse`, nicht für die Vorwärtssuche. Version 38 wurde mit diesem Fix deployed. Danach zeigte der echte Aufruf weiterhin: Overpass auf allen bisherigen Endpunkten fehlgeschlagen, Photon ohne Treffer, Nominatim HTTP 403.
 
-**Noch offen:** Nach dem Deploy ist noch kein neuer Restaurant-Discovery-Aufruf von Version 38 in den abgefragten aktuellen Logs sichtbar. Die tatsächliche Laufzeitwirkung ist daher noch nicht verifiziert.
+Version 39 wurde deshalb deployed. Änderungen:
+- zusätzliche globale Overpass-Fallbacks `maps.mail.ru` und `overpass.osm.jp`
+- Photon nutzt echte OSM-Kategoriefilter (`osm.amenity.*` + `osm.cuisine.*`) statt die Küche primär über einen Namenssuchtext zu ermitteln
+- Photon behält eine kategoriebezogene Namenssuche als zweiten Fallback
+- Provider-Requests verwenden einen identifizierbaren User-Agent; Nominatim erhält zusätzlich einen Referer
+
+**Noch offen:** Nach dem Deploy von Version 39 ist noch kein neuer Restaurant-Discovery-Aufruf in den abgefragten aktuellen Logs sichtbar. Die Laufzeitwirkung von Version 39 ist daher noch nicht verifiziert.
 
 ## Restaurant Discovery – fachliche Regeln
 
@@ -121,7 +127,7 @@ Dafür verwendet der aktuelle Code:
 
 ## Nächster technischer Schritt
 
-1. Einen echten Restaurant-Discovery-Aufruf mit Live-Version 38 auslösen.
+1. Einen echten Restaurant-Discovery-Aufruf mit Live-Version 39 auslösen.
 2. Supabase-Logs prüfen:
    - wird Version 38 verwendet?
    - liefert Overpass Ergebnisse oder greift Photon?
