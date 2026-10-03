@@ -124,6 +124,9 @@ void main() {
   test('Restaurantsuche aktualisiert die Supabase-Sitzung vor dem Edge-Function-Aufruf', () {
     final source = File('lib/data/repositories/restaurant_discovery_repository.dart').readAsStringSync();
     expect(source, contains('await client.auth.refreshSession();'));
+    expect(source, contains("_nominatimFallback"));
+    expect(source, contains("nominatim.openstreetmap.org"));
+    expect(source, contains("if (e.status == 503)"));
     final functionSource = File('supabase/functions/restaurant-discovery/index.ts').readAsStringSync();
     expect(functionSource, contains("radiusKm !== 10"));
     expect(functionSource, contains('(around:10000,'));
