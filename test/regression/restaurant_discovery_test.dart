@@ -149,6 +149,9 @@ void main() {
     expect(functionSource, contains('cuisineSearchFallbackMatches'));
     expect(functionSource, contains('provider_category_fallback'));
     expect(functionSource, contains('Never inspect the name here'));
+    expect(functionSource, contains('return features.filter((feature) => cuisineSearchFallbackMatches'));
+    expect(functionSource, contains('if (results.length > 0)'));
+    expect(functionSource, contains('Overpass returned no strict matches; trying Photon.'));
 
 
     expect(functionSource, contains("delivery_filter: deliveryOnly ? 'verified_or_unknown' : 'not_requested'"));
