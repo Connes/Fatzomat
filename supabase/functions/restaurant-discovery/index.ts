@@ -29,6 +29,8 @@ const OVERPASS_ENDPOINTS = [
   'https://overpass.private.coffee/api/interpreter',
   'https://lz4.overpass-api.de/api/interpreter',
   'https://overpass.nchc.org.tw/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+  'https://overpass.osm.jp/api/interpreter',
 ];
 const PHOTON_TIMEOUT_MS = 9000;
 const OVERPASS_TIMEOUT_MS = 9000;
@@ -119,94 +121,59 @@ function cacheKey(latitude: number, longitude: number, cuisine: string, delivery
 
 function photonQuery(cuisine: string): string {
   const queries: Record<string, string> = {
-    Pizza: 'pizza restaurant',
-    Burger: 'burger restaurant',
-    Asiatisch: 'asian restaurant',
-    Döner: 'kebab restaurant',
-    Sushi: 'sushi restaurant',
-    Indisch: 'indian restaurant',
-    Italienisch: 'italian restaurant',
-    Griechisch: 'greek restaurant',
-    Mexikanisch: 'mexican restaurant',
-    Vegetarisch: 'vegetarian vegan restaurant',
-    Steak: 'steak grill restaurant',
+    Pizza: 'pizza',
+    Burger: 'burger',
+    Asiatisch: 'asian',
+    Döner: 'kebab',
+    Sushi: 'sushi',
+    Indisch: 'indian',
+    Italienisch: 'italian',
+    Griechisch: 'greek',
+    Mexikanisch: 'mexican',
+    Vegetarisch: 'vegetarian',
+    Steak: 'steak',
   };
   return queries[cuisine] ?? 'restaurant';
 }
 
-async function authenticateUser(req: Request) {
-  const authorization = req.headers.get('Authorization') ?? '';
-  if (!authorization.toLowerCase().startsWith('bearer ')) return null;
-  const token = authorization.slice(7).trim();
-  if (!token) return null;
-
-  const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ??
-      Deno.env.get('SUPABASE_ANON_KEY') ??
-      Deno.env.get('SUPABASE_PUBLISHABLE_KEY');
-  if (!supabaseUrl || !supabaseKey) throw new Error('Supabase Auth ist serverseitig nicht konfiguriert.');
-
-  const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data, error } = await supabase.auth.getUser(token);
-  return error || !data.user ? null : data.user;
+function photonCuisineCategories(cuisine: string): string[] {
+  return (CUISINE_VALUES[cuisine] ?? []).map((value) => 'osm.cuisine.' + normalizeSearchText(value).replace(/ /g, '_'));
 }
-
-function normalizeSearchText(value: unknown): string {
-  return String(value ?? '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-}
-
-function cuisineValues(properties: Record<string, any>): string[] {
-  return String(properties.cuisine ?? '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .split(';')
-      .map((value) => value.trim())
-      .filter(Boolean);
-}
-
-function cuisineMatches(properties: Record<string, any>, cuisine: string): boolean {
-  const requested = CUISINE_VALUES[cuisine] ?? [];
-  if (!requested.length) return false;
-
-  if (cuisine === 'Vegetarisch') {
-    const vegetarian = normalizeSearchText(properties['diet:vegetarian']);
-    const vegan = normalizeSearchText(properties['diet:vegan']);
-    if (/^(yes|only)$/.test(vegetarian) || /^(yes|only)$/.test(vegan)) return true;
-  }
-
-  const values = cuisineValues(properties);
-  if (!values.length) return false;
-  return requested.some((value) => values.includes(normalizeSearchText(value)));
-}
-
-function cuisineSearchFallbackMatches(properties: Record<string, any>, cuisine: string): boolean {
-  if (cuisineMatches(properties, cuisine)) return true;
-  // Provider-specific fallback: Photon/Nominatim already received a
-  // category-specific query. If OSM omitted cuisine=, retain the restaurant
-  // instead of making the missing tag an automatic exclusion.
-  // Never inspect the name here, which would recreate old false positives.
-  return cuisineValues(properties).length === 0 && Boolean(String(properties.name ?? '').trim());
-}
-
 async function queryPhoton(latitude: number, longitude: number, cuisine: string): Promise<any[]> {
   const params = new URLSearchParams({
-    q: photonQuery(cuisine), lat: String(latitude), lon: String(longitude), limit: '50', lang: 'de',
+    lat: String(latitude),
+    lon: String(longitude),
+    limit: '50',
+    lang: 'de',
   });
-  const response = await fetch(PHOTON_ENDPOINT + 'api/?' + params.toString(), {
-    method: 'GET',
-    headers: { 'Accept': 'application/json', 'User-Agent': 'Schmackofatz/1.13 restaurant-discovery' },
-    signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
+  params.append('include', 'osm.amenity.restaurant,osm.amenity.fast_food');
+  for (const category of photonCuisineCategories(cuisine)) params.append('include', category);
+
+  const request = async (queryParams: URLSearchParams) => {
+    const response = await fetch(PHOTON_ENDPOINT + 'api/?' + queryParams.toString(), {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Schmackofatz/1.13 (+https://github.com/Connes/Fatzomat)',
+      },
+      signal: AbortSignal.timeout(PHOTON_TIMEOUT_MS),
+    });
+    if (!response.ok) throw new Error('Photon HTTP ' + response.status);
+    const payload = await response.json();
+    return Array.isArray(payload?.features) ? payload.features : [];
+  };
+
+  const categoryFeatures = await request(params);
+  if (categoryFeatures.length) return categoryFeatures;
+
+  const fallbackParams = new URLSearchParams({
+    q: photonQuery(cuisine),
+    lat: String(latitude),
+    lon: String(longitude),
+    limit: '50',
+    lang: 'de',
   });
-  if (!response.ok) throw new Error('Photon reverse HTTP ' + response.status);
-  const payload = await response.json();
-  const features = Array.isArray(payload?.features) ? payload.features : [];
-  return features.filter((feature) => cuisineSearchFallbackMatches((feature?.properties ?? {}) as Record<string, any>, cuisine));
+  return await request(fallbackParams);
 }
 function buildResultsFromPhoton(features: any[], latitude: number, longitude: number, limit: number, deliveryOnly: boolean) {
   const seen = new Set<string>();
@@ -265,7 +232,11 @@ async function queryNominatim(latitude: number, longitude: number, cuisine: stri
   });
   const response = await fetch(NOMINATIM_ENDPOINT + '?' + params.toString(), {
     method: 'GET',
-    headers: { 'Accept': 'application/json', 'User-Agent': 'Schmackofatz/1.13 restaurant-discovery' },
+    headers: {
+      'Accept': 'application/json',
+      'Referer': 'https://github.com/Connes/Fatzomat',
+      'User-Agent': 'Schmackofatz/1.13 (+https://github.com/Connes/Fatzomat)',
+    },
     signal: AbortSignal.timeout(NOMINATIM_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error('Nominatim HTTP ' + response.status);
