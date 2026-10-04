@@ -295,7 +295,7 @@ class _OptionCard extends StatelessWidget {
                         child: Icon(
                           icon ?? Icons.restaurant_rounded,
                           size: 58,
-                          color: AppDesign.textMuted,
+                          color: AppDesign.mutedText,
                         ),
                       ),
                     ),
