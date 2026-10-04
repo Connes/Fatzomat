@@ -134,28 +134,35 @@ def load_geojson(path: Path) -> list[dict[str, Any]]:
 
 
 def query_overpass(bbox) -> list[dict[str, Any]]:
+    """Best-effort OSM enrichment. Overture remains the primary source."""
     west, south, east, north = bbox
     query = f"""
-[out:json][timeout:60];
+[out:json][timeout:45];
 (
   nwr["amenity"="restaurant"]({south},{west},{north},{east});
   nwr["amenity"="fast_food"]({south},{west},{north},{east});
 );
 out center tags;
 """.strip()
-    last_error = None
+    errors = []
     for endpoint in OVERPASS_ENDPOINTS:
         try:
             response = requests.post(
-                endpoint, data=query.encode("utf-8"),
+                endpoint,
+                data=query.encode("utf-8"),
                 headers={"User-Agent": "Fatzomat restaurant-index importer"},
-                timeout=75,
+                timeout=45,
             )
             response.raise_for_status()
             return response.json().get("elements", [])
         except Exception as exc:
-            last_error = exc
-    raise RuntimeError(f"All Overpass endpoints failed: {last_error}")
+            errors.append(f"{endpoint}: {exc}")
+    print(
+        "Warning: all Overpass endpoints failed; continuing with Overture only. "
+        + " | ".join(errors),
+        file=sys.stderr,
+    )
+    return []
 
 
 def osm_point(element):
