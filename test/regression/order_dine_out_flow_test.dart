@@ -60,7 +60,28 @@ RestaurantDiscoveryResult _restaurant(String cuisine) => RestaurantDiscoveryResu
     );
 
 const _orderChoices = ['Pizza', 'Burger', 'Asiatisch', 'Döner', 'Sushi', 'Indisch'];
-const _dineOutChoices = ['Italienisch', 'Steak', 'Asiatisch', 'Sushi', 'Burger', 'Mexikanisch', 'Vegetarisch'];
+const _dineOutChoices = [
+  'Italienisch',
+  'Griechisch',
+  'Türkisch',
+  'Japanisch',
+  'Chinesisch',
+  'Thailändisch',
+  'Vietnamesisch',
+  'Koreanisch',
+  'Indonesisch',
+  'Malaysisch',
+  'Sushi',
+  'Burger',
+  'Steak',
+  'Mexikanisch',
+  'Spanisch',
+  'Libanesisch',
+  'Portugiesisch',
+  'Vegetarisch',
+  'Vegan',
+  'Überrasch mich',
+];
 
 void main() {
   Future<void> verifyChoiceFlow(
