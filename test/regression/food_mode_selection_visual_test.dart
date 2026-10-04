@@ -40,11 +40,23 @@ void main() {
       containsAll([
         'Italienisch',
         'Steak',
-        'Asiatisch',
         'Sushi',
         'Burger',
         'Mexikanisch',
         'Vegetarisch',
+        'Griechisch',
+        'Türkisch',
+        'Japanisch',
+        'Chinesisch',
+        'Thailändisch',
+        'Vietnamesisch',
+        'Koreanisch',
+        'Indonesisch',
+        'Malaysisch',
+        'Spanisch',
+        'Libanesisch',
+        'Portugiesisch',
+        'Vegan',
       ]),
     );
   });
@@ -71,8 +83,10 @@ void main() {
   Future<void> pumpMode(
     WidgetTester tester,
     FoodMode mode,
-    List<String> labels,
-  ) async {
+    List<String> labels, {
+    List<String>? assetLabels,
+  }) async {
+    final imageLabels = assetLabels ?? labels;
     await tester.pumpWidget(
       MaterialApp(home: FoodModePage(mode: mode)),
     );
@@ -87,9 +101,9 @@ void main() {
     }
 
     expect(find.byType(InkWell), findsNWidgets(labels.length));
-    expect(_fullBleedSelectionImageFinder(), findsNWidgets(labels.length));
+    expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
 
-    for (final label in labels) {
+    for (final label in imageLabels) {
       final asset = FoodChoiceAssetService.assetFor(mode, label)!;
       expect(_assetImageFinder(asset), findsOneWidget, reason: 'Asset fehlt: $asset');
     }
@@ -124,8 +138,29 @@ void main() {
       (tester) async {
     await pumpMode(tester, FoodMode.dineOut, const [
       'Italienisch',
+      'Griechisch',
+      'Türkisch',
+      'Japanisch',
+      'Chinesisch',
+      'Thailändisch',
+      'Vietnamesisch',
+      'Koreanisch',
+      'Indonesisch',
+      'Malaysisch',
+      'Sushi',
+      'Burger',
       'Steak',
-      'Asiatisch',
+      'Mexikanisch',
+      'Spanisch',
+      'Libanesisch',
+      'Portugiesisch',
+      'Vegetarisch',
+      'Vegan',
+      'Überrasch mich',
+    ],
+    assetLabels: const [
+      'Italienisch',
+      'Steak',
       'Sushi',
       'Burger',
       'Mexikanisch',
