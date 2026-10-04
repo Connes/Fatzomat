@@ -2,6 +2,9 @@ name: Build restaurant index
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - tools/restaurant_index/import_restaurants.py
 
 permissions:
   contents: read
