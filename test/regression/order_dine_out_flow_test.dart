@@ -80,7 +80,6 @@ const _dineOutChoices = [
   'Portugiesisch',
   'Vegetarisch',
   'Vegan',
-  'Überrasch mich',
 ];
 
 void main() {
