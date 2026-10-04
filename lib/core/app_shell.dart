@@ -31,7 +31,6 @@ class _AppShellState extends State<AppShell> {
     _network.start();
   }
 
-  @override
   void _selectTab(int value) {
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     if (value != index) {
@@ -42,6 +41,7 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
+  @override
   void dispose() {
     _network.dispose();
     _contentIndex.dispose();
