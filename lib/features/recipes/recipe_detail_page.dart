@@ -18,7 +18,8 @@ import 'add_recipe_page.dart';
 class RecipeDetailPage extends StatefulWidget {
   final String recipeId;
   final Future<void> Function()? onTodayPlanChanged;
-  const RecipeDetailPage({super.key, required this.recipeId, this.onTodayPlanChanged});
+  final VoidCallback? onNavigateToToday;
+  const RecipeDetailPage({super.key, required this.recipeId, this.onTodayPlanChanged, this.onNavigateToToday});
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
 
@@ -99,7 +100,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         ),
       );
       if (openToday == true && mounted) {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage()));
+        if (widget.onNavigateToToday != null) {
+          widget.onNavigateToToday!();
+          if (mounted) Navigator.pop(context);
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage()));
+        }
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
@@ -119,10 +125,15 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       }
       final updated = await personalToday.updateStatus(plan.id, 'cooked');
       if (!updated || !mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const TodayPage()),
-      );
+      if (widget.onNavigateToToday != null) {
+        widget.onNavigateToToday!();
+        if (mounted) Navigator.pop(context);
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const TodayPage()),
+        );
+      }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
     } finally {
