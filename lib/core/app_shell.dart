@@ -32,6 +32,16 @@ class _AppShellState extends State<AppShell> {
   }
 
   @override
+  void _selectTab(int value) {
+    _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    if (value != index) {
+      setState(() {
+        index = value;
+        _contentIndex.value = value;
+      });
+    }
+  }
+
   void dispose() {
     _network.dispose();
     _contentIndex.dispose();
@@ -71,7 +81,7 @@ class _AppShellState extends State<AppShell> {
   Widget _buildShell(BuildContext context) {
     final pages = [
       const TodayPage(),
-      const SavedRecipesPage(),
+      SavedRecipesPage(onNavigateToTab: _selectTab),
       const ShoppingListPage(),
       const SettingsPage(),
     ];
@@ -94,15 +104,7 @@ class _AppShellState extends State<AppShell> {
         top: false,
         child: NavigationBar(
         selectedIndex: index,
-        onDestinationSelected: (value) {
-          _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
-          if (value != index) {
-            setState(() {
-              index = value;
-              _contentIndex.value = value;
-            });
-          }
-        },
+        onDestinationSelected: _selectTab,
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'Heute'),
           NavigationDestination(icon: Icon(Icons.bookmark_border_rounded), selectedIcon: Icon(Icons.bookmark_rounded), label: 'Rezepte'),
