@@ -23,6 +23,8 @@ void main() {
     expect(shell, contains('ValueListenableBuilder<int>('));
     expect(shell, contains('index: selectedIndex'));
     expect(shell, contains('_contentIndex.value = value'));
+    expect(shell, contains('SavedRecipesPage(onNavigateToTab: _selectTab)'));
+    expect(shell, contains('void _selectTab(int value)'));
   });
 
   test('normal feature navigation uses the shell navigator context', () {
