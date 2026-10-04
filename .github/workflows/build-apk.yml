@@ -50,3 +50,4 @@ jobs:
           name: Fatzomat-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
+          retention-days: 1
