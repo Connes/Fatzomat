@@ -98,9 +98,17 @@ def categories_from_taxonomy(values: set[str]) -> list[str]:
 
 
 def overture_is_food_place(feature: dict[str, Any]) -> bool:
+    """Accept current Overture restaurant/fast-food taxonomy entries."""
     values = taxonomy_values(feature)
-    return "restaurant" in values or "fast_food" in values or any(
-        v.endswith("_restaurant") for v in values
+    basic_category = normalize_text(feature.get("basic_category"))
+    # Current Overture taxonomy represents restaurants via the hierarchy,
+    # e.g. food_and_drink -> restaurant -> casual_eatery -> subtype.
+    # Keep the filter broad here; cuisine classification stays strict below.
+    return (
+        "restaurant" in values
+        or "fast_food" in values
+        or basic_category in {"restaurant", "fast_food"}
+        or any(v.endswith("_restaurant") for v in values)
     )
 
 
