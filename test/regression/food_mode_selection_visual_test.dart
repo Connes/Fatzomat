@@ -26,7 +26,7 @@ Finder _fullBleedSelectionImageFinder() => find.byWidgetPredicate(
     );
 
 void main() {
-  test('Food-Choice-Asset-Mapping deckt alle Auswahlmöglichkeiten ab', () {
+  test('Food-Choice-Asset-Mapping deckt alle bildgestützten Auswahlmöglichkeiten ab', () {
     expect(
       FoodChoiceAssetService.choicesFor(FoodMode.cook).keys,
       containsAll(['Rind', 'Schwein', 'Huhn', 'Fisch', 'Vegetarisch']),
@@ -44,65 +44,6 @@ void main() {
         'Burger',
         'Mexikanisch',
         'Vegetarisch',
-      ]),'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import 'package:food_app_mvp/core/app_design.dart';
-import 'package:food_app_mvp/core/food_mode.dart';
-import 'package:food_app_mvp/core/services/food_choice_asset_service.dart';
-import 'package:food_app_mvp/features/food_modes/food_mode_page.dart';
-
-Finder _assetImageFinder(String assetName) => find.byWidgetPredicate(
-      (widget) =>
-          widget is Image &&
-          widget.image is AssetImage &&
-          (widget.image as AssetImage).assetName == assetName,
-    );
-
-Finder _fullBleedSelectionImageFinder() => find.byWidgetPredicate(
-      (widget) {
-        if (widget is! Image || widget.fit != BoxFit.cover || widget.image is! AssetImage) {
-          return false;
-        }
-        final asset = (widget.image as AssetImage).assetName;
-        return asset.startsWith('assets/food_choices/') ||
-            asset == 'assets/together/clean/icons/icon_surprise.png';
-      },
-    );
-
-void main() {
-  test('Food-Choice-Asset-Mapping deckt alle Auswahlmöglichkeiten ab', () {
-    expect(
-      FoodChoiceAssetService.choicesFor(FoodMode.cook).keys,
-      containsAll(['Rind', 'Schwein', 'Huhn', 'Fisch', 'Vegetarisch']),
-    );
-    expect(
-      FoodChoiceAssetService.choicesFor(FoodMode.order).keys,
-      containsAll(['Pizza', 'Burger', 'Asiatisch', 'Döner', 'Sushi', 'Indisch']),
-    );
-    expect(
-      FoodChoiceAssetService.choicesFor(FoodMode.dineOut).keys,
-      containsAll([
-        'Italienisch',
-        'Steak',
-        'Sushi',
-        'Burger',
-        'Mexikanisch',
-        'Vegetarisch',
-        'Griechisch',
-        'Türkisch',
-        'Japanisch',
-        'Chinesisch',
-        'Thailändisch',
-        'Vietnamesisch',
-        'Koreanisch',
-        'Indonesisch',
-        'Malaysisch',
-        'Spanisch',
-        'Libanesisch',
-        'Portugiesisch',
-        'Vegan',
       ]),
     );
   });
@@ -180,39 +121,43 @@ void main() {
     ]);
   });
 
-  testWidgets('Wir gehen essen hat eine gemeinsame Box, vollflächige Bilder und alle Auswahltexte',
+  testWidgets('Wir gehen essen hat eine gemeinsame Box und alle Auswahltexte',
       (tester) async {
-    await pumpMode(tester, FoodMode.dineOut, const [
-      'Italienisch',
-      'Griechisch',
-      'Türkisch',
-      'Japanisch',
-      'Chinesisch',
-      'Thailändisch',
-      'Vietnamesisch',
-      'Koreanisch',
-      'Indonesisch',
-      'Malaysisch',
-      'Sushi',
-      'Burger',
-      'Steak',
-      'Mexikanisch',
-      'Spanisch',
-      'Libanesisch',
-      'Portugiesisch',
-      'Vegetarisch',
-      'Vegan',
-      'Überrasch mich',
-    ],
-    assetLabels: const [
-      'Italienisch',
-      'Steak',
-      'Sushi',
-      'Burger',
-      'Mexikanisch',
-      'Vegetarisch',
-      'Überrasch mich',
-    ]);
+    await pumpMode(
+      tester,
+      FoodMode.dineOut,
+      const [
+        'Italienisch',
+        'Griechisch',
+        'Türkisch',
+        'Japanisch',
+        'Chinesisch',
+        'Thailändisch',
+        'Vietnamesisch',
+        'Koreanisch',
+        'Indonesisch',
+        'Malaysisch',
+        'Sushi',
+        'Burger',
+        'Steak',
+        'Mexikanisch',
+        'Spanisch',
+        'Libanesisch',
+        'Portugiesisch',
+        'Vegetarisch',
+        'Vegan',
+        'Überrasch mich',
+      ],
+      assetLabels: const [
+        'Italienisch',
+        'Steak',
+        'Sushi',
+        'Burger',
+        'Mexikanisch',
+        'Vegetarisch',
+        'Überrasch mich',
+      ],
+    );
   });
 
   test('Beide Restaurant-Modi enthalten ausdrücklich den Überraschungsweg', () {
