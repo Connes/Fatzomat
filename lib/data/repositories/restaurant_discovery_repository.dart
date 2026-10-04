@@ -242,7 +242,7 @@ class SupabaseRestaurantDiscoveryRepository implements RestaurantDiscoveryReposi
             location: location,
             cuisine: cuisine,
             deliveryOnly: deliveryOnly,
-            limit: limit.clamp(1, 10),
+            limit: limit.clamp(1, 10).toInt(),
           );
           if (fallback.isNotEmpty) return fallback;
         } catch (_) {
