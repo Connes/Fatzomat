@@ -166,12 +166,24 @@ class _FoodModePageState extends State<FoodModePage> {
         ],
       FoodMode.dineOut => const [
           _ModeOption('Italienisch'),
-          _ModeOption('Steak'),
-          _ModeOption('Asiatisch'),
+          _ModeOption('Griechisch'),
+          _ModeOption('Türkisch'),
+          _ModeOption('Japanisch'),
+          _ModeOption('Chinesisch'),
+          _ModeOption('Thailändisch'),
+          _ModeOption('Vietnamesisch'),
+          _ModeOption('Koreanisch'),
+          _ModeOption('Indonesisch'),
+          _ModeOption('Malaysisch'),
           _ModeOption('Sushi'),
           _ModeOption('Burger'),
+          _ModeOption('Steak'),
           _ModeOption('Mexikanisch'),
+          _ModeOption('Spanisch'),
+          _ModeOption('Libanesisch'),
+          _ModeOption('Portugiesisch'),
           _ModeOption('Vegetarisch'),
+          _ModeOption('Vegan'),
           _ModeOption('Überrasch mich'),
         ],
     };
@@ -237,11 +249,7 @@ class _OptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final assetPath = FoodChoiceAssetService.assetFor(mode, option.label);
-
-    assert(
-      assetPath != null,
-      'Missing FoodChoice asset for ${mode.name}:${option.label}',
-    );
+    final icon = FoodChoiceAssetService.iconFor(mode, option.label);
 
     return Semantics(
       container: true,
@@ -263,22 +271,34 @@ class _OptionCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    assetPath!,
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.high,
-                    excludeFromSemantics: true,
-                    errorBuilder: (_, error, stackTrace) => ColoredBox(
+                  if (assetPath != null)
+                    Image.asset(
+                      assetPath,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
+                      excludeFromSemantics: true,
+                      errorBuilder: (_, error, stackTrace) => ColoredBox(
+                        color: AppDesign.softSurface,
+                        child: Center(
+                          child: Text(
+                            'Bild nicht verfügbar',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Theme.of(context).colorScheme.error),
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ColoredBox(
                       color: AppDesign.softSurface,
                       child: Center(
-                        child: Text(
-                          'Bild nicht verfügbar',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        child: Icon(
+                          icon ?? Icons.restaurant_rounded,
+                          size: 58,
+                          color: AppDesign.textMuted,
                         ),
                       ),
                     ),
-                  ),
                   const Positioned.fill(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
