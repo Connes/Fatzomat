@@ -13,6 +13,11 @@ void main() {
     expect(recipe, contains("personalToday.updateStatus(plan.id, 'cooked')"));
     expect(recipe, contains('Navigator.pushReplacement('));
     expect(recipe, contains('MaterialPageRoute(builder: (_) => const TodayPage())'));
+    expect(recipe, contains('onNavigateToToday'));
+    expect(recipe, contains('widget.onNavigateToToday!();'));
+    expect(recipe, contains('Navigator.pop(context);'));
+    expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
+    expect(today, contains('final VoidCallback? onOpenRecipe;'));
 
     expect(today, contains("plan.status == 'cooked'"));
     expect(today, contains("Icons.check_circle_rounded"));
