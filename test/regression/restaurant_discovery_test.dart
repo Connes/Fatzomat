@@ -57,6 +57,44 @@ RestaurantDiscoveryResult _result(String id, double distance, {bool delivery = f
     );
 
 void main() {
+  testWidgets('Wir gehen essen zeigt die kuratierte Küchenliste ohne Asiatisch', (tester) async {
+    final repository = _FakeDiscoveryRepository([_result('1', 1.2)]);
+    await tester.pumpWidget(MaterialApp(
+      home: FoodModePage(
+        mode: FoodMode.dineOut,
+        locationService: _FakeLocationService(const UserLocation(latitude: 48.89, longitude: 8.70)),
+        discoveryRepository: repository,
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    for (final cuisine in const [
+      'Italienisch',
+      'Griechisch',
+      'Türkisch',
+      'Japanisch',
+      'Chinesisch',
+      'Thailändisch',
+      'Vietnamesisch',
+      'Koreanisch',
+      'Indonesisch',
+      'Malaysisch',
+      'Sushi',
+      'Burger',
+      'Steak',
+      'Mexikanisch',
+      'Spanisch',
+      'Libanesisch',
+      'Portugiesisch',
+      'Vegetarisch',
+      'Vegan',
+      'Überrasch mich',
+    ]) {
+      expect(find.text(cuisine), findsOneWidget, reason: 'Missing cuisine: $cuisine');
+    }
+    expect(find.text('Asiatisch'), findsNothing);
+  });
+
   testWidgets('Wir gehen essen nutzt Küche, Standort, 10 km und maximal 10 Ergebnisse', (tester) async {
     final repository = _FakeDiscoveryRepository(List.generate(12, (i) => _result('$i', i < 10 ? i + .2 : 10.2 + i)));
     await tester.pumpWidget(MaterialApp(
