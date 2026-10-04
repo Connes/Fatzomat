@@ -81,6 +81,7 @@ bool recipeMatchesSelection(
 }
 
 class SavedRecipesPage extends StatefulWidget {
+  final ValueChanged<int>? onNavigateToTab;
   final String? mainChoice;
   final Set<String> selectedFoodIds;
   final String? decisionRequestId;
@@ -88,6 +89,7 @@ class SavedRecipesPage extends StatefulWidget {
 
   const SavedRecipesPage({
     super.key,
+    this.onNavigateToTab,
     this.mainChoice,
     this.selectedFoodIds = const <String>{},
     this.decisionRequestId,
