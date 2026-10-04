@@ -32,16 +32,25 @@ OVERPASS_ENDPOINTS = [
     "https://overpass.private.coffee/api/interpreter",
 ]
 CUISINE_MAP = {
-    "italian": "Italienisch", "greek": "Griechisch",
-    "asian": "Asiatisch", "chinese": "Asiatisch", "thai": "Asiatisch",
-    "vietnamese": "Asiatisch", "korean": "Asiatisch",
-    "indonesian": "Asiatisch", "malaysian": "Asiatisch",
-    "indian": "Indisch", "burger": "Burger", "burger_restaurant": "Burger",
-    "mexican": "Mexikanisch", "vegetarian": "Vegetarisch", "vegan": "Vegetarisch",
+    "italian": "Italienisch", "italian_restaurant": "Italienisch",
+    "greek": "Griechisch", "greek_restaurant": "Griechisch",
+    "asian": "Asiatisch", "asian_restaurant": "Asiatisch",
+    "chinese": "Asiatisch", "chinese_restaurant": "Asiatisch",
+    "thai": "Asiatisch", "thai_restaurant": "Asiatisch",
+    "vietnamese": "Asiatisch", "vietnamese_restaurant": "Asiatisch",
+    "korean": "Asiatisch", "korean_restaurant": "Asiatisch",
+    "indonesian": "Asiatisch", "indonesian_restaurant": "Asiatisch",
+    "malaysian": "Asiatisch", "malaysian_restaurant": "Asiatisch",
+    "indian": "Indisch", "indian_restaurant": "Indisch",
+    "burger": "Burger", "burger_restaurant": "Burger",
+    "mexican": "Mexikanisch", "mexican_restaurant": "Mexikanisch",
+    "vegetarian": "Vegetarisch", "vegetarian_restaurant": "Vegetarisch",
+    "vegan": "Vegetarisch", "vegan_restaurant": "Vegetarisch",
     "sushi": "Sushi", "sushi_restaurant": "Sushi",
     "pizza": "Pizza", "pizza_restaurant": "Pizza", "italian_pizza": "Pizza",
     "kebab": "Döner", "kebab_restaurant": "Döner", "doner": "Döner",
-    "doner_kebab": "Döner", "steak": "Steak", "steak_restaurant": "Steak",
+    "doner_kebab": "Döner", "doner_kebab_restaurant": "Döner",
+    "steak": "Steak", "steak_restaurant": "Steak",
 }
 
 
