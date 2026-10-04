@@ -334,14 +334,8 @@ class _TodayPageState extends State<TodayPage> {
                           plan: plan!,
                           onCancel: removeTodayPlan,
                           onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
-                          onOpenRecipe: plan!.isRecipe
+                          onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
                               ? () async {
-                                  if (plan!.status == 'cooked') {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Für heute ist schon alles erledigt. Deine Entscheidung ist abgeschlossen.')),
-                                    );
-                                    return;
-                                  }
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -353,7 +347,7 @@ class _TodayPageState extends State<TodayPage> {
                                   );
                                   if (mounted) await load();
                                 }
-                              : () {},
+                              : null,
                         ),
                 ),
               ),
@@ -504,7 +498,7 @@ class _TodayDecisionCard extends StatelessWidget {
 
 class _TodayResultCard extends StatelessWidget {
   final TodayPlan plan;
-  final VoidCallback onOpenRecipe;
+  final VoidCallback? onOpenRecipe;
   final VoidCallback onCancel;
   final VoidCallback? onShare;
 
