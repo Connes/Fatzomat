@@ -98,7 +98,7 @@ def categories_from_taxonomy(values: set[str]) -> list[str]:
 
 
 def overture_is_food_place(feature: dict[str, Any]) -> bool:
-    """Accept current Overture restaurant/fast-food taxonomy entries."""
+    """Accept current Overture restaurant/fast-food taxonomy entries from the live schema."""
     values = taxonomy_values(feature)
     basic_category = normalize_text(feature.get("basic_category"))
     # Current Overture taxonomy represents restaurants via the hierarchy,
