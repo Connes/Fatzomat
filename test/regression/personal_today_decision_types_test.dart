@@ -33,7 +33,8 @@ void main() {
     expect(today, contains('RecipeDetailPage('));
     expect(today, contains('recipeId: plan!.recipeId!'));
     expect(today, contains('onTodayPlanChanged: load'));
-    expect(today, contains(': () {},'));
+    expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
+    expect(today, contains('final VoidCallback? onOpenRecipe;'));
     expect(today, contains("label: const Text('Entscheidung entfernen')"));
   });
 }
