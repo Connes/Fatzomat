@@ -1031,7 +1031,6 @@ class _ShoppingPageState extends State<ShoppingPage> {
                             ),
                           ),
                         ),
-                        ),
                       ],
                     ),
                   ),
