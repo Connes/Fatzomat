@@ -59,6 +59,28 @@ class FoodChoiceAssetService {
     return map[choice];
   }
 
+  static IconData? iconFor(FoodMode mode, String choice) => null;
+
+  static Map<String, String> choicesFor(FoodMode mode) => switch (mode) {
+        FoodMode.cook => _cook,
+        FoodMode.order => _order,
+        FoodMode.dineOut => _dineOut,
+      };
+}  static const _surprise =
+      'assets/together/clean/icons/icon_surprise.png';
+  static const _surprise =
+      'assets/together/clean/icons/icon_surprise.png';
+
+  static String? assetFor(FoodMode mode, String choice) {
+    if (choice == 'Überrasch mich') return _surprise;
+    final map = switch (mode) {
+      FoodMode.cook => _cook,
+      FoodMode.order => _order,
+      FoodMode.dineOut => _dineOut,
+    };
+    return map[choice];
+  }
+
   static IconData? iconFor(FoodMode mode, String choice) {
     if (mode == FoodMode.dineOut) return _dineOutIcons[choice];
     return null;
