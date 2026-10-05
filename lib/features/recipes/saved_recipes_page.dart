@@ -430,7 +430,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   Widget build(BuildContext context) {
     return TogetherScaffold(backgroundType: TogetherBackgroundType.recipes, 
       appBar: TogetherAppBar(
-        title: const Text('Unsere Rezepte'),
+        title: const Text('Meine Rezepte'),
         actions: [
           IconButton(
             tooltip: 'Rezept hinzufügen',
