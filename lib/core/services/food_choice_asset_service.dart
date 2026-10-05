@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import '../food_mode.dart';
 
 /// Central mapping from the semantic food choice to its dedicated UI asset.
-///
-/// Keep this mapping in one place so FoodModePage does not accumulate
-/// mode-specific asset paths and so tests can verify the complete coverage.
 class FoodChoiceAssetService {
   static const _cook = <String, String>{
     'Rind': 'assets/food_choices/cooking/rind.png',
@@ -46,8 +43,7 @@ class FoodChoiceAssetService {
     'Vegan': 'assets/food_choices/restaurant/vegan.svg',
   };
 
-  static const _surprise =
-      'assets/together/clean/icons/icon_surprise.png';
+  static const _surprise = 'assets/together/clean/icons/icon_surprise.png';
 
   static String? assetFor(FoodMode mode, String choice) {
     if (choice == 'Überrasch mich') return _surprise;
@@ -60,31 +56,6 @@ class FoodChoiceAssetService {
   }
 
   static IconData? iconFor(FoodMode mode, String choice) => null;
-
-  static Map<String, String> choicesFor(FoodMode mode) => switch (mode) {
-        FoodMode.cook => _cook,
-        FoodMode.order => _order,
-        FoodMode.dineOut => _dineOut,
-      };
-}  static const _surprise =
-      'assets/together/clean/icons/icon_surprise.png';
-  static const _surprise =
-      'assets/together/clean/icons/icon_surprise.png';
-
-  static String? assetFor(FoodMode mode, String choice) {
-    if (choice == 'Überrasch mich') return _surprise;
-    final map = switch (mode) {
-      FoodMode.cook => _cook,
-      FoodMode.order => _order,
-      FoodMode.dineOut => _dineOut,
-    };
-    return map[choice];
-  }
-
-  static IconData? iconFor(FoodMode mode, String choice) {
-    if (mode == FoodMode.dineOut) return _dineOutIcons[choice];
-    return null;
-  }
 
   static Map<String, String> choicesFor(FoodMode mode) => switch (mode) {
         FoodMode.cook => _cook,
