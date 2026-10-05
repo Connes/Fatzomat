@@ -19,7 +19,14 @@ class RecipeDetailPage extends StatefulWidget {
   final String recipeId;
   final Future<void> Function()? onTodayPlanChanged;
   final VoidCallback? onNavigateToToday;
-  const RecipeDetailPage({super.key, required this.recipeId, this.onTodayPlanChanged, this.onNavigateToToday});
+  final bool canMarkCooked;
+  const RecipeDetailPage({
+    super.key,
+    required this.recipeId,
+    this.onTodayPlanChanged,
+    this.onNavigateToToday,
+    this.canMarkCooked = false,
+  });
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
 
@@ -37,7 +44,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   final personalToday = PersonalTodayRepository();
   Recipe? recipe;
   Object? loadError;
-  bool loading = true, working = false, personalTodaySelected = false;
+  bool loading = true, working = false, personalTodaySelected = false, cookedMarked = false;
   int servings = 2;
   final Set<int> completedSteps = <int>{};
   bool ingredientsExpanded = false;
@@ -106,6 +113,38 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage()));
         }
       }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
+  }
+
+  Future<void> markCooked() async {
+    if (!widget.canMarkCooked || working) return;
+    try {
+      final today = await personalToday.todayPlan();
+      if (today == null || !today.isRecipe || today.recipeId != widget.recipeId) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Dieses Rezept ist nicht mehr für heute eingeplant.')),
+          );
+        }
+        return;
+      }
+      setState(() => working = true);
+      final updated = await personalToday.updateStatus(today.id, 'cooked');
+      if (!updated) throw StateError('Das Rezept konnte nicht als gekocht markiert werden.');
+      if (!mounted) return;
+      setState(() {
+        cookedMarked = true;
+        personalTodaySelected = false;
+      });
+      await widget.onTodayPlanChanged?.call();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Rezept als gekocht markiert.')),
+      );
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
     } finally {
@@ -499,6 +538,33 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       )
                     else
                       SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: working ? null : selectPersonalToday, icon: const Icon(Icons.today_rounded), label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen'))),
+                  ],
+                  if (widget.canMarkCooked) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: cookedMarked
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: AppDesign.secondarySurface,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_circle_rounded, size: 20),
+                                  SizedBox(width: 8),
+                                  Text('Als gekocht markiert', style: TextStyle(fontWeight: FontWeight.w800)),
+                                ],
+                              ),
+                            )
+                          : OutlinedButton.icon(
+                              onPressed: working ? null : markCooked,
+                              icon: const Icon(Icons.check_circle_outline_rounded),
+                              label: const Text('Als gekocht markieren'),
+                            ),
+                    ),
                   ],
                 ),
               ),
