@@ -35,7 +35,7 @@ Stand dieses Dokuments: 2026-10-05
 
 ### GitHub
 
-- Aktueller `main`-Commit: `f80be2962e9932ac407a1b9038c19833412b15a8`
+- Aktueller `main`-Commit: `0c32da1f71a39a2985b4e9d7c596048cc0d8c699`
 - Die jüngsten Änderungen betreffen vor allem Regressionstests und die aktuelle Recipe-/Food-Choice-UX.
 - Der letzte Commit passt die Cooked-Recipe-Regression an die aktuelle Widget-Formatierung an.
 - Der aktuelle Restaurant-Discovery-Code in `main` nutzt die Supabase-RPC-Funktion `search_restaurants` direkt über `SupabaseRestaurantDiscoveryRepository`.
@@ -57,7 +57,7 @@ Der Quality-Gate-Workflow ist:
   - `flutter analyze`
   - `flutter test`
 
-Für den aktuellen `main`-Commit ist über die verfügbare GitHub-Workflow-Abfrage kein bestätigter Workflow-Run/Status zurückgekommen. Deshalb CI weiterhin **nicht als grün** darstellen.
+Der Quality-Gate-Run #508 für `0c32da1f71a39a2985b4e9d7c596048cc0d8c699` läuft aktuell noch. Der vorherige Run #507 für den Handover-Commit `378ec884...` ist erfolgreich durchgelaufen.
 
 ### Supabase
 
@@ -74,12 +74,7 @@ Wichtig: Die App verwendet aktuell den RPC `search_restaurants`, nicht die Edge 
 
 Ein direkter Live-SQL-Smoke-Test des RPCs mit einem neutralen Karlsruhe-Zentrum und `Pizza` lieferte mehrere Ergebnisse innerhalb von 10 km, einschließlich Distanz, Telefon, Website, Öffnungszeiten und Cuisine-Tags. Damit ist der aktuell von der App verwendete Restaurant-Suchpfad serverseitig funktionsfähig.
 
-Supabase Performance Advisors melden aktuell unter anderem:
-- der GIN-Index `restaurant_index_cuisine_gin` wurde bisher als ungenutzt erkannt;
-- mehrere unindizierte Foreign Keys in `decision_shares`;
-- mehrere permissive RLS-Policies.
-
-Diese Hinweise sind Beobachtungen, noch keine automatisch auszuführenden Änderungen.
+Supabase Performance Advisors wurden geprüft. Die vier gemeldeten unindizierten Foreign Keys in `decision_shares` wurden mit vier gezielten Indizes behoben. Die drei redundanten Owner-Policies auf `recipes` (DELETE/INSERT/UPDATE) wurden entfernt; die verbleibenden permissiven SELECT-/fachlichen Policies sind bewusst getrennt, weil sie unterschiedliche Zugriffswege abbilden. Der GIN-Index `restaurant_index_cuisine_gin` ist nicht ungenutzt: ein EXPLAIN des aktuellen Pizza-Suchmusters verwendet ihn zusammen mit dem Location-GiST-Index. Die übrigen `unused_index`-Hinweise bleiben vorerst Beobachtungen und werden wegen der kleinen Tabellen/fehlenden Nutzungsnachweise nicht blind entfernt.
 
 ## Restaurant Discovery – fachliche Regeln
 
@@ -132,14 +127,14 @@ Die frühere Overpass/Photon/Nominatim-Fallback-Logik lebt weiterhin in der Edge
 - Direkter RPC-Test: erfolgreiche Ergebnisse im 10-km-Radius.
 - `restaurant-discovery`: keine aktuellen Aufrufe in den abgefragten Function-Logs.
 - Supabase-Projekt: ACTIVE_HEALTHY.
-- CI: Status für den aktuellen Commit weiterhin nicht bestätigt.
+- CI: Run #508 für den aktuellen Commit läuft noch; Run #507 war erfolgreich.
 
 ## Nächster technischer Schritt
 
 1. Den aktuellen Recipe-/Food-Choice-Stand weiter gegen die vorhandenen Regressionstests prüfen.
 2. GitHub-CI-Status erneut prüfen, sobald ein Workflow-Run für den aktuellen `main`-Commit sichtbar ist.
 3. Restaurant-Discovery nicht mehr primär über die alte Edge-Function untersuchen, solange die App den RPC verwendet.
-4. Die Performance-Hinweise für `restaurant_index` und `decision_shares` fachlich bewerten, bevor Datenbankänderungen vorgenommen werden.
+4. Nach Abschluss von CI Run #508 den finalen Status prüfen und bei Erfolg den Handover entsprechend markieren.
 5. Als nächstes sinnvolles Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten, statt die bereits funktionierende Restaurant-Suche erneut umzubauen.
 
 ## Sicherheits-/Arbeitsregeln
