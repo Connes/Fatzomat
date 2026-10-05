@@ -513,62 +513,84 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         ],
       ),
       bottomNavigationBar: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-                decoration: BoxDecoration(color: AppDesign.surface, border: const Border(top: BorderSide(color: AppDesign.divider))),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (personalTodaySelected)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppDesign.secondarySurface,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.check_circle_rounded, size: 20),
-                            SizedBox(width: 8),
-                            Text('Für heute ausgewählt', style: TextStyle(fontWeight: FontWeight.w800)),
-                          ],
-                        ),
-                      )
-                    else
-                      SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: working ? null : selectPersonalToday, icon: const Icon(Icons.today_rounded), label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen'))),
-                  if (widget.canMarkCooked) ...[
-                    const SizedBox(height: 10),
-                    SizedBox(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+          decoration: BoxDecoration(
+            color: AppDesign.surface,
+            border: const Border(top: BorderSide(color: AppDesign.divider)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              personalTodaySelected
+                  ? Container(
                       width: double.infinity,
-                      child: cookedMarked
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: AppDesign.secondarySurface,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.check_circle_rounded, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('Als gekocht markiert', style: TextStyle(fontWeight: FontWeight.w800)),
-                                ],
-                              ),
-                            )
-                          : OutlinedButton.icon(
-                              onPressed: working ? null : markCooked,
-                              icon: const Icon(Icons.check_circle_outline_rounded),
-                              label: const Text('Als gekocht markieren'),
-                            ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppDesign.secondarySurface,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text(
+                            'Für heute ausgewählt',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                    )
+                  : SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: working ? null : selectPersonalToday,
+                        icon: const Icon(Icons.today_rounded),
+                        label: Text(
+                          working
+                              ? 'Für heute vorbereiten …'
+                              : 'Für heute festlegen',
+                        ),
+                      ),
                     ),
-                  ],
-                ],
-              ),
-            ),
-    );
+              if (widget.canMarkCooked) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: cookedMarked
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppDesign.secondarySurface,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.check_circle_rounded, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Als gekocht markiert',
+                                style: TextStyle(fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: working ? null : markCooked,
+                          icon: const Icon(Icons.check_circle_outline_rounded),
+                          label: const Text('Als gekocht markieren'),
+                        ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
 
   }
 }
