@@ -538,7 +538,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       )
                     else
                       SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: working ? null : selectPersonalToday, icon: const Icon(Icons.today_rounded), label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen'))),
-                  ],
                   if (widget.canMarkCooked) ...[
                     const SizedBox(height: 10),
                     SizedBox(
