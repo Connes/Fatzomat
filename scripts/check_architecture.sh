@@ -19,12 +19,13 @@ if [[ -f .env.local || -f .env.production || -f .env.prod ]]; then
   echo "FEHLER: Lokale/Produktions-Secrets im Arbeitsbaum gefunden." >&2
   fail=1
 fi
-if ! grep -q "flutter build apk --release" .github/workflows/flutter.yml; then
-  echo "FEHLER: CI enthält keinen Android-Release-Build." >&2
+if ! grep -q "flutter build apk --release" .github/workflows/build-apk.yml; then
+  echo "FEHLER: Android-Release-Workflow enthält keinen APK-Build." >&2
   fail=1
 fi
-if ! grep -q "flutter pub get --enforce-lockfile" .github/workflows/flutter.yml; then
-  echo "FEHLER: CI erzwingt kein reproduzierbares Dependency-Setup." >&2
+if ! grep -q "flutter pub get --enforce-lockfile" .github/workflows/flutter.yml || \
+   ! grep -q "flutter pub get --enforce-lockfile" .github/workflows/build-apk.yml; then
+  echo "FEHLER: CI erzwingt kein reproduzierbares Dependency-Setup in allen Flutter-Workflows." >&2
   fail=1
 fi
 if [[ $fail -ne 0 ]]; then exit 1; fi
