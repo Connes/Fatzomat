@@ -1037,7 +1037,11 @@ class _ShoppingPageState extends State<ShoppingPage> {
                   const SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
-                    child: OutlinedButton.icon(
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppDesign.surfaceSoft,
+                        foregroundColor: AppDesign.primaryDark,
+                      ),
                       onPressed: addItem,
                       icon: const Icon(Icons.add_rounded),
                       label: const Text('Artikel hinzufügen'),
@@ -1094,28 +1098,74 @@ class _ShoppingPageState extends State<ShoppingPage> {
                       ),
                     ),
                   if (openItems.isNotEmpty) ...[
-                    Text('NOCH OFFEN', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 8),
-                    ...openGrouped.entries.map((entry) => _ShoppingGroup(category: entry.key, items: entry.value, itemLabel: itemLabel, onToggle: toggleItem, onEdit: editItem, onDelete: deleteItem)),
-                  ],
-                  if (completedItems.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'ERLEDIGT',
+                    AppSurface(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'NOCH OFFEN',
                             style: theme.textTheme.labelLarge?.copyWith(
+                              letterSpacing: .8,
                               color: AppDesign.primaryDark,
                               fontWeight: FontWeight.w800,
-                              letterSpacing: .8,
                             ),
                           ),
-                        ),
-                        TextButton.icon(onPressed: clearCompleted, icon: const Icon(Icons.delete_sweep_outlined, size: 18), label: const Text('Leeren')),
-                      ],
+                          const SizedBox(height: 10),
+                          ...openGrouped.entries.map(
+                            (entry) => _ShoppingGroup(
+                              category: entry.key,
+                              items: entry.value,
+                              itemLabel: itemLabel,
+                              onToggle: toggleItem,
+                              onEdit: editItem,
+                              onDelete: deleteItem,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    ...completedGrouped.entries.map((entry) => _ShoppingGroup(category: entry.key, items: entry.value, itemLabel: itemLabel, onToggle: toggleItem, onEdit: editItem, onDelete: deleteItem)),
+                  ],
+                  if (completedItems.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    AppSurface(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'ERLEDIGT',
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    color: AppDesign.primaryDark,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: .8,
+                                  ),
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: clearCompleted,
+                                icon: const Icon(Icons.delete_sweep_outlined, size: 18),
+                                label: const Text('Leeren'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          ...completedGrouped.entries.map(
+                            (entry) => _ShoppingGroup(
+                              category: entry.key,
+                              items: entry.value,
+                              itemLabel: itemLabel,
+                              onToggle: toggleItem,
+                              onEdit: editItem,
+                              onDelete: deleteItem,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -1148,10 +1198,18 @@ class _ShoppingGroup extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 8),
-              child: Text(category.toUpperCase(), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppDesign.text, fontWeight: FontWeight.w800, letterSpacing: .8)),
-            ),
+            if (category.trim().toLowerCase() != 'weitere zutaten')
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Text(
+                  category.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppDesign.text,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: .8,
+                  ),
+                ),
+              ),
             AppSurface(
               padding: EdgeInsets.zero,
               child: Column(
