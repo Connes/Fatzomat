@@ -320,22 +320,7 @@ class _OptionCard extends StatelessWidget {
                       ),
                       child: ColoredBox(
                         color: AppDesign.softSurface,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            image(),
-                            if (assetPath != null)
-                              const IgnorePointer(
-                                child: Align(
-                                  alignment: Alignment.topRight,
-                                  child: Padding(
-                                    padding: EdgeInsets.all(8),
-                                    child: SizedBox.shrink(),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
+                        child: image(),
                       ),
                     ),
                   ),
