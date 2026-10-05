@@ -31,15 +31,16 @@ Der Text in diesem Dokument ist Arbeitsgedächtnis, aber niemals Beweis für den
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-03
+Stand dieses Dokuments: 2026-10-05
 
 ### GitHub
 
-- `main` enthält die Restaurant-Discovery-Fallback-Reparatur und den anschließenden Photon-Parameter-Fix.
-- Der Overpass-Fallback ist implementiert und durch Regressionstests geschützt.
-- Die Photon-Vorwärtssuche verwendet keinen nicht unterstützten `radius=10`-Parameter mehr.
-- Die aktuellen Regressionserwartungen wurden an das bestehende Verhalten angepasst.
-- Der konkrete aktuelle `main`-Commit muss vor weiteren Änderungen erneut gelesen werden.
+- Aktueller `main`-Commit: `f80be2962e9932ac407a1b9038c19833412b15a8`
+- Die jüngsten Änderungen betreffen vor allem Regressionstests und die aktuelle Recipe-/Food-Choice-UX.
+- Der letzte Commit passt die Cooked-Recipe-Regression an die aktuelle Widget-Formatierung an.
+- Der aktuelle Restaurant-Discovery-Code in `main` nutzt die Supabase-RPC-Funktion `search_restaurants` direkt über `SupabaseRestaurantDiscoveryRepository`.
+- `restaurant-discovery` ist damit aktuell **nicht der von der App verwendete Live-Pfad**.
+- Die Migration `20261004185400_restaurant_search_cuisine_expansion.sql` definiert `search_restaurants` mit 10-km-Radius, Cuisine-Token-Matching und optionalem Delivery-Filter.
 
 ### CI
 
@@ -52,91 +53,94 @@ Der Quality-Gate-Workflow ist:
   - Flutter 3.47.2
   - Repository hygiene
   - `flutter pub get --enforce-lockfile`
+  - App-Icon-Generierung
   - `flutter analyze`
   - `flutter test`
 
-Für den aktuellen Stand ist über die GitHub-Workflow-Run-Abfrage noch kein bestätigter Run verfügbar. Deshalb CI nicht als grün darstellen.
+Für den aktuellen `main`-Commit ist über die verfügbare GitHub-Workflow-Abfrage kein bestätigter Workflow-Run/Status zurückgekommen. Deshalb CI weiterhin **nicht als grün** darstellen.
 
 ### Supabase
 
 - Projekt: `oidxezjdwqktpxuypbfb`
+- Projektstatus: ACTIVE_HEALTHY
+- Region: eu-central-1
 - Edge Function: `restaurant-discovery`
-- Live-Version: **39**
+- Live-Version: **42**
 - Status: ACTIVE
 - `verify_jwt=false`
 - Import Map aktiv
-- Die Funktion verwendet weiterhin eigene Authentifizierung über `supabase.auth.getUser(token)`.
 
-Version 37 lieferte am 2026-10-03 wiederholt HTTP 503. Die Logs zeigten:
+Wichtig: Die App verwendet aktuell den RPC `search_restaurants`, nicht die Edge Function. In den aktuellen Logs vom 2026-10-05 sind wiederholt erfolgreiche Requests auf `/rest/v1/rpc/search_restaurants` mit HTTP 200 sichtbar. Für `restaurant-discovery` sind in den aktuellen Function-Logs keine Aufrufe sichtbar.
 
-- Overpass: alle parallelen Endpunkte fehlgeschlagen.
-- Photon: HTTP 400.
-- Nominatim: HTTP 403.
-- Danach 503 an den Client.
+Ein direkter Live-SQL-Smoke-Test des RPCs mit einem neutralen Karlsruhe-Zentrum und `Pizza` lieferte mehrere Ergebnisse innerhalb von 10 km, einschließlich Distanz, Telefon, Website, Öffnungszeiten und Cuisine-Tags. Damit ist der aktuell von der App verwendete Restaurant-Suchpfad serverseitig funktionsfähig.
 
-Die Photon-400-Ursache wurde identifiziert: Bei `/api` wurde `radius=10` gesendet. Photon unterstützt `radius` für `/reverse`, nicht für die Vorwärtssuche. Version 38 wurde mit diesem Fix deployed. Danach zeigte der echte Aufruf weiterhin: Overpass auf allen bisherigen Endpunkten fehlgeschlagen, Photon ohne Treffer, Nominatim HTTP 403.
+Supabase Performance Advisors melden aktuell unter anderem:
+- der GIN-Index `restaurant_index_cuisine_gin` wurde bisher als ungenutzt erkannt;
+- mehrere unindizierte Foreign Keys in `decision_shares`;
+- mehrere permissive RLS-Policies.
 
-Version 39 wurde deshalb deployed. Änderungen:
-- zusätzliche globale Overpass-Fallbacks `maps.mail.ru` und `overpass.osm.jp`
-- Photon nutzt echte OSM-Kategoriefilter (`osm.amenity.*` + `osm.cuisine.*`) statt die Küche primär über einen Namenssuchtext zu ermitteln
-- Photon behält eine kategoriebezogene Namenssuche als zweiten Fallback
-- Provider-Requests verwenden einen identifizierbaren User-Agent; Nominatim erhält zusätzlich einen Referer
-
-**Noch offen:** Nach dem Deploy von Version 39 ist noch kein neuer Restaurant-Discovery-Aufruf in den abgefragten aktuellen Logs sichtbar. Die Laufzeitwirkung von Version 39 ist daher noch nicht verifiziert.
+Diese Hinweise sind Beobachtungen, noch keine automatisch auszuführenden Änderungen.
 
 ## Restaurant Discovery – fachliche Regeln
 
 Radius ist fest auf 10 km.
 
-Aktuelle App-Kategorien:
-
-- FoodMode.order: Pizza, Burger, Asiatisch, Döner, Sushi, Indisch, Überrasch mich
-- FoodMode.dineOut: Italienisch, Steak, Asiatisch, Sushi, Burger, Mexikanisch, Vegetarisch, Überrasch mich
-
-Strikte Cuisine-Werte im Backend:
+Der aktuelle Repository-/UI-Stand enthält inzwischen eine breitere Cuisine-Liste als die ältere Übergabe. Die aktuelle RPC-Migration unterstützt unter anderem:
 
 - Italienisch: italian
 - Griechisch: greek
-- Asiatisch: asian, chinese, thai, vietnamese, korean, indonesian, malaysian
+- Türkisch: turkish
+- Japanisch: japanese
+- Chinesisch: chinese
+- Thailändisch: thai
+- Vietnamesisch: vietnamese
+- Koreanisch: korean
+- Indonesisch: indonesian
+- Malaysisch: malaysian
 - Indisch: indian
 - Burger: burger
 - Mexikanisch: mexican
-- Vegetarisch: vegetarian bzw. passende diet-Tags
+- Spanisch: spanish
+- Libanesisch: lebanese
+- Portugiesisch: portuguese
+- Vegetarisch: vegetarian
+- Vegan: vegan
 - Sushi: sushi
 - Pizza: pizza, italian_pizza
 - Döner: kebab, doner, döner
 - Steak: steak, steak_house
-
-Wichtige Regel: Nicht über Restaurantnamen oder breite Begriffe wie `grill`, `japanese`, `beef` usw. Kategorien erraten. Das hatte zu falschen Treffern geführt.
+- Asiatisch: asian, chinese, thai, vietnamese, korean, indonesian, malaysian
 
 Mehrere echte Cuisine-Tokens wie `italian;pizza` dürfen mehrere Kategorien erfüllen.
 
-### Restaurant-Fallback
+### Aktueller Suchpfad
 
-Restaurants ohne OSM-`cuisine`-Tag sollen trotzdem gefunden werden können.
+`lib/data/repositories/restaurant_discovery_repository.dart`:
 
-Dafür verwendet der aktuelle Code:
+- verlangt eine gültige persönliche Supabase-Sitzung;
+- aktualisiert die Session vor der Suche;
+- ruft `search_restaurants` als RPC auf;
+- erzwingt im Repository einen 10-km-Radius;
+- begrenzt Ergebnisse auf maximal 10;
+- verwirft Antworten außerhalb von 10 km.
 
-`cuisineSearchFallbackMatches(properties, cuisine)`
+Die frühere Overpass/Photon/Nominatim-Fallback-Logik lebt weiterhin in der Edge Function `restaurant-discovery`, ist aber für den aktuellen App-Pfad nicht maßgeblich.
 
-- Bei vorhandener passender Cuisine: strikter Cuisine-Match.
-- Bei fehlendem Cuisine-Tag und kategorisiertem Photon/Nominatim-Ergebnis: providerbasierter Fallback.
-- Der Restaurantname darf im Fallback **nicht** als Kategorie-Matcher verwendet werden.
-- Overpass bleibt der bevorzugte, strikt gefilterte Pfad.
-- Wenn Overpass null strikte Treffer liefert, wird Photon/Nominatim versucht.
+## Letzte verifizierte Live-Beobachtungen
+
+- `search_restaurants`: aktuelle Requests HTTP 200.
+- Direkter RPC-Test: erfolgreiche Ergebnisse im 10-km-Radius.
+- `restaurant-discovery`: keine aktuellen Aufrufe in den abgefragten Function-Logs.
+- Supabase-Projekt: ACTIVE_HEALTHY.
+- CI: Status für den aktuellen Commit weiterhin nicht bestätigt.
 
 ## Nächster technischer Schritt
 
-1. Einen echten Restaurant-Discovery-Aufruf mit Live-Version 39 auslösen.
-2. Supabase-Logs prüfen:
-   - wird Version 38 verwendet?
-   - liefert Overpass Ergebnisse oder greift Photon?
-   - ist der Photon-400 verschwunden?
-   - ist der 503 verschwunden?
-3. GitHub Actions für den aktuellen `main`-Stand prüfen.
-4. Falls die Live-Suche weiterhin 503 liefert, Overpass-Verfügbarkeit und Nominatim-403 getrennt untersuchen.
-5. Nach erfolgreicher Live-Prüfung und bestätigtem CI den Stand hier erneut aktualisieren.
-6. Danach die nächsten offenen Repository-Aufgaben autonom aufnehmen.
+1. Den aktuellen Recipe-/Food-Choice-Stand weiter gegen die vorhandenen Regressionstests prüfen.
+2. GitHub-CI-Status erneut prüfen, sobald ein Workflow-Run für den aktuellen `main`-Commit sichtbar ist.
+3. Restaurant-Discovery nicht mehr primär über die alte Edge-Function untersuchen, solange die App den RPC verwendet.
+4. Die Performance-Hinweise für `restaurant_index` und `decision_shares` fachlich bewerten, bevor Datenbankänderungen vorgenommen werden.
+5. Als nächstes sinnvolles Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten, statt die bereits funktionierende Restaurant-Suche erneut umzubauen.
 
 ## Sicherheits-/Arbeitsregeln
 
