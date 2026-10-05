@@ -1011,12 +1011,21 @@ class _ShoppingPageState extends State<ShoppingPage> {
                           child: LinearProgressIndicator(value: progress, minHeight: 8),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          'Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert. Manuelle Artikel bleiben erhalten.${widget.shared ? ' Änderungen werden bei beiden verbundenen Personen synchronisiert.' : ''}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppDesign.secondaryText,
-                            height: 1.35,
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppDesign.surfaceSoft,
+                            borderRadius: BorderRadius.circular(AppDesign.radiusMd),
                           ),
+                          child: Text(
+                            'Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert. Manuelle Artikel bleiben erhalten.${widget.shared ? ' Änderungen werden bei beiden verbundenen Personen synchronisiert.' : ''}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppDesign.text,
+                              height: 1.45,
+                            ),
+                          ),
+                        ),
                         ),
                       ],
                     ),
@@ -1089,7 +1098,16 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        Expanded(child: Text('ERLEDIGT', style: theme.textTheme.labelMedium?.copyWith(letterSpacing: 1.1, color: AppDesign.primaryDark, fontWeight: FontWeight.w800))),
+                        Expanded(
+                          child: Text(
+                            'ERLEDIGT',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: AppDesign.primaryDark,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: .8,
+                            ),
+                          ),
+                        ),
                         TextButton.icon(onPressed: clearCompleted, icon: const Icon(Icons.delete_sweep_outlined, size: 18), label: const Text('Leeren')),
                       ],
                     ),
@@ -1127,8 +1145,8 @@ class _ShoppingGroup extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 7),
-              child: Text(category.toUpperCase(), style: Theme.of(context).textTheme.labelSmall?.copyWith(letterSpacing: 1.0)),
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Text(category.toUpperCase(), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppDesign.text, fontWeight: FontWeight.w800, letterSpacing: .8)),
             ),
             AppSurface(
               padding: EdgeInsets.zero,
@@ -1143,7 +1161,7 @@ class _ShoppingGroup extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppDesign.radiusXl),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       leading: Checkbox(
                         value: item.checked,
                         onChanged: (value) {
@@ -1154,13 +1172,13 @@ class _ShoppingGroup extends StatelessWidget {
                         duration: AppDesign.fast,
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                               fontWeight: item.checked ? FontWeight.w500 : FontWeight.w600,
-                              color: item.checked ? AppDesign.mutedText : AppDesign.text,
+                              color: item.checked ? AppDesign.secondaryText : AppDesign.text,
                               decoration: item.checked ? TextDecoration.lineThrough : null,
                             ),
                         child: Text(itemLabel(item)),
                       ),
                       subtitle: item.source == 'manual'
-                          ? Text('Manuell hinzugefügt', style: Theme.of(context).textTheme.bodySmall)
+                          ? Text('Manuell hinzugefügt', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText, fontSize: 13))
                           : null,
                       onTap: () => onEdit(item),
                       trailing: PopupMenuButton<String>(
