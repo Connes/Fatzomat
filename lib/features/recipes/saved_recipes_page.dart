@@ -451,10 +451,16 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                       borderRadius: BorderRadius.circular(24),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(24),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const TodayPage()),
-                        ).then((_) => load()),
+                        onTap: () {
+                          if (widget.onNavigateToTab != null) {
+                            widget.onNavigateToTab!(0);
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const TodayPage()),
+                            ).then((_) => load());
+                          }
+                        },
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
@@ -543,7 +549,15 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                             onTap: () async {
                               await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => RecipeDetailPage(recipeId: recipe.id!)),
+                                MaterialPageRoute(
+                                  builder: (_) => RecipeDetailPage(
+                                    recipeId: recipe.id!,
+                                    onTodayPlanChanged: load,
+                                    onNavigateToToday: widget.onNavigateToTab == null
+                                        ? null
+                                        : () => widget.onNavigateToTab!(0),
+                                  ),
+                                ),
                               );
                               if (mounted) load();
                             },
