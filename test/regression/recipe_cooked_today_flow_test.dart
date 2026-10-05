@@ -10,7 +10,7 @@ void main() {
     expect(recipe, isNot(contains("SectionHeader(title: 'Portionen'")));
     expect(recipe, isNot(contains("Die Mengen passen sich automatisch an.")));
     expect(recipe, isNot(contains(r"Schritten erledigt")));
-    expect(recipe, contains("personalToday.updateStatus(plan.id, 'cooked')"));
+    expect(recipe, contains("personalToday.updateStatus(today.id, 'cooked')"));
     expect(recipe, isNot(contains('Navigator.pushReplacement(')));
     expect(recipe, contains('onNavigateToToday'));
     expect(recipe, contains('widget.onNavigateToToday!();'));
