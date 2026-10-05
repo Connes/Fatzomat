@@ -12,9 +12,7 @@ import '../../data/models/recipe.dart';
 import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
-import '../../core/services/surprise_recommendation_service.dart';
 import '../../core/services/food_choice_asset_service.dart';
-import '../shared/personalized_surprise_page.dart';
 import '../../core/food_mode.dart';
 import '../../core/error_text.dart';
 import '../../core/services/location_service.dart';
@@ -43,9 +41,6 @@ class FoodModePage extends StatefulWidget {
 }
 
 class _FoodModePageState extends State<FoodModePage> {
-  bool _surprising = false;
-
-
   String get title => switch (widget.mode) {
         FoodMode.cook => 'Was wollen wir kochen?',
         FoodMode.order => 'Was wollen wir bestellen?',
@@ -63,50 +58,6 @@ class _FoodModePageState extends State<FoodModePage> {
       ),
     );
     if (selected == true && context.mounted) Navigator.pop(context, true);
-  }
-
-  Future<void> _surprise() async {
-    if (_surprising) return;
-    setState(() => _surprising = true);
-    try {
-      final foodRepo = FoodRepository();
-      final recipeRepo = RecipeRepository();
-      final results = await Future.wait([
-        foodRepo.preferences(),
-        foodRepo.foods(),
-        recipeRepo.savedRecipeModels(),
-      ]);
-      final preferences = results[0] as Map<String, String>;
-      final foods = results[1] as List<Food>;
-      final saved = results[2] as List<Recipe>;
-      final service = SurpriseRecommendationService();
-      final recommendation = await service.generate(
-        savedRecipes: saved,
-        preferences: preferences,
-        foods: foods,
-      );
-      if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PersonalizedSurprisePage(
-            recommendation: recommendation,
-            decisionRequestId: widget.decisionRequestId,
-            persistPersonalDecision: widget.decisionRequestId == null,
-            service: service,
-            savedRecipes: saved,
-            preferences: preferences,
-            foods: foods,
-          ),
-        ),
-      );
-      if (mounted && widget.decisionRequestId == null) Navigator.pop(context, true);
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
-    } finally {
-      if (mounted) setState(() => _surprising = false);
-    }
   }
 
   Future<void> _resolveAndOpen(BuildContext context, String choice) async {
@@ -138,10 +89,6 @@ class _FoodModePageState extends State<FoodModePage> {
   }
 
   void _select(BuildContext context, String choice) {
-    if (choice == 'Überrasch mich') {
-      _surprise();
-      return;
-    }
     _resolveAndOpen(context, choice);
   }
 
@@ -154,7 +101,6 @@ class _FoodModePageState extends State<FoodModePage> {
           _ModeOption('Huhn'),
           _ModeOption('Fisch'),
           _ModeOption('Vegetarisch'),
-          _ModeOption('Überrasch mich'),
         ],
       FoodMode.order => const [
           _ModeOption('Pizza'),
@@ -163,7 +109,6 @@ class _FoodModePageState extends State<FoodModePage> {
           _ModeOption('Döner'),
           _ModeOption('Sushi'),
           _ModeOption('Indisch'),
-          _ModeOption('Überrasch mich'),
         ],
       FoodMode.dineOut => const [
           _ModeOption('Italienisch'),
@@ -185,7 +130,6 @@ class _FoodModePageState extends State<FoodModePage> {
           _ModeOption('Portugiesisch'),
           _ModeOption('Vegetarisch'),
           _ModeOption('Vegan'),
-          _ModeOption('Überrasch mich'),
         ],
     };
 
