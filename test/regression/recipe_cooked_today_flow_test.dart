@@ -10,13 +10,16 @@ void main() {
     expect(recipe, isNot(contains("SectionHeader(title: 'Portionen'")));
     expect(recipe, isNot(contains("Die Mengen passen sich automatisch an.")));
     expect(recipe, isNot(contains(r"Schritten erledigt")));
-    expect(recipe, isNot(contains("personalToday.updateStatus(plan.id, 'cooked')")));
+    expect(recipe, contains("personalToday.updateStatus(plan.id, 'cooked')"));
     expect(recipe, isNot(contains('Navigator.pushReplacement(')));
     expect(recipe, contains('onNavigateToToday'));
     expect(recipe, contains('widget.onNavigateToToday!();'));
     expect(recipe, contains('Navigator.pop(context);'));
     expect(recipe, contains("FilledButton.icon(onPressed: working ? null : selectPersonalToday"));
     expect(recipe, contains("label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen')"));
+    expect(recipe, contains('final bool canMarkCooked'));
+    expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
+    expect(recipe, contains("label: const Text('Als gekocht markieren')"));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
     expect(today, contains('final VoidCallback? onOpenRecipe;'));
 
