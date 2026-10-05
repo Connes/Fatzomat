@@ -124,23 +124,6 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     );
   }
 
-  void _openShared() {
-    final plan = sharedPlan;
-    if (plan == null) return;
-    final recipe = plan['recipes'] is Map ? Map<String, dynamic>.from(plan['recipes'] as Map) : const <String, dynamic>{};
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ShoppingPage(
-          planId: plan['id'].toString(),
-          recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
-          servings: (plan['servings'] as num?)?.toInt() ?? 2,
-          shared: true,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (loading) {
