@@ -346,6 +346,7 @@ class _TodayPageState extends State<TodayPage> {
                                     MaterialPageRoute(
                                       builder: (_) => RecipeDetailPage(
                                         recipeId: plan!.recipeId!,
+                                        canMarkCooked: true,
                                         onTodayPlanChanged: load,
                                       ),
                                     ),
