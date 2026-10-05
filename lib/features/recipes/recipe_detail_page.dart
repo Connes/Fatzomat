@@ -40,7 +40,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   bool loading = true, working = false, personalTodaySelected = false;
   int servings = 2;
   final Set<int> completedSteps = <int>{};
-  bool markingCooked = false;
   bool ingredientsExpanded = false;
   bool preparationExpanded = false;
 
@@ -111,33 +110,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
     } finally {
       if (mounted) setState(() => working = false);
-    }
-  }
-
-  Future<void> markCooked() async {
-    if (recipe == null) return;
-    setState(() => markingCooked = true);
-    try {
-      final plan = await personalToday.todayPlan();
-      if (plan == null || plan.recipeId != widget.recipeId) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dieses Rezept ist heute nicht eingeplant.')));
-        return;
-      }
-      final updated = await personalToday.updateStatus(plan.id, 'cooked');
-      if (!updated || !mounted) return;
-      if (widget.onNavigateToToday != null) {
-        widget.onNavigateToToday!();
-        if (mounted) Navigator.pop(context);
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const TodayPage()),
-        );
-      }
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
-    } finally {
-      if (mounted) setState(() => markingCooked = false);
     }
   }
 
@@ -301,16 +273,53 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(recipe!.name, style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    recipe!.name,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Wrap(
+                  alignment: WrapAlignment.center,
                   spacing: 8,
                   runSpacing: 8,
                   children: [
                     MetaPill(icon: Icons.timer_outlined, label: '$total Min.'),
-                    MetaPill(icon: Icons.people_outline, label: '$servings Personen'),
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
                   ],
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppDesign.surface.withValues(alpha: .82),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppDesign.divider),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: 'Eine Person weniger',
+                        onPressed: servings <= 1 || working ? null : () => setState(() => servings--),
+                        icon: const Icon(Icons.remove_rounded),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          '$servings Personen',
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Eine Person mehr',
+                        onPressed: servings >= 12 || working ? null : () => setState(() => servings++),
+                        icon: const Icon(Icons.add_rounded),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -410,7 +419,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       borderRadius: BorderRadius.circular(18),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(18),
-                        onTap: working || markingCooked || !canToggle
+                        onTap: working || !canToggle
                             ? null
                             : () => setState(() {
                                   if (done) {
@@ -495,8 +504,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       )
                     else
                       SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: working ? null : selectPersonalToday, icon: const Icon(Icons.today_rounded), label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen'))),
-                    const SizedBox(height: 8),
-                    SizedBox(width: double.infinity, child: OutlinedButton.icon(onPressed: markingCooked ? null : markCooked, icon: markingCooked ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_circle_outline), label: Text(markingCooked ? 'Wird gespeichert …' : 'Als gekocht markieren'))),
                   ],
                 ),
               ),
