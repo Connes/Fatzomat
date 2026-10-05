@@ -591,7 +591,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
         ),
       ),
-
+    );
   }
 }
 
