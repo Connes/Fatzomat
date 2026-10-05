@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
@@ -212,7 +213,7 @@ class _FoodModePageState extends State<FoodModePage> {
                 crossAxisCount: 2,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: 1.0,
+                childAspectRatio: 0.78,
               ),
               itemCount: options.length,
               itemBuilder: (context, index) {
@@ -250,6 +251,41 @@ class _OptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = FoodChoiceAssetService.assetFor(mode, option.label);
     final icon = FoodChoiceAssetService.iconFor(mode, option.label);
+    final hasSvg = assetPath?.toLowerCase().endsWith('.svg') ?? false;
+
+    Widget image() {
+      if (assetPath == null) {
+        return ColoredBox(
+          color: AppDesign.softSurface,
+          child: Center(
+            child: Icon(
+              icon ?? Icons.restaurant_rounded,
+              size: 58,
+              color: AppDesign.mutedText,
+            ),
+          ),
+        );
+      }
+
+      final image = hasSvg
+          ? SvgPicture.asset(
+              assetPath,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            )
+          : Image.asset(
+              assetPath,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              filterQuality: FilterQuality.high,
+              excludeFromSemantics: true,
+              width: double.infinity,
+              height: double.infinity,
+            );
+
+      return image;
+    }
 
     return Semantics(
       container: true,
@@ -265,72 +301,65 @@ class _OptionCard extends StatelessWidget {
               color: AppDesign.softSurface,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(color: AppDesign.divider),
+              boxShadow: const [
+                BoxShadow(
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                  color: Color(0x16000000),
+                ),
+              ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(17),
-              child: Stack(
-                fit: StackFit.expand,
+              child: Column(
                 children: [
-                  if (assetPath != null)
-                    Image.asset(
-                      assetPath,
-                      fit: BoxFit.cover,
-                      filterQuality: FilterQuality.high,
-                      excludeFromSemantics: true,
-                      errorBuilder: (_, error, stackTrace) => ColoredBox(
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(17),
+                      ),
+                      child: ColoredBox(
                         color: AppDesign.softSurface,
-                        child: Center(
-                          child: Text(
-                            'Bild nicht verfügbar',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Theme.of(context).colorScheme.error),
-                          ),
-                        ),
-                      ),
-                    )
-                  else
-                    ColoredBox(
-                      color: AppDesign.softSurface,
-                      child: Center(
-                        child: Icon(
-                          icon ?? Icons.restaurant_rounded,
-                          size: 58,
-                          color: AppDesign.mutedText,
-                        ),
-                      ),
-                    ),
-                  const Positioned.fill(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: [0.52, 1.0],
-                          colors: [Colors.transparent, Color(0xB8000000)],
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            image(),
+                            if (assetPath != null)
+                              const IgnorePointer(
+                                child: Align(
+                                  alignment: Alignment.topRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8),
+                                    child: SizedBox.shrink(),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    bottom: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.94),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        option.label,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: AppDesign.text,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
+                  Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(minHeight: 48),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF8F5EF),
+                    ),
+                    child: Text(
+                      option.label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppDesign.text,
+                        fontSize: 14,
+                        height: 1.1,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
