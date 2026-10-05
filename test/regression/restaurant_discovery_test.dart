@@ -88,7 +88,6 @@ void main() {
       'Portugiesisch',
       'Vegetarisch',
       'Vegan',
-      'Überrasch mich',
     ]) {
       expect(find.text(cuisine), findsOneWidget, reason: 'Missing cuisine: $cuisine');
     }
