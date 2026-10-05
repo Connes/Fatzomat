@@ -104,7 +104,6 @@ void main() {
       'Huhn',
       'Fisch',
       'Vegetarisch',
-      'Überrasch mich',
     ]);
   });
 
@@ -117,7 +116,6 @@ void main() {
       'Döner',
       'Sushi',
       'Indisch',
-      'Überrasch mich',
     ]);
   });
 
@@ -146,7 +144,6 @@ void main() {
         'Portugiesisch',
         'Vegetarisch',
         'Vegan',
-        'Überrasch mich',
       ],
       assetLabels: const [
         'Italienisch',
@@ -155,13 +152,15 @@ void main() {
         'Burger',
         'Mexikanisch',
         'Vegetarisch',
-        'Überrasch mich',
       ],
     );
   });
 
-  test('Beide Restaurant-Modi enthalten ausdrücklich den Überraschungsweg', () {
-    expect(FoodChoiceAssetService.assetFor(FoodMode.order, 'Überrasch mich'), isNotNull);
-    expect(FoodChoiceAssetService.assetFor(FoodMode.dineOut, 'Überrasch mich'), isNotNull);
+  testWidgets('Die drei Auswahlseiten zeigen keinen Überraschungsweg', (tester) async {
+    for (final mode in FoodMode.values) {
+      await tester.pumpWidget(MaterialApp(home: FoodModePage(mode: mode)));
+      await tester.pumpAndSettle();
+      expect(find.text('Überrasch mich'), findsNothing);
+    }
   });
 }
