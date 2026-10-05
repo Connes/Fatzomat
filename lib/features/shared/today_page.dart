@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/async_error.dart';
 import '../../core/error_text.dart';
 import '../../core/app_design.dart';
+import '../../core/recipe_collection_events.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
 import '../../data/models/recipe.dart';
@@ -262,6 +263,10 @@ class _TodayPageState extends State<TodayPage> {
     if (confirmed != true) return;
     try {
       await repo.removeTodayPlan(plan!.id);
+      // The Recipes tab also shows the current Today plan. Notify it directly
+      // so the "Für dich heute" marker disappears immediately, even if the
+      // Supabase Realtime event arrives later.
+      RecipeCollectionEvents.notifyChanged();
       await load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
