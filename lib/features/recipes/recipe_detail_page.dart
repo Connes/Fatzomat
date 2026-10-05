@@ -291,36 +291,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
                   ],
                 ),
-                const SizedBox(height: 14),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppDesign.surface.withValues(alpha: .82),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppDesign.divider),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        tooltip: 'Eine Person weniger',
-                        onPressed: servings <= 1 || working ? null : () => setState(() => servings--),
-                        icon: const Icon(Icons.remove_rounded),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          '$servings Personen',
-                          style: const TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Eine Person mehr',
-                        onPressed: servings >= 12 || working ? null : () => setState(() => servings++),
-                        icon: const Icon(Icons.add_rounded),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -345,6 +315,31 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             color: AppDesign.background.withValues(alpha: .94),
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Text(recipe!.description, style: Theme.of(context).textTheme.bodyLarge),
+          ),
+          const SizedBox(height: 14),
+          AppSurface(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Personen', style: TextStyle(fontWeight: FontWeight.w800)),
+                const SizedBox(width: 12),
+                IconButton(
+                  tooltip: 'Eine Person weniger',
+                  onPressed: servings <= 1 || working ? null : () => setState(() => servings--),
+                  icon: const Icon(Icons.remove_rounded),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text('$servings', style: const TextStyle(fontWeight: FontWeight.w800)),
+                ),
+                IconButton(
+                  tooltip: 'Eine Person mehr',
+                  onPressed: servings >= 12 || working ? null : () => setState(() => servings++),
+                  icon: const Icon(Icons.add_rounded),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           AppSurface(
