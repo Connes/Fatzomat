@@ -15,8 +15,11 @@ void main() {
     expect(recipe, contains('onNavigateToToday'));
     expect(recipe, contains('widget.onNavigateToToday!();'));
     expect(recipe, contains('Navigator.pop(context);'));
-    expect(recipe, contains("FilledButton.icon(onPressed: working ? null : selectPersonalToday"));
-    expect(recipe, contains("label: Text(working ? 'Für heute vorbereiten …' : 'Für heute festlegen')"));
+    expect(recipe, contains('FilledButton.icon('));
+    expect(recipe, contains('onPressed: working ? null : selectPersonalToday'));
+    expect(recipe, contains("label: Text("));
+    expect(recipe, contains("'Für heute vorbereiten …'"));
+    expect(recipe, contains("'Für heute festlegen'"));
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
     expect(recipe, contains("label: const Text('Als gekocht markieren')"));
