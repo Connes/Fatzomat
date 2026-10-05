@@ -160,16 +160,15 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
     if (connected) {
       if (sharedPlan != null) {
-        return TogetherScaffold(
-          backgroundType: TogetherBackgroundType.today,
-          appBar: const TogetherAppBar(title: Text('Gemeinsame Einkaufsliste')),
-          body: _EntryCard(
-            icon: Icons.people_alt_rounded,
-            title: 'Gemeinsame Einkaufsliste',
-            text: 'Ihr seht dieselbe Liste. Änderungen, Abhaken und neue Artikel werden bei beiden Geräten synchronisiert.',
-            actionLabel: 'Einkaufsliste öffnen',
-            onPressed: _openShared,
-          ),
+        final plan = sharedPlan!;
+        final recipe = plan['recipes'] is Map
+            ? Map<String, dynamic>.from(plan['recipes'] as Map)
+            : const <String, dynamic>{};
+        return ShoppingPage(
+          planId: plan['id'].toString(),
+          recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
+          servings: (plan['servings'] as num?)?.toInt() ?? 2,
+          shared: true,
         );
       }
 
@@ -199,12 +198,11 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
               actionLabel: 'Zu Heute',
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage())),
             )
-          : _EntryCard(
-              icon: Icons.shopping_cart_rounded,
-              title: 'Deine Einkaufsliste',
-              text: 'Diese Liste gehört nur dir. Du kannst Artikel hinzufügen, bearbeiten, abhaken und löschen.',
-              actionLabel: 'Einkaufsliste öffnen',
-              onPressed: _openPersonal,
+          : ShoppingPage(
+              planId: personalPlanId!,
+              recipeName: personalRecipeName,
+              servings: personalServings,
+              shared: false,
             ),
     );
   }
