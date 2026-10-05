@@ -110,14 +110,24 @@ configure_firebase_via_firebase_cli() {
 }
 
 configure_firebase_if_needed() {
-  if [[ ! -f "$PROJECT_ROOT/lib/firebase_options.dart" ]]; then
-    echo "→ Firebase-Konfiguration"
-  elif grep -q "apiKey: '[^']\+'" "$PROJECT_ROOT/lib/firebase_options.dart" && grep -q "projectId: 'schmackofatz-25cce'" "$PROJECT_ROOT/lib/firebase_options.dart"; then
+  if [[ -f "$PROJECT_ROOT/lib/firebase_options.dart" ]] &&
+     grep -q "String.fromEnvironment('FIREBASE_PROJECT_ID')" "$PROJECT_ROOT/lib/firebase_options.dart"; then
     echo "✓ Firebase-Konfiguration bereits vorhanden"
     return 0
-  else
-    echo "→ Firebase-Konfiguration fehlt noch"
   fi
+
+  if [[ -f "$PROJECT_ROOT/android/app/google-services.json" ]] &&
+     [[ -f "$PROJECT_ROOT/ios/Runner/GoogleService-Info.plist" ]]; then
+    echo "→ Firebase-Konfiguration auf Build-Time-Dart-Defines umstellen"
+    python3 "$PROJECT_ROOT/scripts/generate_firebase_options.py" \
+      "$PROJECT_ROOT/android/app/google-services.json" \
+      "$PROJECT_ROOT/ios/Runner/GoogleService-Info.plist" \
+      "$PROJECT_ROOT/lib/firebase_options.dart"
+    echo "✓ Firebase-Konfiguration repariert"
+    return 0
+  fi
+
+  echo "→ Firebase-Konfiguration fehlt noch"
 
   if ! command -v flutterfire >/dev/null 2>&1; then
     echo "FEHLER: flutterfire_cli wurde nicht gefunden. Installiere es mit:" >&2
