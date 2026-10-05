@@ -27,6 +27,9 @@ jobs:
       - name: Dependencies
         run: flutter pub get --enforce-lockfile
 
+      - name: Generate Schmackofatz app icon
+        run: flutter pub run flutter_launcher_icons --file flutter_launcher_icons.yaml
+
       - name: Configure temporary CI release signing
         run: |
           keytool -genkeypair -v             -keystore android/ci-upload.jks             -storepass changeit             -keypass changeit             -alias ci-upload             -keyalg RSA             -keysize 2048             -validity 1             -dname "CN=Schmackofatz CI, OU=CI, O=Schmackofatz, C=DE"
