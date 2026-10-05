@@ -26,30 +26,24 @@ class FoodChoiceAssetService {
 
   static const _dineOut = <String, String>{
     'Italienisch': 'assets/food_choices/restaurant/italienisch.png',
-    'Steak': 'assets/food_choices/restaurant/steak.png',
+    'Griechisch': 'assets/food_choices/restaurant/griechisch.svg',
+    'Türkisch': 'assets/food_choices/restaurant/tuerkisch.svg',
+    'Japanisch': 'assets/food_choices/restaurant/japanisch.svg',
+    'Chinesisch': 'assets/food_choices/restaurant/chinesisch.svg',
+    'Thailändisch': 'assets/food_choices/restaurant/thailaendisch.svg',
+    'Vietnamesisch': 'assets/food_choices/restaurant/vietnamesisch.svg',
+    'Koreanisch': 'assets/food_choices/restaurant/koreanisch.svg',
+    'Indonesisch': 'assets/food_choices/restaurant/indonesisch.svg',
+    'Malaysisch': 'assets/food_choices/restaurant/malaysisch.svg',
     'Sushi': 'assets/food_choices/restaurant/sushi.png',
     'Burger': 'assets/food_choices/restaurant/burger.png',
+    'Steak': 'assets/food_choices/restaurant/steak.png',
     'Mexikanisch': 'assets/food_choices/restaurant/mexikanisch.png',
+    'Spanisch': 'assets/food_choices/restaurant/spanisch.svg',
+    'Libanesisch': 'assets/food_choices/restaurant/libanesisch.svg',
+    'Portugiesisch': 'assets/food_choices/restaurant/portugiesisch.svg',
     'Vegetarisch': 'assets/food_choices/restaurant/vegetarisch.png',
-  };
-
-  /// New cuisine choices currently use a native icon until dedicated artwork
-  /// is added. This keeps the choice available without pretending that a
-  /// reused food image represents the wrong cuisine.
-  static const _dineOutIcons = <String, IconData>{
-    'Griechisch': Icons.local_dining_rounded,
-    'Türkisch': Icons.local_dining_rounded,
-    'Japanisch': Icons.ramen_dining_rounded,
-    'Chinesisch': Icons.ramen_dining_rounded,
-    'Thailändisch': Icons.ramen_dining_rounded,
-    'Vietnamesisch': Icons.ramen_dining_rounded,
-    'Koreanisch': Icons.ramen_dining_rounded,
-    'Indonesisch': Icons.ramen_dining_rounded,
-    'Malaysisch': Icons.ramen_dining_rounded,
-    'Spanisch': Icons.local_dining_rounded,
-    'Libanesisch': Icons.local_dining_rounded,
-    'Portugiesisch': Icons.local_dining_rounded,
-    'Vegan': Icons.eco_rounded,
+    'Vegan': 'assets/food_choices/restaurant/vegan.svg',
   };
 
   static const _surprise =
