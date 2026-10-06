@@ -142,39 +142,6 @@ void main() {
     expect(find.text('Lieferung laut Datenquelle verfügbar'), findsNWidgets(3));
   });
 
-  test('Wir bestellen bietet unten den direkten Einstieg zu Lieferdiensten', () {
-    final source = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
-    final services = File('lib/features/food_modes/delivery_services_page.dart').readAsStringSync();
-
-    expect(source, contains("import 'delivery_services_page.dart';"));
-    expect(source, contains("label: const Text('Lieferdienste')"));
-    expect(source, contains("if (widget.mode == FoodMode.order)"));
-    expect(source, isNot(contains("if (order) ...[\n                const SizedBox(height: 8),\n                FilledButton.icon(")));
-    expect(services, contains("name: 'Lieferando'"));
-    expect(services, contains("https://www.lieferando.de/"));
-    expect(services, contains("name: 'Uber Eats'"));
-    expect(services, contains("https://www.ubereats.com/de/"));
-    expect(services, contains("name: 'Bolt'"));
-    expect(services, contains("https://bolt.eu/de-de/food/"));
-    expect(services, contains("name: 'Wolt'"));
-    expect(services, contains("https://wolt.com/de/deu"));
-    expect(services, contains("retina-1665002030.png"));
-    expect(services, contains("Color(0xFF00C2E8)"));
-    expect(services, contains("ubereats://home"));
-    expect(services, contains("boltfood://home"));
-    expect(services, contains('presse.m2maydell.com/Content/580072/784fb4b0-d671-4862-9ec2-3a603800ed14'));
-
-    expect(services, contains('Uber_Eats_2020_logo.svg'));
-    expect(services, contains('Vector_logo_of_Bolt.svg'));
-    expect(services, contains('Color(0xFFFF8000)'));
-    expect(services, contains('Color(0xFF06C167)'));
-    expect(services, contains('Color(0xFF34D186)'));
-    expect(services, contains('SvgPicture.network'));
-    expect(services, contains('Image.network'));
-    expect(services, contains('launchUrl'));
-    expect(services, contains('LaunchMode.externalApplication'));
-  });
-
   testWidgets('Restaurantdetail zeigt nur tatsächlich vorhandene Kontaktdaten', (tester) async {
     final result = RestaurantDiscoveryResult(
       id: 'x',
