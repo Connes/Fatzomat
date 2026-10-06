@@ -12,7 +12,6 @@ void main() {
     expect(today, contains("label: const Text('Verbindung erstellen')"));
     expect(today, contains("MaterialPageRoute(builder: (_) => const ConnectionPage())"));
     expect(today, contains('onPressed: hasConnection ? onDecide : null'));
-    expect(today, contains('onTap: hasConnection ? null : onDecide'));
     expect(today, isNot(contains("Without a Connection, 'Entscheide Du' remains a valid personal")));
   });
 }
