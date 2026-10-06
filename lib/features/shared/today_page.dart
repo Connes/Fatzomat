@@ -1216,7 +1216,8 @@ class _ShoppingGroup extends StatelessWidget {
                       subtitle: item.source == 'manual'
                           ? Text('Manuell hinzugefügt', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText, fontSize: 13))
                           : null,
-                      onTap: () => onEdit(item),
+                      // Artikel werden nur über das Drei-Punkte-Menü bearbeitet.
+                      onTap: null,
                       trailing: PopupMenuButton<String>(
                         tooltip: 'Artikelaktionen',
                         onSelected: (value) {
