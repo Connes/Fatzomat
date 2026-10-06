@@ -17,6 +17,7 @@ import 'controllers/today_controller.dart';
 import '../recipes/recipe_detail_page.dart';
 import '../../core/food_mode.dart';
 import '../food_modes/food_mode_page.dart';
+import '../food_modes/delivery_services_page.dart';
 import 'personalized_surprise_page.dart';
 import 'connection_page.dart';
 import '../../data/repositories/recipe_repository.dart';
@@ -657,6 +658,24 @@ class _TodayResultCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: AppDesign.primaryDark,
                       ),
+                ),
+              ],
+              if (plan.decisionType == 'order') ...[
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DeliveryServicesPage(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.delivery_dining_rounded),
+                    label: const Text('Lieferdienste'),
+                  ),
                 ),
               ],
               const SizedBox(height: 10),
