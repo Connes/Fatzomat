@@ -210,7 +210,6 @@ class _FoodModePageState extends State<FoodModePage> {
                 ),
         ),
       ),
-      ),
     );
   }
 }
