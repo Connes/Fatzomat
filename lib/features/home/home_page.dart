@@ -155,6 +155,22 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             SizedBox(
                               width: contentWidth,
+                              child: const Padding(
+                                padding: EdgeInsets.only(bottom: 14),
+                                child: Text(
+                                  'Willkommen',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: contentWidth,
                               child: GridView.count(
                                 crossAxisCount: 2,
                                 crossAxisSpacing: gap,
