@@ -148,9 +148,16 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       RecipeCollectionEvents.notifyChanged();
       await widget.onTodayPlanChanged?.call();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Rezept als gekocht markiert.')),
-      );
+      if (widget.onNavigateToToday != null) {
+        final navigateToToday = widget.onNavigateToToday!;
+        Navigator.pop(context);
+        navigateToToday();
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const TodayPage()),
+        );
+      }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
     } finally {
