@@ -11,6 +11,7 @@ import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
 
 import 'food_filter.dart';
+import 'food_item_image.dart';
 
 class FoodPreferencesPage extends StatefulWidget {
   const FoodPreferencesPage({super.key});
@@ -296,15 +297,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                                         dense: false,
                                         title: Text(name),
                                         subtitle: Text(category),
-                                        leading: CircleAvatar(
-                                          child: Icon(
-                                            preference == 'like'
-                                                ? Icons.favorite
-                                                : preference == 'dislike'
-                                                    ? Icons.block
-                                                    : Icons.restaurant,
-                                          ),
-                                        ),
+                                        leading: FoodItemImage(foodName: name),
                                         trailing: Wrap(
                                           spacing: 0,
                                           children: [
