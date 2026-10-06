@@ -22,6 +22,8 @@ void main() {
     expect(source, contains('Manuell hinzugefügt'));
     expect(source, contains('widget.servings'));
     expect(source, contains('Manuelle Artikel bleiben erhalten'));
+    expect(source, isNot(contains('Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert.')));
+    expect(source, isNot(contains('widget.recipeName,\n                          style: theme.textTheme.headlineSmall')));
     expect(entry, contains('ShoppingPage('));
     expect(entry, contains('shared: false'));
     expect(source, contains('controller.dispose();'));

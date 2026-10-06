@@ -994,14 +994,6 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     color: AppDesign.surface,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.recipeName,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            color: AppDesign.primaryDark,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
@@ -1024,22 +1016,6 @@ class _ShoppingPageState extends State<ShoppingPage> {
                             color: AppDesign.surfaceSoft,
                             borderRadius: BorderRadius.circular(AppDesign.radiusMd),
                           ),
-                          child: Text(
-                            'Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert. Manuelle Artikel bleiben erhalten.${widget.shared ? ' Änderungen werden bei beiden verbundenen Personen synchronisiert.' : ''}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: AppDesign.text,
-                              height: 1.45,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
                         backgroundColor: AppDesign.surfaceSoft,
                         foregroundColor: AppDesign.primaryDark,
                       ),
