@@ -8,6 +8,7 @@ String friendlyError(Object error) {
     return 'Die Datenbank ist noch nicht auf die neue Entscheidungsfunktion aktualisiert. Bitte die aktuellen Supabase-Migrationen einspielen.';
   }
   if (error is ConnectionRequiredException ||
+      rawText.contains('keine zweite person ist verbunden') ||
       rawText.contains('keine verbindung zu einer zweiten person') ||
       rawText.contains('für diese funktion wird eine verbindung benötigt')) {
     return 'Verbinde zuerst eine zweite Person, um diese Funktion zu nutzen.';
