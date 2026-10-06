@@ -25,6 +25,7 @@ void main() {
     expect(recipe, contains("label: Text("));
     expect(recipe, contains("'Für heute vorbereiten …'"));
     expect(recipe, contains("'Für heute festlegen'"));
+    expect(recipe, contains('if (!personalTodaySelected)'));
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
     expect(recipe, contains("label: const Text('Als gekocht markieren')"));
