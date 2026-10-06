@@ -87,7 +87,11 @@ void main() {
       expect(find.text(label), findsOneWidget, reason: 'Auswahl fehlt: $label');
     }
 
-    expect(find.byType(InkWell), findsNWidgets(labels.length));
+    final expectedInteractiveCards = labels.length + (mode == FoodMode.order ? 1 : 0);
+    expect(find.byType(InkWell), findsNWidgets(expectedInteractiveCards));
+    if (mode == FoodMode.order) {
+      expect(find.text('Lieferdienste'), findsOneWidget);
+    }
     expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
 
     for (final label in imageLabels) {
