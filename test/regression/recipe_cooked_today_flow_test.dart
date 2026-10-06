@@ -11,6 +11,7 @@ void main() {
     expect(recipe, isNot(contains("Die Mengen passen sich automatisch an.")));
     expect(recipe, isNot(contains(r"Schritten erledigt")));
     expect(recipe, contains("personalToday.updateStatus(today.id, 'cooked')"));
+    expect(recipe, contains('RecipeCollectionEvents.notifyChanged();'));
     expect(recipe, isNot(contains('Navigator.pushReplacement(')));
     expect(recipe, contains('onNavigateToToday'));
     expect(recipe, contains('final navigateToToday = widget.onNavigateToToday!;'));
