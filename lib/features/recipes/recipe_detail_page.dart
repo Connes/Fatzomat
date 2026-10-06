@@ -144,6 +144,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         cookedMarked = true;
         personalTodaySelected = false;
       });
+      RecipeCollectionEvents.notifyChanged();
       await widget.onTodayPlanChanged?.call();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
