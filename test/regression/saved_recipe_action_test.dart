@@ -8,7 +8,7 @@ void main() {
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
     expect(pubspec, contains('version: 1.13.46+262'));
-    expect(source, contains("Zur Einkaufsliste hinzufügen"));
+    expect(source, isNot(contains("PopupMenuItem(value: 'shopping'")));
     expect(source, contains("shareRecipeForToday"));
     expect(source, contains("_ServingsDialog"));
   });
