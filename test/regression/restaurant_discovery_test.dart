@@ -156,6 +156,14 @@ void main() {
     expect(services, contains("https://www.ubereats.com/de/"));
     expect(services, contains("name: 'Bolt'"));
     expect(services, contains("https://bolt.eu/de-de/food/"));
+    expect(services, contains('b33ab9914ece14a4dc6e471df834c49b.png'));
+    expect(services, contains('Uber_Eats_2020_logo.svg'));
+    expect(services, contains('Vector_logo_of_Bolt.svg'));
+    expect(services, contains('Color(0xFFFF8000)'));
+    expect(services, contains('Color(0xFF06C167)'));
+    expect(services, contains('Color(0xFF34D186)'));
+    expect(services, contains('SvgPicture.network'));
+    expect(services, contains('Image.network'));
     expect(services, contains('launchUrl'));
     expect(services, contains('LaunchMode.externalApplication'));
   });
