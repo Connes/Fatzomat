@@ -93,9 +93,10 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
       setState(() {
         connected = connection?.isConnected == true;
         sharedPlan = shared;
-        personalPlanId = personal?.id;
-        personalRecipeName = personal?.name ?? 'Einkaufsliste';
-        personalServings = personal?.servings ?? 2;
+        final activePersonal = personal?.status == 'cooked' ? null : personal;
+        personalPlanId = activePersonal?.id;
+        personalRecipeName = activePersonal?.name ?? 'Einkaufsliste';
+        personalServings = activePersonal?.servings ?? 2;
         error = null;
         loading = false;
       });

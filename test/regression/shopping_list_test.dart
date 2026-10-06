@@ -24,10 +24,12 @@ void main() {
     expect(source, contains("PopupMenuItem(value: 'edit', child: Text('Bearbeiten'))"));
     expect(source, contains("PopupMenuItem(value: 'delete', child: Text('Löschen'))"));
     expect(source, contains('widget.servings'));
+    expect(source, contains('widget.recipeName'));
     expect(source, isNot(contains('Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert.')));
     expect(source, isNot(contains('widget.recipeName,\n                          style: theme.textTheme.headlineSmall')));
     expect(entry, contains('ShoppingPage('));
     expect(entry, contains('shared: false'));
+    expect(entry, contains("personal?.status == 'cooked' ? null : personal"));
     expect(source, contains('controller.dispose();'));
     expect(source, isNot(contains('controller.removeListener(_syncController)')));
   });
