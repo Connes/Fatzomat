@@ -35,6 +35,13 @@ class DeliveryServicesPage extends StatelessWidget {
       logoIsSvg: true,
       appUrl: 'boltfood://home',
     ),
+    _DeliveryService(
+      name: 'Wolt',
+      url: 'https://wolt.com/de/deu',
+      logoUrl: 'https://d21buns5ku92am.cloudfront.net/69297/logo/retina-1665002030.png',
+      brandColor: Color(0xFF00C2E8),
+      appUrl: 'https://wolt.com/de/deu',
+    ),
   ];
 
   Future<void> _openService(BuildContext context, _DeliveryService service) async {
@@ -77,7 +84,7 @@ class DeliveryServicesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Öffne direkt die Webseite deines gewünschten Lieferdienstes.',
+                    'Öffne deinen gewünschten Lieferdienst direkt in der App oder auf der Webseite.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText),
                   ),
