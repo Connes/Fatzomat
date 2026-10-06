@@ -35,6 +35,13 @@ void main() {
     );
     final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
     expect(bottomNavigation, isNot(contains('widget.canMarkCooked')));
+    expect(recipe, contains("if (personalTodaySelected) ...["));
+    expect(recipe, contains("'Für heute ausgewählt'"));
+    expect(
+      recipe.indexOf("'Für heute ausgewählt'"),
+      lessThan(recipe.indexOf('recipe!.name')),
+    );
+    expect(bottomNavigation, isNot(contains("'Für heute ausgewählt'")));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
     expect(today, contains('final VoidCallback? onOpenRecipe;'));
 
