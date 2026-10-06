@@ -350,7 +350,7 @@ class _TodayPageState extends State<TodayPage> {
                           plan: plan!,
                           onCancel: removeTodayPlan,
                           onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
-                          onOpenOrder: plan!.decisionType == 'order' ? () {
+                          onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked' ? () {
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const DeliveryServicesPage()));
                           } : null,
                           onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
@@ -543,7 +543,11 @@ class _TodayResultCard extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: plan.decisionType == 'order' ? onOpenOrder : onOpenRecipe,
+                onTap: plan.status == 'cooked'
+                    ? null
+                    : plan.decisionType == 'order'
+                        ? onOpenOrder
+                        : onOpenRecipe,
                 borderRadius: BorderRadius.circular(22),
                 child: Padding(
                   padding: const EdgeInsets.all(4),
