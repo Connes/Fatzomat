@@ -142,6 +142,23 @@ void main() {
     expect(find.text('Lieferung laut Datenquelle verfügbar'), findsNWidgets(3));
   });
 
+  test('Wir bestellen bietet unten den direkten Einstieg zu Lieferdiensten', () {
+    final source = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
+    final services = File('lib/features/food_modes/delivery_services_page.dart').readAsStringSync();
+
+    expect(source, contains("import 'delivery_services_page.dart';"));
+    expect(source, contains("label: const Text('Lieferdienste')"));
+    expect(source, contains('if (order)'));
+    expect(services, contains("name: 'Lieferando'"));
+    expect(services, contains("https://www.lieferando.de/"));
+    expect(services, contains("name: 'Uber Eats'"));
+    expect(services, contains("https://www.ubereats.com/de/"));
+    expect(services, contains("name: 'Bolt'"));
+    expect(services, contains("https://bolt.eu/de-de/food/"));
+    expect(services, contains('launchUrl'));
+    expect(services, contains('LaunchMode.externalApplication'));
+  });
+
   testWidgets('Restaurantdetail zeigt nur tatsächlich vorhandene Kontaktdaten', (tester) async {
     final result = RestaurantDiscoveryResult(
       id: 'x',
