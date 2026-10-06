@@ -24,9 +24,11 @@ void main() {
     expect(today, contains("'Entscheide Du'"));
     expect(today, isNot(contains("'Entscheidung ändern'")));
     expect(today, contains("'Entscheidung entfernen'"));
-    expect(today, contains("'Lieferdienste'"));
+    expect(today, isNot(contains("label: const Text('Lieferdienste')")));
     expect(today, contains("if (plan.decisionType == 'order')"));
     expect(today, contains('DeliveryServicesPage'));
+    expect(today, contains('FoodChoiceAssetService.assetFor(FoodMode.order'));
+    expect(today, contains("onTap: plan.decisionType == 'order' ? onOpenOrder : onOpenRecipe"));
     expect(today, contains("assets/together/clean/icons/icon_cooking.png"));
     expect(today, contains("assets/together/clean/icons/icon_delivery.png"));
     expect(today, contains("assets/together/clean/icons/icon_restaurant.png"));
