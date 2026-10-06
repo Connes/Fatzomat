@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/app_design.dart';
@@ -267,8 +265,6 @@ class _OptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = FoodChoiceAssetService.assetFor(mode, option.label);
     final icon = FoodChoiceAssetService.iconFor(mode, option.label);
-    final hasSvg = assetPath?.toLowerCase().endsWith('.svg') ?? false;
-
     Widget image() {
       if (assetPath == null) {
         return ColoredBox(
@@ -283,22 +279,15 @@ class _OptionCard extends StatelessWidget {
         );
       }
 
-      final image = hasSvg
-          ? SvgPicture.asset(
-              assetPath,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-            )
-          : Image.asset(
-              assetPath,
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              filterQuality: FilterQuality.high,
-              excludeFromSemantics: true,
-              width: double.infinity,
-              height: double.infinity,
-            );
+      final image = Image.asset(
+        assetPath,
+        fit: BoxFit.cover,
+        alignment: Alignment.center,
+        filterQuality: FilterQuality.high,
+        excludeFromSemantics: true,
+        width: double.infinity,
+        height: double.infinity,
+      );
 
       return image;
     }
