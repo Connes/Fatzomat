@@ -16,6 +16,7 @@ import '../../data/repositories/collaboration_repository.dart';
 import 'controllers/today_controller.dart';
 import '../recipes/recipe_detail_page.dart';
 import '../../core/food_mode.dart';
+import '../../core/services/food_choice_asset_service.dart';
 import '../food_modes/food_mode_page.dart';
 import '../food_modes/delivery_services_page.dart';
 import 'personalized_surprise_page.dart';
@@ -349,6 +350,9 @@ class _TodayPageState extends State<TodayPage> {
                           plan: plan!,
                           onCancel: removeTodayPlan,
                           onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
+                          onOpenOrder: plan!.decisionType == 'order' ? () {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const DeliveryServicesPage()));
+                          } : null,
                           onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
                               ? () async {
                                   await Navigator.push(
@@ -511,12 +515,14 @@ class _TodayDecisionCard extends StatelessWidget {
 class _TodayResultCard extends StatelessWidget {
   final TodayPlan plan;
   final VoidCallback? onOpenRecipe;
+  final VoidCallback? onOpenOrder;
   final VoidCallback onCancel;
   final VoidCallback? onShare;
 
   const _TodayResultCard({
     required this.plan,
     required this.onOpenRecipe,
+    required this.onOpenOrder,
     required this.onCancel,
     required this.onShare,
   });
@@ -537,7 +543,7 @@ class _TodayResultCard extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: onOpenRecipe,
+                onTap: plan.decisionType == 'order' ? onOpenOrder : onOpenRecipe,
                 borderRadius: BorderRadius.circular(22),
                 child: Padding(
                   padding: const EdgeInsets.all(4),
@@ -565,6 +571,16 @@ class _TodayResultCard extends StatelessWidget {
                                 fit: BoxFit.cover,
                               ),
                       ),
+                      else if (plan.decisionType == 'order')
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(22),
+                          child: Image.asset(
+                            FoodChoiceAssetService.assetFor(FoodMode.order, plan.decisionValue ?? '') ?? 'assets/together/clean/icons/icon_delivery.png',
+                            height: 150,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       const SizedBox(height: 20),
                       if (plan.status == 'cooked') ...[
                         Container(
@@ -658,24 +674,6 @@ class _TodayResultCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: AppDesign.primaryDark,
                       ),
-                ),
-              ],
-              if (plan.decisionType == 'order') ...[
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DeliveryServicesPage(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.delivery_dining_rounded),
-                    label: const Text('Lieferdienste'),
-                  ),
                 ),
               ],
               const SizedBox(height: 10),
