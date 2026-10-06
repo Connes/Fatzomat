@@ -35,15 +35,27 @@ void main() {
         reason: 'Fehlendes Restaurant-Asset für $choice',
       );
     }
+  });
 
-    expect(
-      FoodChoiceAssetService.assetFor(FoodMode.order, 'Asiatisch'),
-      'assets/food_choices/delivery/asiatisch.png',
-    );
-    expect(
-      FoodChoiceAssetService.assetFor(FoodMode.order, 'Pizza'),
-      'assets/food_choices/delivery/pizza.png',
-    );
+  test('order mode maps every food choice to the new delivery artwork', () {
+    const expected = <String, String>{
+      'Pizza': 'assets/food_choices/delivery/pizza.png',
+      'Burger': 'assets/food_choices/delivery/burger.png',
+      'Asiatisch': 'assets/food_choices/delivery/asiatisch.png',
+      'Döner': 'assets/food_choices/delivery/doener.png',
+      'Sushi': 'assets/food_choices/delivery/sushi.png',
+      'Indisch': 'assets/food_choices/delivery/indisch.png',
+      'Schnitzel': 'assets/food_choices/delivery/schnitzel.png',
+      'Pasta': 'assets/food_choices/delivery/pasta.png',
+    };
+
+    for (final entry in expected.entries) {
+      expect(
+        FoodChoiceAssetService.assetFor(FoodMode.order, entry.key),
+        entry.value,
+        reason: 'Falsches Delivery-Asset',
+      );
+    }
   });
 
   test('new restaurant categories use dedicated artwork instead of icon fallbacks', () {
