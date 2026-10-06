@@ -417,11 +417,19 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
             onClear: selectedImage == null ? null : _clearSelectedImage,
           ),
           const SizedBox(height: 12),
-          OutlinedButton.icon(
+          FilledButton.icon(
             onPressed: saving ? null : _editRecipe,
             icon: const Icon(Icons.edit_rounded),
             label: const Text('Rezept bearbeiten'),
-            style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+              backgroundColor: AppDesign.primarySoft,
+              foregroundColor: AppDesign.primaryDark,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           _SectionTitle(title: 'Zutaten'),
@@ -590,9 +598,20 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppDesign.surface.withValues(alpha: .96),
+        borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+      ),
+      child: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+      ),
     );
   }
 }
