@@ -44,6 +44,14 @@ void main() {
       FoodChoiceAssetService.assetFor(FoodMode.order, 'Pizza'),
       'assets/food_choices/delivery/pizza.png',
     );
+    expect(
+      FoodChoiceAssetService.assetFor(FoodMode.order, 'Schnitzel'),
+      'assets/food_choices/delivery/schnitzel.png',
+    );
+    expect(
+      FoodChoiceAssetService.assetFor(FoodMode.order, 'Pasta'),
+      'assets/food_choices/delivery/pasta.png',
+    );
   });
 
   test('new restaurant categories use dedicated artwork instead of icon fallbacks', () {
