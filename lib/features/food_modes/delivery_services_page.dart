@@ -14,7 +14,7 @@ class DeliveryServicesPage extends StatelessWidget {
       name: 'Lieferando',
       url: 'https://www.lieferando.de/',
       logoUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/b/b3/b33ab9914ece14a4dc6e471df834c49b.png',
+          'https://presse.m2maydell.com/Content/580072/784fb4b0-d671-4862-9ec2-3a603800ed14/1200/2400/.jpg',
       brandColor: Color(0xFFFF8000),
     ),
     _DeliveryService(
@@ -24,6 +24,7 @@ class DeliveryServicesPage extends StatelessWidget {
           'https://upload.wikimedia.org/wikipedia/commons/b/b3/Uber_Eats_2020_logo.svg',
       brandColor: Color(0xFF06C167),
       logoIsSvg: true,
+      appUrl: 'ubereats://home',
     ),
     _DeliveryService(
       name: 'Bolt',
@@ -32,12 +33,24 @@ class DeliveryServicesPage extends StatelessWidget {
           'https://upload.wikimedia.org/wikipedia/commons/2/28/Vector_logo_of_Bolt.svg',
       brandColor: Color(0xFF34D186),
       logoIsSvg: true,
+      appUrl: 'boltfood://home',
     ),
   ];
 
   Future<void> _openService(BuildContext context, _DeliveryService service) async {
-    final opened = await launchUrl(Uri.parse(service.url), mode: LaunchMode.externalApplication);
-    if (opened || !context.mounted) return;
+    if (service.appUrl != null) {
+      final appOpened = await launchUrl(
+        Uri.parse(service.appUrl!),
+        mode: LaunchMode.externalApplication,
+      );
+      if (appOpened) return;
+    }
+
+    final webOpened = await launchUrl(
+      Uri.parse(service.url),
+      mode: LaunchMode.externalApplication,
+    );
+    if (webOpened || !context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${service.name} konnte nicht geöffnet werden.')),
     );
@@ -177,6 +190,7 @@ class _DeliveryService {
   final String logoUrl;
   final Color brandColor;
   final bool logoIsSvg;
+  final String? appUrl;
 
   const _DeliveryService({
     required this.name,
@@ -184,5 +198,6 @@ class _DeliveryService {
     required this.logoUrl,
     required this.brandColor,
     this.logoIsSvg = false,
+    this.appUrl,
   });
 }
