@@ -13,8 +13,13 @@ void main() {
     expect(recipe, contains("personalToday.updateStatus(today.id, 'cooked')"));
     expect(recipe, isNot(contains('Navigator.pushReplacement(')));
     expect(recipe, contains('onNavigateToToday'));
-    expect(recipe, contains('widget.onNavigateToToday!();'));
+    expect(recipe, contains('final navigateToToday = widget.onNavigateToToday!();'));
     expect(recipe, contains('Navigator.pop(context);'));
+    expect(recipe, contains('navigateToToday();'));
+    expect(
+      recipe.indexOf('Navigator.pop(context);'),
+      lessThan(recipe.indexOf('navigateToToday();')),
+    );
     expect(recipe, contains('FilledButton.icon('));
     expect(recipe, contains('onPressed: working ? null : selectPersonalToday'));
     expect(recipe, contains("label: Text("));

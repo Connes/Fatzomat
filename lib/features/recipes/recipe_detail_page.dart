@@ -107,8 +107,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       );
       if (openToday == true && mounted) {
         if (widget.onNavigateToToday != null) {
-          widget.onNavigateToToday!();
-          if (mounted) Navigator.pop(context);
+          // Close this detail route first. The AppShell callback then only
+          // selects the Today tab instead of trying to remove this route
+          // while its async callback is still executing.
+          final navigateToToday = widget.onNavigateToToday!;
+          Navigator.pop(context);
+          navigateToToday();
         } else {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage()));
         }
