@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -20,7 +21,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // context is available here.
 }
 
-class PushNotificationService {
+class PushNotificationService with WidgetsBindingObserver {
   PushNotificationService._();
 
   static final PushNotificationService instance = PushNotificationService._();
@@ -31,6 +32,8 @@ class PushNotificationService {
 
   bool _initialized = false;
   bool _initializing = false;
+  Timer? _tokenRetryTimer;
+  bool _observingLifecycle = false;
   String? _pendingNotificationId;
   String? _pendingDecisionShareId;
   String? _pendingRecipeId;
@@ -80,27 +83,67 @@ class PushNotificationService {
         _flushPendingNavigation();
       }
 
-      final token = await _messaging.getToken();
-      if (token != null && token.trim().isNotEmpty) {
-        await _devices.saveToken(token, platform: _platform);
+      if (!_observingLifecycle) {
+        WidgetsBinding.instance.addObserver(this);
+        _observingLifecycle = true;
       }
+
+      // Listen before the initial getToken() call so a startup token refresh
+      // cannot leave the server without a usable device token.
       _messaging.onTokenRefresh.listen((token) async {
         try {
           await _devices.saveToken(token, platform: _platform);
         } catch (_) {
-          // A later token refresh will retry registration.
+          _scheduleTokenRetry();
         }
       });
+
       _initialized = true;
+      await _registerCurrentToken();
     } catch (_) {
       // Keep initialization retryable. A transient Firebase/permission/network
       // error must not permanently disable push for the rest of the process.
+      _scheduleTokenRetry();
     } finally {
       _initializing = false;
     }
   }
 
   String get _platform => Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'other');
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _initialized) {
+      _registerCurrentToken();
+    }
+  }
+
+  Future<void> _registerCurrentToken() async {
+    if (!_initialized && !_initializing) return;
+    _tokenRetryTimer?.cancel();
+    _tokenRetryTimer = null;
+
+    try {
+      final token = await _messaging
+          .getToken()
+          .timeout(const Duration(seconds: 15));
+      if (token == null || token.trim().isEmpty) {
+        _scheduleTokenRetry();
+        return;
+      }
+      await _devices.saveToken(token, platform: _platform);
+    } catch (_) {
+      _scheduleTokenRetry();
+    }
+  }
+
+  void _scheduleTokenRetry() {
+    if (_tokenRetryTimer != null || !_initialized) return;
+    _tokenRetryTimer = Timer(const Duration(seconds: 10), () {
+      _tokenRetryTimer = null;
+      _registerCurrentToken();
+    });
+  }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     final title = message.notification?.title ?? message.data['title']?.toString() ?? 'Schmackofatz';

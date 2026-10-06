@@ -27,6 +27,11 @@ void main() {
     expect(androidManifest, contains('android.permission.INTERNET'));
     expect(app, contains('navigatorKey: appNavigatorKey'));
     expect(service, contains('FirebaseMessaging.onMessageOpenedApp'));
+    expect(service, contains('with WidgetsBindingObserver'));
+    expect(service, contains('didChangeAppLifecycleState'));
+    expect(service, contains('_registerCurrentToken'));
+    expect(service, contains('timeout(const Duration(seconds: 15))'));
+    expect(service, contains('_scheduleTokenRetry'));
     expect(service, contains('getInitialMessage'));
     expect(service, contains('NotificationsPage(initialNotificationId: id)'));
     expect(service, contains('DecisionSharePage(share: share)'));
