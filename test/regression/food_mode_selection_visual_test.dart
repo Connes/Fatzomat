@@ -33,7 +33,7 @@ void main() {
     );
     expect(
       FoodChoiceAssetService.choicesFor(FoodMode.order).keys,
-      containsAll(['Pizza', 'Burger', 'Asiatisch', 'Döner', 'Sushi', 'Indisch']),
+      containsAll(['Pizza', 'Burger', 'Asiatisch', 'Döner', 'Sushi', 'Indisch', 'Schnitzel', 'Pasta']),
     );
     expect(
       FoodChoiceAssetService.choicesFor(FoodMode.dineOut).keys,
@@ -94,9 +94,6 @@ void main() {
 
     final expectedInteractiveCards = labels.length + (mode == FoodMode.order ? 1 : 0);
     expect(find.byType(InkWell), findsNWidgets(expectedInteractiveCards));
-    if (mode == FoodMode.order) {
-      expect(find.text('Lieferdienste'), findsOneWidget);
-    }
     expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
     if (compactMode) {
       expect(find.byType(Scrollable), findsOneWidget);
@@ -119,7 +116,7 @@ void main() {
     ]);
   });
 
-  testWidgets('Wir bestellen hat eine gemeinsame Box, vollflächige Bilder und alle Auswahltexte',
+  testWidgets('Wir bestellen hat direkte Tageskategorien ohne Lieferdienst-Abzweig',
       (tester) async {
     await pumpMode(tester, FoodMode.order, const [
       'Pizza',
@@ -128,6 +125,8 @@ void main() {
       'Döner',
       'Sushi',
       'Indisch',
+      'Schnitzel',
+      'Pasta',
     ]);
   });
 
