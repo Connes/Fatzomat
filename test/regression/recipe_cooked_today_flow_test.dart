@@ -28,6 +28,13 @@ void main() {
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
     expect(recipe, contains("label: const Text('Als gekocht markieren')"));
+    expect(recipe, contains("if (widget.canMarkCooked && steps.isNotEmpty && completedSteps.contains(steps.length - 1))"));
+    expect(
+      recipe.indexOf("completedSteps.contains(steps.length - 1)"),
+      lessThan(recipe.indexOf("label: const Text('Als gekocht markieren')")),
+    );
+    final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
+    expect(bottomNavigation, isNot(contains('widget.canMarkCooked')));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
     expect(today, contains('final VoidCallback? onOpenRecipe;'));
 
