@@ -16,7 +16,7 @@ void main() {
     expect(source, contains('setShoppingChecked'));
     expect(source, contains('deleteShoppingItem'));
     expect(source, contains('clearCompleted'));
-    expect(source, contains('Erledigte Artikel löschen?'));
+    expect(source, isNot(contains('Erledigte Artikel löschen?')));
     expect(source, contains('NOCH OFFEN'));
     expect(source, contains('ERLEDIGT'));
     expect(source, contains('Manuell hinzugefügt'));
