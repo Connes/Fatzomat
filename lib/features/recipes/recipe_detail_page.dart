@@ -12,6 +12,7 @@ import '../../data/repositories/personal_today_repository.dart';
 import '../../data/models/recipe.dart';
 import '../../data/services/together_recipe_file_service.dart';
 import '../../data/services/recipe_image_service.dart';
+import '../../core/recipe_collection_events.dart';
 import '../shared/today_page.dart';
 import 'add_recipe_page.dart';
 
