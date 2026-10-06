@@ -373,6 +373,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
   bool get hasSelectionFilter => widget.mainChoice != null || widget.selectedFoodIds.isNotEmpty;
 
+  bool get hasActiveTodayPlan => todayPlan != null && todayPlan!.status != 'cooked';
+
   List<Recipe> get visibleRecipes {
     final normalizedQuery = query.trim().toLowerCase();
     return recipes.where((recipe) {
@@ -473,7 +475,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                if (todayPlan != null)
+                if (hasActiveTodayPlan)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
                     child: Material(

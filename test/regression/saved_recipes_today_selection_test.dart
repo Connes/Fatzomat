@@ -12,5 +12,7 @@ void main() {
     expect(source, contains("'Für heute ausgewählt'"));
     expect(source, contains("key: Key('saved-recipe-select-today-"));
     expect(source, contains("onPressed: () => selectRecipeForToday(recipe)"));
+    expect(source, contains("bool get hasActiveTodayPlan => todayPlan != null && todayPlan!.status != 'cooked';"));
+    expect(source, contains('if (hasActiveTodayPlan)'));
   });
 }
