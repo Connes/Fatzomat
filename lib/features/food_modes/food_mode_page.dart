@@ -12,7 +12,6 @@ import '../../core/error_text.dart';
 import '../../core/services/location_service.dart';
 import '../../data/models/restaurant_discovery.dart';
 import 'restaurant_detail_page.dart';
-import 'delivery_services_page.dart';
 import '../../data/repositories/restaurant_discovery_repository.dart';
 
 class FoodModePage extends StatefulWidget {
@@ -60,6 +59,35 @@ class _FoodModePageState extends State<FoodModePage> {
     // resolve the request prematurely with only the main ingredient choice.
     if (widget.mode == FoodMode.cook) {
       await _openCook(context, choice);
+      return;
+    }
+
+    // "Wir bestellen" is itself the decision. A category such as Pizza or
+    // Burger is the complete result for today. There is deliberately no
+    // restaurant discovery, location lookup or delivery-service detour here.
+    if (widget.mode == FoodMode.order) {
+      try {
+        if (widget.decisionRequestId != null) {
+          await CollaborationRepository().resolveDecisionRequest(
+            requestId: widget.decisionRequestId!,
+            decisionMode: widget.mode.name,
+            resultType: 'order',
+            resultId: choice,
+          );
+        } else {
+          await PersonalTodayRepository().selectDecision(
+            type: 'order',
+            value: choice,
+          );
+        }
+        if (!context.mounted) return;
+        Navigator.pop(context, true);
+      } catch (error) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(friendlyError(error))),
+        );
+      }
       return;
     }
 
@@ -127,6 +155,8 @@ class _FoodModePageState extends State<FoodModePage> {
           _ModeOption('Döner'),
           _ModeOption('Sushi'),
           _ModeOption('Indisch'),
+          _ModeOption('Schnitzel'),
+          _ModeOption('Pasta'),
         ],
       FoodMode.dineOut => const [
           _ModeOption('Italienisch'),
@@ -179,14 +209,8 @@ class _FoodModePageState extends State<FoodModePage> {
             final rows = (options.length + 1) ~/ 2;
             const gap = 10.0;
             const verticalPadding = 16.0;
-            const deliveryButtonHeight = 48.0;
-            const deliveryGap = 10.0;
             final gridGaps = (rows - 1) * gap;
-            final reserved = verticalPadding +
-                gridGaps +
-                (widget.mode == FoodMode.order
-                    ? deliveryButtonHeight + deliveryGap
-                    : 0);
+            final reserved = verticalPadding + gridGaps;
             final cardHeight = (constraints.maxHeight - reserved) / rows;
             final cardWidth = (constraints.maxWidth - gap) / 2;
             final aspectRatio = cardWidth / cardHeight;
@@ -217,25 +241,6 @@ class _FoodModePageState extends State<FoodModePage> {
                       },
                     ),
                   ),
-                  if (widget.mode == FoodMode.order) ...[
-                    const SizedBox(height: deliveryGap),
-                    SizedBox(
-                      height: deliveryButtonHeight,
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DeliveryServicesPage(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.delivery_dining_rounded),
-                        label: const Text('Lieferdienste'),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             );

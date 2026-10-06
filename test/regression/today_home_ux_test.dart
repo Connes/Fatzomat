@@ -24,6 +24,9 @@ void main() {
     expect(today, contains("'Entscheide Du'"));
     expect(today, isNot(contains("'Entscheidung ändern'")));
     expect(today, contains("'Entscheidung entfernen'"));
+    expect(today, contains("'Lieferdienste'"));
+    expect(today, contains("if (plan.decisionType == 'order')"));
+    expect(today, contains('DeliveryServicesPage'));
     expect(today, contains("assets/together/clean/icons/icon_cooking.png"));
     expect(today, contains("assets/together/clean/icons/icon_delivery.png"));
     expect(today, contains("assets/together/clean/icons/icon_restaurant.png"));
