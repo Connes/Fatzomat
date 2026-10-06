@@ -994,6 +994,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                     color: AppDesign.surface,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
@@ -1008,20 +1009,16 @@ class _ShoppingPageState extends State<ShoppingPage> {
                           borderRadius: BorderRadius.circular(AppDesign.radiusPill),
                           child: LinearProgressIndicator(value: progress, minHeight: 8),
                         ),
-                        const SizedBox(height: 12),
-                        Container(
+                        const SizedBox(height: 16),
+                        SizedBox(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppDesign.surfaceSoft,
-                            borderRadius: BorderRadius.circular(AppDesign.radiusMd),
+                          child: FilledButton.icon(
+                            onPressed: addItem,
+                            icon: const Icon(Icons.add_rounded),
+                            label: const Text('Artikel hinzufügen'),
                           ),
-                        backgroundColor: AppDesign.surfaceSoft,
-                        foregroundColor: AppDesign.primaryDark,
-                      ),
-                      onPressed: addItem,
-                      icon: const Icon(Icons.add_rounded),
-                      label: const Text('Artikel hinzufügen'),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 18),
