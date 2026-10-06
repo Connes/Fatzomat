@@ -19,8 +19,8 @@ class FoodChoiceAssetService {
     'Döner': 'assets/food_choices/delivery/doener.png',
     'Sushi': 'assets/food_choices/delivery/sushi.png',
     'Indisch': 'assets/food_choices/delivery/indisch.png',
-    'Schnitzel': 'assets/food_choices/order/schnitzel.webp',
-    'Pasta': 'assets/food_choices/order/pasta.webp',
+    'Schnitzel': 'assets/food_choices/delivery/schnitzel.png',
+    'Pasta': 'assets/food_choices/delivery/pasta.png',
   };
 
   static const _dineOut = <String, String>{

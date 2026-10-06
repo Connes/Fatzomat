@@ -34,16 +34,12 @@ Stand dieses Dokuments: 2026-10-06
 
 ### GitHub
 
-- Aktueller `main`-Commit vor Handover-Update: `974619cd2de84a14ec2562a5ea038edbd456eeec`
-- PR #38 wurde gemergt: Die Today-Seite zeigt die gewählte Bestellart und öffnet die Lieferdienst-Auswahl.
-- PR #39 wurde gemergt: `public.recipe_fingerprint(jsonb,jsonb)` verwendet nun explizit `search_path=pg_catalog`.
-- Die zugehörige Migration ist `supabase/migrations/20261006205000_harden_recipe_fingerprint_search_path.sql`.
+- `main` enthält den Grafik-Commit `9dc4dd0`: die acht neuen Delivery-PNGs sind im Repository und die beiden alten Order-WebPs sind entfernt.
+- In diesem Folge-Stand werden Schnitzel und Pasta auch in der zentralen Service-Zuordnung auf `delivery/*.png` umgestellt.
 
 ### CI
 
 Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`.
-
-PR #39 hatte Quality-Gate-Run #591. Der PR wurde erfolgreich gemergt. Der abschließende Workflow-Status war beim Check zeitlich noch nicht vollständig aus dem Actions-Feed verfügbar; für den neuen Main-Commit ist CI daher noch separat zu verifizieren.
 
 ### Supabase
 
@@ -54,22 +50,15 @@ PR #39 hatte Quality-Gate-Run #591. Der PR wurde erfolgreich gemergt. Der abschl
 
 Die App verwendet weiterhin den RPC `search_restaurants`, nicht die Edge Function.
 
-Der Security Advisor meldet nach der Härtung keinen `function_search_path_mutable`-Befund mehr für `recipe_fingerprint`. Verifiziert wurde `proconfig=["search_path=pg_catalog"]` und ein erfolgreicher Fingerprint-Smoke-Test.
-
-Verbleibende Security-Warnungen betreffen u.a. `pg_net` in `public`, bewusst eingesetzte `SECURITY DEFINER`-RPCs und bestehende Anonymous-Auth/RLS-Policies. Diese werden nicht blind entfernt.
-
-## Restaurant Discovery
+### Restaurant Discovery
 
 Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` als RPC auf, verlangt eine gültige persönliche Session, aktualisiert die Session vor der Suche, begrenzt auf maximal 10 Ergebnisse und verwirft Ergebnisse außerhalb von 10 km.
 
-Die RPC unterstützt die inzwischen erweiterte Cuisine-Taxonomie einschließlich italienisch, griechisch, türkisch, japanisch, chinesisch, thailändisch, vietnamesisch, koreanisch, indonesisch, malaysisch, indisch, Burger, mexikanisch, spanisch, libanesisch, portugiesisch, vegetarisch, vegan, Sushi, Pizza, Döner, Steak und asiatisch.
-
 ## Nächster technischer Schritt
 
-1. CI für den neuen `main`-Commit prüfen.
-2. Recipe-/Food-Choice-Stand gegen die vorhandenen Regressionstests prüfen.
-3. Restaurant-Discovery nicht erneut über die alte Edge Function umbauen, solange die App den RPC verwendet.
-4. Danach das nächste sinnvolle Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten.
+1. CI für den neuen Stand verifizieren.
+2. Recipe-/Food-Choice-Regressionstests prüfen.
+3. Danach das nächste sinnvolle Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten.
 
 ## Sicherheits-/Arbeitsregeln
 
