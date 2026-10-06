@@ -38,6 +38,7 @@ flutter:
     - assets/together/clean/background/
     - assets/food_choices/cooking/
     - assets/food_choices/delivery/
+    - assets/food_choices/order/
     - assets/food_choices/restaurant/
   fonts:
     - family: Inter
