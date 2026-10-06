@@ -79,11 +79,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final compactMode = mode == FoodMode.cook || mode == FoodMode.order;
     expect(
       find.byKey(const ValueKey<String>('food_mode_choice_group')),
-      mode == FoodMode.cook ? findsNothing : findsOneWidget,
+      compactMode ? findsNothing : findsOneWidget,
     );
-    expect(find.byType(AppSurface), mode == FoodMode.cook ? findsNothing : findsOneWidget);
+    expect(find.byType(AppSurface), compactMode ? findsNothing : findsOneWidget);
+    expect(find.byType(SingleChildScrollView), compactMode ? findsNothing : findsOneWidget);
     expect(find.byType(GridView), findsOneWidget);
 
     for (final label in labels) {
@@ -96,6 +98,9 @@ void main() {
       expect(find.text('Lieferdienste'), findsOneWidget);
     }
     expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
+    if (compactMode) {
+      expect(find.byType(Scrollable), findsOneWidget);
+    }
 
     for (final label in imageLabels) {
       final asset = FoodChoiceAssetService.assetFor(mode, label)!;

@@ -89,6 +89,29 @@ class _FoodModePageState extends State<FoodModePage> {
     _resolveAndOpen(context, choice);
   }
 
+  Widget _choiceGrid(List<_ModeOption> options) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.78,
+      ),
+      itemCount: options.length,
+      itemBuilder: (context, index) {
+        final option = options[index];
+        return _OptionCard(
+          mode: widget.mode,
+          option: option,
+          onTap: () => _select(context, option.label),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final options = switch (widget.mode) {
@@ -140,74 +163,85 @@ class _FoodModePageState extends State<FoodModePage> {
         }),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: widget.mode == FoodMode.cook
-              ? GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 0.78,
-                  ),
-                  itemCount: options.length,
-                  itemBuilder: (context, index) {
-                    final option = options[index];
-                    return _OptionCard(
-                      mode: widget.mode,
-                      option: option,
-                      onTap: () => _select(context, option.label),
-                    );
-                  },
-                )
-              : AppSurface(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compactMode = widget.mode == FoodMode.cook || widget.mode == FoodMode.order;
+            if (!compactMode) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: AppSurface(
                   key: const ValueKey<String>('food_mode_choice_group'),
                   padding: const EdgeInsets.all(10),
                   color: AppDesign.surface.withValues(alpha: 0.96),
-                  child: Column(
-                    children: [
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio: 0.78,
-                        ),
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options[index];
-                          return _OptionCard(
-                            mode: widget.mode,
-                            option: option,
-                            onTap: () => _select(context, option.label),
+                  child: _choiceGrid(options),
+                ),
+              );
+            }
+
+            final rows = (options.length + 1) ~/ 2;
+            const gap = 10.0;
+            const verticalPadding = 16.0;
+            const deliveryButtonHeight = 48.0;
+            const deliveryGap = 10.0;
+            final gridGaps = (rows - 1) * gap;
+            final reserved = verticalPadding +
+                gridGaps +
+                (widget.mode == FoodMode.order
+                    ? deliveryButtonHeight + deliveryGap
+                    : 0);
+            final cardHeight = (constraints.maxHeight - reserved) / rows;
+            final cardWidth = (constraints.maxWidth - gap) / 2;
+            final aspectRatio = cardWidth / cardHeight;
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: cardHeight * rows + gridGaps,
+                    child: GridView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: gap,
+                        crossAxisSpacing: gap,
+                        childAspectRatio: aspectRatio,
+                      ),
+                      itemCount: options.length,
+                      itemBuilder: (context, index) {
+                        final option = options[index];
+                        return _OptionCard(
+                          mode: widget.mode,
+                          option: option,
+                          onTap: () => _select(context, option.label),
+                        );
+                      },
+                    ),
+                  ),
+                  if (widget.mode == FoodMode.order) ...[
+                    const SizedBox(height: deliveryGap),
+                    SizedBox(
+                      height: deliveryButtonHeight,
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DeliveryServicesPage(),
+                            ),
                           );
                         },
+                        icon: const Icon(Icons.delivery_dining_rounded),
+                        label: const Text('Lieferdienste'),
                       ),
-                      if (widget.mode == FoodMode.order) ...[
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          width: double.infinity,
-                          child: FilledButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
-                              );
-                            },
-                            icon: const Icon(Icons.delivery_dining_rounded),
-                            label: const Text('Lieferdienste'),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
