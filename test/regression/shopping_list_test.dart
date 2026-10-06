@@ -20,6 +20,9 @@ void main() {
     expect(source, contains('NOCH OFFEN'));
     expect(source, contains('ERLEDIGT'));
     expect(source, contains('Manuell hinzugefügt'));
+    expect(source, contains('onTap: null'));
+    expect(source, contains("PopupMenuItem(value: 'edit', child: Text('Bearbeiten'))"));
+    expect(source, contains("PopupMenuItem(value: 'delete', child: Text('Löschen'))"));
     expect(source, contains('widget.servings'));
     expect(source, isNot(contains('Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert.')));
     expect(source, isNot(contains('widget.recipeName,\n                          style: theme.textTheme.headlineSmall')));
