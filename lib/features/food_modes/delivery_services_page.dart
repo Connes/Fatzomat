@@ -77,7 +77,7 @@ class DeliveryServicesPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Öffne direkt die Webseite deines gewünschten Lieferdienstes.',
+                    'Öffne deinen gewünschten Lieferdienst direkt in der App oder auf der Webseite.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText),
                   ),
