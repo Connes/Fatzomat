@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
@@ -389,6 +390,35 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   }
 
 
+  Future<void> shareRecipe(Recipe recipe) async {
+    final ingredients = recipe.ingredients.map((ingredient) {
+      final amount = ingredient.isQualitative
+          ? ''
+          : '${ingredient.quantity} ${ingredient.unit}'.trim();
+      return amount.isEmpty ? '• ${ingredient.name}' : '• $amount ${ingredient.name}';
+    }).join('\\n');
+    final steps = recipe.instructions.asMap().entries
+        .map((entry) => '${entry.key + 1}. ${entry.value}')
+        .join('\\n');
+    final details = [
+      recipe.description.trim(),
+      'Für ${recipe.servings} Personen',
+      if (ingredients.isNotEmpty) 'Zutaten:\\n$ingredients',
+      if (steps.isNotEmpty) 'Zubereitung:\\n$steps',
+    ].where((part) => part.trim().isNotEmpty).join('\\n\\n');
+
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          title: recipe.name,
+          subject: 'Rezept: ${recipe.name}',
+          text: '${recipe.name}\\n\\n$details',
+        ),
+      );
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    }
+  }
   Future<void> editRecipe(Recipe recipe) async {
     final changed = await Navigator.push<bool>(
       context,
@@ -600,19 +630,14 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                   ),
                                   PopupMenuButton<String>(
                                     onSelected: (value) {
-                                      if (value == 'today') selectRecipeForToday(recipe);
-                                      if (value == 'delete') deleteRecipe(recipe);
-                                      if (value == 'shopping') addRecipeToShoppingList(recipe);
                                       if (value == 'edit') editRecipe(recipe);
+                                      if (value == 'delete') deleteRecipe(recipe);
+                                      if (value == 'share') shareRecipe(recipe);
                                     },
                                     itemBuilder: (_) => [
-                                      const PopupMenuItem(value: 'today', child: Text('Für heute auswählen')),
-                                      const PopupMenuItem(value: 'shopping', child: Text('Zur Einkaufsliste hinzufügen')),
                                       const PopupMenuItem(value: 'edit', child: Text('Rezept bearbeiten')),
-                                      PopupMenuItem(
-                                        value: 'delete',
-                                        child: const Text('Löschen'),
-                                      ),
+                                      const PopupMenuItem(value: 'delete', child: Text('Rezept löschen')),
+                                      const PopupMenuItem(value: 'share', child: Text('Rezept teilen')),
                                     ],
                                   ),
                                 ],
