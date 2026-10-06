@@ -164,7 +164,16 @@ class _TodayPageState extends State<TodayPage> {
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      final errorText = error.toString().toLowerCase();
+      if (errorText.contains('keine zweite person ist verbunden') ||
+          errorText.contains('keine verbindung zu einer zweiten person')) {
+        setState(() => _hasConnection = false);
+        await _showNoConnectionDialog();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(friendlyError(error))),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loadingDecisionMessage = false);
     }
