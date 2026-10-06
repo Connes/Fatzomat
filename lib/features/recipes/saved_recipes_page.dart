@@ -618,12 +618,30 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                         const SizedBox(height: 8),
                                         Align(
                                           alignment: Alignment.centerLeft,
-                                          child: TextButton.icon(
-                                            key: Key('saved-recipe-select-today-${recipe.id}'),
-                                            onPressed: () => selectRecipeForToday(recipe),
-                                            icon: const Icon(Icons.today_rounded, size: 18),
-                                            label: const Text('Für heute auswählen'),
-                                          ),
+                                          child: todayPlan?.isRecipe == true &&
+                                                  todayPlan?.recipeId == recipe.id &&
+                                                  todayPlan?.status != 'cooked'
+                                              ? Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: const [
+                                                    Icon(
+                                                      Icons.check_circle_rounded,
+                                                      size: 18,
+                                                      color: AppDesign.primaryDark,
+                                                    ),
+                                                    SizedBox(width: 6),
+                                                    Text(
+                                                      'Für heute ausgewählt',
+                                                      style: TextStyle(fontWeight: FontWeight.w700),
+                                                    ),
+                                                  ],
+                                                )
+                                              : TextButton.icon(
+                                                  key: Key('saved-recipe-select-today-${recipe.id}'),
+                                                  onPressed: () => selectRecipeForToday(recipe),
+                                                  icon: const Icon(Icons.today_rounded, size: 18),
+                                                  label: const Text('Für heute auswählen'),
+                                                ),
                                         ),
                                       ],
                                     ),
