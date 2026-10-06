@@ -58,7 +58,7 @@ AppException normalizeAppException(Object error) {
     final details = error.details?.toString() ?? '';
     final hint = error.hint?.toString() ?? '';
     final combined = '$message $details $hint'.toLowerCase();
-    final code = error.code.toUpperCase();
+    final code = error.code?.toUpperCase() ?? '';
 
     if (combined.contains('keine zweite person ist verbunden') ||
         combined.contains('keine verbindung zu einer zweiten person') ||
