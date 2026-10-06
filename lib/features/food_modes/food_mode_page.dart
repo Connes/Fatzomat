@@ -146,42 +146,46 @@ class _FoodModePageState extends State<FoodModePage> {
             key: const ValueKey<String>('food_mode_choice_group'),
             padding: const EdgeInsets.all(10),
             color: AppDesign.surface.withValues(alpha: 0.96),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.zero,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.78,
-              ),
-              itemCount: options.length,
-              itemBuilder: (context, index) {
-                final option = options[index];
-                return _OptionCard(
-                  mode: widget.mode,
-                  option: option,
-                  onTap: () => _select(context, option.label),
-                );
-              },
-            ),
-            if (widget.mode == FoodMode.order) ...[
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+            child: Column(
+              children: [
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 0.78,
+                  ),
+                  itemCount: options.length,
+                  itemBuilder: (context, index) {
+                    final option = options[index];
+                    return _OptionCard(
+                      mode: widget.mode,
+                      option: option,
+                      onTap: () => _select(context, option.label),
                     );
                   },
-                  icon: const Icon(Icons.delivery_dining_rounded),
-                  label: const Text('Lieferdienste'),
                 ),
-              ),
-            ],
+                if (widget.mode == FoodMode.order) ...[
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+                        );
+                      },
+                      icon: const Icon(Icons.delivery_dining_rounded),
+                      label: const Text('Lieferdienste'),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),
