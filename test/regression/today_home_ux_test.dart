@@ -28,7 +28,9 @@ void main() {
     expect(today, contains("if (plan.decisionType == 'order')"));
     expect(today, contains('DeliveryServicesPage'));
     expect(today, contains('FoodChoiceAssetService.assetFor(FoodMode.order'));
-    expect(today, contains("onTap: plan.decisionType == 'order' ? onOpenOrder : onOpenRecipe"));
+    expect(today, contains("onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'"));
+    expect(today, contains("onTap: plan.status == 'cooked'"));
+    expect(today, contains("? onOpenOrder"));
     expect(today, contains("assets/together/clean/icons/icon_cooking.png"));
     expect(today, contains("assets/together/clean/icons/icon_delivery.png"));
     expect(today, contains("assets/together/clean/icons/icon_restaurant.png"));
