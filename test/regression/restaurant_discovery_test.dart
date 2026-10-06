@@ -148,7 +148,8 @@ void main() {
 
     expect(source, contains("import 'delivery_services_page.dart';"));
     expect(source, contains("label: const Text('Lieferdienste')"));
-    expect(source, contains('if (order)'));
+    expect(source, contains("if (widget.mode == FoodMode.order)"));
+    expect(source, isNot(contains("if (order) ...[\n                const SizedBox(height: 8),\n                FilledButton.icon(")));
     expect(services, contains("name: 'Lieferando'"));
     expect(services, contains("https://www.lieferando.de/"));
     expect(services, contains("name: 'Uber Eats'"));
