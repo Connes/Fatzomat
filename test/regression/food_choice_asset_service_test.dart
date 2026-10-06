@@ -71,7 +71,7 @@ void main() {
       );
       expect(
         FoodChoiceAssetService.assetFor(FoodMode.dineOut, choice),
-        endsWith('.svg'),
+        endsWith('.png'),
         reason: '$choice soll ein eigenes Restaurant-Food-Asset verwenden',
       );
     }
