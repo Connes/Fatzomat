@@ -79,8 +79,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey<String>('food_mode_choice_group')), findsOneWidget);
-    expect(find.byType(AppSurface), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('food_mode_choice_group')),
+      mode == FoodMode.cook ? findsNothing : findsOneWidget,
+    );
+    expect(find.byType(AppSurface), mode == FoodMode.cook ? findsNothing : findsOneWidget);
     expect(find.byType(GridView), findsOneWidget);
 
     for (final label in labels) {
@@ -100,7 +103,7 @@ void main() {
     }
   }
 
-  testWidgets('Wir kochen hat eine gemeinsame Box, vollflächige Bilder und alle Auswahltexte',
+  testWidgets('Wir kochen zeigt fünf Kategorien ohne Sammelbox und mit ausgeglichenem Abstand',
       (tester) async {
     await pumpMode(tester, FoodMode.cook, const [
       'Rind',
