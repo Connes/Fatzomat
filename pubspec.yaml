@@ -39,7 +39,6 @@ flutter:
     - assets/food_choices/cooking/
     - assets/food_choices/delivery/
     - assets/food_choices/restaurant/
-    - assets/food_choices/order/
   fonts:
     - family: Inter
       fonts:
