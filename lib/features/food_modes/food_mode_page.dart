@@ -14,6 +14,7 @@ import '../../core/error_text.dart';
 import '../../core/services/location_service.dart';
 import '../../data/models/restaurant_discovery.dart';
 import 'restaurant_detail_page.dart';
+import 'delivery_services_page.dart';
 import '../../data/repositories/restaurant_discovery_repository.dart';
 
 class FoodModePage extends StatefulWidget {
@@ -436,6 +437,19 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   onTap: () => _openDetails(result),
                 ),
               ),
+              if (order) ...[
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+                    );
+                  },
+                  icon: const Icon(Icons.delivery_dining_rounded),
+                  label: const Text('Lieferdienste'),
+                ),
+              ],
             ],
           );
         },
