@@ -77,18 +77,7 @@ class DeliveryServicesPage extends StatelessWidget {
               color: AppDesign.surface.withValues(alpha: 0.96),
               child: Column(
                 children: [
-                  Text(
-                    'Lieferdienst auswählen',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-                  ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Öffne deinen gewünschten Lieferdienst direkt in der App oder auf der Webseite.',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText),
-                  ),
-                  const SizedBox(height: 20),
                   ..._services.map(
                     (service) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
