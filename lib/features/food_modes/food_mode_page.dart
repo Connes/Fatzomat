@@ -166,6 +166,22 @@ class _FoodModePageState extends State<FoodModePage> {
                 );
               },
             ),
+            if (widget.mode == FoodMode.order) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+                    );
+                  },
+                  icon: const Icon(Icons.delivery_dining_rounded),
+                  label: const Text('Lieferdienste'),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -437,19 +453,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   onTap: () => _openDetails(result),
                 ),
               ),
-              if (order) ...[
-                const SizedBox(height: 8),
-                FilledButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
-                    );
-                  },
-                  icon: const Icon(Icons.delivery_dining_rounded),
-                  label: const Text('Lieferdienste'),
-                ),
-              ],
             ],
           );
         },
