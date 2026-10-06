@@ -156,6 +156,10 @@ void main() {
     expect(services, contains("https://www.ubereats.com/de/"));
     expect(services, contains("name: 'Bolt'"));
     expect(services, contains("https://bolt.eu/de-de/food/"));
+    expect(services, contains("name: 'Wolt'"));
+    expect(services, contains("https://wolt.com/de/deu"));
+    expect(services, contains("retina-1665002030.png"));
+    expect(services, contains("Color(0xFF00C2E8)"));
     expect(services, contains("ubereats://home"));
     expect(services, contains("boltfood://home"));
     expect(services, contains('presse.m2maydell.com/Content/580072/784fb4b0-d671-4862-9ec2-3a603800ed14'));
