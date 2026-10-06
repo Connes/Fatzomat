@@ -316,6 +316,28 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (personalTodaySelected) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    margin: const EdgeInsets.only(bottom: 14),
+                    decoration: BoxDecoration(
+                      color: AppDesign.secondarySurface,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check_circle_rounded, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Für heute ausgewählt',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 Align(
                   alignment: Alignment.center,
                   child: Text(
@@ -553,27 +575,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              personalTodaySelected
-                  ? Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppDesign.secondarySurface,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle_rounded, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Für heute ausgewählt',
-                            style: TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                        ],
-                      ),
-                    )
-                  : SizedBox(
+              SizedBox(
                       width: double.infinity,
                       child: FilledButton.icon(
                         onPressed: working ? null : selectPersonalToday,
