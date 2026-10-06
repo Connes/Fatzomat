@@ -874,19 +874,6 @@ class _ShoppingPageState extends State<ShoppingPage> {
     final completed = items.where((item) => item.checked).toList();
     if (completed.isEmpty) return;
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Erledigte Artikel löschen?'),
-        content: Text('${completed.length} erledigte Artikel werden aus ${widget.shared ? 'eurer gemeinsamen' : 'deiner'} Einkaufsliste entfernt.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Abbrechen')),
-          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Löschen')),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-
     try {
       for (final item in completed) {
         if (widget.shared) {
