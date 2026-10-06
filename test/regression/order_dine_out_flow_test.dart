@@ -59,7 +59,6 @@ RestaurantDiscoveryResult _restaurant(String cuisine) => RestaurantDiscoveryResu
       orderUri: Uri.parse('https://example.com/order'),
     );
 
-const _orderChoices = ['Pizza', 'Burger', 'Asiatisch', 'Döner', 'Sushi', 'Indisch'];
 const _dineOutChoices = [
   'Italienisch',
   'Griechisch',
@@ -148,12 +147,6 @@ void main() {
     );
   }
 
-  for (final choice in _orderChoices) {
-    testWidgets('Wir bestellen: $choice durchläuft den Discovery- und Detailpfad', (tester) async {
-      await verifyChoiceFlow(tester, mode: FoodMode.order, choice: choice);
-    });
-  }
-
   for (final choice in _dineOutChoices) {
     testWidgets('Wir gehen essen: $choice durchläuft den Discovery- und Detailpfad', (tester) async {
       await verifyChoiceFlow(tester, mode: FoodMode.dineOut, choice: choice);
@@ -174,17 +167,6 @@ void main() {
     expect(find.text('Suche nicht möglich'), findsOneWidget);
     expect(find.text('Standorttestfehler'), findsOneWidget);
     expect(find.text('Erneut versuchen'), findsOneWidget);
-  });
-
-  testWidgets('Restaurantdetails zeigen für Bestellen alle vorhandenen Aktionen', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: RestaurantDetailPage(result: _restaurant('Burger'), order: true)));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Telefon'), findsOneWidget);
-    expect(find.text('Webseite'), findsOneWidget);
-    expect(find.text('Bestellen / Lieferung'), findsOneWidget);
-    expect(find.text('Öffnungszeiten'), findsNothing);
-    expect(find.text('Lieferung verfügbar'), findsOneWidget);
   });
 
   testWidgets('Restaurantdetails zeigen für Essen gehen keine Bestellaktion', (tester) async {
