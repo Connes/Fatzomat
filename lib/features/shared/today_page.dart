@@ -549,7 +549,8 @@ class _TodayResultCard extends StatelessWidget {
                   padding: const EdgeInsets.all(4),
                   child: Column(
                     children: [
-                      if (plan.isRecipe) ClipRRect(
+                      if (plan.isRecipe) ...[
+                        ClipRRect(
                         borderRadius: BorderRadius.circular(22),
                         child: plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
                             ? Image.network(
@@ -570,8 +571,8 @@ class _TodayResultCard extends StatelessWidget {
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
-                      ),
-                      else if (plan.decisionType == 'order')
+                        ),
+                      ] else if (plan.decisionType == 'order') ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(22),
                           child: Image.asset(
@@ -581,6 +582,7 @@ class _TodayResultCard extends StatelessWidget {
                             fit: BoxFit.cover,
                           ),
                         ),
+                      ],
                       const SizedBox(height: 20),
                       if (plan.status == 'cooked') ...[
                         Container(
