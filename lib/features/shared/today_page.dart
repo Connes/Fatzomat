@@ -494,14 +494,10 @@ class _TodayDecisionCard extends StatelessWidget {
             const SizedBox(height: 14),
             SizedBox(
               width: double.infinity,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: hasConnection ? null : onDecide,
-                child: FilledButton.icon(
-                  onPressed: hasConnection ? onDecide : null,
-                  icon: const Icon(Icons.auto_awesome_rounded),
-                  label: const Text('Entscheide Du'),
-                ),
+              child: FilledButton.icon(
+                onPressed: hasConnection ? onDecide : null,
+                icon: const Icon(Icons.auto_awesome_rounded),
+                label: const Text('Entscheide Du'),
               ),
             ),
           ],
