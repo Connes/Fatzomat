@@ -396,23 +396,23 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           ? ''
           : '${ingredient.quantity} ${ingredient.unit}'.trim();
       return amount.isEmpty ? '• ${ingredient.name}' : '• $amount ${ingredient.name}';
-    }).join('\\n');
+    }).join('\n');
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
-        .join('\\n');
+        .join('\n');
     final details = [
       recipe.description.trim(),
       'Für ${recipe.servings} Personen',
-      if (ingredients.isNotEmpty) 'Zutaten:\\n$ingredients',
-      if (steps.isNotEmpty) 'Zubereitung:\\n$steps',
-    ].where((part) => part.trim().isNotEmpty).join('\\n\\n');
+      if (ingredients.isNotEmpty) 'Zutaten:\n$ingredients',
+      if (steps.isNotEmpty) 'Zubereitung:\n$steps',
+    ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
     try {
       await SharePlus.instance.share(
         ShareParams(
           title: recipe.name,
           subject: 'Rezept: ${recipe.name}',
-          text: '${recipe.name}\\n\\n$details',
+          text: '${recipe.name}\n\n$details',
         ),
       );
     } catch (e) {
