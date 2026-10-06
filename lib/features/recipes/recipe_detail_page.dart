@@ -575,18 +575,19 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: working ? null : selectPersonalToday,
-                        icon: const Icon(Icons.today_rounded),
-                        label: Text(
-                          working
-                              ? 'Für heute vorbereiten …'
-                              : 'Für heute festlegen',
-                        ),
-                      ),
+              if (!personalTodaySelected)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: working ? null : selectPersonalToday,
+                    icon: const Icon(Icons.today_rounded),
+                    label: Text(
+                      working
+                          ? 'Für heute vorbereiten …'
+                          : 'Für heute festlegen',
                     ),
+                  ),
+                ),
             ],
           ),
         ),
