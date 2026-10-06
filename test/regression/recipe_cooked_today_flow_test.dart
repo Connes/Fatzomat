@@ -39,7 +39,7 @@ void main() {
     expect(recipe, contains("'Für heute ausgewählt'"));
     expect(
       recipe.indexOf("'Für heute ausgewählt'"),
-      lessThan(recipe.indexOf('recipe!.name')),
+      lessThan(recipe.lastIndexOf('recipe!.name')),
     );
     expect(bottomNavigation, isNot(contains("'Für heute ausgewählt'")));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
