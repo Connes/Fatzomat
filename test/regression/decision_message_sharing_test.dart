@@ -13,6 +13,7 @@ void main() {
     final fixMigration = File('supabase/migrations/20260925120000_fix_decision_share_rpc.sql').readAsStringSync();
     final acceptMigration = File('supabase/migrations/20260927100000_accept_decision_share_personally.sql').readAsStringSync();
     final rejectMigration = File('supabase/migrations/20261007091500_reject_decision_share.sql').readAsStringSync();
+    final responseMigration = File('supabase/migrations/20261007110000_decision_share_response_notifications.sql').readAsStringSync();
     final pushService = File('lib/core/push_notification_service.dart').readAsStringSync();
 
     expect(today, contains("sendDecisionMessage("));
@@ -51,5 +52,9 @@ void main() {
     expect(rejectMigration, contains('create or replace function public.reject_decision_share'));
     expect(rejectMigration, contains('rejected_at'));
     expect(rejectMigration, contains('rejected_by'));
+    expect(responseMigration, contains("'decision_message_response'"));
+    expect(responseMigration, contains("'Entscheidung übernommen'"));
+    expect(responseMigration, contains("'Entscheidung abgelehnt'"));
+    expect(responseMigration, contains('decision_share_id'));
   });
 }
