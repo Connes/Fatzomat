@@ -442,6 +442,10 @@ class _TodayPageState extends State<TodayPage> {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+        ),
       );
     }
 
