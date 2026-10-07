@@ -22,6 +22,9 @@ void main() {
     expect(today, contains('decisionName: plan!.displayTitle'));
     expect(today, contains("label: const Text('Entscheidung teilen')"));
     expect(today, contains('pendingDecisionShareForToday'));
+    expect(today, contains('onPressed: onDecide'));
+    expect(today, isNot(contains('onPressed: hasConnection ? onDecide : null')));
+    expect(today, contains('Noch keine Connection vorhanden.'));
     expect(today, contains('rejectDecisionShare'));
     expect(today, isNot(contains('Geteilte Entscheidung abgelehnt.')));
     expect(repo, contains('Future<DecisionShare?> decisionShare'));
