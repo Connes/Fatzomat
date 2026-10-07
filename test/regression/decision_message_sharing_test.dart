@@ -22,6 +22,7 @@ void main() {
     expect(today, contains("label: const Text('Entscheidung teilen')"));
     expect(today, contains('pendingDecisionShareForToday'));
     expect(today, contains('rejectDecisionShare'));
+    expect(today, isNot(contains('Geteilte Entscheidung abgelehnt.')));
     expect(repo, contains('Future<DecisionShare?> decisionShare'));
     expect(repo, contains('pendingDecisionShareForToday'));
     expect(repo, contains('rejectDecisionShare'));
