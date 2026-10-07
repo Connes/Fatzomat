@@ -195,6 +195,66 @@ configure_firebase_if_needed() {
   echo "✓ Firebase-Konfiguration vorhanden"
 }
 
+
+load_firebase_build_defines() {
+  local android_config="$PROJECT_ROOT/android/app/google-services.json"
+  local ios_config="$PROJECT_ROOT/ios/Runner/GoogleService-Info.plist"
+
+  if [[ ! -f "$android_config" || ! -f "$ios_config" ]]; then
+    echo "FEHLER: Firebase-Plattformkonfiguration fehlt. Führe zuerst ./setup.sh aus." >&2
+    exit 1
+  fi
+
+  local values
+  values="$(python3 - "$android_config" "$ios_config" <<'PY'
+import json
+import plistlib
+import sys
+
+android_path, ios_path = sys.argv[1:]
+android = json.load(open(android_path, encoding="utf-8"))
+with open(ios_path, "rb") as f:
+    ios = plistlib.load(f)
+
+project = android["project_info"]
+clients = android["client"]
+client = next(
+    c for c in clients
+    if c.get("client_info", {}).get("android_client_info", {}).get("package_name")
+    == "com.example.food_app_mvp"
+)
+
+android_api_key = client["api_key"][0]["current_key"]
+ios_api_key = ios.get("API_KEY", android_api_key)
+if android_api_key != ios_api_key:
+    raise SystemExit("Firebase Android/iOS API keys do not match.")
+
+project_id = str(project["project_id"])
+if project_id != "schmackofatz-25cce":
+    raise SystemExit(f"Unexpected Firebase project: {project_id}")
+
+print(android_api_key)
+print(client["client_info"]["mobilesdk_app_id"])
+print(ios["GOOGLE_APP_ID"])
+print(project["project_number"])
+print(project_id)
+PY
+)"
+
+  mapfile -t _firebase_values <<< "$values"
+  if [[ "${#_firebase_values[@]}" -ne 5 ]] || [[ -z "${_firebase_values[0]}" ]] || [[ -z "${_firebase_values[1]}" ]] || [[ -z "${_firebase_values[2]}" ]] || [[ -z "${_firebase_values[3]}" ]] || [[ -z "${_firebase_values[4]}" ]]; then
+    echo "FEHLER: Firebase-Konfiguration konnte nicht vollständig gelesen werden." >&2
+    exit 1
+  fi
+
+  export FIREBASE_API_KEY="${_firebase_values[0]}"
+  export FIREBASE_ANDROID_APP_ID="${_firebase_values[1]}"
+  export FIREBASE_IOS_APP_ID="${_firebase_values[2]}"
+  export FIREBASE_MESSAGING_SENDER_ID="${_firebase_values[3]}"
+  export FIREBASE_PROJECT_ID="${_firebase_values[4]}"
+  unset _firebase_values
+}
+
 load_local_env() {
   ensure_config_dir
   migrate_local_env_if_needed || true
