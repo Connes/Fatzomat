@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import json
 import plistlib
 import sys
@@ -25,28 +24,37 @@ client = next(
     clients[0],
 )
 
+android_app_id = client['client_info']['mobilesdk_app_id']
+android_api_key = client['api_key'][0]['current_key']
+sender_id = str(project_info['project_number'])
+ios_app_id = ios['GOOGLE_APP_ID']
+
+if android_api_key != ios.get('API_KEY', android_api_key):
+    raise SystemExit('Firebase Android/iOS API keys do not match the configured project.')
+
+if str(project_info['project_id']) != 'schmackofatz-25cce':
+    raise SystemExit(
+        f"Unexpected Firebase project: {project_info['project_id']}. "
+        "Refusing to generate configuration for a different project."
+    )
+
 content = '''import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 /// Firebase identifiers are supplied at build time. They are not secrets.
-///
-/// Android example:
-/// flutter build apk \
-///   --dart-define=FIREBASE_API_KEY=... \
-///   --dart-define=FIREBASE_APP_ID=... \
-///   --dart-define=FIREBASE_MESSAGING_SENDER_ID=... \
-///   --dart-define=FIREBASE_PROJECT_ID=...
+/// Platform-specific app IDs are required because Android and iOS are
+/// registered as different Firebase applications.
 class DefaultFirebaseOptions {
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: String.fromEnvironment('FIREBASE_API_KEY'),
-    appId: String.fromEnvironment('FIREBASE_APP_ID'),
+    appId: String.fromEnvironment('FIREBASE_ANDROID_APP_ID'),
     messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
     projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: String.fromEnvironment('FIREBASE_API_KEY'),
-    appId: String.fromEnvironment('FIREBASE_APP_ID'),
+    appId: String.fromEnvironment('FIREBASE_IOS_APP_ID'),
     messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
     projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
     iosBundleId: 'com.example.foodAppMvp',
@@ -59,17 +67,22 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       default:
-        throw UnsupportedError('Firebase Push ist für diese Plattform nicht konfiguriert.');
+        throw UnsupportedError(
+          'Firebase Push ist für diese Plattform nicht konfiguriert.',
+        );
     }
   }
 }
 '''
 
-# Keep reading both registered platform configs here. Their presence validates
-# that Firebase is configured locally, while the generated Dart file remains
-# free of project-specific identifiers and gets them only via dart-define.
+# The generated Dart file intentionally contains no project-specific values.
+# Keep the registered identifiers in the local platform config files and pass
+# them as dart-defines at run/build time.
 _ = project_info
 _ = client
-_ = ios
+_ = android_app_id
+_ = android_api_key
+_ = sender_id
+_ = ios_app_id
 
 out_path.write_text(content)
