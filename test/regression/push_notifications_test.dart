@@ -34,7 +34,8 @@ void main() {
     expect(service, contains('_scheduleTokenRetry'));
     expect(service, contains('getInitialMessage'));
     expect(service, contains('NotificationsPage(initialNotificationId: id)'));
-    expect(service, contains('DecisionSharePage(share: share)'));
+    expect(service, contains('const TodayPage()'));
+    expect(service, isNot(contains('DecisionSharePage')));
     expect(service, contains("decision_share_id"));
     expect(service, contains("_pendingDecisionShareId"));
     expect(function, contains("decision_share_id: String(notification.decision_share_id ?? '')"));
