@@ -222,7 +222,6 @@ class _TodayPageState extends State<TodayPage> {
       final connection = await _collaborationRepository.connectionInfo();
       if (!mounted) return;
       final connected = connection?.isConnected == true;
-      setState(() => _hasConnection = connected);
       if (!connected) {
         await _showNoConnectionDialog();
         return;
