@@ -32,8 +32,8 @@ class DecisionShare {
     required this.servings,
     required this.sourcePlanId,
     required this.acceptedAt,
-    required this.rejectedAt,
-    required this.cancelledAt,
+    this.rejectedAt,
+    this.cancelledAt,
     required this.createdAt,
   });
 
@@ -59,4 +59,3 @@ class DecisionShare {
         cancelledAt: map['cancelled_at'] == null ? null : DateTime.tryParse(map['cancelled_at'].toString()),
         createdAt: DateTime.parse(map['created_at'].toString()),
       );
-}
