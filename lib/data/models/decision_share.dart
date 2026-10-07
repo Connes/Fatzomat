@@ -32,8 +32,8 @@ class DecisionShare {
     required this.servings,
     required this.sourcePlanId,
     required this.acceptedAt,
-    this.rejectedAt,
-    this.cancelledAt,
+    required this.rejectedAt,
+    required this.cancelledAt,
     required this.createdAt,
   });
 
