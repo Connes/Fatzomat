@@ -401,45 +401,44 @@ class _TodayPageState extends State<TodayPage> {
                       const SizedBox(height: 14),
                     ],
                     ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 560),
-                  child: plan == null
-                      ? _TodayDecisionCard(
-                          onCook: () => _openMode(FoodMode.cook),
-                          onOrder: () => _openMode(FoodMode.order),
-                          onDineOut: () => _openMode(FoodMode.dineOut),
-                          onSurprise: _handleSurprise,
-                          onDecide: _askPartnerToDecide,
-                          hasConnection: _hasConnection,
-                        )
-                      : _TodayResultCard(
-                          plan: plan!,
-                          onCancel: removeTodayPlan,
-                          onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
-                          onOpenOrder: plan!.decisionType == 'order' ? () {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const DeliveryServicesPage()));
-                          } : null,
-                          onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
-                              ? () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => RecipeDetailPage(
-                                        recipeId: plan!.recipeId!,
-                                        canMarkCooked: true,
-                                        onTodayPlanChanged: load,
-                                      ),
-                                    ),
-                                  );
-                                  if (mounted) await load();
-                                }
-                              : null,
-                        ),
-                ),
-              ),
-            ),
-          ),
-        ),
-
+                      constraints: const BoxConstraints(maxWidth: 560),
+                      child: plan == null
+                          ? _TodayDecisionCard(
+                              onCook: () => _openMode(FoodMode.cook),
+                              onOrder: () => _openMode(FoodMode.order),
+                              onDineOut: () => _openMode(FoodMode.dineOut),
+                              onSurprise: _handleSurprise,
+                              onDecide: _askPartnerToDecide,
+                              hasConnection: _hasConnection,
+                            )
+                          : _TodayResultCard(
+                              plan: plan!,
+                              onCancel: removeTodayPlan,
+                              onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
+                              onOpenOrder: plan!.decisionType == 'order'
+                                  ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+                                      );
+                                    }
+                                  : null,
+                              onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
+                                  ? () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => RecipeDetailPage(
+                                            recipeId: plan!.recipeId!,
+                                            canMarkCooked: true,
+                                            onTodayPlanChanged: load,
+                                          ),
+                                        ),
+                                      );
+                                      if (mounted) await load();
+                                    }
+                                  : null,
+                            ),
                     ),
                   ],
                 ),
