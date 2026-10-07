@@ -9,8 +9,14 @@ require_flutter
 require_project_structure
 load_local_env
 configure_firebase_if_needed
+load_firebase_build_defines
 
 exec "$FLUTTER_BIN" run \
   --dart-define="SUPABASE_URL=$SUPABASE_URL" \
   --dart-define="SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY" \
+  --dart-define="FIREBASE_API_KEY=$FIREBASE_API_KEY" \
+  --dart-define="FIREBASE_ANDROID_APP_ID=$FIREBASE_ANDROID_APP_ID" \
+  --dart-define="FIREBASE_IOS_APP_ID=$FIREBASE_IOS_APP_ID" \
+  --dart-define="FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID" \
+  --dart-define="FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID" \
   "$@"
