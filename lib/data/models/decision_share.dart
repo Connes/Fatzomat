@@ -59,3 +59,4 @@ class DecisionShare {
         cancelledAt: map['cancelled_at'] == null ? null : DateTime.tryParse(map['cancelled_at'].toString()),
         createdAt: DateTime.parse(map['created_at'].toString()),
       );
+}
