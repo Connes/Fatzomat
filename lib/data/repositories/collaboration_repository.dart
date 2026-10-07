@@ -178,8 +178,26 @@ class CollaborationRepository {
   Future<DecisionShare?> decisionShare(String shareId) async {
     final row = await client
         .from('decision_shares')
-        .select('id,connection_id,sender_id,recipient_id,message_type,plan_date,source_plan_id,decision_type,decision_value,decision_name,image_url,recipe_id,servings,accepted_at,created_at')
+        .select('id,connection_id,sender_id,recipient_id,message_type,plan_date,source_plan_id,decision_type,decision_value,decision_name,image_url,recipe_id,servings,accepted_at,rejected_at,cancelled_at,created_at')
         .eq('id', shareId)
+        .maybeSingle();
+    return row == null ? null : DecisionShare.fromMap(Map<String, dynamic>.from(row));
+  }
+
+  Future<DecisionShare?> pendingDecisionShareForToday() async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return null;
+    final row = await client
+        .from('decision_shares')
+        .select('id,connection_id,sender_id,recipient_id,message_type,plan_date,source_plan_id,decision_type,decision_value,decision_name,image_url,recipe_id,servings,accepted_at,rejected_at,cancelled_at,created_at')
+        .eq('recipient_id', userId)
+        .eq('message_type', 'share')
+        .eq('plan_date', DateTime.now().toIso8601String().substring(0, 10))
+        .isFilter('accepted_at', null)
+        .isFilter('rejected_at', null)
+        .isFilter('cancelled_at', null)
+        .order('created_at', ascending: false)
+        .limit(1)
         .maybeSingle();
     return row == null ? null : DecisionShare.fromMap(Map<String, dynamic>.from(row));
   }
@@ -188,6 +206,14 @@ class CollaborationRepository {
     final id = shareId.trim();
     if (id.isEmpty) throw StateError('Keine Entscheidungs-ID vorhanden.');
     await client.rpc('accept_decision_share', params: {
+      'p_share_id': id,
+    });
+  }
+
+  Future<void> rejectDecisionShare(String shareId) async {
+    final id = shareId.trim();
+    if (id.isEmpty) throw StateError('Keine Entscheidungs-ID vorhanden.');
+    await client.rpc('reject_decision_share', params: {
       'p_share_id': id,
     });
   }
