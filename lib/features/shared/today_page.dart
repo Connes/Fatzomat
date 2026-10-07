@@ -45,7 +45,6 @@ class _TodayPageState extends State<TodayPage> {
   RealtimeChannel? channel;
   CollaborationRepository? _collaboration;
   bool _loadingDecisionMessage = false;
-  bool _hasConnection = false;
   DecisionShare? _pendingDecisionShare;
   bool _decisionShareActionInFlight = false;
 
@@ -57,7 +56,6 @@ class _TodayPageState extends State<TodayPage> {
     super.initState();
     controller = TodayController();
     load();
-    _loadConnectionState();
     _subscribeRealtime();
   }
 
@@ -185,18 +183,6 @@ class _TodayPageState extends State<TodayPage> {
     if (selected == true && mounted) await load();
   }
 
-  Future<void> _loadConnectionState() async {
-    try {
-      final info = await _collaborationRepository.connectionInfo();
-      if (!mounted) return;
-      setState(() => _hasConnection = info?.isConnected == true);
-    } catch (_) {
-      // Connection status is optional UI metadata. Keep Single Modus when it
-      // cannot be determined instead of breaking the Today screen.
-      if (mounted) setState(() => _hasConnection = false);
-    }
-  }
-
   Future<void> _askPartnerToDecide() async {
     if (_loadingDecisionMessage) return;
     setState(() => _loadingDecisionMessage = true);
@@ -204,7 +190,6 @@ class _TodayPageState extends State<TodayPage> {
       final connection = await _collaborationRepository.connectionInfo();
       if (!mounted) return;
       final connected = connection?.isConnected == true;
-      setState(() => _hasConnection = connected);
       if (!connected) {
         await _showNoConnectionDialog();
         return;
@@ -219,7 +204,6 @@ class _TodayPageState extends State<TodayPage> {
       final errorText = error.toString().toLowerCase();
       if (errorText.contains('keine zweite person ist verbunden') ||
           errorText.contains('keine verbindung zu einer zweiten person')) {
-        setState(() => _hasConnection = false);
         await _showNoConnectionDialog();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -271,7 +255,7 @@ class _TodayPageState extends State<TodayPage> {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Keine Verbindung vorhanden'),
         content: const Text(
-          'Für „Entscheide Du“ brauchst du eine Verbindung zu einem anderen Schmackofatz-Benutzer.',
+          'Noch keine Connection vorhanden. Für „Entscheide Du“ brauchst du eine Verbindung zu einem anderen Schmackofatz-Benutzer. Du kannst jetzt eine Connection aufbauen.',
         ),
         actions: [
           TextButton(
@@ -281,7 +265,7 @@ class _TodayPageState extends State<TodayPage> {
           FilledButton.icon(
             onPressed: () => Navigator.pop(dialogContext, true),
             icon: const Icon(Icons.link_rounded),
-            label: const Text('Verbindung erstellen'),
+            label: const Text('Jetzt Connection aufbauen'),
           ),
         ],
       ),
@@ -291,7 +275,6 @@ class _TodayPageState extends State<TodayPage> {
       context,
       MaterialPageRoute(builder: (_) => const ConnectionPage()),
     );
-    if (mounted) await _loadConnectionState();
   }
 
   Future<void> removeTodayPlan() async {
@@ -406,7 +389,6 @@ class _TodayPageState extends State<TodayPage> {
                               onDineOut: () => _openMode(FoodMode.dineOut),
                               onSurprise: _handleSurprise,
                               onDecide: _askPartnerToDecide,
-                              hasConnection: _hasConnection,
                             )
                           : _TodayResultCard(
                               plan: plan!,
@@ -626,15 +608,12 @@ class _TodayDecisionCard extends StatelessWidget {
   final VoidCallback onDineOut;
   final VoidCallback onSurprise;
   final VoidCallback onDecide;
-  final bool hasConnection;
-
   const _TodayDecisionCard({
     required this.onCook,
     required this.onOrder,
     required this.onDineOut,
     required this.onSurprise,
     required this.onDecide,
-    required this.hasConnection,
   });
 
   @override
@@ -685,7 +664,7 @@ class _TodayDecisionCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: hasConnection ? onDecide : null,
+                onPressed: onDecide,
                 icon: const Icon(Icons.auto_awesome_rounded),
                 label: const Text('Entscheide Du'),
               ),
