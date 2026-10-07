@@ -6,21 +6,23 @@ import 'package:firebase_core/firebase_core.dart';
 /// Android example:
 /// flutter build apk \
 ///   --dart-define=FIREBASE_API_KEY=... \
-///   --dart-define=FIREBASE_APP_ID=... \
+///   --dart-define=FIREBASE_ANDROID_APP_ID=... \
 ///   --dart-define=FIREBASE_MESSAGING_SENDER_ID=... \
 ///   --dart-define=FIREBASE_PROJECT_ID=...
 class DefaultFirebaseOptions {
   static FirebaseOptions get android => const FirebaseOptions(
         apiKey: String.fromEnvironment('FIREBASE_API_KEY'),
-        appId: String.fromEnvironment('FIREBASE_APP_ID'),
-        messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+        appId: String.fromEnvironment('FIREBASE_ANDROID_APP_ID'),
+        messagingSenderId:
+            String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
         projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
       );
 
   static FirebaseOptions get ios => const FirebaseOptions(
         apiKey: String.fromEnvironment('FIREBASE_API_KEY'),
-        appId: String.fromEnvironment('FIREBASE_APP_ID'),
-        messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+        appId: String.fromEnvironment('FIREBASE_IOS_APP_ID'),
+        messagingSenderId:
+            String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
         projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
         iosBundleId: 'com.example.foodAppMvp',
       );
@@ -32,7 +34,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       default:
-        throw UnsupportedError('Firebase Push ist für diese Plattform nicht konfiguriert.');
+        throw UnsupportedError(
+          'Firebase Push ist für diese Plattform nicht konfiguriert.',
+        );
     }
   }
 }
