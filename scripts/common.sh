@@ -111,7 +111,9 @@ configure_firebase_via_firebase_cli() {
 
 configure_firebase_if_needed() {
   if [[ -f "$PROJECT_ROOT/lib/firebase_options.dart" ]] &&
-     grep -q "String.fromEnvironment('FIREBASE_PROJECT_ID')" "$PROJECT_ROOT/lib/firebase_options.dart"; then
+     grep -q "String.fromEnvironment('FIREBASE_PROJECT_ID')" "$PROJECT_ROOT/lib/firebase_options.dart" &&
+     [[ -f "$PROJECT_ROOT/android/app/google-services.json" ]] &&
+     [[ -f "$PROJECT_ROOT/ios/Runner/GoogleService-Info.plist" ]]; then
     echo "✓ Firebase-Konfiguration bereits vorhanden"
     return 0
   fi
@@ -206,18 +208,22 @@ load_firebase_build_defines() {
   fi
 
   local values
-  values="$(python3 - "$android_config" "$ios_config" <<'PY'
+  values="$(python3 - "$android_config" "$ios_config" <<'PYINNER'
 import json
 import plistlib
 import sys
 
 android_path, ios_path = sys.argv[1:]
-android = json.load(open(android_path, encoding="utf-8"))
+
+with open(android_path, encoding="utf-8") as f:
+    android = json.load(f)
+
 with open(ios_path, "rb") as f:
     ios = plistlib.load(f)
 
 project = android["project_info"]
 clients = android["client"]
+
 client = next(
     c for c in clients
     if c.get("client_info", {}).get("android_client_info", {}).get("package_name")
@@ -225,33 +231,50 @@ client = next(
 )
 
 android_api_key = client["api_key"][0]["current_key"]
-ios_api_key = ios.get("API_KEY", android_api_key)
-if android_api_key != ios_api_key:
-    raise SystemExit("Firebase Android/iOS API keys do not match.")
+android_app_id = client["client_info"]["mobilesdk_app_id"]
+
+ios_api_key = ios["API_KEY"]
+ios_app_id = ios["GOOGLE_APP_ID"]
 
 project_id = str(project["project_id"])
+sender_id = str(project["project_number"])
+
 if project_id != "schmackofatz-25cce":
     raise SystemExit(f"Unexpected Firebase project: {project_id}")
 
+for name, value in {
+    "Android API key": android_api_key,
+    "iOS API key": ios_api_key,
+    "Android app ID": android_app_id,
+    "iOS app ID": ios_app_id,
+    "sender ID": sender_id,
+}.items():
+    if not value:
+        raise SystemExit(f"Firebase {name} fehlt.")
+
 print(android_api_key)
-print(client["client_info"]["mobilesdk_app_id"])
-print(ios["GOOGLE_APP_ID"])
-print(project["project_number"])
+print(ios_api_key)
+print(android_app_id)
+print(ios_app_id)
+print(sender_id)
 print(project_id)
-PY
+PYINNER
 )"
 
   mapfile -t _firebase_values <<< "$values"
-  if [[ "${#_firebase_values[@]}" -ne 5 ]] || [[ -z "${_firebase_values[0]}" ]] || [[ -z "${_firebase_values[1]}" ]] || [[ -z "${_firebase_values[2]}" ]] || [[ -z "${_firebase_values[3]}" ]] || [[ -z "${_firebase_values[4]}" ]]; then
+
+  if [[ "${#_firebase_values[@]}" -ne 6 ]]; then
     echo "FEHLER: Firebase-Konfiguration konnte nicht vollständig gelesen werden." >&2
     exit 1
   fi
 
-  export FIREBASE_API_KEY="${_firebase_values[0]}"
-  export FIREBASE_ANDROID_APP_ID="${_firebase_values[1]}"
-  export FIREBASE_IOS_APP_ID="${_firebase_values[2]}"
-  export FIREBASE_MESSAGING_SENDER_ID="${_firebase_values[3]}"
-  export FIREBASE_PROJECT_ID="${_firebase_values[4]}"
+  export FIREBASE_ANDROID_API_KEY="${_firebase_values[0]}"
+  export FIREBASE_IOS_API_KEY="${_firebase_values[1]}"
+  export FIREBASE_ANDROID_APP_ID="${_firebase_values[2]}"
+  export FIREBASE_IOS_APP_ID="${_firebase_values[3]}"
+  export FIREBASE_MESSAGING_SENDER_ID="${_firebase_values[4]}"
+  export FIREBASE_PROJECT_ID="${_firebase_values[5]}"
+
   unset _firebase_values
 }
 
