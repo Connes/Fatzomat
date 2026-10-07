@@ -124,9 +124,6 @@ class _TodayPageState extends State<TodayPage> {
     try {
       await _collaborationRepository.rejectDecisionShare(share.id);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Geteilte Entscheidung abgelehnt.')),
-      );
       await load();
     } catch (error) {
       if (!mounted) return;
