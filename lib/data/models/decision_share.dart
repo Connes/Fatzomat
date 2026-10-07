@@ -13,6 +13,8 @@ class DecisionShare {
   final int? servings;
   final String? sourcePlanId;
   final DateTime? acceptedAt;
+  final DateTime? rejectedAt;
+  final DateTime? cancelledAt;
   final DateTime createdAt;
 
   const DecisionShare({
@@ -30,6 +32,8 @@ class DecisionShare {
     required this.servings,
     required this.sourcePlanId,
     required this.acceptedAt,
+    required this.rejectedAt,
+    required this.cancelledAt,
     required this.createdAt,
   });
 
@@ -51,6 +55,8 @@ class DecisionShare {
         servings: (map['servings'] as num?)?.toInt(),
         sourcePlanId: map['source_plan_id']?.toString(),
         acceptedAt: map['accepted_at'] == null ? null : DateTime.tryParse(map['accepted_at'].toString()),
+        rejectedAt: map['rejected_at'] == null ? null : DateTime.tryParse(map['rejected_at'].toString()),
+        cancelledAt: map['cancelled_at'] == null ? null : DateTime.tryParse(map['cancelled_at'].toString()),
         createdAt: DateTime.parse(map['created_at'].toString()),
       );
 }

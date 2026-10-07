@@ -8,7 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../data/repositories/collaboration_repository.dart';
 import '../data/repositories/push_device_repository.dart';
 import '../features/settings/notifications_page.dart';
-import '../features/shared/decision_share_page.dart';
+import '../features/shared/today_page.dart';
 import '../features/recipes/recipe_detail_page.dart';
 import '../data/repositories/recipe_repository.dart';
 
@@ -229,24 +229,16 @@ class PushNotificationService with WidgetsBindingObserver {
       _pendingRecipeId = null;
 
       if (shareId != null) {
-        try {
-          final share = await CollaborationRepository().decisionShare(shareId);
-          if (share != null) {
-            if (id != null) {
-              try {
-                await CollaborationRepository().markNotificationRead(id);
-              } catch (_) {
-                // Reading the decision is the primary action. A read-state
-                // update must never block direct navigation from the push.
-              }
-            }
-            navigator.push(MaterialPageRoute(builder: (_) => DecisionSharePage(share: share)));
-            return;
+        if (id != null) {
+          try {
+            await CollaborationRepository().markNotificationRead(id);
+          } catch (_) {
+            // The Today page remains the primary action even if read-state
+            // synchronization fails.
           }
-        } catch (_) {
-          // Fall through to the notification inbox if the share cannot be
-          // loaded. The push must never leave the user on a dead screen.
         }
+        navigator.push(MaterialPageRoute(builder: (_) => const TodayPage()));
+        return;
       }
 
       if (recipeId != null) {

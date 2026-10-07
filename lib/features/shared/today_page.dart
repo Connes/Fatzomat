@@ -25,6 +25,7 @@ import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
+import '../../data/models/decision_share.dart';
 import '../../core/services/surprise_recommendation_service.dart';
 
 class TodayPage extends StatefulWidget {
@@ -45,6 +46,8 @@ class _TodayPageState extends State<TodayPage> {
   CollaborationRepository? _collaboration;
   bool _loadingDecisionMessage = false;
   bool _hasConnection = false;
+  DecisionShare? _pendingDecisionShare;
+  bool _decisionShareActionInFlight = false;
 
   CollaborationRepository get _collaborationRepository =>
       _collaboration ??= CollaborationRepository();
@@ -77,12 +80,62 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> load() async {
     await controller.load();
+    DecisionShare? pendingShare;
+    try {
+      pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
+    } catch (_) {
+      // A pending shared decision is additive UI. Never make Today unusable
+      // because its optional collaboration lookup failed.
+    }
     if (!mounted) return;
     setState(() {
       plan = controller.data;
       loading = controller.loading;
       loadError = controller.error;
+      _pendingDecisionShare = pendingShare;
     });
+  }
+
+  Future<void> _acceptPendingDecisionShare() async {
+    final share = _pendingDecisionShare;
+    if (share == null || _decisionShareActionInFlight) return;
+    setState(() => _decisionShareActionInFlight = true);
+    try {
+      await _collaborationRepository.acceptDecisionShare(share.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Geteilte Entscheidung übernommen.')),
+      );
+      await load();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(friendlyError(error))),
+      );
+    } finally {
+      if (mounted) setState(() => _decisionShareActionInFlight = false);
+    }
+  }
+
+  Future<void> _rejectPendingDecisionShare() async {
+    final share = _pendingDecisionShare;
+    if (share == null || _decisionShareActionInFlight) return;
+    setState(() => _decisionShareActionInFlight = true);
+    try {
+      await _collaborationRepository.rejectDecisionShare(share.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Geteilte Entscheidung abgelehnt.')),
+      );
+      await load();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(friendlyError(error))),
+      );
+    } finally {
+      if (mounted) setState(() => _decisionShareActionInFlight = false);
+    }
   }
 
   Future<void> _handleSurprise() async {
@@ -335,40 +388,59 @@ class _TodayPageState extends State<TodayPage> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 560),
-                  child: plan == null
-                      ? _TodayDecisionCard(
-                          onCook: () => _openMode(FoodMode.cook),
-                          onOrder: () => _openMode(FoodMode.order),
-                          onDineOut: () => _openMode(FoodMode.dineOut),
-                          onSurprise: _handleSurprise,
-                          onDecide: _askPartnerToDecide,
-                          hasConnection: _hasConnection,
-                        )
-                      : _TodayResultCard(
-                          plan: plan!,
-                          onCancel: removeTodayPlan,
-                          onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
-                          onOpenOrder: plan!.decisionType == 'order' ? () {
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const DeliveryServicesPage()));
-                          } : null,
-                          onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
-                              ? () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => RecipeDetailPage(
-                                        recipeId: plan!.recipeId!,
-                                        canMarkCooked: true,
-                                        onTodayPlanChanged: load,
-                                      ),
-                                    ),
-                                  );
-                                  if (mounted) await load();
-                                }
-                              : null,
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_pendingDecisionShare != null) ...[
+                      _IncomingDecisionShareCard(
+                        share: _pendingDecisionShare!,
+                        busy: _decisionShareActionInFlight,
+                        onAccept: _acceptPendingDecisionShare,
+                        onReject: _rejectPendingDecisionShare,
+                      ),
+                      const SizedBox(height: 14),
+                    ],
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 560),
+                      child: plan == null
+                          ? _TodayDecisionCard(
+                              onCook: () => _openMode(FoodMode.cook),
+                              onOrder: () => _openMode(FoodMode.order),
+                              onDineOut: () => _openMode(FoodMode.dineOut),
+                              onSurprise: _handleSurprise,
+                              onDecide: _askPartnerToDecide,
+                              hasConnection: _hasConnection,
+                            )
+                          : _TodayResultCard(
+                              plan: plan!,
+                              onCancel: removeTodayPlan,
+                              onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
+                              onOpenOrder: plan!.decisionType == 'order'
+                                  ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+                                      );
+                                    }
+                                  : null,
+                              onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
+                                  ? () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => RecipeDetailPage(
+                                            recipeId: plan!.recipeId!,
+                                            canMarkCooked: true,
+                                            onTodayPlanChanged: load,
+                                          ),
+                                        ),
+                                      );
+                                      if (mounted) await load();
+                                    }
+                                  : null,
+                            ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -433,6 +505,122 @@ PreferredSizeWidget _todayAppBar() {
       ),
     ),
   );
+}
+
+class _IncomingDecisionShareCard extends StatelessWidget {
+  final DecisionShare share;
+  final bool busy;
+  final VoidCallback onAccept;
+  final VoidCallback onReject;
+
+  const _IncomingDecisionShareCard({
+    required this.share,
+    required this.busy,
+    required this.onAccept,
+    required this.onReject,
+  });
+
+  String get _decisionLabel {
+    final name = share.decisionName?.trim();
+    if (name != null && name.isNotEmpty) return name;
+    final value = share.decisionValue?.trim();
+    if (value != null && value.isNotEmpty) return value;
+    return 'Heutige Entscheidung';
+  }
+
+  String get _typeLabel {
+    switch (share.decisionType) {
+      case 'recipe':
+        return 'Rezept';
+      case 'order':
+        return 'Bestellung';
+      case 'dine_out':
+        return 'Restaurant';
+      case 'surprise':
+        return 'Überraschung';
+      default:
+        return 'Geteilte Entscheidung';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppDesign.surface.withValues(alpha: 0.98),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.people_alt_rounded, color: AppDesign.primaryDark),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Geteilte Entscheidung',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppDesign.primaryDark,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Deine verbundene Person hat heute entschieden.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
+              const SizedBox(height: 14),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.network(
+                  share.imageUrl!,
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+            const SizedBox(height: 14),
+            Text(
+              _decisionLabel,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(_typeLabel),
+            if (share.servings != null) ...[
+              const SizedBox(height: 4),
+              Text('${share.servings} Personen'),
+            ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: busy ? null : onReject,
+                    child: const Text('Ablehnen'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: busy ? null : onAccept,
+                    child: const Text('Übernehmen'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _TodayDecisionCard extends StatelessWidget {

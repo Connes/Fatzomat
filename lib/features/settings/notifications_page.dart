@@ -9,7 +9,6 @@ import '../../core/async_error.dart';
 import '../../data/models/app_notification.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../shared/decision_request_page.dart';
-import '../shared/decision_share_page.dart';
 import '../recipes/saved_recipes_page.dart';
 import '../recipes/recipe_detail_page.dart';
 import '../recipes/recipe_share_request_page.dart';
@@ -116,13 +115,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
     if (item.decisionShareId != null || item.type == 'decision_message') {
       if (item.decisionShareId != null) {
-        final share = await repo.decisionShare(item.decisionShareId!);
-        if (mounted && share != null) {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => DecisionSharePage(share: share)),
-          );
-        }
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const TodayPage()),
+        );
       } else {
         // Compatibility fallback for installations where the V85
         // decision_share_id column is not available yet. The notification
