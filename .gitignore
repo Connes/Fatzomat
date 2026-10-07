@@ -16,6 +16,11 @@ coverage/
 .env.local
 .env.*.local
 
+# Firebase local configuration
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+firebase.json
+
 # Generated platform/build files
 android/local.properties
 android/.gradle/
