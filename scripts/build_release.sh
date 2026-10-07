@@ -8,6 +8,8 @@ source "$SCRIPT_DIR/common.sh"
 require_flutter
 require_project_structure
 load_local_env
+configure_firebase_if_needed
+load_firebase_build_defines
 
 if [[ -f android/key.properties ]]; then
   echo "→ Private Release-Signierung: eigener Keystore"
