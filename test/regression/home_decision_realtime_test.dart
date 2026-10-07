@@ -14,6 +14,7 @@ void main() {
     expect(home, contains("'Entscheide Du'"));
     expect(home, isNot(contains("table: 'decision_requests'")));
     expect(notifications, contains('decisionShareId'));
-    expect(notifications, contains('DecisionSharePage'));
+    expect(notifications, contains('const TodayPage()'));
+    expect(notifications, isNot(contains('DecisionSharePage')));
   });
 }
