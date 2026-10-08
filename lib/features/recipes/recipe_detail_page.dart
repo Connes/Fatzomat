@@ -22,6 +22,7 @@ class RecipeDetailPage extends StatefulWidget {
   final VoidCallback? onNavigateToToday;
   final VoidCallback? onNavigateToShoppingList;
   final bool canMarkCooked;
+  final bool viewingTodaySelection;
   const RecipeDetailPage({
     super.key,
     required this.recipeId,
@@ -29,6 +30,7 @@ class RecipeDetailPage extends StatefulWidget {
     this.onNavigateToToday,
     this.onNavigateToShoppingList,
     this.canMarkCooked = false,
+    this.viewingTodaySelection = false,
   });
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
@@ -297,7 +299,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         title: const Text('Rezept'),
         backgroundColor: const Color(0xF7FFFBF7),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        actions: [
+        actions: widget.viewingTodaySelection ? null : [
           IconButton(
             tooltip: 'Rezeptdatei speichern',
             onPressed: working ? null : exportRecipe,
@@ -336,7 +338,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (personalTodaySelected) ...[
+                if (personalTodaySelected || widget.viewingTodaySelection) ...[
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -585,7 +587,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
+      bottomNavigationBar: widget.viewingTodaySelection
+          ? null
+          : SafeArea(
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
           decoration: BoxDecoration(
