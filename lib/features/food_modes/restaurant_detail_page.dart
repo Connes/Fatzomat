@@ -100,7 +100,7 @@ class RestaurantDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
         children: [
-          if (hasAddress || result.formattedDistance.isNotEmpty)
+          if (hasAddress)
             _infoCard(
               icon: Icons.location_on_rounded,
               title: 'Anschrift',
@@ -108,6 +108,12 @@ class RestaurantDetailPage extends StatelessWidget {
                 ...addressParts,
                 result.formattedDistance,
               ].join('\n')),
+            ),
+          if (!hasAddress)
+            _infoCard(
+              icon: Icons.near_me_rounded,
+              title: 'Entfernung',
+              child: Text(result.formattedDistance),
             ),
           if (result.phone != null) ...[
             const SizedBox(height: 10),
