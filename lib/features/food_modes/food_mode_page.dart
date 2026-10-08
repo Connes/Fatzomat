@@ -466,19 +466,33 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
     }
   }
 
-  void _openDetails(RestaurantDiscoveryResult result) {
-    Navigator.push(
+  Future<void> _openDetails(RestaurantDiscoveryResult result) async {
+    if (widget.decisionRequestId == null && !widget.persistPersonalDecision) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RestaurantDetailPage(
+            result: result,
+            order: order,
+          ),
+        ),
+      );
+      return;
+    }
+
+    final selected = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => RestaurantDetailPage(
           result: result,
           order: order,
-          onSelect: (widget.decisionRequestId != null || widget.persistPersonalDecision)
-              ? () => _selectResult(result)
-              : null,
+          onSelect: () => Navigator.pop(context, true),
         ),
       ),
     );
+    if (selected == true && mounted) {
+      await _selectResult(result);
+    }
   }
 
   @override
