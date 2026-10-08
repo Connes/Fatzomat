@@ -65,6 +65,10 @@ begin
     raise exception 'Der Name darf höchstens 40 Zeichen lang sein.';
   end if;
 
+  insert into public.profiles(id, display_name)
+  values (uid, clean_name)
+  on conflict (id) do update set display_name = excluded.display_name, updated_at = now();
+
   select connection_id into existing
   from public.connection_members
   where user_id = uid
@@ -122,6 +126,10 @@ begin
   if char_length(clean_name) > 40 then
     raise exception 'Der Name darf höchstens 40 Zeichen lang sein.';
   end if;
+
+  insert into public.profiles(id, display_name)
+  values (uid, clean_name)
+  on conflict (id) do update set display_name = excluded.display_name, updated_at = now();
 
   if exists (
     select 1
