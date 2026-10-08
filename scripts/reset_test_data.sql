@@ -37,9 +37,6 @@ TRUNCATE TABLE
 -- Remove test-created recipes while preserving application seed data.
 DELETE FROM public.recipes WHERE created_by IS NOT NULL;
 
--- Remove onboarding foods explicitly marked as unwanted test data.
-DELETE FROM public.foods WHERE category = 'Gewürze';
-
 -- Auth users are removed last so user-linked foreign keys can be validated first.
 DELETE FROM auth.users;
 
@@ -51,5 +48,4 @@ SELECT
   (SELECT count(*) FROM public.personal_today_plans) AS today_plan_count,
   (SELECT count(*) FROM public.shopping_items) AS shopping_item_count,
   (SELECT count(*) FROM public.user_food_preferences) AS food_preference_count,
-  (SELECT count(*) FROM public.foods WHERE category = 'Gewürze') AS unwanted_spice_count,
   (SELECT count(*) FROM public.recipes WHERE created_by IS NOT NULL) AS user_recipe_count;
