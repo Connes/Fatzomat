@@ -15,7 +15,6 @@ class RestaurantDiscoveryResult {
   final String? cuisine;
 
   const RestaurantDiscoveryResult({
-    super.key,
     required this.id,
     required this.name,
     required this.distanceKm,
