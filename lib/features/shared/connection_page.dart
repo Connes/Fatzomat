@@ -16,6 +16,7 @@ class ConnectionPage extends StatefulWidget {
 class _ConnectionPageState extends State<ConnectionPage> {
   final repo = CollaborationRepository();
   final code = TextEditingController();
+  final displayName = TextEditingController();
   String? myCode;
   int memberCount = 0;
   bool loading = true, working = false;
@@ -30,6 +31,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
   }
   @override void dispose() {
     code.dispose();
+    displayName.dispose();
     if (channel != null) {
       try {
         Supabase.instance.client.removeChannel(channel!);
@@ -75,19 +77,97 @@ class _ConnectionPageState extends State<ConnectionPage> {
     catch (e) { if (mounted && generation == _loadGeneration) { setState(() { loading = false; loadError = e; }); } }
   }
 
+  Future<String?> _askDisplayName() async {
+    displayName.clear();
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Dein Name für diese Verbindung'),
+        content: TextField(
+          controller: displayName,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          maxLength: 40,
+          decoration: const InputDecoration(
+            labelText: 'Name',
+            hintText: 'z. B. Max',
+          ),
+          onSubmitted: (_) {
+            final value = displayName.text.trim();
+            if (value.isNotEmpty) Navigator.pop(dialogContext, value);
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = displayName.text.trim();
+              if (value.isNotEmpty) Navigator.pop(dialogContext, value);
+            },
+            child: const Text('Weiter'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> create() async {
+    final name = await _askDisplayName();
+    if (name == null || !mounted) return;
     setState(() => working = true);
-    try { final c = await repo.createConnection(); if (mounted) setState(() { myCode = c; memberCount = 1; info = ConnectionInfo(id: info?.id ?? '', code: c, memberCount: 1); }); }
-    catch (e) { if (mounted) showAppError(context, e); }
-    finally { if (mounted) setState(() => working = false); }
+    try {
+      final c = await repo.createConnection(name);
+      if (mounted) {
+        setState(() {
+          myCode = c;
+          memberCount = 1;
+          info = ConnectionInfo(
+            id: info?.id ?? '',
+            code: c,
+            memberCount: 1,
+            myDisplayName: name,
+          );
+        });
+      }
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
   }
 
   Future<void> join() async {
-    final value = code.text.trim(); if (value.isEmpty) return;
+    final value = code.text.trim();
+    if (value.isEmpty) return;
+    final name = await _askDisplayName();
+    if (name == null || !mounted) return;
     setState(() => working = true);
-    try { await repo.joinConnection(value); if (mounted) { setState(() { myCode = value.toUpperCase(); memberCount = 2; info = ConnectionInfo(id: info?.id ?? '', code: value.toUpperCase(), memberCount: 2); }); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ihr seid jetzt verbunden.'))); } }
-    catch (e) { if (mounted) showAppError(context, e); }
-    finally { if (mounted) setState(() => working = false); }
+    try {
+      await repo.joinConnection(value, name);
+      if (mounted) {
+        setState(() {
+          myCode = value.toUpperCase();
+          memberCount = 2;
+          info = ConnectionInfo(
+            id: info?.id ?? '',
+            code: value.toUpperCase(),
+            memberCount: 2,
+            myDisplayName: name,
+          );
+        });
+        await load();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ihr seid jetzt verbunden.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
   }
 
   Future<void> disconnect() async {
@@ -139,7 +219,24 @@ class _ConnectionPageState extends State<ConnectionPage> {
               Text(memberCount >= 2 ? 'Ihr seid verbunden' : 'Verbindung bereit', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               Text(memberCount >= 2 ? '2 Personen nutzen jetzt dieselbe gemeinsame Sammlung.' : 'Der Code kann auf dem zweiten Gerät eingegeben werden.', textAlign: TextAlign.center),
-              const SizedBox(height: 18),
+              if (info?.myDisplayName != null) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Dein Name: ${info!.myDisplayName}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                const SizedBox(height: 6),
+              ],
+              if (memberCount >= 2 && info?.partnerDisplayName != null) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Verbunden mit: ${info!.partnerDisplayName}'),
+                ),
+                const SizedBox(height: 12),
+              ],
+              const SizedBox(height: 6),
               const Text('Verbindungscode'),
               const SizedBox(height: 8),
               SelectableText(myCode!, style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800, letterSpacing: 4)),
