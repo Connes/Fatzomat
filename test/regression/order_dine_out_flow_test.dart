@@ -145,6 +145,11 @@ void main() {
       isTrue,
       reason: '$mode/$choice speichert die Auswahl nicht über den vollständigen Pfad',
     );
+    expect(
+      find.byType(FoodModePage),
+      findsNothing,
+      reason: '$mode/$choice bleibt nach der Auswahl fälschlich auf der Auswahlseite',
+    );
   }
 
   for (final choice in _dineOutChoices) {
