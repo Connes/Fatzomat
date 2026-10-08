@@ -101,7 +101,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           title: const Text('Für heute festgelegt'),
           content: const Text('Das Rezept ist jetzt dein persönlicher Plan für heute. Die persönliche Einkaufsliste wurde vorbereitet.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Hier bleiben')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Rezept öffnen')),
             FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Heute öffnen')),
           ],
         ),
