@@ -49,8 +49,6 @@ class RestaurantDetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded, size: 44),
-                  const SizedBox(height: 12),
                   Text(result.name, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
                   if (result.locationLabel.isNotEmpty) Text(result.locationLabel),
