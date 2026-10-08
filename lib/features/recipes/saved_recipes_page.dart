@@ -460,6 +460,18 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final noMatchingSelection = hasSelectionFilter && visibleRecipes.isEmpty && recipes.isNotEmpty;
+
+    if (noMatchingSelection) {
+      return TogetherScaffold(
+        backgroundType: TogetherBackgroundType.recipes,
+        appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
+        body: const Center(
+          child: Text('Kein passendes Rezept gefunden.'),
+        ),
+      );
+    }
+
     return TogetherScaffold(backgroundType: TogetherBackgroundType.recipes, 
       appBar: TogetherAppBar(
         title: const Text('Meine Rezepte'),
