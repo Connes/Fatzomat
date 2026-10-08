@@ -448,6 +448,7 @@ class _TodayPageState extends State<TodayPage> {
                                           builder: (_) => RecipeDetailPage(
                                             recipeId: plan!.recipeId!,
                                             canMarkCooked: true,
+                                            viewingTodaySelection: true,
                                             onTodayPlanChanged: load,
                                           ),
                                         ),
