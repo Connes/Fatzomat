@@ -168,6 +168,7 @@ void main() {
     expect(source, isNot(contains("nominatim.openstreetmap.org")));
     final functionSource = File('supabase/functions/restaurant-discovery/index.ts').readAsStringSync();
     final searchMigrationSource = File('supabase/migrations/20261004185400_restaurant_search_cuisine_expansion.sql').readAsStringSync();
+    final postalMigrationSource = File('supabase/migrations/20261008161500_restaurant_postal_code.sql').readAsStringSync();
     expect(functionSource, contains("radiusKm !== 10"));
     expect(functionSource, contains('(around:10000,'));
     expect(functionSource, contains('contactPhone'));
