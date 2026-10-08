@@ -811,6 +811,17 @@ class _TodayResultCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                       ],
+                      if (plan.decisionType == 'dine_out' && plan.restaurantCuisine != null) ...[
+                        Text(
+                          plan.restaurantCuisine!,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: AppDesign.primaryDark.withValues(alpha: 0.72),
+                              ),
+                        ),
+                        const SizedBox(height: 6),
+                      ],
                       Text(
                         plan.displayTitle,
                         textAlign: TextAlign.center,
