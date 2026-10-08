@@ -51,6 +51,7 @@ class TodayPlan {
   String? get restaurantPhone => _nullable(restaurantData['phone']);
   String? get restaurantWebsite => _nullable(restaurantData['website']);
   String? get restaurantOpeningHours => _nullable(restaurantData['opening_hours']);
+  String? get restaurantCuisine => _nullable(restaurantData['cuisine']);
   bool get restaurantDeliveryAvailable => restaurantData['delivery_available'] == true;
   double? get restaurantDistanceKm => (restaurantData['distance_km'] as num?)?.toDouble();
 
