@@ -405,7 +405,11 @@ class _TodayPageState extends State<TodayPage> {
                                   ? () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
+                                        MaterialPageRoute(
+                                          builder: (_) => DeliveryServicesPage(
+                                            orderQuery: plan!.decisionValue,
+                                          ),
+                                        ),
                                       );
                                     }
                                   : plan!.decisionType == 'dine_out'
