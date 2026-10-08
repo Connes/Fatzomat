@@ -32,7 +32,8 @@ void main() {
     expect(today, contains("plan.restaurantCuisine != null"));
     expect(today, contains('RestaurantDetailPage'));
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
-    expect(foodMode, contains("'cuisine': result.cuisine?.trim().isNotEmpty == true ? result.cuisine : widget.preference"));
+    expect(foodMode, contains("'cuisine': widget.preference"));
+    expect(foodMode, isNot(contains("'cuisine': result.cuisine?.trim().isNotEmpty == true ? result.cuisine : widget.preference")));
     expect(today, contains("assets/together/clean/icons/icon_cooking.png"));
     expect(today, contains("assets/together/clean/icons/icon_delivery.png"));
     expect(today, contains("assets/together/clean/icons/icon_restaurant.png"));
