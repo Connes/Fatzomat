@@ -142,6 +142,40 @@ void main() {
     expect(find.text('Lieferung laut Datenquelle verfügbar'), findsNWidgets(3));
   });
 
+  testWidgets('Restaurantdetail zeigt Adresse, Kontakte und Auswahl in sauberer Reihenfolge', (tester) async {
+    final result = RestaurantDiscoveryResult(
+      id: 'x',
+      name: 'Asiadong-Gourmet',
+      address: 'Westliche Karl-Friedrich-Straße 123',
+      postalCode: '75172',
+      city: 'Pforzheim',
+      distanceKm: 2.3,
+      latitude: 48.89,
+      longitude: 8.70,
+      phone: '+49 7231 586670',
+      website: Uri.parse('https://example.com'),
+      openingHours: 'Tu 11:30-15:00,17:30-22:30; We-Fr 11:30-15:00,17:30-22:30',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: RestaurantDetailPage(
+          result: result,
+          order: false,
+          onSelect: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Asiadong-Gourmet'), findsOneWidget);
+    expect(find.text('Westliche Karl-Friedrich-Straße 123\n75172 Pforzheim\n2,3 km'), findsOneWidget);
+    expect(find.text('+49 7231 586670'), findsOneWidget);
+    expect(find.text('example.com'), findsOneWidget);
+    expect(find.text('Di 11:30-15:00, 17:30-22:30\nMi-Fr 11:30-15:00, 17:30-22:30'), findsOneWidget);
+    expect(find.text('Für heute auswählen'), findsOneWidget);
+  });
+
   testWidgets('Restaurantdetail zeigt nur tatsächlich vorhandene Kontaktdaten', (tester) async {
     final result = RestaurantDiscoveryResult(
       id: 'x',
@@ -176,6 +210,9 @@ void main() {
     expect(functionSource, contains('PHOTON_ENDPOINT'));
     expect(functionSource, contains('deliveryMetadata'));
     expect(functionSource, contains('delivery_filter'));
+    expect(postalMigrationSource, contains('postal_code text'));
+    expect(postalMigrationSource, contains("metadata #>> '{osm_tags,addr:postcode}'"));
+    expect(postalMigrationSource, contains('overture_postcode'));
     expect(searchMigrationSource, contains("when 'Italienisch' then array['italian']"));
     expect(searchMigrationSource, contains("when 'Griechisch' then array['greek']"));
     expect(searchMigrationSource, contains("when 'Türkisch' then array['turkish']"));
