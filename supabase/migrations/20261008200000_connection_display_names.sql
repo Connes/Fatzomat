@@ -4,6 +4,8 @@
 alter table public.connection_members
   add column if not exists display_name text;
 
+drop function if exists public.connection_info();
+
 create or replace function public.connection_info()
 returns table(
   connection_id uuid,
