@@ -210,7 +210,6 @@ def osm_record(element, region):
                               str(tags.get("addr:housenumber") or "").strip()] if part
         ) or None,
         "postal_code": str(tags.get("addr:postcode") or "").strip() or None,
-        "postal_code": str(tags.get("addr:postcode") or "").strip() or None,
         "city": str(tags.get("addr:city") or "").strip() or None,
         "area": region, "cuisine": cuisines,
         "phone": tags.get("phone") or tags.get("contact:phone"),
