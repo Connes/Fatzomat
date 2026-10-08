@@ -77,7 +77,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('Trattoria Test'), findsNWidgets(2));
+    expect(find.text('Trattoria Test'), findsOneWidget);
     expect(find.text('+497231123'), findsOneWidget);
     expect(find.text('Webseite'), findsOneWidget);
     expect(find.text('2,4 km'), findsOneWidget);
