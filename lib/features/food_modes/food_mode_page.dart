@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
@@ -421,6 +423,23 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   }
 
   Future<void> _selectResult(RestaurantDiscoveryResult result) async {
+    final decisionValue = order
+        ? result.name
+        : jsonEncode({
+            'id': result.id,
+            'name': result.name,
+            'address': result.address,
+            'city': result.city,
+            'distance_km': result.distanceKm,
+            'latitude': result.latitude,
+            'longitude': result.longitude,
+            'phone': result.phone,
+            'website': result.website?.toString(),
+            'order_url': result.orderUri?.toString(),
+            'opening_hours': result.openingHours,
+            'delivery_available': result.deliveryAvailable,
+            'cuisine': result.cuisine,
+          });
     try {
       if (widget.onResultSelected != null) {
         await widget.onResultSelected!(result);
@@ -429,12 +448,12 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           requestId: widget.decisionRequestId!,
           decisionMode: widget.mode.name,
           resultType: order ? 'order' : 'dine_out',
-          resultId: result.name,
+          resultId: decisionValue,
         );
       } else if (widget.persistPersonalDecision) {
         await PersonalTodayRepository().selectDecision(
           type: order ? 'order' : 'dine_out',
-          value: result.name,
+          value: decisionValue,
         );
       }
       if (!mounted) return;
