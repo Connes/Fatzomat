@@ -92,7 +92,7 @@ class RestaurantDetailPage extends StatelessWidget {
         [result.postalCode, result.city].whereType<String>().join(' '),
     ].where((part) => part.isNotEmpty).toList();
 
-    final hasAddress = addressParts.isNotEmpty;
+    final hasAddress = result.address != null || result.postalCode != null;
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
