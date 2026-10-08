@@ -20,12 +20,14 @@ class RecipeDetailPage extends StatefulWidget {
   final String recipeId;
   final Future<void> Function()? onTodayPlanChanged;
   final VoidCallback? onNavigateToToday;
+  final VoidCallback? onNavigateToShoppingList;
   final bool canMarkCooked;
   const RecipeDetailPage({
     super.key,
     required this.recipeId,
     this.onTodayPlanChanged,
     this.onNavigateToToday,
+    this.onNavigateToShoppingList,
     this.canMarkCooked = false,
   });
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
@@ -95,18 +97,22 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       // to wait for either one to reflect the successful selection.
       await widget.onTodayPlanChanged?.call();
       if (!mounted) return;
-      final openToday = await showDialog<bool>(
+      final action = await showDialog<String>(
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('Für heute festgelegt'),
           content: const Text('Das Rezept ist jetzt dein persönlicher Plan für heute. Die persönliche Einkaufsliste wurde vorbereitet.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Einkaufsliste')),
-            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Heute öffnen')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, 'shopping'), child: const Text('Einkaufsliste')),
+            FilledButton(onPressed: () => Navigator.pop(dialogContext, 'today'), child: const Text('Heute öffnen')),
           ],
         ),
       );
-      if (openToday == true && mounted) {
+      if (action == 'shopping' && mounted && widget.onNavigateToShoppingList != null) {
+        final navigateToShoppingList = widget.onNavigateToShoppingList!;
+        Navigator.pop(context);
+        navigateToShoppingList();
+      } else if (action == 'today' && mounted) {
         if (widget.onNavigateToToday != null) {
           // Close this detail route first. The AppShell callback then only
           // selects the Today tab instead of trying to remove this route
