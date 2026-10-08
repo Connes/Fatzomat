@@ -14,6 +14,7 @@ import '../../data/services/together_recipe_file_service.dart';
 import '../../data/services/recipe_image_service.dart';
 import '../../core/recipe_collection_events.dart';
 import '../shared/today_page.dart';
+import '../shared/shopping_list_page.dart';
 import 'add_recipe_page.dart';
 
 class RecipeDetailPage extends StatefulWidget {
@@ -108,10 +109,17 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ],
         ),
       );
-      if (action == 'shopping' && mounted && widget.onNavigateToShoppingList != null) {
-        final navigateToShoppingList = widget.onNavigateToShoppingList!;
-        Navigator.pop(context);
-        navigateToShoppingList();
+      if (action == 'shopping' && mounted) {
+        if (widget.onNavigateToShoppingList != null) {
+          final navigateToShoppingList = widget.onNavigateToShoppingList!;
+          Navigator.pop(context);
+          navigateToShoppingList();
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ShoppingListPage()),
+          );
+        }
       } else if (action == 'today' && mounted) {
         if (widget.onNavigateToToday != null) {
           // Close this detail route first. The AppShell callback then only
