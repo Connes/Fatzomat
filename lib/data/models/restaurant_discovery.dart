@@ -2,6 +2,7 @@ class RestaurantDiscoveryResult {
   final String id;
   final String name;
   final String? address;
+  final String? postalCode;
   final String? city;
   final double distanceKm;
   final double latitude;
@@ -14,12 +15,14 @@ class RestaurantDiscoveryResult {
   final String? cuisine;
 
   const RestaurantDiscoveryResult({
+    super.key,
     required this.id,
     required this.name,
     required this.distanceKm,
     required this.latitude,
     required this.longitude,
     this.address,
+    this.postalCode,
     this.city,
     this.phone,
     this.website,
@@ -41,6 +44,7 @@ class RestaurantDiscoveryResult {
       id: map['id']?.toString() ?? '',
       name: map['name']?.toString() ?? 'Unbenannter Anbieter',
       address: _nullable(map['address']),
+      postalCode: _nullable(map['postal_code']),
       city: _nullable(map['city']),
       distanceKm: (map['distance_km'] as num?)?.toDouble() ?? 0,
       latitude: (map['latitude'] as num?)?.toDouble() ?? 0,
@@ -62,7 +66,8 @@ class RestaurantDiscoveryResult {
   String get locationLabel {
     final parts = <String>[];
     if (address != null) parts.add(address!);
-    if (city != null && city != address) parts.add(city!);
+    final locality = [postalCode, city].whereType<String>().join(' ');
+    if (locality.isNotEmpty) parts.add(locality);
     return parts.join(', ');
   }
 
