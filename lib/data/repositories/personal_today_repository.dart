@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_exception.dart';
+import '../../core/recipe_collection_events.dart';
 import '../models/shopping_item.dart';
 import '../models/today_plan.dart';
 import '../models/personal_history_entry.dart';
@@ -78,6 +79,10 @@ class PersonalTodayRepository {
     });
     final id = result?.toString() ?? '';
     if (id.isEmpty) throw StateError('Der persönliche Tagesplan konnte nicht gespeichert werden.');
+    // Any route can create the personal Today plan. Notify the persistent
+    // "Meine Rezepte" tab immediately so it refreshes its "Für dich heute"
+    // state without relying on a Realtime round-trip.
+    RecipeCollectionEvents.notifyChanged();
     return id;
   }
 
