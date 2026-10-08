@@ -927,7 +927,8 @@ class ShoppingPage extends StatefulWidget {
   final String recipeName;
   final int servings;
   final bool shared;
-  const ShoppingPage({super.key, required this.planId, required this.recipeName, required this.servings, this.shared = false});
+  final VoidCallback? onCompleted;
+  const ShoppingPage({super.key, required this.planId, required this.recipeName, required this.servings, this.shared = false, this.onCompleted});
 
   @override
   State<ShoppingPage> createState() => _ShoppingPageState();
@@ -1069,11 +1070,15 @@ class _ShoppingPageState extends State<ShoppingPage> {
           await personalRepo.deleteShoppingItem(item.id);
         }
       }
-      await load();
+
+      if (widget.shared) {
+        await collaborationRepo.removeSharedRecipePlan(widget.planId);
+      } else {
+        await personalRepo.removeTodayPlan(widget.planId);
+      }
+
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${completed.length} erledigte Artikel entfernt.')),
-        );
+        widget.onCompleted?.call();
       }
     } catch (e) {
       if (mounted) showAppError(context, e);
