@@ -19,7 +19,7 @@ void main() {
     expect(page, contains("resultType: order ? 'order' : 'dine_out'"));
     expect(page, contains('final decisionValue = order'));
     expect(page, contains('jsonEncode({'));
-    expect(page, contains("'cuisine': result.cuisine"));
+    expect(page, contains("'cuisine': widget.preference"));
     expect(page, isNot(contains("resultType: 'preference'")));
   });
 
