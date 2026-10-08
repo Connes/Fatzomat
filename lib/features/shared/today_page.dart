@@ -56,7 +56,12 @@ class _TodayPageState extends State<TodayPage> {
     super.initState();
     controller = TodayController();
     load();
+    RecipeCollectionEvents.revision.addListener(_onRecipeCollectionChanged);
     _subscribeRealtime();
+  }
+
+  void _onRecipeCollectionChanged() {
+    if (mounted) load();
   }
 
   void _subscribeRealtime() {
@@ -324,6 +329,7 @@ class _TodayPageState extends State<TodayPage> {
 
   @override
   void dispose() {
+    RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     if (channel != null) {
       try {
         Supabase.instance.client.removeChannel(channel!);
