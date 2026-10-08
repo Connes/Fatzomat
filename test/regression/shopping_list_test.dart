@@ -56,9 +56,6 @@ void main() {
     expect(savedRecipes, contains('Gemeinsames Rezept hinzugefügt'));
   });
 
-}
-
-
   test('V86 zeigt persönliche Einkaufsliste nur für Rezeptentscheidungen', () {
     final entry = File('lib/features/shared/shopping_list_page.dart').readAsStringSync();
     final todayPlan = File('lib/data/models/today_plan.dart').readAsStringSync();
@@ -70,3 +67,4 @@ void main() {
     expect(migration, contains("p.recipe_id is not null"));
     expect(migration, contains('shopping personal insert'));
   });
+}
