@@ -131,6 +131,7 @@ def first_address(feature: dict[str, Any]):
     return (
         str(address.get("freeform") or "").strip() or None,
         str(address.get("locality") or "").strip() or None,
+        str(address.get("postcode") or "").strip() or None,
     )
 
 
@@ -208,6 +209,7 @@ def osm_record(element, region):
             part for part in [str(tags.get("addr:street") or "").strip(),
                               str(tags.get("addr:housenumber") or "").strip()] if part
         ) or None,
+        "postal_code": str(tags.get("addr:postcode") or "").strip() or None,
         "city": str(tags.get("addr:city") or "").strip() or None,
         "area": region, "cuisine": cuisines,
         "phone": tags.get("phone") or tags.get("contact:phone"),
@@ -227,17 +229,18 @@ def overture_record(feature, region):
     if geometry.get("type") != "Point" or len(coords) < 2 or not name or not overture_is_food_place(feature):
         return None
     lon, lat = float(coords[0]), float(coords[1])
-    address, city = first_address(feature)
+    address, city, postal_code = first_address(feature)
     phones, websites = feature.get("phones") or [], feature.get("websites") or []
     return {
         "name": name, "latitude": lat, "longitude": lon,
-        "address": address, "city": city, "area": region,
+        "address": address, "postal_code": postal_code, "city": city, "area": region,
         "cuisine": categories_from_taxonomy(taxonomy_values(feature)),
         "phone": phones[0] if phones else None,
         "website": websites[0] if websites else None,
         "order_url": None, "opening_hours": None, "delivery_available": False,
         "source_ids": {"overture": str(feature.get("id") or "")},
         "metadata": {
+            "overture_postcode": postal_code,
             "overture_basic_category": feature.get("basic_category"),
             "overture_taxonomy": feature.get("taxonomy"),
             "overture_confidence": feature.get("confidence"),
@@ -261,7 +264,7 @@ def merge_records(records):
             merged.append(record)
             continue
         match["cuisine"] = sorted(set(match["cuisine"]) | set(record["cuisine"]))
-        for key in ("phone", "website", "order_url", "opening_hours", "address", "city"):
+        for key in ("phone", "website", "order_url", "opening_hours", "address", "postal_code", "city"):
             match[key] = match[key] or record[key]
         match["delivery_available"] |= record["delivery_available"]
         match["source_ids"].update(record["source_ids"])
