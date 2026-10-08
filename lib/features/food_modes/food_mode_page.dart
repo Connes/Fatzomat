@@ -547,9 +547,6 @@ class _RestaurantListCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          child: Icon(order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded),
-        ),
         title: Text(result.name, style: const TextStyle(fontWeight: FontWeight.w800)),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
