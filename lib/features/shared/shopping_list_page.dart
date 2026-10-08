@@ -120,6 +120,10 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           recipeName: personalRecipeName,
           servings: personalServings,
           shared: false,
+          onCompleted: () {
+            if (!mounted) return;
+            Navigator.pop(context);
+          },
         ),
       ),
     );
@@ -153,6 +157,10 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
           servings: (plan['servings'] as num?)?.toInt() ?? 2,
           shared: true,
+          onCompleted: () {
+            if (!mounted) return;
+            setState(() => sharedPlan = null);
+          },
         );
       }
 
@@ -179,6 +187,14 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
         recipeName: personalRecipeName,
         servings: personalServings,
         shared: false,
+        onCompleted: () {
+          if (!mounted) return;
+          setState(() {
+            personalPlanId = null;
+            personalRecipeName = 'Einkaufsliste';
+            personalServings = 2;
+          });
+        },
       );
     }
 
