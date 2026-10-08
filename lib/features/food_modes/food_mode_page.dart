@@ -438,7 +438,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             'order_url': result.orderUri?.toString(),
             'opening_hours': result.openingHours,
             'delivery_available': result.deliveryAvailable,
-            'cuisine': result.cuisine?.trim().isNotEmpty == true ? result.cuisine : widget.preference,
+            'cuisine': widget.preference,
           });
     try {
       if (widget.onResultSelected != null) {
