@@ -11,6 +11,7 @@ import '../../core/app_design.dart';
 import '../../core/recipe_collection_events.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
+import '../../data/models/restaurant_discovery.dart';
 import '../../data/models/recipe.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import 'controllers/today_controller.dart';
