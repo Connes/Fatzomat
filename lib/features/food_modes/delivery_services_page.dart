@@ -7,7 +7,9 @@ import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 
 class DeliveryServicesPage extends StatelessWidget {
-  const DeliveryServicesPage({super.key});
+  final String? orderQuery;
+
+  const DeliveryServicesPage({super.key, this.orderQuery});
 
   static const _services = <_DeliveryService>[
     _DeliveryService(
@@ -45,6 +47,20 @@ class DeliveryServicesPage extends StatelessWidget {
   ];
 
   Future<void> _openService(BuildContext context, _DeliveryService service) async {
+    final query = orderQuery?.trim();
+    if (query != null && query.isNotEmpty) {
+      final searchUrl = service.searchUrl(query);
+      final opened = await launchUrl(
+        Uri.parse(searchUrl),
+        mode: LaunchMode.externalApplication,
+      );
+      if (opened || !context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${service.name} konnte nicht geöffnet werden.')),
+      );
+      return;
+    }
+
     if (service.appUrl != null) {
       final appOpened = await launchUrl(
         Uri.parse(service.appUrl!),
@@ -187,6 +203,24 @@ class _DeliveryService {
   final Color brandColor;
   final bool logoIsSvg;
   final String? appUrl;
+
+  String searchUrl(String query) {
+    switch (name) {
+      case 'Lieferando':
+        return Uri.https('www.lieferando.de', '/suche', {'q': query}).toString();
+      case 'Uber Eats':
+        return Uri.https('www.ubereats.com', '/de/search', {
+          'q': query,
+          'searchType': 'GLOBAL_SEARCH',
+        }).toString();
+      case 'Wolt':
+        return Uri.https('wolt.com', '/de/deu/search', {'q': query}).toString();
+      case 'Bolt':
+        return Uri.https('food.bolt.eu', '/search', {'query': query}).toString();
+      default:
+        return url;
+    }
+  }
 
   const _DeliveryService({
     required this.name,
