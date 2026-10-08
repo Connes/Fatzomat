@@ -17,7 +17,8 @@ void main() {
     expect(page, contains('decisionRequestId: widget.decisionRequestId'));
     expect(page, contains('persistPersonalDecision: widget.decisionRequestId == null'));
     expect(page, contains("resultType: order ? 'order' : 'dine_out'"));
-    expect(page, contains('value: result.name'));
+    expect(page, contains("final decisionValue = order ? result.name : jsonEncode"));
+    expect(page, contains("'cuisine': result.cuisine"));
     expect(page, isNot(contains("resultType: 'preference'")));
   });
 
