@@ -29,7 +29,7 @@ void main() {
     expect(source, isNot(contains('widget.recipeName,\n                          style: theme.textTheme.headlineSmall')));
     expect(entry, contains('ShoppingPage('));
     expect(entry, contains('shared: false'));
-    expect(entry, contains("personal?.status == 'cooked' ? null : personal"));
+    expect(entry, contains("personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal"));
     expect(source, contains('controller.dispose();'));
     expect(source, isNot(contains('controller.removeListener(_syncController)')));
   });
