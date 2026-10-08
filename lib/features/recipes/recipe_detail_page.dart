@@ -90,6 +90,25 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
   Future<void> selectPersonalToday() async {
     if (working) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Für heute festlegen?'),
+        content: const Text('Dieses Rezept wird für heute ausgewählt.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Festlegen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
     setState(() => working = true);
     try {
       await personalToday.selectRecipeForToday(widget.recipeId, servings: servings);
@@ -98,39 +117,18 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       // to wait for either one to reflect the successful selection.
       await widget.onTodayPlanChanged?.call();
       if (!mounted) return;
-      final action = await showDialog<String>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Für heute festgelegt'),
-          content: const Text('Das Rezept ist jetzt dein persönlicher Plan für heute. Die persönliche Einkaufsliste wurde vorbereitet.'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, 'shopping'), child: const Text('Einkaufsliste')),
-            FilledButton(onPressed: () => Navigator.pop(dialogContext, 'today'), child: const Text('Heute öffnen')),
-          ],
-        ),
-      );
-      if (action == 'shopping' && mounted) {
-        if (widget.onNavigateToShoppingList != null) {
-          final navigateToShoppingList = widget.onNavigateToShoppingList!;
-          Navigator.pop(context);
-          navigateToShoppingList();
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const ShoppingListPage()),
-          );
-        }
-      } else if (action == 'today' && mounted) {
-        if (widget.onNavigateToToday != null) {
-          // Close this detail route first. The AppShell callback then only
-          // selects the Today tab instead of trying to remove this route
-          // while its async callback is still executing.
-          final navigateToToday = widget.onNavigateToToday!;
-          Navigator.pop(context);
-          navigateToToday();
-        } else {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage()));
-        }
+
+      if (widget.onNavigateToToday != null) {
+        // Close this detail route first. The AppShell callback then selects
+        // the Today tab, where the newly selected recipe is visible.
+        final navigateToToday = widget.onNavigateToToday!;
+        Navigator.pop(context);
+        navigateToToday();
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const TodayPage()),
+        );
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
