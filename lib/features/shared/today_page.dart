@@ -712,7 +712,7 @@ class _TodayResultCard extends StatelessWidget {
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: plan.decisionType == 'order' ? onOpenOrder : onOpenRecipe,
+                onTap: plan.decisionType == 'order' || plan.decisionType == 'dine_out' ? onOpenOrder : onOpenRecipe,
                 borderRadius: BorderRadius.circular(22),
                 child: Padding(
                   padding: const EdgeInsets.all(4),
@@ -793,33 +793,6 @@ class _TodayResultCard extends StatelessWidget {
                               color: AppDesign.primaryDark,
                             ),
                       ),
-                      if (plan.decisionType == 'dine_out') ...[
-                        const SizedBox(height: 12),
-                        if (plan.restaurantAddress != null || plan.restaurantCity != null)
-                          Text(
-                            [plan.restaurantAddress, plan.restaurantCity].whereType<String>().join(', '),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        if (plan.restaurantDistanceKm != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              plan.restaurantDistanceKm!.toStringAsFixed(1).replaceAll('.', ',') + ' km entfernt',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        if (plan.restaurantOpeningHours != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(plan.restaurantOpeningHours!, textAlign: TextAlign.center),
-                          ),
-                        if (plan.restaurantPhone != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(plan.restaurantPhone!, textAlign: TextAlign.center),
-                          ),
-                      ],
                     ],
                   ),
                 ),
