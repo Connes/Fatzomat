@@ -725,14 +725,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                               padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
                               child: Row(
                                 children: [
-                                  Container(
-                                    width: 58,
-                                    height: 58,
-                                    decoration: BoxDecoration(
-                                      color: AppDesign.softSurface,
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+                                  _RecipeCardImage(
+                                    imageUrl: recipe.imageUrl,
+                                    imagePath: recipe.imagePath,
                                   ),
                                   const SizedBox(width: 14),
                                   Expanded(
