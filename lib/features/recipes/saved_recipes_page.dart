@@ -460,232 +460,83 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final noMatchingSelection = hasSelectionFilter && visibleRecipes.isEmpty;
+    final selectionActive = hasSelectionFilter;
 
-    if (noMatchingSelection) {
+    if (selectionActive) {
+      if (visibleRecipes.isEmpty) {
+        return TogetherScaffold(
+          backgroundType: TogetherBackgroundType.recipes,
+          appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
+          body: const Center(child: Text('Kein passendes Rezept gefunden.')),
+        );
+      }
+
       return TogetherScaffold(
         backgroundType: TogetherBackgroundType.recipes,
         appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
-        body: const Center(
-          child: Text('Kein passendes Rezept gefunden.'),
+        body: ListView.separated(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+          itemCount: visibleRecipes.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          itemBuilder: (_, i) {
+            final recipe = visibleRecipes[i];
+            final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+            return Card(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(22),
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecipeDetailPage(
+                        recipeId: recipe.id!,
+                        onTodayPlanChanged: load,
+                        onNavigateToToday: widget.onNavigateToTab == null
+                            ? null
+                            : () => widget.onNavigateToTab!(0),
+                      ),
+                    ),
+                  );
+                  if (mounted) load();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 58,
+                        height: 58,
+                        decoration: BoxDecoration(
+                          color: AppDesign.softSurface,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
+                            const SizedBox(height: 6),
+                            Text(
+                              '${recipe.servings} Personen · $total Min. · ${_difficulty(recipe.difficulty)}',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       );
     }
 
-    return TogetherScaffold(backgroundType: TogetherBackgroundType.recipes, 
-      appBar: TogetherAppBar(
-        title: const Text('Meine Rezepte'),
-        actions: [
-          IconButton(
-            tooltip: 'Rezept hinzufügen',
-            onPressed: loading ? null : addFavorite,
-            icon: const Icon(Icons.add_rounded),
-          ),
-        ],
-      ),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (hasActiveTodayPlan)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
-                    child: Material(
-                      color: const Color(0xFFDDF3E7),
-                      borderRadius: BorderRadius.circular(24),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
-                        onTap: () {
-                          if (widget.onNavigateToTab != null) {
-                            widget.onNavigateToTab!(0);
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const TodayPage()),
-                            ).then((_) => load());
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.favorite_rounded, color: AppDesign.primaryDark),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Für dich heute', style: Theme.of(context).textTheme.bodyMedium),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      todayPlan!.name,
-                                      style: Theme.of(context).textTheme.titleMedium,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Icon(Icons.arrow_forward_rounded, size: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                if (hasSelectionFilter)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.selectedFoodIds.isEmpty
-                            ? 'Passend zu deiner Auswahl'
-                            : 'Passend zu deiner Auswahl · ${widget.selectedFoodIds.length} zusätzliche Zutaten',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
-                  child: TextField(
-                    controller: searchController,
-                    onChanged: (value) => setState(() => query = value),
-                    decoration: InputDecoration(
-                      hintText: 'Rezepte suchen',
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      suffixIcon: query.isEmpty
-                          ? null
-                          : IconButton(
-                              onPressed: () {
-                                searchController.clear();
-                                setState(() => query = '');
-                              },
-                              icon: const Icon(Icons.clear_rounded),
-                            ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: load,
-                    child: ListView.separated(
-                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-                      itemCount: visibleRecipes.isEmpty ? 1 : visibleRecipes.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) {
-                        if (visibleRecipes.isEmpty) {
-                          return recipes.isEmpty
-                              ? const SavedRecipesEmptyState()
-                              : Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 32),
-                                    child: Text('Kein passendes Rezept gefunden.', style: Theme.of(context).textTheme.bodyMedium),
-                                  ),
-                                );
-                        }
-
-                        final recipe = visibleRecipes[i];
-                        final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
-                        return Card(
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(22),
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => RecipeDetailPage(
-                                    recipeId: recipe.id!,
-                                    onTodayPlanChanged: load,
-                                    onNavigateToToday: widget.onNavigateToTab == null
-                                        ? null
-                                        : () => widget.onNavigateToTab!(0),
-                                  ),
-                                ),
-                              );
-                              if (mounted) load();
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 58,
-                                    height: 58,
-                                    decoration: BoxDecoration(
-                                      color: AppDesign.softSurface,
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${recipe.servings} Personen · $total Min. · ${_difficulty(recipe.difficulty)}',
-                                          style: Theme.of(context).textTheme.bodyMedium,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: todayPlan?.isRecipe == true &&
-                                                  todayPlan?.recipeId == recipe.id &&
-                                                  todayPlan?.status != 'cooked'
-                                              ? Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: const [
-                                                    Icon(
-                                                      Icons.check_circle_rounded,
-                                                      size: 18,
-                                                      color: AppDesign.primaryDark,
-                                                    ),
-                                                    SizedBox(width: 6),
-                                                    Text(
-                                                      'Für heute ausgewählt',
-                                                      style: TextStyle(fontWeight: FontWeight.w700),
-                                                    ),
-                                                  ],
-                                                )
-                                              : TextButton.icon(
-                                                  key: Key('saved-recipe-select-today-${recipe.id}'),
-                                                  onPressed: () => selectRecipeForToday(recipe),
-                                                  icon: const Icon(Icons.today_rounded, size: 18),
-                                                  label: const Text('Für heute auswählen'),
-                                                ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuButton<String>(
-                                    onSelected: (value) {
-                                      if (value == 'edit') editRecipe(recipe);
-                                      if (value == 'delete') deleteRecipe(recipe);
-                                      if (value == 'share') shareRecipe(recipe);
-                                    },
-                                    itemBuilder: (_) => [
-                                      const PopupMenuItem(value: 'edit', child: Text('Rezept bearbeiten')),
-                                      const PopupMenuItem(value: 'delete', child: Text('Rezept löschen')),
-                                      const PopupMenuItem(value: 'share', child: Text('Rezept teilen')),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                )
-              ],
-            ),
-    );
-  }
-
+    return TogetherScaffold(backgroundType: TogetherBackgroundType.recipes,
   String _difficulty(String value) {
     switch (value) {
       case 'easy':
