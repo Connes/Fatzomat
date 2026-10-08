@@ -460,7 +460,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final noMatchingSelection = hasSelectionFilter && visibleRecipes.isEmpty && recipes.isNotEmpty;
+    final noMatchingSelection = hasSelectionFilter && visibleRecipes.isEmpty;
 
     if (noMatchingSelection) {
       return TogetherScaffold(
