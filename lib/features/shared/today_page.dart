@@ -18,6 +18,7 @@ import '../recipes/recipe_detail_page.dart';
 import '../../core/food_mode.dart';
 import '../../core/services/food_choice_asset_service.dart';
 import '../food_modes/food_mode_page.dart';
+import '../food_modes/restaurant_detail_page.dart';
 import '../food_modes/delivery_services_page.dart';
 import 'personalized_surprise_page.dart';
 import 'connection_page.dart';
@@ -406,7 +407,34 @@ class _TodayPageState extends State<TodayPage> {
                                         MaterialPageRoute(builder: (_) => const DeliveryServicesPage()),
                                       );
                                     }
-                                  : null,
+                                  : plan!.decisionType == 'dine_out'
+                                      ? () {
+                                          final data = plan!.restaurantData;
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => RestaurantDetailPage(
+                                                result: RestaurantDiscoveryResult(
+                                                  id: data['id']?.toString() ?? '',
+                                                  name: plan!.restaurantName,
+                                                  address: data['address']?.toString(),
+                                                  city: data['city']?.toString(),
+                                                  distanceKm: (data['distance_km'] as num?)?.toDouble() ?? 0,
+                                                  latitude: (data['latitude'] as num?)?.toDouble() ?? 0,
+                                                  longitude: (data['longitude'] as num?)?.toDouble() ?? 0,
+                                                  phone: data['phone']?.toString(),
+                                                  website: data['website'] == null ? null : Uri.tryParse(data['website'].toString()),
+                                                  orderUri: data['order_url'] == null ? null : Uri.tryParse(data['order_url'].toString()),
+                                                  openingHours: data['opening_hours']?.toString(),
+                                                  deliveryAvailable: data['delivery_available'] == true,
+                                                  cuisine: data['cuisine']?.toString(),
+                                                ),
+                                                order: false,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      : null,
                               onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
                                   ? () async {
                                       await Navigator.push(
