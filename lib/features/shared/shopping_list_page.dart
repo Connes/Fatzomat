@@ -93,7 +93,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
       setState(() {
         connected = connection?.isConnected == true;
         sharedPlan = shared;
-        final activePersonal = personal?.status == 'cooked' ? null : personal;
+        final activePersonal = personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal;
         personalPlanId = activePersonal?.id;
         personalRecipeName = activePersonal?.name ?? 'Einkaufsliste';
         personalServings = activePersonal?.servings ?? 2;

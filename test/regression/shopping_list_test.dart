@@ -29,7 +29,7 @@ void main() {
     expect(source, isNot(contains('widget.recipeName,\n                          style: theme.textTheme.headlineSmall')));
     expect(entry, contains('ShoppingPage('));
     expect(entry, contains('shared: false'));
-    expect(entry, contains("personal?.status == 'cooked' ? null : personal"));
+    expect(entry, contains("personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal"));
     expect(source, contains('controller.dispose();'));
     expect(source, isNot(contains('controller.removeListener(_syncController)')));
   });
@@ -56,4 +56,15 @@ void main() {
     expect(savedRecipes, contains('Gemeinsames Rezept hinzugefügt'));
   });
 
+  test('V86 zeigt persönliche Einkaufsliste nur für Rezeptentscheidungen', () {
+    final entry = File('lib/features/shared/shopping_list_page.dart').readAsStringSync();
+    final todayPlan = File('lib/data/models/today_plan.dart').readAsStringSync();
+    final migration = File('supabase/migrations/20261008190000_recipe_only_personal_shopping.sql').readAsStringSync();
+
+    expect(entry, contains("personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal"));
+    expect(todayPlan, contains("bool get isRecipe => decisionType == 'recipe' && recipeId != null;"));
+    expect(migration, contains("p.decision_type = 'recipe'"));
+    expect(migration, contains("p.recipe_id is not null"));
+    expect(migration, contains('shopping personal insert'));
+  });
 }
