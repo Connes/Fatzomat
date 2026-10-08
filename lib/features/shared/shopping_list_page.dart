@@ -171,23 +171,27 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
       );
     }
 
+    if (personalPlanId != null) {
+      // ShoppingPage already renders its own page heading. Wrapping it in
+      // another scaffold app bar would show "Einkaufsliste" twice.
+      return ShoppingPage(
+        planId: personalPlanId!,
+        recipeName: personalRecipeName,
+        servings: personalServings,
+        shared: false,
+      );
+    }
+
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
       appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
-      body: personalPlanId == null
-          ? _EntryCard(
-              icon: Icons.shopping_cart_outlined,
-              title: 'Deine Einkaufsliste ist leer',
-              text: 'Wähle zuerst ein Rezept für heute. Die zugehörigen Zutaten erscheinen anschließend hier.',
-              actionLabel: 'Zu Heute',
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage())),
-            )
-          : ShoppingPage(
-              planId: personalPlanId!,
-              recipeName: personalRecipeName,
-              servings: personalServings,
-              shared: false,
-            ),
+      body: _EntryCard(
+        icon: Icons.shopping_cart_outlined,
+        title: 'Deine Einkaufsliste ist leer',
+        text: 'Wähle zuerst ein Rezept für heute. Die zugehörigen Zutaten erscheinen anschließend hier.',
+        actionLabel: 'Zu Heute',
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage())),
+      ),
     );
   }
 }
