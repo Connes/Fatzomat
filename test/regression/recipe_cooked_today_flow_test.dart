@@ -59,7 +59,7 @@ void main() {
     expect(today, contains("Deine Entscheidung ist abgeschlossen."));
     expect(today, contains("plan!.status == 'cooked' || plan!.isShared"));
     final shoppingEntry = File('lib/features/shared/shopping_list_page.dart').readAsStringSync();
-    expect(shoppingEntry, contains("final activePersonal = personal?.status == 'cooked' ? null : personal;"));
+    expect(shoppingEntry, contains("final activePersonal = personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal;"));
     expect(shoppingEntry, contains('personalPlanId = activePersonal?.id;'));
   });
 }
