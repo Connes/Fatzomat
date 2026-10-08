@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class TodayPlan {
   final String id;
   final String? recipeId;
@@ -29,10 +31,38 @@ class TodayPlan {
 
   bool get isRecipe => decisionType == 'recipe' && recipeId != null;
 
+  Map<String, dynamic> get restaurantData {
+    if (decisionType != 'dine_out' || decisionValue == null) return const <String, dynamic>{};
+    try {
+      final decoded = jsonDecode(decisionValue!);
+      return decoded is Map ? Map<String, dynamic>.from(decoded) : const <String, dynamic>{};
+    } catch (_) {
+      return const <String, dynamic>{};
+    }
+  }
+
+  String get restaurantName =>
+      restaurantData['name']?.toString().trim().isNotEmpty == true
+          ? restaurantData['name'].toString()
+          : (decisionValue ?? 'Auswahl');
+
+  String? get restaurantAddress => _nullable(restaurantData['address']);
+  String? get restaurantCity => _nullable(restaurantData['city']);
+  String? get restaurantPhone => _nullable(restaurantData['phone']);
+  String? get restaurantWebsite => _nullable(restaurantData['website']);
+  String? get restaurantOpeningHours => _nullable(restaurantData['opening_hours']);
+  bool get restaurantDeliveryAvailable => restaurantData['delivery_available'] == true;
+  double? get restaurantDistanceKm => (restaurantData['distance_km'] as num?)?.toDouble();
+
+  static String? _nullable(dynamic value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty ? null : text;
+  }
+
   String get displayTitle {
     if (isRecipe) return name;
     if (decisionType == 'order') return 'Wir bestellen · ${decisionValue ?? 'Auswahl'}';
-    if (decisionType == 'dine_out') return 'Wir gehen essen · ${decisionValue ?? 'Auswahl'}';
+    if (decisionType == 'dine_out') return 'Wir gehen essen · $restaurantName';
     if (decisionType == 'surprise') return 'Überrasch mich · ${decisionValue ?? 'Heute entscheidet der Zufall'}';
     return name;
   }
