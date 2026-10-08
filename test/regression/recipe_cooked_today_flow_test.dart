@@ -40,7 +40,9 @@ void main() {
     );
     final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
     expect(bottomNavigation, isNot(contains('widget.canMarkCooked')));
-    expect(recipe, contains("if (personalTodaySelected) ...["));
+    expect(recipe, contains("if (personalTodaySelected || widget.viewingTodaySelection) ...["));
+    expect(recipe, contains("final bool viewingTodaySelection"));
+    expect(recipe, contains("actions: widget.viewingTodaySelection ? null : ["));
     expect(recipe, contains("'Für heute ausgewählt'"));
     expect(
       recipe.indexOf("'Für heute ausgewählt'"),
