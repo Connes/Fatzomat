@@ -21,6 +21,7 @@ import '../shared/today_page.dart';
 
 import 'add_recipe_page.dart';
 import 'recipe_detail_page.dart';
+import '../../data/services/recipe_image_service.dart';
 
 /// Filters a saved recipe against the cooking summary selection.
 ///
@@ -79,6 +80,72 @@ bool recipeMatchesSelection(
     _ => <String>[],
   };
   return needles.isEmpty || names.any((name) => needles.any(name.contains));
+}
+
+class _RecipeCardImage extends StatefulWidget {
+  final String? imageUrl;
+  final String? imagePath;
+
+  const _RecipeCardImage({
+    required this.imageUrl,
+    required this.imagePath,
+  });
+
+  @override
+  State<_RecipeCardImage> createState() => _RecipeCardImageState();
+}
+
+class _RecipeCardImageState extends State<_RecipeCardImage> {
+  String? resolvedUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    resolvedUrl = widget.imageUrl;
+    _resolveImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant _RecipeCardImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl || oldWidget.imagePath != widget.imagePath) {
+      resolvedUrl = widget.imageUrl;
+      _resolveImage();
+    }
+  }
+
+  Future<void> _resolveImage() async {
+    if (widget.imageUrl?.trim().isNotEmpty == true) return;
+    final path = widget.imagePath?.trim() ?? '';
+    if (path.isEmpty) return;
+    final url = await RecipeImageService().resolveSignedUrl(path);
+    if (mounted && url != null && url.trim().isNotEmpty) {
+      setState(() => resolvedUrl = url);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: resolvedUrl?.trim().isNotEmpty == true
+          ? Image.network(
+              resolvedUrl!,
+              width: 58,
+              height: 58,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => _fallback(),
+            )
+          : _fallback(),
+    );
+  }
+
+  Widget _fallback() => Container(
+        width: 58,
+        height: 58,
+        color: AppDesign.softSurface,
+        child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+      );
 }
 
 class SavedRecipesPage extends StatefulWidget {
@@ -506,27 +573,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
                   child: Row(
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        child: recipe.imageUrl != null && recipe.imageUrl!.trim().isNotEmpty
-                            ? Image.network(
-                                recipe.imageUrl!,
-                                width: 58,
-                                height: 58,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  width: 58,
-                                  height: 58,
-                                  color: AppDesign.softSurface,
-                                  child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
-                                ),
-                              )
-                            : Container(
-                                width: 58,
-                                height: 58,
-                                color: AppDesign.softSurface,
-                                child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
-                              ),
+                      _RecipeCardImage(
+                        imageUrl: recipe.imageUrl,
+                        imagePath: recipe.imagePath,
                       ),
                       const SizedBox(width: 14),
                       Expanded(
