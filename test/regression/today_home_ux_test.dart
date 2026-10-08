@@ -28,7 +28,9 @@ void main() {
     expect(today, contains("if (plan.decisionType == 'order')"));
     expect(today, contains('DeliveryServicesPage'));
     expect(today, contains('FoodChoiceAssetService.assetFor(FoodMode.order'));
-    expect(today, contains("onTap: plan.decisionType == 'order' || plan.decisionType == 'dine_out' ? onOpenOrder : onOpenRecipe"));
+    expect(today, contains("onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'"));
+    expect(today, contains("onTap: plan.status == 'cooked'"));
+    expect(today, contains('? onOpenOrder'));
     expect(today, contains("plan.restaurantCuisine != null"));
     expect(today, contains('RestaurantDetailPage'));
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
