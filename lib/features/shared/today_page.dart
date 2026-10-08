@@ -781,15 +781,17 @@ class _TodayResultCard extends StatelessWidget {
                           ),
                         ),
                       ] else if (plan.decisionType == 'dine_out') ...[
-                        Container(
-                          height: 150,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: AppDesign.secondarySurface,
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.restaurant_rounded, size: 64, color: AppDesign.primaryDark),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(22),
+                          child: Image.asset(
+                            FoodChoiceAssetService.assetFor(
+                                  FoodMode.dineOut,
+                                  plan.restaurantCuisine ?? '',
+                                ) ??
+                                'assets/together/clean/icons/icon_restaurant.png',
+                            height: 150,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ],
