@@ -11,6 +11,20 @@ void main() {
       );
     });
 
+    test('uses current postcode for location-scoped pizza results', () {
+      expect(
+        deliveryServiceSearchUrl('Lieferando', 'Pizza', postalCode: '75175'),
+        'https://www.lieferando.de/lieferservice/pizza/75175',
+      );
+    });
+
+    test('ignores invalid postcodes and falls back to the pizza landing page', () {
+      expect(
+        deliveryServiceSearchUrl('Lieferando', 'Pizza', postalCode: 'not-a-postcode'),
+        'https://www.lieferando.de/pizza-bestellen',
+      );
+    });
+
     test('normalizes whitespace and case for pizza', () {
       expect(
         deliveryServiceSearchUrl('Lieferando', '  PIZZA  '),
