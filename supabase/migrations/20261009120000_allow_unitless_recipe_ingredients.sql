@@ -64,7 +64,7 @@ begin
   if exists(select 1 from public.recipes where id<>p_recipe_id and recipe_fingerprint=fp) then raise exception 'Dieses Rezept gibt es bereits in der gemeinsamen Rezeptsammlung.'; end if;
   update public.recipes set name=trim(p_recipe->>'name'),description=coalesce(p_recipe->>'description',''),
     servings=greatest(coalesce((p_recipe->>'servings')::integer,1),1),
-    prep_time_minutes=greatest(coalesce((p_recipe->>'cook_time_minutes')::integer,0),0),
+    prep_time_minutes=greatest(coalesce((p_recipe->>'prep_time_minutes')::integer,0),0),
     cook_time_minutes=greatest(coalesce((p_recipe->>'cook_time_minutes')::integer,0),0),
     difficulty=coalesce(nullif(trim(p_recipe->>'difficulty'),''),'Einfach'),
     instructions=coalesce(p_recipe->'instructions','[]'::jsonb),
