@@ -380,6 +380,7 @@ class DiscoveryPage extends StatefulWidget {
   final bool surprised;
   final String? decisionRequestId;
   final bool persistPersonalDecision;
+  final DateTime? planDate;
   final LocationService locationService;
   final RestaurantDiscoveryRepository discoveryRepository;
   final Future<void> Function(RestaurantDiscoveryResult result)? onResultSelected;
@@ -391,6 +392,7 @@ class DiscoveryPage extends StatefulWidget {
     this.surprised = false,
     this.decisionRequestId,
     this.persistPersonalDecision = false,
+    this.planDate,
     this.locationService = const DeviceLocationService(),
     this.discoveryRepository = const SupabaseRestaurantDiscoveryRepository(),
     this.onResultSelected,
