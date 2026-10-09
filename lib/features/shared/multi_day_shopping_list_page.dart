@@ -82,8 +82,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
       selectedPlanIds.addAll(_plansFor(day).where((p) => p.isRecipe).map((p) => p.id));
     }
     final visibleItems = _items.where((item) => selectedPlanIds.contains(
-      // The repository keeps each source item's plan ID in the query, but the
-      // public model intentionally doesn't expose it. Resolve via plan groups below.
+      // Each persisted item retains its originating personal plan ID so
+      // only ingredients from selected days contribute to the aggregate.
       item.planId,
     )).toList();
     final aggregated = _aggregator.aggregate(visibleItems);
