@@ -244,6 +244,21 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
   bool _matchesCategory(Food food, Map<String, String> preferences) {
     final category = food.category.trim();
     final name = food.name.trim().toLowerCase();
+    // These catalog entries are intentionally unavailable when creating recipes.
+    if (_containsAny(name, const [
+      'süßkartoffel', 'suesskartoffel', 'susskartoffel',
+    ])) {
+      return false;
+    }
+    // Keep these items out of the side-dish picker while leaving other beans available.
+    if (widget.category == IngredientCategory.side &&
+        _containsAny(name, const [
+          'weiße bohnen', 'weisse bohnen', 'kidneybohnen', 'kidney-bohnen',
+          'grüne bohnen', 'grune bohnen', 'gruen bohnen', 'grünbohnen',
+          'tortilla', 'toast',
+        ])) {
+      return false;
+    }
     final isPotato = name.contains('kartoffel');
     final isRice = name.contains('reis');
     final isPasta = name.contains('nudel') || name.contains('pasta');
