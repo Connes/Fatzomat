@@ -84,7 +84,7 @@ class _RecipeShareRequestPageState extends State<RecipeShareRequestPage> {
         working = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(accept ? 'Rezept wurde in deine Rezepte übernommen.' : 'Rezept wurde abgelehnt.')),
+        SnackBar(content: Text(accept ? 'Rezept ist jetzt in der gemeinsamen Bibliothek bestätigt.' : 'Rezept wurde abgelehnt.')),
       );
       if (accept) {
         await Future<void>.delayed(const Duration(milliseconds: 250));
@@ -201,7 +201,7 @@ class _RecipeShareContent extends StatelessWidget {
     final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
     final pending = suggestion.isPending;
     final statusText = switch (suggestion.status) {
-      'accepted' => 'Dieses Rezept wurde bereits übernommen.',
+      'accepted' => 'Dieses Rezept wurde bereits bestätigt.',
       'declined' => 'Dieses Rezept wurde bereits abgelehnt.',
       _ => null,
     };
@@ -237,7 +237,7 @@ class _RecipeShareContent extends StatelessWidget {
         Text(recipe.name, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
         Text(
-          'Geteilt von ${suggestion.senderName?.trim().isNotEmpty == true ? suggestion.senderName : 'deiner verbundenen Person'}',
+          'Dieses Rezept gehört zur gemeinsamen Bibliothek.',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 12),
@@ -314,7 +314,7 @@ class _RecipeShareContent extends StatelessWidget {
               Expanded(
                 child: FilledButton(
                   onPressed: working ? null : onAccept,
-                  child: Text(working ? 'Wird übernommen …' : 'Rezept übernehmen'),
+                  child: Text(working ? 'Wird bestätigt …' : 'Rezept bestätigen'),
                 ),
               ),
             ],
