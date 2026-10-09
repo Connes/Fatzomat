@@ -549,7 +549,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   'Kein passendes Rezept gefunden.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppDesign.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
