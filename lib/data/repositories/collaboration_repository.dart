@@ -408,7 +408,15 @@ class CollaborationRepository {
     return RecipeSuggestion.fromMap(Map<String, dynamic>.from(result as Map));
   }
 
-  Future<bool> respondToRecipeDeletion(String requestId, {required bool approve}) async {\n    final result = await client.rpc('respond_to_recipe_deletion', params: {\n      'p_request_id': requestId,\n      'p_approve': approve,\n    });\n    return result == true;\n  }\n\n  Future<String> shareRecipeForToday(String recipeId, {int? servings}) async {
+  Future<bool> respondToRecipeDeletion(String requestId, {required bool approve}) async {
+    final result = await client.rpc('respond_to_recipe_deletion', params: {
+      'p_request_id': requestId,
+      'p_approve': approve,
+    });
+    return result == true;
+  }
+
+  Future<String> shareRecipeForToday(String recipeId, {int? servings}) async {
     final result = await client.rpc('share_recipe_for_today', params: {
       'p_recipe_id': recipeId,
       'p_servings': servings,
