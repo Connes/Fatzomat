@@ -34,14 +34,19 @@ void main() {
     expect(scaffold.extendBody, isTrue);
   });
 
-  testWidgets('V92 Beilage zeigt nur Reis, Nudeln und Kartoffeln', (tester) async {
+  testWidgets('Beilagen umfassen die passenden Lebensmittel aus dem Katalog', (tester) async {
     await _openCategory(tester, 'Beilage');
 
     expect(find.text('Reis'), findsOneWidget);
     expect(find.text('Nudeln'), findsOneWidget);
     expect(find.text('Kartoffel'), findsOneWidget);
     expect(find.text('Haferflocken'), findsNothing);
-    expect(find.text('Brot'), findsNothing);
+    expect(find.text('Brot'), findsOneWidget);
+    expect(find.text('Couscous'), findsOneWidget);
+    expect(find.text('Quinoa'), findsOneWidget);
+    expect(find.text('Kichererbsen'), findsOneWidget);
+    expect(find.text('🍚'), findsOneWidget);
+    expect(find.text('🍞'), findsOneWidget);
   });
 
   testWidgets('V92 Gemüse schließt Kartoffeln aus', (tester) async {
@@ -127,7 +132,10 @@ class _FakeFoodRepository extends FoodRepository {
         const Food(id: 'pasta', name: 'Nudeln', category: 'Pasta', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'potato', name: 'Kartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'oats', name: 'Haferflocken', category: 'Getreide', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
-        const Food(id: 'bread', name: 'Brot', category: 'Backwaren', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'bread', name: 'Brot', category: 'Getreide & Beilagen', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'couscous', name: 'Couscous', category: 'Getreide & Beilagen', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'quinoa', name: 'Quinoa', category: 'Getreide & Beilagen', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'chickpeas', name: 'Kichererbsen', category: 'Hülsenfrüchte', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'broccoli', name: 'Brokkoli', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'zucchini', name: 'Zucchini', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'carrot', name: 'Karotte', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
