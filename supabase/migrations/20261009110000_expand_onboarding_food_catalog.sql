@@ -59,3 +59,44 @@ insert into public.foods (id, name, category, default_unit) values
   ('shiitake_mushrooms', 'Shiitake-Pilze', 'Gemüse', 'g'),
   ('oyster_mushrooms', 'Austernpilze', 'Gemüse', 'g')
 on conflict do nothing;
+
+-- Add common fresh and dried herbs to the shared onboarding catalog.
+insert into public.foods (id, name, category, default_unit) values
+  ('dill', 'Dill', 'Gewürze & Kräuter', 'g'),
+  ('chives', 'Schnittlauch', 'Gewürze & Kräuter', 'g'),
+  ('coriander_leaves', 'Koriander', 'Gewürze & Kräuter', 'g'),
+  ('mint', 'Minze', 'Gewürze & Kräuter', 'g'),
+  ('sage', 'Salbei', 'Gewürze & Kräuter', 'g'),
+  ('marjoram', 'Majoran', 'Gewürze & Kräuter', 'g'),
+  ('tarragon', 'Estragon', 'Gewürze & Kräuter', 'g'),
+  ('lovage', 'Liebstöckel', 'Gewürze & Kräuter', 'g'),
+  ('lemon_balm', 'Zitronenmelisse', 'Gewürze & Kräuter', 'g'),
+  ('lemongrass', 'Zitronengras', 'Gewürze & Kräuter', 'Stück'),
+  ('bay_leaf', 'Lorbeerblatt', 'Gewürze & Kräuter', 'Stück'),
+  ('cloves', 'Nelken', 'Gewürze & Kräuter', 'g'),
+  ('cardamom', 'Kardamom', 'Gewürze & Kräuter', 'g'),
+  ('coriander_seeds', 'Koriandersamen', 'Gewürze & Kräuter', 'g'),
+  ('fennel_seeds', 'Fenchelsamen', 'Gewürze & Kräuter', 'g'),
+  ('mustard_seeds', 'Senfkörner', 'Gewürze & Kräuter', 'g'),
+  ('garam_masala', 'Garam Masala', 'Gewürze & Kräuter', 'g'),
+  ('italian_herbs', 'Italienische Kräuter', 'Gewürze & Kräuter', 'g'),
+  ('herbes_de_provence', 'Kräuter der Provence', 'Gewürze & Kräuter', 'g'),
+  ('smoked_paprika', 'Geräuchertes Paprikapulver', 'Gewürze & Kräuter', 'g')
+on conflict do nothing;
+
+-- Normalize category names for existing catalog items and user-created foods.
+update public.foods
+set category = 'Gewürze & Kräuter'
+where category = 'Gewürze';
+
+update public.foods
+set category = 'Milchprodukte & Eier'
+where category = 'Milchprodukte';
+
+-- Keep the egg in the combined dairy-and-eggs category even if it was seeded
+-- under a different category in an older database.
+update public.foods
+set category = 'Milchprodukte & Eier'
+where id = 'egg';
+
+-- Sonstiges remains the intentional catch-all category for uncategorized foods.
