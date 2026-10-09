@@ -346,6 +346,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
         await PersonalTodayRepository().selectRecipeForToday(
           recipeId,
           servings: _recipe.servings.clamp(1, 12).toInt(),
+          date: widget.planDate,
         );
       }
 
