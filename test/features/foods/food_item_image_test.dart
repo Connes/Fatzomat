@@ -4,11 +4,11 @@ import 'package:food_app_mvp/features/foods/food_item_image.dart';
 void main() {
   test('catalog foods have stable emoji illustrations', () {
     const foods = <String, String>{
-      'Rinderfilet': '🐄', 'Hähnchenflügel': '🐔', 'Dorade': '🐠',
-      'Räucherlachs': '🍣', 'Tintenfisch': '🦑', 'Fenchel': '🌿',
-      'Rote Bete': '🫜', 'Zuckerschoten': '🫛', 'Dill': '🌿',
+      'Rinderfilet': '🐄', 'Hähnchenflügel': '🐔', 'Dorade': '🐟',
+      'Räucherlachs': '🐟', 'Tintenfisch': '🦑', 'Fenchel': '🥬',
+      'Rote Bete': '🫜', 'Radieschen': '🫜', 'Rettich': '🫜', 'Steckrübe': '🫜', 'Zuckerschoten': '🫛', 'Dill': '🌿',
       'Garam Masala': '🌿', 'Kardamom': '🌿', 'Miesmuscheln': '🦪',
-      'Kokosmilch': '🥥', 'Apfel': '🍎', 'Ei': '🥚',
+      'Kokosmilch': '🥥', 'Backpulver': '🥄', 'Marmelade': '🍯', 'Vanillezucker': '🥄', 'Zucker': '🥄', 'Apfel': '🍎', 'Ei': '🥚',
       'Wassermelone': '🍉', 'Kiwi': '🥝', 'Olive': '🫒', 'Knoblauch': '🧄', 'Limette': '🍋‍🟩',
       'Schweinebraten': '🐖', 'Entenbrust': '🦆', 'Lammkotelett': '🐑', 'Kassler': '🐖',
     };
