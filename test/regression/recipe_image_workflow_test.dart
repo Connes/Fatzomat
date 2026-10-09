@@ -17,6 +17,19 @@ void main() {
     expect(repo, contains('removeRecipeImage'));
   });
 
+  test('recipe image upload does not sign the object before the recipe references it', () {
+    final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
+    final uploadMethod = service.substring(
+      service.indexOf('Future<RecipeImageUpload> upload('),
+      service.indexOf('Future<String?> resolveSignedUrl('),
+    );
+
+    expect(uploadMethod, contains('uploadBinary('));
+    expect(uploadMethod, contains('return RecipeImageUpload(path: path);'));
+    expect(uploadMethod, isNot(contains('createSignedUrl')));
+    expect(service, contains('createSignedUrl(normalized, signedUrlLifetimeSeconds)'));
+  });
+
   test('recipe image upload refreshes an expired Supabase session', () {
     final auth = File('lib/core/auth_session_service.dart').readAsStringSync();
     final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
