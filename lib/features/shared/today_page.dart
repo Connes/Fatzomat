@@ -407,7 +407,7 @@ class _TodayPageState extends State<TodayPage> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => DeliveryServicesPage(
-                                            orderQuery: plan!.decisionValue,
+                                            planId: plan!.id,
                                           ),
                                         ),
                                       );
