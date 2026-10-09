@@ -111,22 +111,9 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   }
 
   void _openPersonal() {
-    final planId = personalPlanId;
-    if (planId == null) return;
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ShoppingPage(
-          planId: planId,
-          recipeName: personalRecipeName,
-          servings: personalServings,
-          shared: false,
-          onCompleted: () {
-            if (!mounted) return;
-            Navigator.pop(context);
-          },
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => const MultiDayShoppingListPage()),
     );
   }
 
@@ -174,18 +161,18 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           text: 'Wählt zuerst ein gemeinsames Rezept für heute. Danach steht dieselbe Einkaufsliste beiden verbundenen Personen zur Verfügung.',
           actionLabel: 'Gemeinsames Rezept auswählen',
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedRecipesPage())),
-          secondaryLabel: personalPlanId != null ? 'Persönliche Liste öffnen' : null,
-          onSecondaryPressed: personalPlanId != null ? _openPersonal : null,
+          secondaryLabel: 'Persönliche Mehrtagesliste öffnen',
+          onSecondaryPressed: _openPersonal,
         ),
       );
     }
 
-    if (personalPlanId != null) {
-      // Personal shopping supports selecting and aggregating ingredients from
-      // Today, Tomorrow and the day after. Shared lists keep their own flow.
-      return const MultiDayShoppingListPage();
-    }
+    // Show the multi-day personal list even when Today has no recipe but a
+    // recipe is planned for tomorrow or the day after.
+    return const MultiDayShoppingListPage();
 
+    /* Legacy empty-state retained below for reference; the multi-day page
+       handles the empty state itself.
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
       appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
@@ -197,6 +184,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage())),
       ),
     );
+    */
   }
 }
 
