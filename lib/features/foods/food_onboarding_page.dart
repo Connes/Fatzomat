@@ -11,6 +11,7 @@ import '../../data/models/food.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../recipes/add_favorite_recipe_dialog.dart';
 import 'add_food_dialog.dart';
+import 'food_item_image.dart';
 
 class FoodOnboardingPage extends StatefulWidget {
   final VoidCallback onCompleted;
@@ -252,26 +253,7 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
                             padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
                             child: Row(
                               children: [
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: value == 'like'
-                                        ? const Color(0xFFDDF3E7)
-                                        : value == 'dislike'
-                                            ? AppDesign.softSurface
-                                            : const Color(0xFFFFF8F2),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Icon(
-                                    value == 'like'
-                                        ? Icons.favorite_rounded
-                                        : value == 'dislike'
-                                            ? Icons.block_rounded
-                                            : Icons.restaurant_rounded,
-                                    color: value == 'like' ? AppDesign.primaryDark : AppDesign.secondaryText,
-                                  ),
-                                ),
+                                FoodItemImage(foodName: food.name, category: food.category, size: 44),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
