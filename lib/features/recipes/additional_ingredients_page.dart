@@ -58,14 +58,12 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
           children: [
             _CategoryCard(
-              icon: Icons.rice_bowl_rounded,
               title: 'Beilage',
               subtitle: 'Reis, Nudeln oder Kartoffeln',
               onTap: () => _openCategory(IngredientCategory.side),
             ),
             const SizedBox(height: 12),
             _CategoryCard(
-              icon: Icons.eco_rounded,
               title: 'Gemüse',
               subtitle: 'Frisches Gemüse für euer Rezept',
               onTap: () => _openCategory(IngredientCategory.vegetables),
@@ -138,13 +136,11 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
 enum IngredientCategory { side, vegetables, favorites }
 
 class _CategoryCard extends StatelessWidget {
-  final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
   const _CategoryCard({
-    required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -163,20 +159,6 @@ class _CategoryCard extends StatelessWidget {
             padding: const EdgeInsets.all(18),
             child: Row(
               children: [
-                Container(
-                  width: 62,
-                  height: 62,
-                  decoration: BoxDecoration(
-                    color: AppDesign.secondarySurface,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 32,
-                    color: AppDesign.primaryDark,
-                  ),
-                ),
-                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,6 +257,9 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
       IngredientCategory.favorites => preferences[food.id] == 'like',
     };
   }
+
+  bool _containsAny(String value, List<String> terms) =>
+      terms.any(value.contains);
 
   void _toggle(String id) {
     setState(() {
@@ -397,16 +382,34 @@ class _FoodSelectionTile extends StatelessWidget {
     required this.onTap,
   });
 
-  IconData get _foodIcon {
+  String get _foodEmoji {
     final value = name.toLowerCase();
-    if (value.contains('reis')) return Icons.rice_bowl_rounded;
-    if (value.contains('nudel') || value.contains('pasta')) return Icons.ramen_dining_rounded;
-    if (value.contains('kartoffel')) return Icons.egg_alt_rounded;
-    if (value.contains('brokkoli')) return Icons.eco_rounded;
-    if (value.contains('karotte')) return Icons.grass_rounded;
-    if (value.contains('tomate')) return Icons.local_florist_rounded;
-    if (value.contains('zwiebel')) return Icons.circle_rounded;
-    return favorite ? Icons.favorite_rounded : Icons.restaurant_rounded;
+    if (value.contains('reis')) return '🍚';
+    if (value.contains('nudel') || value.contains('pasta') || value.contains('lasagne')) return '🍝';
+    if (value.contains('süßkartoffel')) return '🍠';
+    if (value.contains('kartoffel')) return '🥔';
+    if (value.contains('couscous') || value.contains('bulgur') || value.contains('quinoa')) return '🌾';
+    if (value.contains('brot') || value.contains('toast') || value.contains('baguette')) return '🍞';
+    if (value.contains('tortilla')) return '🫓';
+    if (value.contains('gnocchi')) return '🥟';
+    if (value.contains('bohne') || value.contains('erbse') || value.contains('linsen') || value.contains('kichererbse')) return '🫘';
+    if (value.contains('brokkoli') || value.contains('blumenkohl') || value.contains('romanesco')) return '🥦';
+    if (value.contains('karotte') || value.contains('möhre')) return '🥕';
+    if (value.contains('tomate')) return '🍅';
+    if (value.contains('zwiebel') || value.contains('schalotte')) return '🧅';
+    if (value.contains('paprika') || value.contains('chili')) return '🫑';
+    if (value.contains('gurke') || value.contains('zucchini')) return '🥒';
+    if (value.contains('mais')) return '🌽';
+    if (value.contains('pilz') || value.contains('champignon')) return '🍄';
+    if (value.contains('aubergine')) return '🍆';
+    if (value.contains('knoblauch')) return '🧄';
+    if (value.contains('salat') || value.contains('spinat') || value.contains('rucola') || value.contains('kohl') || value.contains('pak choi')) return '🥬';
+    if (value.contains('kürbis')) return '🎃';
+    if (value.contains('avocado')) return '🥑';
+    if (value.contains('ingwer')) return '🫚';
+    if (value.contains('sellerie') || value.contains('fenchel') || value.contains('spargel')) return '🌿';
+    if (value.contains('rettich') || value.contains('radieschen')) return '🌱';
+    return favorite ? '❤️' : '🥗';
   }
 
   @override
@@ -425,14 +428,13 @@ class _FoodSelectionTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(
               children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: AppDesign.softSurface,
-                    borderRadius: BorderRadius.circular(15),
+                SizedBox(
+                  width: 42,
+                  child: Text(
+                    _foodEmoji,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 27),
                   ),
-                  child: Icon(_foodIcon, color: AppDesign.primaryDark, size: 26),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
