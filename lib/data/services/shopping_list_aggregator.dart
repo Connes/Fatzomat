@@ -30,7 +30,7 @@ class ShoppingListAggregator {
     final buckets = <String, List<ShoppingItem>>{};
     for (final item in input) {
       final unit = _unitFamily(item.unit);
-      final nameKey = item.name.trim().toLowerCase().replaceAll(RegExp(r'\\s+'), ' ');
+      final nameKey = item.name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
       final identity = (item.foodId?.trim().isNotEmpty ?? false)
           ? 'food:${item.foodId}'
           : 'name:$nameKey';
