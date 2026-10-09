@@ -45,6 +45,7 @@ class _TodayPageState extends State<TodayPage> {
   DateTime _selectedDate = DateTime.now();
   List<TodayPlan> completedPlans = const [];
   bool loading = true;
+  int _loadGeneration = 0;
   Object? loadError;
   RealtimeChannel? channel;
   CollaborationRepository? _collaboration;
@@ -91,8 +92,10 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> load() async {
+    final generation = ++_loadGeneration;
+    final requestedDate = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     try {
-      final selectedPlan = await repo.todayPlan(date: _selectedDate);
+      final selectedPlan = await repo.todayPlan(date: requestedDate);
       DecisionShare? pendingShare;
       List<TodayPlan> completed = const [];
       try {
@@ -107,7 +110,7 @@ class _TodayPageState extends State<TodayPage> {
       } catch (_) {
         // Shared decisions are additive UI and must not block the day view.
       }
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         plan = selectedPlan;
         completedPlans = completed;
@@ -116,7 +119,7 @@ class _TodayPageState extends State<TodayPage> {
         _pendingDecisionShare = pendingShare;
       });
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
       setState(() {
         loading = false;
         loadError = error;
