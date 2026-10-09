@@ -82,7 +82,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
     final visibleItems = _items.where((item) => selectedPlanIds.contains(
       // The repository keeps each source item's plan ID in the query, but the
       // public model intentionally doesn't expose it. Resolve via plan groups below.
-      _planIdForItem(item.id),
+      item.planId,
     )).toList();
     final aggregated = _aggregator.aggregate(visibleItems);
 
@@ -138,15 +138,4 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
     );
   }
 
-  String? _planIdForItem(String itemId) {
-    for (final plan in _plans.expand((day) => day)) {
-      // shoppingItemsForPlans returns only the source item model; plan linkage
-      // is attached below by looking up item membership in each plan's list.
-      // A null result safely excludes rows that cannot be associated.
-      if (_itemPlanIds[itemId] == plan.id) return plan.id;
-    }
-    return null;
-  }
-
-  final Map<String, String> _itemPlanIds = <String, String>{};
 }
