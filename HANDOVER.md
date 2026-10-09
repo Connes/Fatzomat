@@ -54,17 +54,17 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-09
+Stand dieses Dokuments: 2026-10-09 (nach Merge von PR #55)
 
 ### GitHub
 
 - `main` enthält den Grafik-Commit `9dc4dd0`: die acht neuen Delivery-PNGs sind im Repository und die beiden alten Order-WebPs sind entfernt.
-- PR #55 („Standardize food emojis and add missing produce“) ist laut letzter Prüfung offen und nicht gemergt. Er enthält die Emoji-Korrekturen, Wassermelone 🍉, Kiwi 🥝 und Olive 🫒 sowie zugehörige Tests. Branch: `feat/food-animal-and-herb-emojis`.
-- In diesem PR wurde Limette auf 🍋‍🟩 und Rote Bete auf 🫜 umgestellt. Die Änderungen sind noch nicht automatisch in `main`, solange der PR nicht gemergt ist.
+- PR #55 („Standardize food emojis and add missing produce“) wurde am 2026-10-09 gemergt. Merge-Commit: `9eb78ff8a1bb743a3a8a314b36fc33d432f9ffff`.
+- Enthalten sind die Emoji-Korrekturen, Wassermelone 🍉, Kiwi 🥝 und Olive 🫒 sowie zugehörige Tests. Limette ist 🍋‍🟩, Rote Bete 🫜. Diese Änderungen sind nun in `main`.
 
 ### CI
 
-Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für den letzten geprüften PR-Commit wurden keine Statusprüfungen zurückgegeben; CI daher nicht als erfolgreich markieren, bevor sie erneut konkret geprüft wurde.
+Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren sowohl `Quality Gate` (Analyze und Test) als auch `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) erfolgreich.
 
 Es gibt außerdem `.github/workflows/build-apk.yml`, der manuell oder über einen `v*`-Tag läuft. Dieser Release-Build ist **nicht Teil des gewünschten Standardworkflows** und soll nicht automatisch ausgelöst oder erweitert werden.
 
@@ -83,11 +83,8 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 
 ## Nächster technischer Schritt
 
-1. PR #55 und seinen aktuellen Head prüfen.
-2. Die tatsächlichen GitHub-Actions/CI-Ergebnisse für den aktuellen Commit abrufen. Falls Prüfungen nicht laufen, die Ursache im Workflow bzw. in der PR-Konfiguration untersuchen.
-3. Wenn alle erforderlichen Qualitätsprüfungen erfolgreich sind und GitHub-Regeln es erlauben, PR #55 mergen; andernfalls Blockade konkret beheben.
-4. Nach dem Merge `main` und die Tests erneut verifizieren.
-5. Danach das nächste sinnvolle Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten.
+1. Den aktuellen `main`-Stand nach dem Merge prüfen und bei Bedarf die CI-Läufe für den Merge-Commit verifizieren.
+2. Danach das nächste sinnvolle Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten.
 
 ## Sicherheits-/Arbeitsregeln
 
