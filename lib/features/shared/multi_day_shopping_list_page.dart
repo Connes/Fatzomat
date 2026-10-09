@@ -116,7 +116,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
                             children: _plansFor(_days[i]).map((plan) => ListTile(
                               leading: const Icon(Icons.restaurant_menu_rounded),
                               title: Text(plan.displayTitle),
-                              subtitle: Text(plan.servings == null ? 'Geplant' : '${plan.servings} Portionen'),
+                              subtitle: Text('${plan.servings} Portionen'),
                             )).toList(),
                           ),
                         ),
