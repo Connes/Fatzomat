@@ -11,11 +11,11 @@ class FoodItemImage extends StatelessWidget {
 
   static const Map<String, String> _emoji = {
     // Baking and sweets
-    'Backpulver':'🧁','Kakao':'🍫','Marmelade':'🍓','Mehl':'🌾','Vanillezucker':'🍨','Zucker':'🍚',
+    'Backpulver':'🥄','Kakao':'🍫','Marmelade':'🍯','Mehl':'🌾','Vanillezucker':'🥄','Zucker':'🥄',
     // Fish and seafood
-    'Dorade':'🐠','Forelle':'🐟','Garnelen':'🍤','Heilbutt':'🐡','Hering':'🐟','Kabeljau':'🐠',
-    'Lachs':'🍣','Makrele':'🐟','Pangasius':'🐠','Räucherlachs':'🍣','Rotbarsch':'🐡',
-    'Sardellen':'🐟','Thunfisch':'🐟','Wolfsbarsch':'🐠','Krabben':'🦀','Miesmuscheln':'🦪','Tintenfisch':'🦑',
+    'Dorade':'🐟','Forelle':'🐟','Garnelen':'🍤','Heilbutt':'🐟','Hering':'🐟','Kabeljau':'🐟',
+    'Lachs':'🐟','Makrele':'🐟','Pangasius':'🐟','Räucherlachs':'🐟','Rotbarsch':'🐟',
+    'Sardellen':'🐟','Thunfisch':'🐟','Wolfsbarsch':'🐟','Krabben':'🦀','Miesmuscheln':'🦪','Tintenfisch':'🦑',
     // Meat
     'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hähnchen':'🐔',
     'Hähnchenbrust':'🐔','Hähnchenflügel':'🐔','Hähnchenhackfleisch':'🐔','Hähncheninnenfilet':'🐔',
@@ -24,15 +24,15 @@ class FoodItemImage extends StatelessWidget {
     'Salami':'🐖','Schinken':'🐖','Schweinebraten':'🐖','Schweinefleisch':'🐖',
     'Schweinehackfleisch':'🐖','Spareribs':'🐖','Speck':'🐖','Würstchen':'🐖',
     // Vegetables
-    'Artischocke':'🌿','Aubergine':'🍆','Austernpilze':'🍄','Avocado':'🥑','Blumenkohl':'🥦',
-    'Brokkoli':'🥦','Brunnenkresse':'🌿','Champignons':'🍄','Cherrytomaten':'🍅','Chicorée':'🥬',
-    'Chinakohl':'🥬','Endivie':'🥬','Erbsen':'🫛','Feldsalat':'🥬','Fenchel':'🌿','Frische Chilischote':'🌶️',
+    'Artischocke':'🥬','Aubergine':'🍆','Austernpilze':'🍄','Avocado':'🥑','Blumenkohl':'🥦',
+    'Brokkoli':'🥦','Brunnenkresse':'🥬','Champignons':'🍄','Cherrytomaten':'🍅','Chicorée':'🥬',
+    'Chinakohl':'🥬','Endivie':'🥬','Erbsen':'🫛','Feldsalat':'🥬','Fenchel':'🥬','Frische Chilischote':'🌶️',
     'Frühlingszwiebel':'🧅','Grüne Bohnen':'🫛','Gurke':'🥒','Karotte':'🥕','Karotten':'🥕',
     'Kartoffel':'🥔','Kartoffeln':'🥔','Knoblauch':'🧄','Knollensellerie':'🥬','Kohlrabi':'🥬',
     'Kürbis':'🎃','Lauch':'🥬','Mais':'🌽','Mangold':'🥬','Okra':'🥬','Pak Choi':'🥬','Paprika':'🫑',
-    'Pastinake':'🥕','Petersilienwurzel':'🥕','Radieschen':'🔴','Rettich':'🥬','Romanesco':'🥦',
+    'Pastinake':'🥕','Petersilienwurzel':'🥕','Radieschen':'🫜','Rettich':'🫜','Romanesco':'🥦',
     'Rosenkohl':'🥬','Rote Bete':'🫜','Schalotte':'🧅','Shiitake-Pilze':'🍄','Spinat':'🥬','Spitzkohl':'🥬',
-    'Stangensellerie':'🥬','Steckrübe':'🥔','Süßkartoffel':'🍠','Süßkartoffeln':'🍠','Tomate':'🍅',
+    'Stangensellerie':'🥬','Steckrübe':'🫜','Süßkartoffel':'🍠','Süßkartoffeln':'🍠','Tomate':'🍅',
     'Tomaten':'🍅','Weißkohl':'🥬','Zucchini':'🥒','Zuckerschoten':'🫛','Zwiebel':'🧅','Zwiebeln':'🧅',
     // Grains and sides
     'Brot':'🍞','Bulgur':'🌾','Couscous':'🍚','Gnocchi':'🥔','Haferflocken':'🥣','Nudeln':'🍝',
