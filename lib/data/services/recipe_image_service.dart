@@ -59,11 +59,10 @@ class RecipeImageService {
       ),
     );
 
-    final signedUrl = await AuthSessionService.runWithRefresh(
-      client: client,
-      action: () => client.storage.from(bucket).createSignedUrl(path, signedUrlLifetimeSeconds),
-    );
-    return RecipeImageUpload(path: path, signedUrl: signedUrl);
+    // Do not sign the object yet: the bucket's SELECT policy permits signing
+    // only after recipes.image_path references this path. The repository links
+    // it first, then resolves a signed URL when loading the updated recipe.
+    return RecipeImageUpload(path: path);
   }
 
   Future<String?> resolveSignedUrl(String path) async {
@@ -106,7 +105,6 @@ class RecipeImageService {
 
 class RecipeImageUpload {
   final String path;
-  final String signedUrl;
 
-  const RecipeImageUpload({required this.path, required this.signedUrl});
+  const RecipeImageUpload({required this.path});
 }
