@@ -8,6 +8,7 @@ import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import 'multi_day_shopping_list_page.dart';
+import 'today_page.dart';
 import '../recipes/saved_recipes_page.dart';
 
 class ShoppingListPage extends StatefulWidget {
