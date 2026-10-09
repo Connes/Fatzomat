@@ -249,10 +249,21 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
     final isPasta = name.contains('nudel') || name.contains('pasta');
 
     return switch (widget.category) {
-      // Beilage is intentionally narrow: only the three requested food groups.
-      IngredientCategory.side => isRice || isPasta || isPotato,
-      // The database category is authoritative for vegetables; potatoes are sides.
-      IngredientCategory.vegetables => category == 'Gemüse' && !isPotato,
+      // Include the side dishes already present in the shared food catalog.
+      IngredientCategory.side =>
+          isRice ||
+          isPasta ||
+          isPotato ||
+          (category == 'Getreide & Beilagen' &&
+              !_containsAny(name, const ['haferflocken', 'semmelbrösel'])) ||
+          category == 'Hülsenfrüchte' ||
+          _containsAny(name, const [
+            'couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette',
+            'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse',
+          ]),
+      // The catalog category is authoritative; potatoes are sides.
+      IngredientCategory.vegetables =>
+          category == 'Gemüse' && !isPotato && !name.contains('süßkartoffel'),
       // Favorites are independent of the food category.
       IngredientCategory.favorites => preferences[food.id] == 'like',
     };
