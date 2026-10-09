@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fatzomat/features/foods/food_item_image.dart';
+import 'package:food_app_mvp/features/foods/food_item_image.dart';
 
 void main() {
   test('catalog foods have stable emoji illustrations', () {
