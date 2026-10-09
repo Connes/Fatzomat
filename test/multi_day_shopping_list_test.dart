@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:food_app_mvp/data/models/shopping_item.dart';
-import 'package:fatzomat/data/services/shopping_list_aggregator.dart';
+import 'package:food_app_mvp/data/services/shopping_list_aggregator.dart';
 
 void main() {
   test('shopping item retains its source plan ID for day filtering', () {
