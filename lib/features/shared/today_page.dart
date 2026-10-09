@@ -52,6 +52,11 @@ class _TodayPageState extends State<TodayPage> {
   DecisionShare? _pendingDecisionShare;
   bool _decisionShareActionInFlight = false;
 
+  bool get _isSelectedDateToday {
+    final now = DateTime.now();
+    return _selectedDate.year == now.year && _selectedDate.month == now.month && _selectedDate.day == now.day;
+  }
+
   CollaborationRepository get _collaborationRepository =>
       _collaboration ??= CollaborationRepository();
 
@@ -86,12 +91,11 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> load() async {
-    await controller.load();
     final selectedPlan = await repo.todayPlan(date: _selectedDate);
     DecisionShare? pendingShare;
     List<TodayPlan> completed = const [];
     try {
-      completed = await repo.completedTodayPlans();
+      if (_isSelectedDateToday) completed = await repo.completedTodayPlans();
     } catch (_) {
       // Completed history must not block the current decision card.
     }
@@ -195,7 +199,7 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> _openMode(FoodMode mode) async {
     final selected = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => FoodModePage(mode: mode)),
+      MaterialPageRoute(builder: (_) => FoodModePage(mode: mode, planDate: _selectedDate)),
     );
     if (selected == true && mounted) await load();
   }
@@ -437,6 +441,7 @@ class _TodayPageState extends State<TodayPage> {
                           : _TodayResultCard(
                               plan: plan!,
                               onCancel: removeTodayPlan,
+                              canMarkCooked: _isSelectedDateToday,
                               onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
                               onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'
                                   ? () {
@@ -477,7 +482,7 @@ class _TodayPageState extends State<TodayPage> {
                                           );
                                         }
                                       : null,
-                              onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
+                              onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked' && _isSelectedDateToday
                                   ? () async {
                                       await Navigator.push(
                                         context,
@@ -762,6 +767,7 @@ class _TodayResultCard extends StatelessWidget {
   final VoidCallback? onOpenOrder;
   final VoidCallback onCancel;
   final VoidCallback? onShare;
+  final bool canMarkCooked;
 
   const _TodayResultCard({
     required this.plan,
@@ -769,6 +775,7 @@ class _TodayResultCard extends StatelessWidget {
     required this.onOpenOrder,
     required this.onCancel,
     required this.onShare,
+    this.canMarkCooked = true,
   });
 
   @override
