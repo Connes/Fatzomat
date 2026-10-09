@@ -117,6 +117,27 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     );
   }
 
+  void _openPersonalSingleDay() {
+    final planId = personalPlanId;
+    if (planId == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ShoppingPage(
+          planId: planId,
+          recipeName: personalRecipeName,
+          servings: personalServings,
+          shared: false,
+          onCompleted: () {
+            if (!mounted) return;
+            Navigator.pop(context);
+            load();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -161,8 +182,8 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           text: 'Wählt zuerst ein gemeinsames Rezept für heute. Danach steht dieselbe Einkaufsliste beiden verbundenen Personen zur Verfügung.',
           actionLabel: 'Gemeinsames Rezept auswählen',
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedRecipesPage())),
-          secondaryLabel: 'Persönliche Mehrtagesliste öffnen',
-          onSecondaryPressed: _openPersonal,
+          secondaryLabel: personalPlanId != null ? 'Persönliche Liste für heute öffnen' : 'Persönliche Mehrtagesliste öffnen',
+          onSecondaryPressed: personalPlanId != null ? _openPersonalSingleDay : _openPersonal,
         ),
       );
     }
