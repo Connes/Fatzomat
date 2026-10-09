@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -5,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
+import '../../core/services/location_service.dart';
 
 class DeliveryServicesPage extends StatelessWidget {
   final String? orderQuery;
@@ -49,7 +53,18 @@ class DeliveryServicesPage extends StatelessWidget {
   Future<void> _openService(BuildContext context, _DeliveryService service) async {
     final query = orderQuery?.trim();
     if (query != null && query.isNotEmpty) {
-      final searchUrl = service.searchUrl(query);
+      var searchUrl = service.searchUrl(query);
+      if (service.name == 'Lieferando') {
+        final postalCode = await _currentPostalCode();
+        if (postalCode != null) {
+          searchUrl = deliveryServiceSearchUrl(
+            service.name,
+            query,
+            postalCode: postalCode,
+            fallbackUrl: service.url,
+          );
+        }
+      }
       final opened = await launchUrl(
         Uri.parse(searchUrl),
         mode: LaunchMode.externalApplication,
@@ -204,23 +219,7 @@ class _DeliveryService {
   final bool logoIsSvg;
   final String? appUrl;
 
-  String searchUrl(String query) {
-    switch (name) {
-      case 'Lieferando':
-        return Uri.https('www.lieferando.de', '/suche', {'q': query}).toString();
-      case 'Uber Eats':
-        return Uri.https('www.ubereats.com', '/de/search', {
-          'q': query,
-          'searchType': 'GLOBAL_SEARCH',
-        }).toString();
-      case 'Wolt':
-        return Uri.https('wolt.com', '/de/deu/search', {'q': query}).toString();
-      case 'Bolt':
-        return Uri.https('food.bolt.eu', '/search', {'query': query}).toString();
-      default:
-        return url;
-    }
-  }
+  String searchUrl(String query) => deliveryServiceSearchUrl(name, query, fallbackUrl: url);
 
   const _DeliveryService({
     required this.name,
@@ -230,4 +229,72 @@ class _DeliveryService {
     this.logoIsSvg = false,
     this.appUrl,
   });
+}
+
+Future<String?> _currentPostalCode() async {
+  try {
+    final location = await const DeviceLocationService().currentLocation();
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
+    try {
+      final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
+        'format': 'jsonv2',
+        'lat': location.latitude.toString(),
+        'lon': location.longitude.toString(),
+        'zoom': '18',
+        'addressdetails': '1',
+      });
+      final request = await client.getUrl(uri).timeout(const Duration(seconds: 5));
+      request.headers.set(HttpHeaders.userAgentHeader, 'Fatzomat/1.0 (delivery location lookup)');
+      final response = await request.close().timeout(const Duration(seconds: 5));
+      if (response.statusCode != HttpStatus.ok) return null;
+      final body = await response.transform(utf8.decoder).join().timeout(const Duration(seconds: 5));
+      final decoded = jsonDecode(body);
+      if (decoded is! Map) return null;
+      final address = decoded['address'];
+      if (address is! Map) return null;
+      final postalCode = address['postcode']?.toString().trim();
+      return postalCode != null && RegExp(r'^\d{5}$').hasMatch(postalCode)
+          ? postalCode
+          : null;
+    } finally {
+      client.close(force: true);
+    }
+  } catch (_) {
+    // Location lookup is best-effort; category search still works without it.
+    return null;
+  }
+}
+
+/// Builds the category/search destination opened by a delivery-service card.
+/// A postcode lets Lieferando open its location-scoped category results.
+String deliveryServiceSearchUrl(
+  String serviceName,
+  String query, {
+  String? postalCode,
+  String fallbackUrl = '',
+}) {
+  final normalizedQuery = query.trim().toLowerCase();
+  switch (serviceName) {
+    case 'Lieferando':
+      if (postalCode != null &&
+          RegExp(r'^\d{5}$').hasMatch(postalCode) &&
+          normalizedQuery == 'pizza') {
+        return Uri.https('www.lieferando.de', '/lieferservice/pizza/$postalCode').toString();
+      }
+      if (normalizedQuery == 'pizza') {
+        return 'https://www.lieferando.de/pizza-bestellen';
+      }
+      return Uri.https('www.lieferando.de', '/suche', {'q': query.trim()}).toString();
+    case 'Uber Eats':
+      return Uri.https('www.ubereats.com', '/de/search', {
+        'q': query.trim(),
+        'searchType': 'GLOBAL_SEARCH',
+      }).toString();
+    case 'Wolt':
+      return Uri.https('wolt.com', '/de/deu/search', {'q': query.trim()}).toString();
+    case 'Bolt':
+      return Uri.https('food.bolt.eu', '/search', {'query': query.trim()}).toString();
+    default:
+      return fallbackUrl;
+  }
 }
