@@ -23,6 +23,74 @@ alter table public.recipes
   add constraint recipes_created_by_fkey
   foreign key (created_by) references auth.users(id) on delete set null;
 
+-- Some deployed installations already have the fingerprint function but not
+-- the v2 fingerprint column. Make this migration safe for both schema shapes.
+alter table public.recipes
+  add column if not exists recipe_fingerprint text;
+create index if not exists idx_recipes_connection_fingerprint
+  on public.recipes(recipe_fingerprint, created_by);
+
+create or replace function public.recipe_fingerprint(p_recipe jsonb, p_ingredients jsonb)
+returns text
+language sql
+immutable
+as $
+  select md5(
+    lower(regexp_replace(trim(coalesce(p_recipe->>'name','')), '\\s+', ' ', 'g'))
+    || '|' || coalesce((
+      select string_agg(
+        lower(regexp_replace(trim(coalesce(item->>'name','')), '\\s+', ' ', 'g'))
+        || ':'
+        || coalesce(nullif(item->>'amount','')::numeric, nullif(item->>'quantity','')::numeric, 1)::text
+        || ':'
+        || lower(trim(coalesce(item->>'unit',''))),
+        '|' order by
+          lower(regexp_replace(trim(coalesce(item->>'name','')), '\\s+', ' ', 'g')),
+          coalesce(nullif(item->>'amount','')::numeric, nullif(item->>'quantity','')::numeric, 1),
+          lower(trim(coalesce(item->>'unit','')))
+      )
+      from jsonb_array_elements(coalesce(p_ingredients,'[]'::jsonb)) as values(item)
+    ), '')
+  );
+$;
+
+revoke all on function public.recipe_fingerprint(jsonb,jsonb) from public, anon;
+grant execute on function public.recipe_fingerprint(jsonb,jsonb) to authenticated;
+
+-- Backfill fingerprints for recipes already in the collection so duplicate
+-- detection also works against historical data.
+update public.recipes r
+set recipe_fingerprint = public.recipe_fingerprint(
+  jsonb_build_object('name', r.name),
+  coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'name', ri.name,
+      'amount', ri.quantity,
+      'unit', ri.unit
+    ) order by ri.name, ri.quantity, ri.unit)
+    from public.recipe_ingredients ri
+    where ri.recipe_id = r.id
+  ), '[]'::jsonb)
+)
+where r.recipe_fingerprint is null;
+
+
+update public.recipes r
+set recipe_fingerprint = public.recipe_fingerprint(
+  jsonb_build_object('name', r.name),
+  coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'name', ri.name,
+      'amount', ri.quantity,
+      'unit', ri.unit
+    ) order by ri.name, ri.quantity, ri.unit)
+    from public.recipe_ingredients ri
+    where ri.recipe_id = r.id
+  ), '[]'::jsonb)
+)
+where r.recipe_fingerprint is null;
+
+
 -- The library and ingredients are readable by every authenticated user.
 drop policy if exists "recipes connection collection read" on public.recipes;
 drop policy if exists "recipes owner or shared" on public.recipes;
