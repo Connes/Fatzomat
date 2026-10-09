@@ -17,12 +17,12 @@ class FoodItemImage extends StatelessWidget {
     'Lachs':'🍣','Makrele':'🐟','Pangasius':'🐠','Räucherlachs':'🍣','Rotbarsch':'🐡',
     'Sardellen':'🐟','Thunfisch':'🐟','Wolfsbarsch':'🐠','Krabben':'🦀','Miesmuscheln':'🦪','Tintenfisch':'🦑',
     // Meat
-    'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hackfleisch':'🥩','Hähnchen':'🍗',
-    'Hähnchenbrust':'🍗','Hähnchenflügel':'🍗','Hähnchenhackfleisch':'🍗','Hähncheninnenfilet':'🍗',
-    'Kalbfleisch':'🥩','Kassler':'🥓','Lammhackfleisch':'🥩','Lammkotelett':'🍖','Putenbrust':'🍗',
-    'Rinderbraten':'🥩','Rinderfilet':'🥩','Rinderhackfleisch':'🥩','Rinderrouladen':'🥩','Rindersteak':'🥩',
-    'Salami':'🥓','Schinken':'🥓','Schweinebraten':'🍖','Schweinefleisch':'🥩',
-    'Schweinehackfleisch':'🥩','Spareribs':'🍖','Speck':'🥓','Würstchen':'🌭',
+    'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hackfleisch':'🥩','Hähnchen':'🐔',
+    'Hähnchenbrust':'🐔','Hähnchenflügel':'🐔','Hähnchenhackfleisch':'🐔','Hähncheninnenfilet':'🐔',
+    'Kalbfleisch':'🐄','Kassler':'🐖','Lammhackfleisch':'🐑','Lammkotelett':'🐑','Putenbrust':'🐔',
+    'Rinderbraten':'🐄','Rinderfilet':'🐄','Rinderhackfleisch':'🐄','Rinderrouladen':'🐄','Rindersteak':'🐄',
+    'Salami':'🐖','Schinken':'🐖','Schweinebraten':'🐖','Schweinefleisch':'🐖',
+    'Schweinehackfleisch':'🐖','Spareribs':'🐖','Speck':'🐖','Würstchen':'🐖',
     // Vegetables
     'Artischocke':'🌿','Aubergine':'🍆','Austernpilze':'🍄','Avocado':'🥑','Blumenkohl':'🥦',
     'Brokkoli':'🥦','Brunnenkresse':'🌿','Champignons':'🍄','Cherrytomaten':'🍅','Chicorée':'🥬',
@@ -38,12 +38,12 @@ class FoodItemImage extends StatelessWidget {
     'Brot':'🍞','Bulgur':'🌾','Couscous':'🍚','Gnocchi':'🥔','Haferflocken':'🥣','Nudeln':'🍝',
     'Penne':'🍝','Quinoa':'🌾','Reis':'🍚','Spaghetti':'🍝','Toast':'🍞','Tortillas':'🌯',
     // Herbs and spices
-    'Basilikum':'🌿','Chili':'🌶️','Currypulver':'🟡','Dill':'🌿','Estragon':'🌿','Fenchelsamen':'🌱',
-    'Garam Masala':'🟤','Geräuchertes Paprikapulver':'🟥','Italienische Kräuter':'🌿','Kardamom':'🟢',
-    'Koriander':'🌿','Koriandersamen':'🌱','Kräuter der Provence':'🌿','Liebstöckel':'🌿',
-    'Lorbeerblatt':'🍃','Majoran':'🌿','Minze':'🌿','Nelken':'🌰','Oregano':'🌿','Paprikapulver':'🟥',
-    'Petersilie':'🌿','Pfeffer':'⚫','Rosmarin':'🌿','Salbei':'🌿','Salz':'🧂','Schnittlauch':'🌿',
-    'Senfkörner':'🟡','Sesam':'🌾','Thymian':'🌿','Zimt':'🪵','Zitronengras':'🌿','Zitronenmelisse':'🌿',
+    'Basilikum':'🌿','Chili':'🌿','Currypulver':'🌿','Dill':'🌿','Estragon':'🌿','Fenchelsamen':'🌿',
+    'Garam Masala':'🌿','Geräuchertes Paprikapulver':'🌿','Italienische Kräuter':'🌿','Kardamom':'🌿',
+    'Koriander':'🌿','Koriandersamen':'🌿','Kräuter der Provence':'🌿','Liebstöckel':'🌿',
+    'Lorbeerblatt':'🌿','Majoran':'🌿','Minze':'🌿','Nelken':'🌿','Oregano':'🌿','Paprikapulver':'🌿',
+    'Petersilie':'🌿','Pfeffer':'🌿','Rosmarin':'🌿','Salbei':'🌿','Salz':'🌿','Schnittlauch':'🌿',
+    'Senfkörner':'🌿','Sesam':'🌿','Thymian':'🌿','Zimt':'🌿','Zitronengras':'🌿','Zitronenmelisse':'🌿',
     // Legumes
     'Kichererbsen':'🫘','Kidneybohnen':'🫘','Linsen':'🫘','Weiße Bohnen':'🫘',
     // Dairy and eggs
