@@ -42,6 +42,7 @@ class _TodayPageState extends State<TodayPage> {
   final recipeRepo = RecipeRepository();
   late final TodayController controller;
   TodayPlan? plan;
+  List<TodayPlan> completedPlans = const [];
   bool loading = true;
   Object? loadError;
   RealtimeChannel? channel;
@@ -86,6 +87,12 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> load() async {
     await controller.load();
     DecisionShare? pendingShare;
+    List<TodayPlan> completed = const [];
+    try {
+      completed = await repo.completedTodayPlans();
+    } catch (_) {
+      // Completed history must not block the current decision card.
+    }
     try {
       pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
     } catch (_) {
@@ -95,6 +102,7 @@ class _TodayPageState extends State<TodayPage> {
     if (!mounted) return;
     setState(() {
       plan = controller.data;
+      completedPlans = completed;
       loading = controller.loading;
       loadError = controller.error;
       _pendingDecisionShare = pendingShare;
@@ -458,6 +466,10 @@ class _TodayPageState extends State<TodayPage> {
                                   : null,
                             ),
                     ),
+                    if (completedPlans.isNotEmpty) ...[
+                      const SizedBox(height: 22),
+                      _CompletedTodayDecisions(plans: completedPlans),
+                    ],
                   ],
                 ),
               ),
@@ -1559,6 +1571,46 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
         FilledButton(onPressed: submit, child: Text(editing ? 'Speichern' : 'Hinzufügen')),
       ],
+    );
+  }
+}
+class _CompletedTodayDecisions extends StatelessWidget {
+  final List<TodayPlan> plans;
+  const _CompletedTodayDecisions({required this.plans});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 560),
+      child: AppSurface(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
+              const SizedBox(width: 8),
+              Expanded(child: Text('HEUTE BEREITS ERLEDIGT',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: AppDesign.primaryDark, fontWeight: FontWeight.w800, letterSpacing: .7,
+                ))),
+              Text('${plans.length}', style: theme.textTheme.labelLarge),
+            ]),
+            const SizedBox(height: 8),
+            ...plans.map((item) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              leading: const Icon(Icons.done_rounded, color: AppDesign.secondaryText),
+              title: Text(item.displayTitle, style: theme.textTheme.bodyMedium?.copyWith(
+                decoration: TextDecoration.lineThrough,
+                color: AppDesign.secondaryText,
+              )),
+              trailing: const Icon(Icons.check_circle_outline_rounded, size: 18, color: AppDesign.secondaryText),
+            )),
+          ],
+        ),
+      ),
     );
   }
 }
