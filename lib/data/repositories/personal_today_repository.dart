@@ -197,6 +197,40 @@ class PersonalTodayRepository {
     return maps.map(TodayPlan.fromMap).toList(growable: false);
   }
 
+  /// Returns the planned decisions for a specific local calendar date.
+  /// Kept separate from [todayPlan] because the database supports multiple
+  /// decisions for a date and shopping must include every planned recipe.
+  Future<List<TodayPlan>> plannedPlansForDate(DateTime date) async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return const [];
+    final rows = await client
+        .from('personal_today_plans')
+        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
+        .eq('user_id', userId)
+        .eq('plan_date', _dateOnly(date))
+        .eq('status', 'planned')
+        .order('created_at', ascending: true);
+    final maps = rows.map((row) => Map<String, dynamic>.from(row)).toList();
+    for (final map in maps) {
+      await _resolveNestedRecipeImage(map);
+    }
+    return maps.map(TodayPlan.fromMap).toList(growable: false);
+  }
+
+  /// Loads persisted items for multiple selected day plans without changing
+  /// their IDs or checked state. Aggregation is deliberately a presentation
+  /// concern, so each source row can still be checked independently.
+  Future<List<ShoppingItem>> shoppingItemsForPlans(Iterable<String> planIds) async {
+    final ids = planIds.toSet().where((id) => id.trim().isNotEmpty).toList();
+    if (ids.isEmpty) return const [];
+    final rows = await client
+        .from('shopping_items')
+        .select('id,name,quantity,unit,checked,checked_by,food_id,source,personal_today_plan_id,foods(category)')
+        .inFilter('personal_today_plan_id', ids)
+        .order('name');
+    return rows.map((row) => ShoppingItem.fromMap(Map<String, dynamic>.from(row))).toList(growable: false);
+  }
+
   Future<List<PersonalHistoryEntry>> history({int limit = 100}) async {
     final userId = client.auth.currentUser?.id;
     if (userId == null) throw const AuthenticationException();
