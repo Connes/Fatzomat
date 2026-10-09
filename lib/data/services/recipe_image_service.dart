@@ -30,7 +30,10 @@ class RecipeImageService {
 
   Future<RecipeImageUpload> upload({required String recipeId, required XFile file}) async {
     final extension = _extension(file.name, file.mimeType);
-    final path = '$recipeId/cover.$extension';
+    // Never overwrite a storage object in place. A fresh path avoids the
+    // Storage UpsertObject RLS path, and the repository removes the old object
+    // after the recipe has been updated successfully.
+    final path = '$recipeId/cover-${DateTime.now().microsecondsSinceEpoch}.$extension';
     final bytes = await file.readAsBytes();
     if (bytes.isEmpty) {
       throw const FormatException('Das ausgewählte Bild ist leer. Bitte wähle ein anderes Bild.');
@@ -51,7 +54,7 @@ class RecipeImageService {
           // Some platforms report the source image's MIME type even though
           // image_picker has re-encoded the picked image.
           contentType: _mimeType(extension),
-          upsert: true,
+          upsert: false,
         ),
       ),
     );
