@@ -257,8 +257,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rezept aus deiner Sammlung entfernen?'),
-        content: const Text('Das Rezept wird aus deiner Sammlung entfernt. Ein gespeichertes Rezept der verbundenen Person oder ein aktiver Plan schützt das Rezept vor dem endgültigen Löschen.'),
+        title: const Text('Rezept aus der gemeinsamen Bibliothek löschen?'),
+        content: const Text('Bei bestehender Connection erhält die verbundene Person eine Löschanfrage. Das Rezept wird erst nach ausdrücklicher Zustimmung gelöscht.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Abbrechen')),
           FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Löschen')),
@@ -274,7 +274,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           setState(() => working = false);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Das Rezept bleibt erhalten, weil es noch gespeichert oder für heute eingeplant ist.'),
+              content: Text('Die Löschanfrage wurde gesendet. Das Rezept bleibt bis zur ausdrücklichen Zustimmung erhalten.'),
             ),
           );
         }
