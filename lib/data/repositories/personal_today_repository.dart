@@ -21,7 +21,8 @@ class PersonalTodayRepository {
       : _client = client,
         _offlineCache = offlineCache;
 
-  Future<TodayPlan?> todayPlan() async {
+  Future<TodayPlan?> todayPlan({DateTime? date}) async {
+    final planDate = _dateOnly(date ?? DateTime.now());
     final userId = client.auth.currentUser?.id;
     if (userId == null) {
       final cached = await offlineCache.readToday();
@@ -35,7 +36,7 @@ class PersonalTodayRepository {
           .from('personal_today_plans')
           .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
           .eq('user_id', userId)
-          .eq('plan_date', _dateOnly(DateTime.now()))
+          .eq('plan_date', planDate)
           .eq('status', 'planned')
           .order('created_at', ascending: false)
           .limit(1);
@@ -71,10 +72,12 @@ class PersonalTodayRepository {
     }
   }
 
-  Future<String> selectRecipeForToday(String recipeId, {int? servings}) async {
+  Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
-    final result = await client.rpc('set_personal_today_plan', params: {
+    final result = await client.rpc('set_personal_plan_for_date', params: {
+      'p_plan_date': _dateOnly(date ?? DateTime.now()),
+      'p_decision_type': 'recipe',
       'p_recipe_id': recipeId,
       'p_servings': servings,
     });
@@ -93,6 +96,7 @@ class PersonalTodayRepository {
     required String value,
     String? recipeId,
     int? servings,
+    DateTime? date,
   }) async {
     final normalizedType = type.trim();
     if (!{'recipe', 'order', 'dine_out', 'surprise'}.contains(normalizedType)) {
@@ -100,7 +104,7 @@ class PersonalTodayRepository {
     }
     if (normalizedType == 'recipe') {
       if (recipeId == null || recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
-      return selectRecipeForToday(recipeId, servings: servings);
+      return selectRecipeForToday(recipeId, servings: servings, date: date);
     }
     if (value.trim().isEmpty) throw StateError('Die Auswahl darf nicht leer sein.');
     final localDecision = {
@@ -125,7 +129,8 @@ class PersonalTodayRepository {
 
     if (client.auth.currentUser == null) throw const AuthenticationException();
     try {
-      final result = await client.rpc('set_personal_today_decision', params: {
+      final result = await client.rpc('set_personal_plan_for_date', params: {
+        'p_plan_date': _dateOnly(date ?? DateTime.now()),
         'p_decision_type': normalizedType,
         'p_decision_value': value.trim(),
       });
