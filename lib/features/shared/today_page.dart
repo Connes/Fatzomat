@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -37,12 +39,14 @@ class TodayPage extends StatefulWidget {
   State<TodayPage> createState() => _TodayPageState();
 }
 
-class _TodayPageState extends State<TodayPage> {
+class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   final repo = PersonalTodayRepository();
   final recipeRepo = RecipeRepository();
   late final TodayController controller;
   TodayPlan? plan;
   DateTime _selectedDate = DateTime.now();
+  DateTime _lastObservedDay = DateTime.now();
+  Timer? _dayBoundaryTimer;
   List<TodayPlan> completedPlans = const [];
   bool loading = true;
   int _loadGeneration = 0;
@@ -64,10 +68,36 @@ class _TodayPageState extends State<TodayPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _lastObservedDay = _dateOnly(DateTime.now());
+    _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     controller = TodayController();
     load();
     RecipeCollectionEvents.revision.addListener(_onRecipeCollectionChanged);
     _subscribeRealtime();
+  }
+
+  DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  void _checkDayBoundary() {
+    final nowDay = _dateOnly(DateTime.now());
+    if (nowDay == _lastObservedDay) return;
+    final previousDay = _lastObservedDay;
+    _lastObservedDay = nowDay;
+    // Follow the calendar only when the user was viewing the previous Today.
+    // A future/past date they deliberately selected stays selected.
+    if (_dateOnly(_selectedDate) == previousDay && mounted) {
+      setState(() {
+        _selectedDate = nowDay;
+        loading = true;
+      });
+      load();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _checkDayBoundary();
   }
 
   void _onRecipeCollectionChanged() {
@@ -358,6 +388,8 @@ class _TodayPageState extends State<TodayPage> {
 
   @override
   void dispose() {
+    _dayBoundaryTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     if (channel != null) {
       try {
