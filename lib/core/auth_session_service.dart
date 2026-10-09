@@ -4,11 +4,13 @@ import 'app_exception.dart';
 
 /// Keeps the client session usable before authenticated database/storage work.
 ///
-/// supabase_flutter restores a persisted session during initialization, but the
-/// restored access token may already be expired. In that case currentSession
-/// can be non-null while the next API request still receives 401.
+/// Several parts of the app can issue requests while the access token expires.
+/// Refresh tokens are single-use, so parallel refresh calls can invalidate one
+/// another. Serialize refreshes and reuse the refreshed session.
 class AuthSessionService {
   const AuthSessionService._();
+
+  static Future<Session>? _refreshInFlight;
 
   static Future<Session> ensureValidSession({SupabaseClient? client}) async {
     final supabase = client ?? Supabase.instance.client;
@@ -28,18 +30,67 @@ class AuthSessionService {
     }
 
     if (session.isExpired) {
+      session = await _refreshSession(supabase);
+    }
+
+    if (session.accessToken.trim().isEmpty || session.isExpired) {
+      throw const AuthenticationException(
+        'Die Sitzung konnte nicht erneuert werden. Bitte prüfe deine Internetverbindung und versuche es erneut.',
+      );
+    }
+    return session;
+  }
+
+  static Future<Session> _refreshSession(SupabaseClient client) async {
+    final inFlight = _refreshInFlight;
+    if (inFlight != null) {
       try {
-        final response = await supabase.auth.refreshSession();
-        session = response.session ?? supabase.auth.currentSession;
-      } on AuthException catch (error) {
-        throw AuthenticationException('Die Sitzung konnte nicht erneuert werden.', error);
+        final refreshed = await inFlight;
+        final current = client.auth.currentSession;
+        if (current != null && !current.isExpired && current.accessToken.isNotEmpty) {
+          return current;
+        }
+        if (!refreshed.isExpired && refreshed.accessToken.isNotEmpty) return refreshed;
+      } catch (_) {
+        // The request that started the refresh reports the original failure.
+        // A later caller gets one fresh attempt if no valid session remains.
       }
     }
 
-    if (session == null || session.accessToken.trim().isEmpty || session.isExpired) {
-      throw const AuthenticationException('Die Sitzung ist abgelaufen. Bitte App neu starten.');
+    final current = client.auth.currentSession;
+    if (current != null && !current.isExpired && current.accessToken.isNotEmpty) {
+      return current;
     }
-    return session;
+
+    final future = _performRefresh(client);
+    _refreshInFlight = future;
+    try {
+      return await future;
+    } finally {
+      if (identical(_refreshInFlight, future)) _refreshInFlight = null;
+    }
+  }
+
+  static Future<Session> _performRefresh(SupabaseClient client) async {
+    try {
+      final response = await client.auth.refreshSession();
+      final session = response.session ?? client.auth.currentSession;
+      if (session == null || session.accessToken.trim().isEmpty || session.isExpired) {
+        throw const AuthenticationException(
+          'Die Sitzung konnte nicht erneuert werden. Bitte prüfe deine Internetverbindung und versuche es erneut.',
+        );
+      }
+      return session;
+    } on AuthException catch (error) {
+      final current = client.auth.currentSession;
+      if (current != null && !current.isExpired && current.accessToken.trim().isNotEmpty) {
+        return current;
+      }
+      throw AuthenticationException(
+        'Die Sitzung konnte nicht erneuert werden. Bitte prüfe deine Internetverbindung und versuche es erneut.',
+        error,
+      );
+    }
   }
 
   static Future<T> runWithRefresh<T>({
@@ -51,11 +102,7 @@ class AuthSessionService {
       return await action();
     } catch (error) {
       if (!_looksLikeAuthenticationFailure(error)) rethrow;
-      final response = await client.auth.refreshSession();
-      final session = response.session ?? client.auth.currentSession;
-      if (session == null || session.accessToken.trim().isEmpty || session.isExpired) {
-        throw AuthenticationException('Die Sitzung konnte nicht erneuert werden.', error);
-      }
+      await _refreshSession(client);
       return action();
     }
   }

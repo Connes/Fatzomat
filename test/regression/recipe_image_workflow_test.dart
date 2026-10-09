@@ -17,7 +17,6 @@ void main() {
     expect(repo, contains('removeRecipeImage'));
   });
 
-
   test('recipe image upload refreshes an expired Supabase session', () {
     final auth = File('lib/core/auth_session_service.dart').readAsStringSync();
     final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
@@ -29,6 +28,18 @@ void main() {
     expect(service, contains('AuthSessionService.runWithRefresh'));
     expect(main, contains('AuthSessionService.ensureValidSession'));
     expect(main, isNot(contains('final auth = Supabase.instance.client.auth;')));
+  });
+
+  test('recipe image upload uses allow-listed MIME types and stays below bucket size limit', () {
+    final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
+
+    expect(service, contains('static const maxUploadBytes = 10 * 1024 * 1024;'));
+    expect(service, contains('imageQuality: 80'));
+    expect(service, contains('maxWidth: 1600'));
+    expect(service, contains('maxHeight: 1600'));
+    expect(service, contains('contentType: _mimeType(extension)'));
+    expect(service, contains('if (bytes.length > maxUploadBytes)'));
+    expect(service, isNot(contains('contentType: file.mimeType ?? _mimeType(extension)')));
   });
 
   test('recipe JSON stays separate from the storage image path', () {

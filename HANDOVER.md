@@ -54,7 +54,7 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-09 (nach Merge von PR #56)
+Stand dieses Dokuments: 2026-10-09 (Rezeptbild-Upload wird untersucht)
 
 ### GitHub
 
@@ -66,7 +66,7 @@ Stand dieses Dokuments: 2026-10-09 (nach Merge von PR #56)
 
 ### CI
 
-Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren beide Workflows erfolgreich. Für PR #56 waren `Quality Gate` (Analyze und Test) sowie `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) auf dem korrigierten PR-Head erfolgreich. Die nach dem Merge gestarteten Workflows für den Merge-Commit laufen bei der letzten Prüfung noch.
+Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren beide Workflows erfolgreich. Für PR #56 waren `Quality Gate` (Analyze und Test) sowie `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) auf dem korrigierten PR-Head erfolgreich. Die nach dem Merge gestarteten Workflows für Merge-Commit `1007547a8a52f242f058f486529d7b9ce67801d4` sowie den Handover-Commit `dde2e4e99a4f8494b3dd99c2e19316316e854ac7` sind inzwischen erfolgreich.
 
 Es gibt außerdem `.github/workflows/build-apk.yml`, der manuell oder über einen `v*`-Tag läuft. Dieser Release-Build ist **nicht Teil des gewünschten Standardworkflows** und soll nicht automatisch ausgelöst oder erweitert werden.
 
@@ -83,10 +83,18 @@ Die App verwendet weiterhin den RPC `search_restaurants`, nicht die Edge Functio
 
 Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` als RPC auf, verlangt eine gültige persönliche Session, aktualisiert die Session vor der Suche, begrenzt auf maximal 10 Ergebnisse und verwirft Ergebnisse außerhalb von 10 km.
 
+## Aktuelle Fehleranalyse: Rezeptbild kann nicht hinzugefügt werden
+
+- Relevante Implementierung: `lib/data/services/recipe_image_service.dart`, `lib/features/recipes/add_recipe_page.dart`, `lib/features/recipes/recipe_detail_page.dart` und `lib/data/repositories/recipe_repository.dart`.
+- Live-Supabase-Prüfung am 2026-10-09: Bucket `recipe-images` existiert, ist privat, erlaubt JPEG/PNG/WebP und hat eine 10-MiB-Grenze. Storage- und Rezept-RLS-Policies weichen teilweise von den versionierten Migrationen ab; der Upload-Fehler ließ sich aus den verfügbaren Logs nicht konkret reproduzieren.
+- Wahrscheinlicher Client-Schwachpunkt: `RecipeImageService.upload` verwendete `file.mimeType` direkt, auch wenn `image_picker` das Bild neu kodiert und der Dateityp nicht mehr zur Dateiendung passt. Zusätzlich wurden Bilder mit 2400 px und Qualität 92 ausgewählt, was bei manchen Fotos die Bucket-Grenze erreichen kann.
+- Branch `fix/recipe-image-upload`: Uploads werden jetzt mit 1600 px/Qualität 80 vorbereitet, der MIME-Typ wird aus dem erlaubten Ziel-Format abgeleitet und Dateien über 10 MiB erhalten eine verständliche Fehlermeldung. Regressionstest ergänzt.
+- Das ist eine robuste Fehlerbehebung für die erkennbaren Client-Risiken, aber ohne konkrete fehlgeschlagene Upload-Logs kein Beweis, dass dies die einzige Ursache war. Nach CI und Merge erneute Prüfung des Live-Setups vornehmen.
+
 ## Nächster technischer Schritt
 
-1. Die nach dem Merge gestarteten CI-Läufe für den aktuellen `main`-Stand abschließend verifizieren.
-2. Danach das nächste sinnvolle Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten.
+1. PR für den Rezeptbild-Upload öffnen, CI prüfen und bei grünen Checks mergen.
+2. Nach Merge CI und den aktuellen Supabase-Stand prüfen; Nutzer lokal `git pull` ausführen und Bild-Upload erneut testen.
 
 ## Sicherheits-/Arbeitsregeln
 
