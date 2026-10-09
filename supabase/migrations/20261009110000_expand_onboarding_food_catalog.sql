@@ -44,6 +44,5 @@ insert into public.foods (id, name, category, default_unit) values
   ('cherry_tomatoes', 'Cherrytomaten', 'Gemüse', 'g'),
   ('red_chili_pepper', 'Frische Chilischote', 'Gemüse', 'Stück'),
   ('watercress', 'Brunnenkresse', 'Gemüse', 'g'),
-  ('corn_salad', 'Feldsalat', 'Gemüse', 'g'),
-  ('swiss_chard', 'Mangoldblätter', 'Gemüse', 'g')
+  ('corn_salad', 'Feldsalat', 'Gemüse', 'g')
 on conflict do nothing;
