@@ -38,6 +38,14 @@ void main() {
     expect(repo, contains("action: () => client\n          .from('recipes')\n          .select('image_path')"));
   });
 
+  test('storage RLS denials are not mislabeled as expired sessions', () {
+    final exceptions = File('lib/core/app_exception.dart').readAsStringSync();
+
+    expect(exceptions, contains("text.contains('accessdenied')"));
+    expect(exceptions, contains("text.contains('row-level security policy')"));
+    expect(exceptions, contains("return AuthorizationException('Der Zugriff auf den Supabase-Speicher wurde verweigert.', error);"));
+  });
+
   test('recipe image upload uses unique paths and avoids storage upsert RLS', () {
     final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
 
