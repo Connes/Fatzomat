@@ -30,6 +30,14 @@ void main() {
     expect(main, isNot(contains('final auth = Supabase.instance.client.auth;')));
   });
 
+  test('recipe image metadata reads retry after an authentication failure', () {
+    final repo = File('lib/data/repositories/recipe_repository.dart').readAsStringSync();
+
+    expect(repo, contains('Future<Recipe> getRecipeModel(String id) async {'));
+    expect(repo, contains("action: () => client\n          .from('recipes')\n          .select('*,recipe_ingredients(*)')"));
+    expect(repo, contains("action: () => client\n          .from('recipes')\n          .select('image_path')"));
+  });
+
   test('recipe image upload uses allow-listed MIME types and stays below bucket size limit', () {
     final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
 
