@@ -191,6 +191,7 @@ class _TodayPageState extends State<TodayPage> {
           builder: (_) => PersonalizedSurprisePage(
             recommendation: recommendation,
             persistPersonalDecision: true,
+            planDate: _selectedDate,
             service: service,
             savedRecipes: saved,
             preferences: preferences,
