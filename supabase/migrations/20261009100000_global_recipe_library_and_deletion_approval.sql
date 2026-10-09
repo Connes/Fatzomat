@@ -285,6 +285,7 @@ revoke all on function public.respond_to_recipe_suggestion(uuid,boolean) from pu
 grant execute on function public.respond_to_recipe_suggestion(uuid,boolean) to authenticated;
 
 -- Recipe image objects follow the shared library's visibility, not account ownership.
+drop policy if exists "recipe images owner upload" on storage.objects;
 drop policy if exists "recipe images owner insert" on storage.objects;
 drop policy if exists "recipe images owner update" on storage.objects;
 drop policy if exists "recipe images owner delete" on storage.objects;
@@ -465,3 +466,12 @@ $function$;
 
 revoke execute on function public.accept_decision_share(uuid) from public,anon;
 grant execute on function public.accept_decision_share(uuid) to authenticated;
+
+
+-- Image paths are editable on the shared canonical recipe by any authenticated
+-- library user, just like the recipe's other fields.
+drop policy if exists "recipes own update" on public.recipes;
+create policy "recipes global update"
+on public.recipes for update to authenticated
+using (true)
+with check (true);
