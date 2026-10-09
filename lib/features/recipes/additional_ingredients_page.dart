@@ -244,6 +244,10 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
   bool _matchesCategory(Food food, Map<String, String> preferences) {
     final category = food.category.trim();
     final name = food.name.trim().toLowerCase();
+    // Keep these items out of the side-dish picker while leaving other beans available.
+    if (_containsAny(name, const ['weiße bohnen', 'weisse bohnen', 'kidneybohnen', 'kidney-bohnen', 'tortilla', 'toast'])) {
+      return false;
+    }
     final isPotato = name.contains('kartoffel');
     final isRice = name.contains('reis');
     final isPasta = name.contains('nudel') || name.contains('pasta');
