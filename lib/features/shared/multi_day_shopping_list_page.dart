@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
@@ -16,10 +18,12 @@ class MultiDayShoppingListPage extends StatefulWidget {
   State<MultiDayShoppingListPage> createState() => _MultiDayShoppingListPageState();
 }
 
-class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
+class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> with WidgetsBindingObserver {
   final _repo = PersonalTodayRepository();
   final _aggregator = const ShoppingListAggregator();
-  late final List<DateTime> _days;
+  late List<DateTime> _days;
+  DateTime _observedToday = DateTime.now();
+  Timer? _dayBoundaryTimer;
   final Set<String> _selected = <String>{};
   final Set<String> _expanded = <String>{};
   List<List<TodayPlan>> _plans = const [];
@@ -28,15 +32,44 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
   Object? _error;
   int _generation = 0;
 
+  DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
+  List<DateTime> _makeDays(DateTime today) =>
+      List.generate(3, (i) => today.add(Duration(days: i)));
+
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   String _label(int index) => index == 0 ? 'Heute' : index == 1 ? 'Morgen' : 'Übermorgen';
+
+  void _checkDayBoundary() {
+    final today = _dateOnly(DateTime.now());
+    if (today == _observedToday || !mounted) return;
+    final oldTodayKey = _key(_observedToday);
+    final newTodayKey = _key(today);
+    setState(() {
+      _days = _makeDays(today);
+      // Carry the default selection forward with the calendar. Preserve any
+      // explicitly selected future day that remains in the new three-day view.
+      final hadOnlyTodaySelected = _selected.length == 1 && _selected.contains(oldTodayKey);
+      _selected.removeWhere((key) => !_days.any((day) => _key(day) == key));
+      if (hadOnlyTodaySelected || _selected.isEmpty) _selected.add(newTodayKey);
+      _expanded.removeWhere((key) => !_days.any((day) => _key(day) == key));
+      if (_expanded.isEmpty) _expanded.add(newTodayKey);
+      _observedToday = today;
+    });
+    load();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _checkDayBoundary();
+  }
 
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    _days = List.generate(3, (i) => today.add(Duration(days: i)));
+    WidgetsBinding.instance.addObserver(this);
+    _observedToday = _dateOnly(DateTime.now());
+    _days = _makeDays(_observedToday);
+    _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     _selected.add(_key(today));
     _expanded.add(_key(today));
     load();
@@ -73,6 +106,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Einkaufsartikel konnte nicht aktualisiert werden: $e')));
     }
+  }
+
+  @override
+  void dispose() {
+    _dayBoundaryTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
