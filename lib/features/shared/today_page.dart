@@ -42,6 +42,7 @@ class _TodayPageState extends State<TodayPage> {
   final recipeRepo = RecipeRepository();
   late final TodayController controller;
   TodayPlan? plan;
+  DateTime _selectedDate = DateTime.now();
   List<TodayPlan> completedPlans = const [];
   bool loading = true;
   Object? loadError;
@@ -86,6 +87,7 @@ class _TodayPageState extends State<TodayPage> {
 
   Future<void> load() async {
     await controller.load();
+    final selectedPlan = await repo.todayPlan(date: _selectedDate);
     DecisionShare? pendingShare;
     List<TodayPlan> completed = const [];
     try {
@@ -101,7 +103,7 @@ class _TodayPageState extends State<TodayPage> {
     }
     if (!mounted) return;
     setState(() {
-      plan = controller.data;
+      plan = selectedPlan;
       completedPlans = completed;
       loading = controller.loading;
       loadError = controller.error;
@@ -395,6 +397,33 @@ class _TodayPageState extends State<TodayPage> {
                       ),
                       const SizedBox(height: 14),
                     ],
+                    GestureDetector(
+                      onHorizontalDragEnd: (details) {
+                        final velocity = details.primaryVelocity ?? 0;
+                        if (velocity.abs() < 180) return;
+                        setState(() {
+                          _selectedDate = _selectedDate.add(Duration(days: velocity < 0 ? 1 : -1));
+                          loading = true;
+                        });
+                        load();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(tooltip: 'Vorheriger Tag', onPressed: () { setState(() { _selectedDate = _selectedDate.subtract(const Duration(days: 1)); loading = true; }); load(); }, icon: const Icon(Icons.chevron_left)),
+                            Text(
+                              _selectedDate.year == DateTime.now().year && _selectedDate.month == DateTime.now().month && _selectedDate.day == DateTime.now().day
+                                  ? 'Heute'
+                                  : '${_selectedDate.day.toString().padLeft(2, '0')}.${_selectedDate.month.toString().padLeft(2, '0')}.${_selectedDate.year}',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            IconButton(tooltip: 'Nächster Tag', onPressed: () { setState(() { _selectedDate = _selectedDate.add(const Duration(days: 1)); loading = true; }); load(); }, icon: const Icon(Icons.chevron_right)),
+                          ],
+                        ),
+                      ),
+                    ),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 560),
                       child: plan == null
