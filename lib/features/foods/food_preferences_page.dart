@@ -297,7 +297,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                                         dense: false,
                                         title: Text(name),
                                         subtitle: Text(category),
-                                        leading: FoodItemImage(foodName: name),
+                                        leading: FoodItemImage(foodName: name, category: category),
                                         trailing: Wrap(
                                           spacing: 0,
                                           children: [
