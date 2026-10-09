@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fatzomat/data/models/shopping_item.dart';
+import 'package:food_app_mvp/data/models/shopping_item.dart';
 import 'package:fatzomat/data/services/shopping_list_aggregator.dart';
 
 void main() {
