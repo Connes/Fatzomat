@@ -23,6 +23,7 @@ class RecipeDetailPage extends StatefulWidget {
   final VoidCallback? onNavigateToShoppingList;
   final bool canMarkCooked;
   final bool viewingTodaySelection;
+  final DateTime? planDate;
   const RecipeDetailPage({
     super.key,
     required this.recipeId,
@@ -31,6 +32,7 @@ class RecipeDetailPage extends StatefulWidget {
     this.onNavigateToShoppingList,
     this.canMarkCooked = false,
     this.viewingTodaySelection = false,
+    this.planDate,
   });
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
@@ -61,7 +63,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       final r = await repo.getRecipeModel(widget.recipeId);
       bool selectedForToday = false;
       try {
-        final today = await personalToday.todayPlan();
+        final today = await personalToday.todayPlan(date: widget.planDate);
         selectedForToday = today?.isRecipe == true &&
             today?.recipeId == widget.recipeId &&
             today?.status != 'cooked';
@@ -74,6 +76,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
     }
+  }
+
+  bool get _isPlanDateToday {
+    final date = widget.planDate;
+    if (date == null) return true;
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
   double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 12).toDouble();
@@ -94,8 +103,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Für heute festlegen?'),
-        content: const Text('Dieses Rezept wird für heute ausgewählt.'),
+        title: Text(widget.planDate == null || _isPlanDateToday ? 'Für heute festlegen?' : 'Für diesen Tag festlegen?'),
+        content: Text(widget.planDate == null || _isPlanDateToday
+            ? 'Dieses Rezept wird für heute ausgewählt.'
+            : 'Dieses Rezept wird für den ausgewählten Tag eingeplant.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -112,7 +123,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
     setState(() => working = true);
     try {
-      await personalToday.selectRecipeForToday(widget.recipeId, servings: servings);
+      await personalToday.selectRecipeForToday(widget.recipeId, servings: servings, date: widget.planDate);
       // Notify an already-mounted TodayPage immediately. Navigation and
       // Realtime remain fallback paths, but the current page no longer needs
       // to wait for either one to reflect the successful selection.
