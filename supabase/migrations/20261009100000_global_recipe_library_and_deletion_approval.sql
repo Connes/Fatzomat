@@ -34,7 +34,7 @@ create or replace function public.recipe_fingerprint(p_recipe jsonb, p_ingredien
 returns text
 language sql
 immutable
-as $
+as $$
   select md5(
     lower(regexp_replace(trim(coalesce(p_recipe->>'name','')), '\\s+', ' ', 'g'))
     || '|' || coalesce((
@@ -52,7 +52,7 @@ as $
       from jsonb_array_elements(coalesce(p_ingredients,'[]'::jsonb)) as values(item)
     ), '')
   );
-$;
+$$;
 
 revoke all on function public.recipe_fingerprint(jsonb,jsonb) from public, anon;
 grant execute on function public.recipe_fingerprint(jsonb,jsonb) to authenticated;
