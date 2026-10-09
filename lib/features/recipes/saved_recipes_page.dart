@@ -534,7 +534,28 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         return TogetherScaffold(
           backgroundType: TogetherBackgroundType.recipes,
           appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
-          body: const Center(child: Text('Kein passendes Rezept gefunden.')),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                decoration: BoxDecoration(
+                  color: AppDesign.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: AppDesign.divider),
+                ),
+                child: Text(
+                  'Kein passendes Rezept gefunden.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppDesign.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
         );
       }
 
