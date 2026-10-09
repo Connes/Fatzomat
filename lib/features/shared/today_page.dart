@@ -91,28 +91,37 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> load() async {
-    final selectedPlan = await repo.todayPlan(date: _selectedDate);
-    DecisionShare? pendingShare;
-    List<TodayPlan> completed = const [];
     try {
-      if (_isSelectedDateToday) completed = await repo.completedTodayPlans();
-    } catch (_) {
-      // Completed history must not block the current decision card.
+      final selectedPlan = await repo.todayPlan(date: _selectedDate);
+      DecisionShare? pendingShare;
+      List<TodayPlan> completed = const [];
+      try {
+        if (_isSelectedDateToday) completed = await repo.completedTodayPlans();
+      } catch (_) {
+        // Completed history must not block the current decision card.
+      }
+      try {
+        if (_isSelectedDateToday) {
+          pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
+        }
+      } catch (_) {
+        // Shared decisions are additive UI and must not block the day view.
+      }
+      if (!mounted) return;
+      setState(() {
+        plan = selectedPlan;
+        completedPlans = completed;
+        loading = false;
+        loadError = null;
+        _pendingDecisionShare = pendingShare;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        loading = false;
+        loadError = error;
+      });
     }
-    try {
-      pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
-    } catch (_) {
-      // A pending shared decision is additive UI. Never make Today unusable
-      // because its optional collaboration lookup failed.
-    }
-    if (!mounted) return;
-    setState(() {
-      plan = selectedPlan;
-      completedPlans = completed;
-      loading = controller.loading;
-      loadError = controller.error;
-      _pendingDecisionShare = pendingShare;
-    });
   }
 
   Future<void> _acceptPendingDecisionShare() async {
