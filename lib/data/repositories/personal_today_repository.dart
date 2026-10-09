@@ -81,12 +81,21 @@ class PersonalTodayRepository {
   Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
-    final result = await client.rpc('set_personal_plan_for_date', params: {
-      'p_plan_date': _dateOnly(date ?? DateTime.now()),
-      'p_decision_type': 'recipe',
-      'p_recipe_id': recipeId,
-      'p_servings': servings,
-    });
+    final planDate = _dateOnly(date ?? DateTime.now());
+    final isToday = planDate == _dateOnly(DateTime.now());
+    // Preserve the established RPC for Today and older database deployments.
+    // The explicit-date RPC is only needed when planning another day.
+    final result = isToday
+        ? await client.rpc('set_personal_today_plan', params: {
+            'p_recipe_id': recipeId,
+            'p_servings': servings,
+          })
+        : await client.rpc('set_personal_plan_for_date', params: {
+            'p_plan_date': planDate,
+            'p_decision_type': 'recipe',
+            'p_recipe_id': recipeId,
+            'p_servings': servings,
+          });
     final id = result?.toString() ?? '';
     if (id.isEmpty) throw StateError('Der persönliche Tagesplan konnte nicht gespeichert werden.');
     // Any route can create the personal Today plan. Notify the persistent
@@ -123,8 +132,12 @@ class PersonalTodayRepository {
       'recipes': const <String, dynamic>{},
     };
 
+    final planDate = _dateOnly(date ?? DateTime.now());
+    final isToday = planDate == _dateOnly(DateTime.now());
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity.contains(ConnectivityResult.none)) {
+      // The legacy offline cache has no date key. Never put a future plan in it.
+      if (!isToday) throw StateError('Zukünftige Entscheidungen benötigen eine Verbindung.');
       await offlineCache.writeToday(localDecision);
       await offlineCache.writePendingTodayDecision({
         'decision_type': normalizedType,
@@ -135,11 +148,16 @@ class PersonalTodayRepository {
 
     if (client.auth.currentUser == null) throw const AuthenticationException();
     try {
-      final result = await client.rpc('set_personal_plan_for_date', params: {
-        'p_plan_date': _dateOnly(date ?? DateTime.now()),
-        'p_decision_type': normalizedType,
-        'p_decision_value': value.trim(),
-      });
+      final result = isToday
+          ? await client.rpc('set_personal_today_decision', params: {
+              'p_decision_type': normalizedType,
+              'p_decision_value': value.trim(),
+            })
+          : await client.rpc('set_personal_plan_for_date', params: {
+              'p_plan_date': planDate,
+              'p_decision_type': normalizedType,
+              'p_decision_value': value.trim(),
+            });
       final id = result?.toString() ?? '';
       if (id.isEmpty) throw StateError('Die persönliche Entscheidung konnte nicht gespeichert werden.');
       await offlineCache.clearPendingTodayDecision();
