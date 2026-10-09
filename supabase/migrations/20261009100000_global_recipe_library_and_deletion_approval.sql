@@ -201,8 +201,10 @@ begin
   update public.app_notifications set read_at=coalesce(read_at,now()) where user_id=uid and type='recipe_deletion_request' and recipe_id=req.recipe_id;
   if p_approve then
     delete from public.recipes where id=req.recipe_id;
-    insert into public.app_notifications(user_id,type,title,body)
-    values(req.requested_by,'recipe_deletion_approved','Rezept gelöscht','Die Löschung von „'||coalesce(recipe_name,'Rezept')||'“ wurde bestätigt.');
+    if req.requested_by is not null then
+      insert into public.app_notifications(user_id,type,title,body)
+      values(req.requested_by,'recipe_deletion_approved','Rezept gelöscht','Die Löschung von „'||coalesce(recipe_name,'Rezept')||'“ wurde bestätigt.');
+    end if;
   else
     insert into public.app_notifications(user_id,type,title,body,recipe_id)
     values(req.requested_by,'recipe_deletion_rejected','Löschung abgelehnt','Die Löschung von „'||coalesce(recipe_name,'Rezept')||'“ wurde abgelehnt.',req.recipe_id);
