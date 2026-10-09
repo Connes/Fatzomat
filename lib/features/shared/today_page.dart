@@ -535,6 +535,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                             recipeId: plan!.recipeId!,
                                             canMarkCooked: _isSelectedDateToday,
                                             viewingTodaySelection: true,
+                                            planDate: _selectedDate,
                                             onTodayPlanChanged: load,
                                           ),
                                         ),
