@@ -417,6 +417,7 @@ begin
     update public.decision_shares
     set accepted_at = now(),
         accepted_plan_id = personal_plan_id,
+        accepted_recipe_id = copied_recipe_id,
         shared_recipe_plan_id = shared_plan_id
     where id = share_row.id;
   elsif share_row.decision_type in ('order','dine_out','surprise') then
