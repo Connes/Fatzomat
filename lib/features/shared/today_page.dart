@@ -1584,31 +1584,48 @@ class _CompletedTodayDecisions extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 560),
       child: AppSurface(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
-              const SizedBox(width: 8),
-              Expanded(child: Text('HEUTE BEREITS ERLEDIGT',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: AppDesign.primaryDark, fontWeight: FontWeight.w800, letterSpacing: .7,
-                ))),
-              Text('${plans.length}', style: theme.textTheme.labelLarge),
-            ]),
-            const SizedBox(height: 8),
-            ...plans.map((item) => ListTile(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Theme(
+          data: theme.copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: false,
+            tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+            childrenPadding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
+            leading: const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
+            title: Text(
+              'Heute bereits erledigt',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: AppDesign.primaryDark,
+                fontWeight: FontWeight.w800,
+                letterSpacing: .3,
+              ),
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('${plans.length}', style: theme.textTheme.labelLarge),
+                const SizedBox(width: 8),
+                const Icon(Icons.expand_more_rounded),
+              ],
+            ),
+            children: plans.map((item) => ListTile(
               contentPadding: EdgeInsets.zero,
               dense: true,
               leading: const Icon(Icons.done_rounded, color: AppDesign.secondaryText),
-              title: Text(item.displayTitle, style: theme.textTheme.bodyMedium?.copyWith(
-                decoration: TextDecoration.lineThrough,
+              title: Text(
+                item.displayTitle,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  decoration: TextDecoration.lineThrough,
+                  color: AppDesign.secondaryText,
+                ),
+              ),
+              trailing: const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 18,
                 color: AppDesign.secondaryText,
-              )),
-              trailing: const Icon(Icons.check_circle_outline_rounded, size: 18, color: AppDesign.secondaryText),
-            )),
-          ],
+              ),
+            )).toList(),
+          ),
         ),
       ),
     );
