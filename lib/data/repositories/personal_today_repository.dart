@@ -36,7 +36,8 @@ class PersonalTodayRepository {
           .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
           .eq('user_id', userId)
           .eq('plan_date', _dateOnly(DateTime.now()))
-          .neq('status', 'cancelled')
+          .eq('status', 'planned')
+          .order('created_at', ascending: false)
           .limit(1);
       if (rows.isEmpty) return null;
       final map = Map<String, dynamic>.from(rows.first);
