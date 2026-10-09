@@ -7,7 +7,6 @@ import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
-import 'today_page.dart';
 import 'multi_day_shopping_list_page.dart';
 import '../recipes/saved_recipes_page.dart';
 
@@ -171,20 +170,6 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     // recipe is planned for tomorrow or the day after.
     return const MultiDayShoppingListPage();
 
-    /* Legacy empty-state retained below for reference; the multi-day page
-       handles the empty state itself.
-    return TogetherScaffold(
-      backgroundType: TogetherBackgroundType.today,
-      appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
-      body: _EntryCard(
-        icon: Icons.shopping_cart_outlined,
-        title: 'Deine Einkaufsliste ist leer',
-        text: 'Wähle zuerst ein Rezept für heute. Die zugehörigen Zutaten erscheinen anschließend hier.',
-        actionLabel: 'Zu Heute',
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage())),
-      ),
-    );
-    */
   }
 }
 
