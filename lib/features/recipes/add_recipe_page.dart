@@ -293,12 +293,11 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     setState(() => selectedImage = null);
   }
 
-  Future<void> _save({bool allowDuplicate = false}) async {
+  Future<void> _save() async {
     if (saving) return;
     setState(() => saving = true);
-    var saveDuplicate = allowDuplicate;
     try {
-      if (!saveDuplicate) {
+      {
         final duplicate = await repository.findDuplicateRecipe(_recipe);
         if (duplicate != null && mounted) {
           setState(() => saving = false);
@@ -309,22 +308,19 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
               content: Text('„${duplicate.name}“ gibt es bereits in eurer gemeinsamen Rezeptsammlung.'),
               actions: [
                 TextButton(onPressed: () => Navigator.pop(dialogContext, 'open'), child: const Text('Vorhandenes öffnen')),
-                TextButton(onPressed: () => Navigator.pop(dialogContext, 'save'), child: const Text('Trotzdem speichern')),
+                TextButton(onPressed: () => Navigator.pop(dialogContext, 'cancel'), child: const Text('Abbrechen')),
               ],
             ),
           );
           if (!mounted) return;
           if (action == 'open' && duplicate.id != null) {
             await Navigator.push(context, MaterialPageRoute(builder: (_) => RecipeDetailPage(recipeId: duplicate.id!)));
-            return;
           }
-          if (action != 'save') return;
-          setState(() => saving = true);
-          saveDuplicate = true;
+          return;
         }
       }
 
-      final recipeId = await repository.saveRecipeModel(_recipe, allowDuplicate: saveDuplicate);
+      final recipeId = await repository.saveRecipeModel(_recipe);
 
       if (selectedImage != null) {
         final upload = await RecipeImageService().upload(
