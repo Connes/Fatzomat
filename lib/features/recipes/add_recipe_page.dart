@@ -216,12 +216,14 @@ class RecipeImportPreviewPage extends StatefulWidget {
   final Recipe recipe;
   final String? decisionRequestId;
   final bool selectForToday;
+  final DateTime? planDate;
 
   const RecipeImportPreviewPage({
     super.key,
     required this.recipe,
     this.decisionRequestId,
     this.selectForToday = false,
+    this.planDate,
   });
 
   @override
@@ -337,6 +339,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           resultType: 'recipe',
           resultId: recipeId,
           servings: _recipe.servings.clamp(1, 12).toInt(),
+          date: widget.planDate,
         );
       }
 
@@ -642,6 +645,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
   final Set<String> initialSelectedFoodIds;
   final String? decisionRequestId;
   final bool selectForToday;
+  final DateTime? planDate;
 
   const ChatGptRecipeSetupPage({
     super.key,
@@ -649,6 +653,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
     this.initialSelectedFoodIds = const <String>{},
     this.decisionRequestId,
     this.selectForToday = false,
+    this.planDate,
   });
 
   @override
@@ -719,6 +724,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
             recipe: recipe,
             decisionRequestId: widget.decisionRequestId,
             selectForToday: widget.selectForToday || widget.decisionRequestId != null,
+            planDate: widget.planDate,
           ),
         ),
       );
