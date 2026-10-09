@@ -451,7 +451,6 @@ class _TodayPageState extends State<TodayPage> {
                           : _TodayResultCard(
                               plan: plan!,
                               onCancel: removeTodayPlan,
-                              canMarkCooked: _isSelectedDateToday,
                               onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
                               onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'
                                   ? () {
@@ -777,7 +776,6 @@ class _TodayResultCard extends StatelessWidget {
   final VoidCallback? onOpenOrder;
   final VoidCallback onCancel;
   final VoidCallback? onShare;
-  final bool canMarkCooked;
 
   const _TodayResultCard({
     required this.plan,
@@ -785,7 +783,6 @@ class _TodayResultCard extends StatelessWidget {
     required this.onOpenOrder,
     required this.onCancel,
     required this.onShare,
-    this.canMarkCooked = true,
   });
 
   @override
