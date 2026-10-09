@@ -35,4 +35,20 @@ void main() {
     expect(migration, contains("revoke all on function public.create_recipe_suggestion(uuid)"));
     expect(migration, isNot(contains('create policy "recipe suggestions sender insert"')));
   });
+  test('connection display name is captured and used for collaboration identity', () {
+    final migration = File('supabase/migrations/20261008200000_connection_display_names.sql').readAsStringSync();
+    final page = File('lib/features/shared/connection_page.dart').readAsStringSync();
+    final repository = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
+
+    expect(migration, contains('display_name text'));
+    expect(migration, contains('create_connection(p_display_name text)'));
+    expect(migration, contains('join_connection(p_code text, p_display_name text)'));
+    expect(migration, contains('insert into public.profiles(id, display_name)'));
+    expect(migration, contains('connection_member_display_name'));
+    expect(page, contains('Dein Name für diese Verbindung'));
+    expect(page, contains("repo.createConnection(name)"));
+    expect(page, contains("repo.joinConnection(value, name)"));
+    expect(repository, contains("'p_display_name': displayName.trim()"));
+  });
+
 }

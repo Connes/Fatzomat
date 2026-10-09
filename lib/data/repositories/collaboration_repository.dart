@@ -223,13 +223,16 @@ class CollaborationRepository {
     return result == true;
   }
 
-  Future<String> createConnection() async {
-    final result = await client.rpc('create_connection');
+  Future<String> createConnection(String displayName) async {
+    final result = await client.rpc('create_connection', params: {'p_display_name': displayName.trim()});
     return result.toString();
   }
 
-  Future<void> joinConnection(String code) async {
-    await client.rpc('join_connection', params: {'p_code': code.trim()});
+  Future<void> joinConnection(String code, String displayName) async {
+    await client.rpc('join_connection', params: {
+      'p_code': code.trim(),
+      'p_display_name': displayName.trim(),
+    });
   }
 
 
