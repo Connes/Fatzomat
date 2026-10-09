@@ -482,14 +482,14 @@ class _TodayPageState extends State<TodayPage> {
                                           );
                                         }
                                       : null,
-                              onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked' && _isSelectedDateToday
+                              onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
                                   ? () async {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => RecipeDetailPage(
                                             recipeId: plan!.recipeId!,
-                                            canMarkCooked: true,
+                                            canMarkCooked: _isSelectedDateToday,
                                             viewingTodaySelection: true,
                                             onTodayPlanChanged: load,
                                           ),
