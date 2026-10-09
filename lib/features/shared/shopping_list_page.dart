@@ -8,6 +8,7 @@ import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import 'today_page.dart';
+import 'multi_day_shopping_list_page.dart';
 import '../recipes/saved_recipes_page.dart';
 
 class ShoppingListPage extends StatefulWidget {
@@ -180,22 +181,9 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     }
 
     if (personalPlanId != null) {
-      // ShoppingPage already renders its own page heading. Wrapping it in
-      // another scaffold app bar would show "Einkaufsliste" twice.
-      return ShoppingPage(
-        planId: personalPlanId!,
-        recipeName: personalRecipeName,
-        servings: personalServings,
-        shared: false,
-        onCompleted: () {
-          if (!mounted) return;
-          setState(() {
-            personalPlanId = null;
-            personalRecipeName = 'Einkaufsliste';
-            personalServings = 2;
-          });
-        },
-      );
+      // Personal shopping supports selecting and aggregating ingredients from
+      // Today, Tomorrow and the day after. Shared lists keep their own flow.
+      return const MultiDayShoppingListPage();
     }
 
     return TogetherScaffold(
