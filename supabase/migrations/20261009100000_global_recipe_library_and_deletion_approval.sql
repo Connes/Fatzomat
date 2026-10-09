@@ -475,3 +475,38 @@ create policy "recipes global update"
 on public.recipes for update to authenticated
 using (true)
 with check (true);
+
+
+-- Shared Today plans also accept any canonical recipe from the global library.
+drop function if exists public.share_recipe_for_today(uuid);
+create or replace function public.share_recipe_for_today(p_recipe_id uuid,p_servings integer default null)
+returns uuid language plpgsql security definer set search_path=public,pg_temp as $$
+declare
+  uid uuid:=auth.uid(); cid uuid; partner uuid; pid uuid; recipe_row public.recipes; target_servings integer;
+begin
+  if uid is null then raise exception 'Nicht authentifiziert.'; end if;
+  select connection_id into cid from public.connection_members where user_id=uid limit 1;
+  if cid is null then raise exception 'Keine Verbindung zu einer zweiten Person vorhanden.'; end if;
+  select * into recipe_row from public.recipes where id=p_recipe_id;
+  if recipe_row.id is null then raise exception 'Rezept ist nicht verfügbar.'; end if;
+  target_servings:=coalesce(p_servings,recipe_row.servings);
+  if target_servings<1 or target_servings>12 then raise exception 'Ungültige Personenzahl.'; end if;
+  if exists(select 1 from public.shared_recipe_plans where connection_id=cid and plan_date=current_date and status<>'cancelled') then
+    raise exception 'Für heute ist bereits ein gemeinsames Rezept ausgewählt.';
+  end if;
+  insert into public.shared_recipe_plans(connection_id,recipe_id,shared_by,plan_date,status,servings)
+  values(cid,p_recipe_id,uid,current_date,'planned',target_servings) returning id into pid;
+  insert into public.shopping_items(shared_recipe_plan_id,food_id,name,quantity,unit,source)
+  select pid,ri.food_id,ri.name,
+    round((ri.quantity*target_servings::numeric/greatest(recipe_row.servings,1))::numeric,2),
+    ri.unit,'recipe'
+  from public.recipe_ingredients ri where ri.recipe_id=p_recipe_id;
+  select user_id into partner from public.connection_members where connection_id=cid and user_id<>uid limit 1;
+  if partner is not null then
+    insert into public.app_notifications(user_id,type,title,body,recipe_id,shared_recipe_plan_id)
+    values(partner,'shared_recipe','Neues Rezept für heute',recipe_row.name||' wurde für euch heute ausgewählt.',p_recipe_id,pid);
+  end if;
+  return pid;
+end $$;
+revoke all on function public.share_recipe_for_today(uuid,integer) from public,anon;
+grant execute on function public.share_recipe_for_today(uuid,integer) to authenticated;
