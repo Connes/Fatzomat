@@ -11,39 +11,39 @@ class FoodItemImage extends StatelessWidget {
 
   static const Map<String, String> _emoji = {
     // Baking and sweets
-    'Backpulver':'🧁','Kakao':'🍫','Marmelade':'🍓','Mehl':'🌾','Vanillezucker':'🍨','Zucker':'🍚',
+    'Backpulver':'🥄','Kakao':'🍫','Marmelade':'🍯','Mehl':'🌾','Vanillezucker':'🥄','Zucker':'🥄',
     // Fish and seafood
-    'Dorade':'🐠','Forelle':'🐟','Garnelen':'🍤','Heilbutt':'🐡','Hering':'🐟','Kabeljau':'🐠',
-    'Lachs':'🍣','Makrele':'🐟','Pangasius':'🐠','Räucherlachs':'🍣','Rotbarsch':'🐡',
-    'Sardellen':'🐟','Thunfisch':'🐟','Wolfsbarsch':'🐠','Krabben':'🦀','Miesmuscheln':'🦪','Tintenfisch':'🦑',
+    'Dorade':'🐟','Forelle':'🐟','Garnelen':'🍤','Heilbutt':'🐟','Hering':'🐟','Kabeljau':'🐟',
+    'Lachs':'🐟','Makrele':'🐟','Pangasius':'🐟','Räucherlachs':'🐟','Rotbarsch':'🐟',
+    'Sardellen':'🐟','Thunfisch':'🐟','Wolfsbarsch':'🐟','Krabben':'🦀','Miesmuscheln':'🦪','Tintenfisch':'🦑',
     // Meat
-    'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hackfleisch':'🥩','Hähnchen':'🍗',
-    'Hähnchenbrust':'🍗','Hähnchenflügel':'🍗','Hähnchenhackfleisch':'🍗','Hähncheninnenfilet':'🍗',
-    'Kalbfleisch':'🥩','Kassler':'🥓','Lammhackfleisch':'🥩','Lammkotelett':'🍖','Putenbrust':'🍗',
-    'Rinderbraten':'🥩','Rinderfilet':'🥩','Rinderhackfleisch':'🥩','Rinderrouladen':'🥩','Rindersteak':'🥩',
-    'Salami':'🥓','Schinken':'🥓','Schweinebraten':'🍖','Schweinefleisch':'🥩',
-    'Schweinehackfleisch':'🥩','Spareribs':'🍖','Speck':'🥓','Würstchen':'🌭',
+    'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hähnchen':'🐔',
+    'Hähnchenbrust':'🐔','Hähnchenflügel':'🐔','Hähnchenhackfleisch':'🐔','Hähncheninnenfilet':'🐔',
+    'Kalbfleisch':'🐄','Kassler':'🐖','Lammhackfleisch':'🐑','Lammkotelett':'🐑','Putenbrust':'🐔',
+    'Rinderbraten':'🐄','Rinderfilet':'🐄','Rinderhackfleisch':'🐄','Rinderrouladen':'🐄','Rindersteak':'🐄',
+    'Salami':'🐖','Schinken':'🐖','Schweinebraten':'🐖','Schweinefleisch':'🐖',
+    'Schweinehackfleisch':'🐖','Spareribs':'🐖','Speck':'🐖','Würstchen':'🐖',
     // Vegetables
-    'Artischocke':'🌿','Aubergine':'🍆','Austernpilze':'🍄','Avocado':'🥑','Blumenkohl':'🥦',
-    'Brokkoli':'🥦','Brunnenkresse':'🌿','Champignons':'🍄','Cherrytomaten':'🍅','Chicorée':'🥬',
-    'Chinakohl':'🥬','Endivie':'🥬','Erbsen':'🫛','Feldsalat':'🥬','Fenchel':'🌿','Frische Chilischote':'🌶️',
+    'Artischocke':'🥬','Aubergine':'🍆','Austernpilze':'🍄','Avocado':'🥑','Blumenkohl':'🥦',
+    'Brokkoli':'🥦','Brunnenkresse':'🥬','Champignons':'🍄','Cherrytomaten':'🍅','Chicorée':'🥬',
+    'Chinakohl':'🥬','Endivie':'🥬','Erbsen':'🫛','Feldsalat':'🥬','Fenchel':'🥬','Frische Chilischote':'🌶️',
     'Frühlingszwiebel':'🧅','Grüne Bohnen':'🫛','Gurke':'🥒','Karotte':'🥕','Karotten':'🥕',
     'Kartoffel':'🥔','Kartoffeln':'🥔','Knoblauch':'🧄','Knollensellerie':'🥬','Kohlrabi':'🥬',
     'Kürbis':'🎃','Lauch':'🥬','Mais':'🌽','Mangold':'🥬','Okra':'🥬','Pak Choi':'🥬','Paprika':'🫑',
-    'Pastinake':'🥕','Petersilienwurzel':'🥕','Radieschen':'🔴','Rettich':'🥬','Romanesco':'🥦',
-    'Rosenkohl':'🥬','Rote Bete':'🟣','Schalotte':'🧅','Shiitake-Pilze':'🍄','Spinat':'🥬','Spitzkohl':'🥬',
-    'Stangensellerie':'🥬','Steckrübe':'🥔','Süßkartoffel':'🍠','Süßkartoffeln':'🍠','Tomate':'🍅',
+    'Pastinake':'🥕','Petersilienwurzel':'🥕','Radieschen':'🫜','Rettich':'🫜','Romanesco':'🥦',
+    'Rosenkohl':'🥬','Rote Bete':'🫜','Schalotte':'🧅','Shiitake-Pilze':'🍄','Spinat':'🥬','Spitzkohl':'🥬',
+    'Stangensellerie':'🥬','Steckrübe':'🫜','Süßkartoffel':'🍠','Süßkartoffeln':'🍠','Tomate':'🍅',
     'Tomaten':'🍅','Weißkohl':'🥬','Zucchini':'🥒','Zuckerschoten':'🫛','Zwiebel':'🧅','Zwiebeln':'🧅',
     // Grains and sides
     'Brot':'🍞','Bulgur':'🌾','Couscous':'🍚','Gnocchi':'🥔','Haferflocken':'🥣','Nudeln':'🍝',
     'Penne':'🍝','Quinoa':'🌾','Reis':'🍚','Spaghetti':'🍝','Toast':'🍞','Tortillas':'🌯',
     // Herbs and spices
-    'Basilikum':'🌿','Chili':'🌶️','Currypulver':'🟡','Dill':'🌿','Estragon':'🌿','Fenchelsamen':'🌱',
-    'Garam Masala':'🟤','Geräuchertes Paprikapulver':'🟥','Italienische Kräuter':'🌿','Kardamom':'🟢',
-    'Koriander':'🌿','Koriandersamen':'🌱','Kräuter der Provence':'🌿','Liebstöckel':'🌿',
-    'Lorbeerblatt':'🍃','Majoran':'🌿','Minze':'🌿','Nelken':'🌰','Oregano':'🌿','Paprikapulver':'🟥',
-    'Petersilie':'🌿','Pfeffer':'⚫','Rosmarin':'🌿','Salbei':'🌿','Salz':'🧂','Schnittlauch':'🌿',
-    'Senfkörner':'🟡','Sesam':'🌾','Thymian':'🌿','Zimt':'🪵','Zitronengras':'🌿','Zitronenmelisse':'🌿',
+    'Basilikum':'🌿','Chili':'🌿','Currypulver':'🌿','Dill':'🌿','Estragon':'🌿','Fenchelsamen':'🌿',
+    'Garam Masala':'🌿','Geräuchertes Paprikapulver':'🌿','Italienische Kräuter':'🌿','Kardamom':'🌿',
+    'Koriander':'🌿','Koriandersamen':'🌿','Kräuter der Provence':'🌿','Liebstöckel':'🌿',
+    'Lorbeerblatt':'🌿','Majoran':'🌿','Minze':'🌿','Nelken':'🌿','Oregano':'🌿','Paprikapulver':'🌿',
+    'Petersilie':'🌿','Pfeffer':'🌿','Rosmarin':'🌿','Salbei':'🌿','Salz':'🌿','Schnittlauch':'🌿',
+    'Senfkörner':'🌿','Sesam':'🌿','Thymian':'🌿','Zimt':'🌿','Zitronengras':'🌿','Zitronenmelisse':'🌿',
     // Legumes
     'Kichererbsen':'🫘','Kidneybohnen':'🫘','Linsen':'🫘','Weiße Bohnen':'🫘',
     // Dairy and eggs
@@ -53,11 +53,11 @@ class FoodItemImage extends StatelessWidget {
     'Cashews':'🥜','Erdnüsse':'🥜','Haselnüsse':'🌰','Kürbiskerne':'🌱','Mandeln':'🥜',
     'Pistazien':'🥜','Sonnenblumenkerne':'🌻','Walnüsse':'🌰',
     // Fruit
-    'Ananas':'🍍','Apfel':'🍎','Banane':'🍌','Birne':'🍐','Erdbeeren':'🍓','Heidelbeeren':'🫐',
-    'Himbeeren':'🍓','Limette':'🍋','Mandarine':'🍊','Mango':'🥭','Orange':'🍊','Pfirsich':'🍑','Trauben':'🍇','Zitrone':'🍋',
+    'Ananas':'🍍','Apfel':'🍎','Banane':'🍌','Wassermelone':'🍉','Birne':'🍐','Erdbeeren':'🍓','Heidelbeeren':'🫐',
+    'Himbeeren':'🍓','Kiwi':'🥝','Limette':'🍋‍🟩','Mandarine':'🍊','Mango':'🥭','Orange':'🍊','Pfirsich':'🍑','Trauben':'🍇','Zitrone':'🍋',
     // Sauces and pantry basics
     'Currypaste':'🟡','Essig':'🫗','Gemüsebrühe':'🍲','Honig':'🍯','Ketchup':'🍅','Kokosmilch':'🥥',
-    'Mayonnaise':'🥣','Olivenöl':'🫒','Passierte Tomaten':'🍅','Pesto':'🌿','Senf':'🟡',
+    'Mayonnaise':'🥣','Olive':'🫒','Olivenöl':'🫒','Passierte Tomaten':'🍅','Pesto':'🌿','Senf':'🟡',
     'Sojasauce':'🫗','Sonnenblumenöl':'🌻','Tomatenmark':'🍅',
   };
 
