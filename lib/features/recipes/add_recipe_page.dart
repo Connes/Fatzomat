@@ -339,7 +339,6 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           resultType: 'recipe',
           resultId: recipeId,
           servings: _recipe.servings.clamp(1, 12).toInt(),
-          date: widget.planDate,
         );
       }
 
