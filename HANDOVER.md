@@ -54,7 +54,7 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-09 (Rezeptbild-Upload wird untersucht)
+Stand dieses Dokuments: 2026-10-09 (Rezeptbild-Upload und Sitzungs-Refresh behoben)
 
 ### GitHub
 
@@ -88,13 +88,15 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Relevante Implementierung: `lib/data/services/recipe_image_service.dart`, `lib/features/recipes/add_recipe_page.dart`, `lib/features/recipes/recipe_detail_page.dart` und `lib/data/repositories/recipe_repository.dart`.
 - Live-Supabase-Prüfung am 2026-10-09: Bucket `recipe-images` existiert, ist privat, erlaubt JPEG/PNG/WebP und hat eine 10-MiB-Grenze. Storage- und Rezept-RLS-Policies weichen teilweise von den versionierten Migrationen ab; der Upload-Fehler ließ sich aus den verfügbaren Logs nicht konkret reproduzieren.
 - Wahrscheinlicher Client-Schwachpunkt: `RecipeImageService.upload` verwendete `file.mimeType` direkt, auch wenn `image_picker` das Bild neu kodiert und der Dateityp nicht mehr zur Dateiendung passt. Zusätzlich wurden Bilder mit 2400 px und Qualität 92 ausgewählt, was bei manchen Fotos die Bucket-Grenze erreichen kann.
-- Branch `fix/recipe-image-upload`: Uploads werden jetzt mit 1600 px/Qualität 80 vorbereitet, der MIME-Typ wird aus dem erlaubten Ziel-Format abgeleitet und Dateien über 10 MiB erhalten eine verständliche Fehlermeldung. Regressionstest ergänzt.
-- Das ist eine robuste Fehlerbehebung für die erkennbaren Client-Risiken, aber ohne konkrete fehlgeschlagene Upload-Logs kein Beweis, dass dies die einzige Ursache war. Nach CI und Merge erneute Prüfung des Live-Setups vornehmen.
+- PR #57 („Fix recipe image upload and session refresh“) wurde am 2026-10-09 gemergt. Squash-Commit: `c41521591f3aa6393bbb4545345f4ed837926a8b`.
+- Uploads werden jetzt mit 1600 px/Qualität 80 vorbereitet, der MIME-Typ wird aus dem erlaubten Zielformat abgeleitet und Dateien über 10 MiB erhalten eine verständliche Fehlermeldung.
+- `AuthSessionService` serialisiert Token-Refreshes, damit parallele Requests nicht konkurrierend dasselbe Refresh-Token verwenden. Das adressiert eine plausible Ursache für „Sitzung konnte nicht verwendet werden“, ist ohne konkrete fehlgeschlagene Upload-Logs aber kein Beweis für die einzige Ursache.
+- Regressionstests und beide CI-Workflows auf PR-Head `8399161613603975d34a5cb73d580bb999f0345b` waren erfolgreich. Merge-CI noch abschließend prüfen. Live-Bucket und Storage-Policies wurden geprüft; keine Supabase-Migration war für diesen Fix nötig.
 
 ## Nächster technischer Schritt
 
-1. PR für den Rezeptbild-Upload öffnen, CI prüfen und bei grünen Checks mergen.
-2. Nach Merge CI und den aktuellen Supabase-Stand prüfen; Nutzer lokal `git pull` ausführen und Bild-Upload erneut testen.
+1. Post-Merge-CI für `c41521591f3aa6393bbb4545345f4ed837926a8b` prüfen.
+2. Nutzer lokal `git pull` ausführen und Rezeptbild-Upload erneut testen. Bei erneutem Sitzungsfehler den vollständigen technischen Fehler aus dem Debug-Log erfassen, da der genaue fehlgeschlagene Auth-Refresh in den verfügbaren Live-Logs nicht sichtbar war.
 
 ## Sicherheits-/Arbeitsregeln
 
