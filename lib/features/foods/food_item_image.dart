@@ -31,7 +31,7 @@ class FoodItemImage extends StatelessWidget {
     'Kartoffel':'🥔','Kartoffeln':'🥔','Knoblauch':'🧄','Knollensellerie':'🥬','Kohlrabi':'🥬',
     'Kürbis':'🎃','Lauch':'🥬','Mais':'🌽','Mangold':'🥬','Okra':'🥬','Pak Choi':'🥬','Paprika':'🫑',
     'Pastinake':'🥕','Petersilienwurzel':'🥕','Radieschen':'🔴','Rettich':'🥬','Romanesco':'🥦',
-    'Rosenkohl':'🥬','Rote Bete':'🟣','Schalotte':'🧅','Shiitake-Pilze':'🍄','Spinat':'🥬','Spitzkohl':'🥬',
+    'Rosenkohl':'🥬','Rote Bete':'🫜','Schalotte':'🧅','Shiitake-Pilze':'🍄','Spinat':'🥬','Spitzkohl':'🥬',
     'Stangensellerie':'🥬','Steckrübe':'🥔','Süßkartoffel':'🍠','Süßkartoffeln':'🍠','Tomate':'🍅',
     'Tomaten':'🍅','Weißkohl':'🥬','Zucchini':'🥒','Zuckerschoten':'🫛','Zwiebel':'🧅','Zwiebeln':'🧅',
     // Grains and sides
@@ -53,11 +53,11 @@ class FoodItemImage extends StatelessWidget {
     'Cashews':'🥜','Erdnüsse':'🥜','Haselnüsse':'🌰','Kürbiskerne':'🌱','Mandeln':'🥜',
     'Pistazien':'🥜','Sonnenblumenkerne':'🌻','Walnüsse':'🌰',
     // Fruit
-    'Ananas':'🍍','Apfel':'🍎','Banane':'🍌','Birne':'🍐','Erdbeeren':'🍓','Heidelbeeren':'🫐',
-    'Himbeeren':'🍓','Limette':'🍋','Mandarine':'🍊','Mango':'🥭','Orange':'🍊','Pfirsich':'🍑','Trauben':'🍇','Zitrone':'🍋',
+    'Ananas':'🍍','Apfel':'🍎','Banane':'🍌','Wassermelone':'🍉','Birne':'🍐','Erdbeeren':'🍓','Heidelbeeren':'🫐',
+    'Himbeeren':'🍓','Kiwi':'🥝','Limette':'🍋‍🟩','Mandarine':'🍊','Mango':'🥭','Orange':'🍊','Pfirsich':'🍑','Trauben':'🍇','Zitrone':'🍋',
     // Sauces and pantry basics
     'Currypaste':'🟡','Essig':'🫗','Gemüsebrühe':'🍲','Honig':'🍯','Ketchup':'🍅','Kokosmilch':'🥥',
-    'Mayonnaise':'🥣','Olivenöl':'🫒','Passierte Tomaten':'🍅','Pesto':'🌿','Senf':'🟡',
+    'Mayonnaise':'🥣','Olive':'🫒','Olivenöl':'🫒','Passierte Tomaten':'🍅','Pesto':'🌿','Senf':'🟡',
     'Sojasauce':'🫗','Sonnenblumenöl':'🌻','Tomatenmark':'🍅',
   };
 
