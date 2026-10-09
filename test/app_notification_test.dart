@@ -12,12 +12,14 @@ void main() {
       'shared_recipe_plan_id': null,
       'decision_request_id': 'r1',
       'recipe_suggestion_id': null,
+      'recipe_deletion_request_id': 'delete-request-1',
       'read_at': null,
       'created_at': '2026-09-15T10:00:00Z',
     });
 
     expect(notification.id, 'n1');
     expect(notification.decisionRequestId, 'r1');
+    expect(notification.recipeDeletionRequestId, 'delete-request-1');
     expect(notification.isRead, isFalse);
   });
 

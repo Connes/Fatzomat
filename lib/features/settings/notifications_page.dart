@@ -113,6 +113,48 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
     if (!mounted) return;
 
+    if (item.type == 'recipe_deletion_request' && item.recipeDeletionRequestId != null) {
+      final approve = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Rezept wirklich löschen?'),
+          content: Text(
+            '${item.body} Wenn du zustimmst, wird das Rezept aus der gemeinsamen Bibliothek entfernt.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Ablehnen'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Löschung zustimmen'),
+            ),
+          ],
+        ),
+      );
+      if (approve != null) {
+        try {
+          await repo.respondToRecipeDeletion(
+            item.recipeDeletionRequestId!,
+            approve: approve,
+          );
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(approve
+                  ? 'Das Rezept wurde gelöscht.'
+                  : 'Die Löschung wurde abgelehnt. Das Rezept bleibt erhalten.'),
+            ),
+          );
+        } catch (error) {
+          if (mounted) showAppError(context, error);
+        }
+      }
+      await load();
+      return;
+    }
+
     if (item.decisionShareId != null || item.type == 'decision_message') {
       if (item.decisionShareId != null) {
         await Navigator.push(
@@ -216,6 +258,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
     if (item.type == 'decision_message') return Icons.people_alt_rounded;
     if (item.type == 'decision_request_accepted') return Icons.check_circle_outline_rounded;
     if (item.type == 'decision_request_cancelled') return Icons.undo_rounded;
+    if (item.type == 'recipe_deletion_request') return Icons.delete_outline_rounded;
+    if (item.type == 'recipe_deletion_approved') return Icons.delete_forever_rounded;
+    if (item.type == 'recipe_deletion_rejected') return Icons.block_rounded;
     if (item.type == 'recipe_created' || item.type == 'shared_recipe' || item.type == 'recipe_suggestion') return Icons.restaurant_menu_rounded;
     return Icons.notifications_none_rounded;
   }

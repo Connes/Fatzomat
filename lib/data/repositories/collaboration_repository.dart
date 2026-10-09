@@ -311,7 +311,7 @@ class CollaborationRepository {
 
   Future<List<AppNotification>> notifications() async {
     const baseColumns =
-        'id,type,title,body,recipe_id,shared_recipe_plan_id,decision_request_id,recipe_suggestion_id,read_at,created_at';
+        'id,type,title,body,recipe_id,shared_recipe_plan_id,decision_request_id,recipe_suggestion_id,recipe_deletion_request_id,read_at,created_at';
 
     // decision_share_id was introduced with the V85 decision-message
     // migration. Keep the inbox readable when an existing installation has
@@ -406,6 +406,14 @@ class CollaborationRepository {
       'p_accept': accept,
     });
     return RecipeSuggestion.fromMap(Map<String, dynamic>.from(result as Map));
+  }
+
+  Future<bool> respondToRecipeDeletion(String requestId, {required bool approve}) async {
+    final result = await client.rpc('respond_to_recipe_deletion', params: {
+      'p_request_id': requestId,
+      'p_approve': approve,
+    });
+    return result == true;
   }
 
   Future<String> shareRecipeForToday(String recipeId, {int? servings}) async {
