@@ -204,23 +204,7 @@ class _DeliveryService {
   final bool logoIsSvg;
   final String? appUrl;
 
-  String searchUrl(String query) {
-    switch (name) {
-      case 'Lieferando':
-        return Uri.https('www.lieferando.de', '/suche', {'q': query}).toString();
-      case 'Uber Eats':
-        return Uri.https('www.ubereats.com', '/de/search', {
-          'q': query,
-          'searchType': 'GLOBAL_SEARCH',
-        }).toString();
-      case 'Wolt':
-        return Uri.https('wolt.com', '/de/deu/search', {'q': query}).toString();
-      case 'Bolt':
-        return Uri.https('food.bolt.eu', '/search', {'query': query}).toString();
-      default:
-        return url;
-    }
-  }
+  String searchUrl(String query) => deliveryServiceSearchUrl(name, query, fallbackUrl: url);
 
   const _DeliveryService({
     required this.name,
@@ -230,4 +214,29 @@ class _DeliveryService {
     this.logoIsSvg = false,
     this.appUrl,
   });
+}
+
+/// Builds the category/search destination opened by a delivery-service card.
+/// Lieferando's dedicated pizza landing page is more reliable than a generic
+/// search query for this common category.
+String deliveryServiceSearchUrl(String serviceName, String query, {String fallbackUrl = ''}) {
+    final normalizedQuery = query.trim().toLowerCase();
+    switch (serviceName) {
+      case 'Lieferando':
+        if (normalizedQuery == 'pizza') {
+          return 'https://www.lieferando.de/pizza-bestellen';
+        }
+        return Uri.https('www.lieferando.de', '/suche', {'q': query.trim()}).toString();
+      case 'Uber Eats':
+        return Uri.https('www.ubereats.com', '/de/search', {
+          'q': query.trim(),
+          'searchType': 'GLOBAL_SEARCH',
+        }).toString();
+      case 'Wolt':
+        return Uri.https('wolt.com', '/de/deu/search', {'q': query.trim()}).toString();
+      case 'Bolt':
+        return Uri.https('food.bolt.eu', '/search', {'query': query.trim()}).toString();
+      default:
+        return fallbackUrl;
+    }
 }
