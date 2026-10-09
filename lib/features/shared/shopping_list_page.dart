@@ -161,15 +161,33 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
         final recipe = plan['recipes'] is Map
             ? Map<String, dynamic>.from(plan['recipes'] as Map)
             : const <String, dynamic>{};
-        return ShoppingPage(
-          planId: plan['id'].toString(),
-          recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
-          servings: (plan['servings'] as num?)?.toInt() ?? 2,
-          shared: true,
-          onCompleted: () {
-            if (!mounted) return;
-            setState(() => sharedPlan = null);
-          },
+        return TogetherScaffold(
+          backgroundType: TogetherBackgroundType.today,
+          appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
+          body: _EntryCard(
+            icon: Icons.people_outline_rounded,
+            title: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
+            text: 'Die gemeinsame Einkaufsliste ist bereit. Du kannst sie öffnen oder zur persönlichen Mehrtagesplanung wechseln.',
+            actionLabel: 'Gemeinsame Einkaufsliste öffnen',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ShoppingPage(
+                  planId: plan['id'].toString(),
+                  recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
+                  servings: (plan['servings'] as num?)?.toInt() ?? 2,
+                  shared: true,
+                  onCompleted: () {
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    load();
+                  },
+                ),
+              ),
+            ),
+            secondaryLabel: 'Persönliche Mehrtagesliste öffnen',
+            onSecondaryPressed: _openPersonal,
+          ),
         );
       }
 
