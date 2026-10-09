@@ -218,3 +218,81 @@ drop policy if exists "recipe images accessible with recipe" on storage.objects;
 create policy "recipe images accessible with recipe"
 on storage.objects for select to authenticated
 using (bucket_id='recipe-images' and exists(select 1 from public.recipes r where r.image_path=storage.objects.name));
+
+
+-- Notification records carry the actionable deletion request identifier.
+alter table public.app_notifications
+  add column if not exists recipe_deletion_request_id uuid
+  references public.recipe_deletion_requests(id) on delete cascade;
+create index if not exists idx_notifications_recipe_deletion_request
+  on public.app_notifications(recipe_deletion_request_id)
+  where recipe_deletion_request_id is not null;
+
+-- A suggestion now points at the shared recipe itself. Accepting it records
+-- the decision only; it never creates a second recipes row.
+create or replace function public.create_recipe_suggestion(p_recipe_id uuid)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
+declare
+  uid uuid:=auth.uid(); cid uuid; recipient uuid; row public.recipe_suggestions; recipe_name text; created_new boolean:=false;
+begin
+  if uid is null then raise exception 'Nicht authentifiziert.'; end if;
+  select connection_id into cid from public.connection_members where user_id=uid limit 1;
+  if cid is null then raise exception 'Keine Verbindung zu einer zweiten Person vorhanden.'; end if;
+  select user_id into recipient from public.connection_members where connection_id=cid and user_id<>uid limit 1;
+  if recipient is null then raise exception 'Keine verbundene Person vorhanden.'; end if;
+  select name into recipe_name from public.recipes where id=p_recipe_id;
+  if recipe_name is null then raise exception 'Das Rezept ist nicht verfügbar.'; end if;
+  select * into row from public.recipe_suggestions
+   where connection_id=cid and recipe_id=p_recipe_id and suggested_by=uid and suggested_to=recipient and status='pending'
+   limit 1;
+  if row.id is null then
+    insert into public.recipe_suggestions(connection_id,recipe_id,suggested_by,suggested_to)
+    values(cid,p_recipe_id,uid,recipient) returning * into row;
+    created_new:=true;
+  end if;
+  if created_new then
+    insert into public.app_notifications(user_id,type,title,body,recipe_id,recipe_suggestion_id)
+    values(recipient,'recipe_suggestion','Rezept geteilt','Ein Rezept wurde mit dir geteilt: '||recipe_name,p_recipe_id,row.id);
+  end if;
+  return jsonb_build_object('id',row.id,'connection_id',row.connection_id,'recipe_id',row.recipe_id,
+    'suggested_by',row.suggested_by,'suggested_to',row.suggested_to,'status',row.status,
+    'created_at',row.created_at,'responded_at',row.responded_at);
+end $$;
+revoke all on function public.create_recipe_suggestion(uuid) from public,anon;
+grant execute on function public.create_recipe_suggestion(uuid) to authenticated;
+
+create or replace function public.respond_to_recipe_suggestion(p_suggestion_id uuid,p_accept boolean)
+returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
+declare uid uuid:=auth.uid(); row public.recipe_suggestions; new_status text;
+begin
+  if uid is null then raise exception 'Nicht authentifiziert.'; end if;
+  select * into row from public.recipe_suggestions
+  where id=p_suggestion_id and suggested_to=uid and status='pending'
+    and public.is_connection_member(connection_id) for update;
+  if row.id is null then raise exception 'Der Rezeptvorschlag ist nicht mehr offen oder gehört nicht zu deiner Verbindung.'; end if;
+  new_status:=case when p_accept then 'accepted' else 'declined' end;
+  update public.recipe_suggestions set status=new_status,responded_at=now() where id=row.id;
+  update public.app_notifications set read_at=coalesce(read_at,now())
+    where recipe_suggestion_id=row.id and user_id=uid;
+  row.status:=new_status; row.responded_at:=now();
+  return jsonb_build_object('id',row.id,'connection_id',row.connection_id,'recipe_id',row.recipe_id,
+    'suggested_by',row.suggested_by,'suggested_to',row.suggested_to,'status',row.status,
+    'created_at',row.created_at,'responded_at',row.responded_at);
+end $$;
+revoke all on function public.respond_to_recipe_suggestion(uuid,boolean) from public,anon;
+grant execute on function public.respond_to_recipe_suggestion(uuid,boolean) to authenticated;
+
+-- Recipe image objects follow the shared library's visibility, not account ownership.
+drop policy if exists "recipe images owner insert" on storage.objects;
+drop policy if exists "recipe images owner update" on storage.objects;
+drop policy if exists "recipe images owner delete" on storage.objects;
+create policy "recipe images global insert"
+on storage.objects for insert to authenticated
+with check (bucket_id='recipe-images');
+create policy "recipe images global update"
+on storage.objects for update to authenticated
+using (bucket_id='recipe-images')
+with check (bucket_id='recipe-images');
+create policy "recipe images global delete"
+on storage.objects for delete to authenticated
+using (bucket_id='recipe-images');
