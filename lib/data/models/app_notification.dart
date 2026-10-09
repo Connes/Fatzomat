@@ -6,7 +6,8 @@ class AppNotification {
   final String? recipeId;
   final String? sharedRecipePlanId;
   final String? decisionRequestId;
-  final String? recipeSuggestionId;\n  final String? recipeDeletionRequestId;
+  final String? recipeSuggestionId;
+  final String? recipeDeletionRequestId;
   final String? decisionShareId;
   final DateTime? readAt;
   final DateTime createdAt;
@@ -19,7 +20,8 @@ class AppNotification {
     required this.recipeId,
     required this.sharedRecipePlanId,
     required this.decisionRequestId,
-    required this.recipeSuggestionId,\n    required this.recipeDeletionRequestId,
+    required this.recipeSuggestionId,
+    required this.recipeDeletionRequestId,
     required this.decisionShareId,
     required this.readAt,
     required this.createdAt,
@@ -36,7 +38,8 @@ class AppNotification {
       recipeId: map['recipe_id']?.toString(),
       sharedRecipePlanId: map['shared_recipe_plan_id']?.toString(),
       decisionRequestId: map['decision_request_id']?.toString(),
-      recipeSuggestionId: map['recipe_suggestion_id']?.toString(),\n      recipeDeletionRequestId: map['recipe_deletion_request_id']?.toString(),
+      recipeSuggestionId: map['recipe_suggestion_id']?.toString(),
+      recipeDeletionRequestId: map['recipe_deletion_request_id']?.toString(),
       decisionShareId: map['decision_share_id']?.toString(),
       readAt: map['read_at'] == null ? null : DateTime.parse(map['read_at'].toString()),
       createdAt: DateTime.parse(map['created_at'].toString()),
