@@ -180,9 +180,9 @@ begin
   select id into pending_id from public.recipe_deletion_requests where recipe_id=p_recipe_id and status='pending' limit 1;
   if pending_id is not null then return false; end if;
   insert into public.recipe_deletion_requests(recipe_id,requested_by,requested_for,connection_id)
-  values(p_recipe_id,uid,partner,cid);
-  insert into public.app_notifications(user_id,type,title,body,recipe_id)
-  values(partner,'recipe_deletion_request','Löschung bestätigen','Die Löschung des Rezepts „'||recipe_name||'“ wird angefragt.',p_recipe_id);
+  values(p_recipe_id,uid,partner,cid) returning id into pending_id;
+  insert into public.app_notifications(user_id,type,title,body,recipe_id,recipe_deletion_request_id)
+  values(partner,'recipe_deletion_request','Löschung bestätigen','Die Löschung des Rezepts „'||recipe_name||'“ wird angefragt.',p_recipe_id,pending_id);
   return false;
 end $$;
 revoke all on function public.remove_recipe_from_collection(uuid) from public, anon;
