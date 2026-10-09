@@ -169,6 +169,23 @@ class PersonalTodayRepository {
   }
 
 
+  Future<List<TodayPlan>> completedTodayPlans() async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return const [];
+    final rows = await client
+        .from('personal_today_plans')
+        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
+        .eq('user_id', userId)
+        .eq('plan_date', _dateOnly(DateTime.now()))
+        .eq('status', 'cooked')
+        .order('updated_at', ascending: false);
+    final maps = rows.map((row) => Map<String, dynamic>.from(row)).toList();
+    for (final map in maps) {
+      await _resolveNestedRecipeImage(map);
+    }
+    return maps.map(TodayPlan.fromMap).toList(growable: false);
+  }
+
   Future<List<PersonalHistoryEntry>> history({int limit = 100}) async {
     final userId = client.auth.currentUser?.id;
     if (userId == null) throw const AuthenticationException();
