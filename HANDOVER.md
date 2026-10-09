@@ -54,17 +54,19 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-09 (nach Merge von PR #55)
+Stand dieses Dokuments: 2026-10-09 (nach Merge von PR #56)
 
 ### GitHub
 
 - `main` enthält den Grafik-Commit `9dc4dd0`: die acht neuen Delivery-PNGs sind im Repository und die beiden alten Order-WebPs sind entfernt.
 - PR #55 („Standardize food emojis and add missing produce“) wurde am 2026-10-09 gemergt. Merge-Commit: `9eb78ff8a1bb743a3a8a314b36fc33d432f9ffff`.
-- Enthalten sind die Emoji-Korrekturen, Wassermelone 🍉, Kiwi 🥝 und Olive 🫒 sowie zugehörige Tests. Limette ist 🍋‍🟩, Rote Bete 🫜. Diese Änderungen sind nun in `main`.
+- Enthalten sind die Emoji-Korrekturen, Wassermelone 🍉, Kiwi 🥝 und Olive 🫒 sowie zugehörige Tests. Limette ist 🍋‍🟩, Rote Bete 🫜. Diese Änderungen sind in `main`.
+- PR #56 („Allow unitless ingredients in imported recipes“) wurde am 2026-10-09 gemergt. Merge-Commit: `1007547a8a52f242f058f486529d7b9ce67801d4`.
+- Fix: `create_shared_recipe` und `update_shared_recipe` erlauben nun leere Einheiten für Stück-Zutaten, z. B. „2 Zwiebeln“. Supabase-Migration `allow_unitless_recipe_ingredients` wurde auf Projekt `oidxezjdwqktpxuypbfb` angewendet und die Live-Funktionsdefinitionen verifiziert: Die Fehlermeldung „Eine Zutat benötigt eine Einheit.“ ist nicht mehr enthalten.
 
 ### CI
 
-Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren sowohl `Quality Gate` (Analyze und Test) als auch `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) erfolgreich.
+Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren beide Workflows erfolgreich. Für PR #56 waren `Quality Gate` (Analyze und Test) sowie `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) auf dem korrigierten PR-Head erfolgreich. Die nach dem Merge gestarteten Workflows für den Merge-Commit laufen bei der letzten Prüfung noch.
 
 Es gibt außerdem `.github/workflows/build-apk.yml`, der manuell oder über einen `v*`-Tag läuft. Dieser Release-Build ist **nicht Teil des gewünschten Standardworkflows** und soll nicht automatisch ausgelöst oder erweitert werden.
 
@@ -83,7 +85,7 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 
 ## Nächster technischer Schritt
 
-1. Den aktuellen `main`-Stand nach dem Merge prüfen und bei Bedarf die CI-Läufe für den Merge-Commit verifizieren.
+1. Die nach dem Merge gestarteten CI-Läufe für den aktuellen `main`-Stand abschließend verifizieren.
 2. Danach das nächste sinnvolle Produkt-/Repository-Feature aus dem aktuellen `main`-Stand ableiten.
 
 ## Sicherheits-/Arbeitsregeln
