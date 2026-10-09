@@ -19,12 +19,14 @@ import '../recipes/add_recipe_page.dart';
 /// selected when the user returns here.
 class CookNextStepPage extends StatefulWidget {
   final String mainChoice;
+  final DateTime? planDate;
   final String? decisionRequestId;
   final FoodRepository? repository;
 
   const CookNextStepPage({
     super.key,
     required this.mainChoice,
+    this.planDate,
     this.decisionRequestId,
     this.repository,
   });
@@ -107,6 +109,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           mainChoice: widget.mainChoice,
           selectedFoodIds: Set<String>.from(selectedFoodIds),
           decisionRequestId: widget.decisionRequestId,
+          planDate: widget.planDate,
         ),
       ),
     );
