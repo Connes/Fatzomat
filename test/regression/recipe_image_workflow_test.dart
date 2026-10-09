@@ -38,6 +38,14 @@ void main() {
     expect(repo, contains("action: () => client\n          .from('recipes')\n          .select('image_path')"));
   });
 
+  test('recipe image upload uses unique paths and avoids storage upsert RLS', () {
+    final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
+
+    expect(service, contains("cover-\${DateTime.now().microsecondsSinceEpoch}"));
+    expect(service, contains('upsert: false'));
+    expect(service, isNot(contains('upsert: true')));
+  });
+
   test('recipe image upload uses allow-listed MIME types and stays below bucket size limit', () {
     final service = File('lib/data/services/recipe_image_service.dart').readAsStringSync();
 
