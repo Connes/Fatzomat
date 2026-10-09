@@ -296,3 +296,169 @@ with check (bucket_id='recipe-images');
 create policy "recipe images global delete"
 on storage.objects for delete to authenticated
 using (bucket_id='recipe-images');
+
+
+-- Today selections reference the canonical shared recipe instead of creating
+-- a recipient-owned copy.
+create or replace function public.set_personal_today_plan(p_recipe_id uuid,p_servings integer default null)
+returns uuid language plpgsql security definer set search_path=public,pg_temp as $$
+declare uid uuid:=auth.uid(); pid uuid; base_servings integer; target_servings integer;
+begin
+  if uid is null then raise exception 'Keine Supabase-Sitzung vorhanden.'; end if;
+  select servings into base_servings from public.recipes where id=p_recipe_id;
+  if base_servings is null then raise exception 'Rezept ist nicht verfügbar.'; end if;
+  target_servings:=coalesce(p_servings,base_servings);
+  if target_servings<1 or target_servings>12 then raise exception 'Ungültige Personenzahl.'; end if;
+  select id into pid from public.personal_today_plans
+    where user_id=uid and plan_date=current_date and status<>'cancelled' limit 1;
+  if pid is null then
+    insert into public.personal_today_plans(user_id,recipe_id,plan_date,status,servings)
+    values(uid,p_recipe_id,current_date,'planned',target_servings) returning id into pid;
+  else
+    update public.personal_today_plans set recipe_id=p_recipe_id,status='planned',servings=target_servings,updated_at=now()
+    where id=pid and user_id=uid;
+  end if;
+  delete from public.shopping_items where personal_today_plan_id=pid and source='recipe';
+  insert into public.shopping_items(personal_today_plan_id,food_id,name,quantity,unit,source)
+  select pid,ri.food_id,ri.name,
+    round((ri.quantity*target_servings::numeric/greatest(base_servings,1))::numeric,2),ri.unit,'recipe'
+  from public.recipe_ingredients ri where ri.recipe_id=p_recipe_id;
+  return pid;
+end $$;
+revoke all on function public.set_personal_today_plan(uuid,integer) from public,anon;
+grant execute on function public.set_personal_today_plan(uuid,integer) to authenticated;
+
+create or replace function public.accept_decision_share(p_share_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $function$
+declare
+  uid uuid := auth.uid();
+  share_row public.decision_shares;
+  source_recipe public.recipes;
+  copied_recipe_id uuid;
+  personal_plan_id uuid;
+  shared_plan_id uuid;
+  sender_name text;
+begin
+  if uid is null then raise exception 'Keine Supabase-Sitzung vorhanden.'; end if;
+
+  select * into share_row
+  from public.decision_shares
+  where id = p_share_id and recipient_id = uid and public.is_connection_member(connection_id)
+  for update;
+
+  if share_row.id is null then raise exception 'Die geteilte Entscheidung ist nicht mehr verfügbar.'; end if;
+  if share_row.message_type <> 'share' then raise exception 'Diese Nachricht enthält keine übernehmbare Entscheidung.'; end if;
+  if share_row.cancelled_at is not null then raise exception 'Diese gemeinsame Entscheidung wurde bereits entfernt.'; end if;
+  if share_row.plan_date <> current_date then raise exception 'Die geteilte Entscheidung gilt nicht mehr für heute.'; end if;
+  if share_row.rejected_at is not null then raise exception 'Die geteilte Entscheidung wurde bereits abgelehnt.'; end if;
+
+  if share_row.accepted_at is not null and share_row.accepted_plan_id is not null then
+    return jsonb_build_object(
+      'share_id', share_row.id,
+      'plan_id', share_row.accepted_plan_id,
+      'decision_type', share_row.decision_type,
+      'recipe_id', share_row.accepted_recipe_id,
+      'shared_recipe_plan_id', share_row.shared_recipe_plan_id
+    );
+  end if;
+
+  if share_row.decision_type = 'recipe' then
+    if share_row.recipe_id is null then raise exception 'Das geteilte Rezept ist nicht mehr verfügbar.'; end if;
+
+    copied_recipe_id := share_row.recipe_id;
+    select * into source_recipe
+    from public.recipes
+    where id = share_row.recipe_id
+    for share;
+    if source_recipe.id is null then raise exception 'Das geteilte Rezept ist nicht mehr verfügbar.'; end if;
+
+    personal_plan_id := public.set_personal_today_plan(copied_recipe_id,share_row.servings);
+
+    select id into shared_plan_id
+    from public.shared_recipe_plans
+    where connection_id = share_row.connection_id
+      and plan_date = current_date
+      and status <> 'cancelled'
+    order by created_at desc
+    limit 1;
+
+    if shared_plan_id is null then
+      insert into public.shared_recipe_plans(
+        connection_id,recipe_id,shared_by,plan_date,status,servings
+      )
+      values(
+        share_row.connection_id,
+        share_row.recipe_id,
+        share_row.sender_id,
+        current_date,
+        'planned',
+        share_row.servings
+      )
+      returning id into shared_plan_id;
+
+      insert into public.shopping_items(
+        shared_recipe_plan_id,food_id,name,quantity,unit,source
+      )
+      select
+        shared_plan_id,
+        ri.food_id,
+        ri.name,
+        round((ri.quantity * share_row.servings::numeric / greatest(source_recipe.servings,1))::numeric,2),
+        ri.unit,
+        'recipe'
+      from public.recipe_ingredients ri
+      where ri.recipe_id = share_row.recipe_id;
+    end if;
+
+    update public.decision_shares
+    set accepted_at = now(),
+        accepted_plan_id = personal_plan_id,
+        shared_recipe_plan_id = shared_plan_id
+    where id = share_row.id;
+  elsif share_row.decision_type in ('order','dine_out','surprise') then
+    if nullif(btrim(share_row.decision_value),'') is null then
+      raise exception 'Die geteilte Entscheidung ist nicht mehr vollständig verfügbar.';
+    end if;
+
+    personal_plan_id := public.set_personal_today_decision(
+      share_row.decision_type, share_row.decision_value
+    );
+
+    update public.decision_shares
+    set accepted_at = now(), accepted_plan_id = personal_plan_id
+    where id = share_row.id;
+  else
+    raise exception 'Ungültige geteilte Entscheidung.';
+  end if;
+
+  select nullif(btrim(display_name),'')
+  into sender_name
+  from public.profiles
+  where id = uid;
+
+  insert into public.app_notifications(user_id,type,title,body,decision_share_id)
+  values (
+    share_row.sender_id,
+    'decision_message_response',
+    'Entscheidung übernommen',
+    coalesce(sender_name,'Deine verbundene Person') || ' hat deine geteilte Entscheidung übernommen.',
+    share_row.id
+  );
+
+  return jsonb_build_object(
+    'share_id', share_row.id,
+    'plan_id', personal_plan_id,
+    'decision_type', share_row.decision_type,
+    'recipe_id', copied_recipe_id,
+    'shared_recipe_plan_id', shared_plan_id
+  );
+end;
+$function$;
+
+
+revoke execute on function public.accept_decision_share(uuid) from public,anon;
+grant execute on function public.accept_decision_share(uuid) to authenticated;
