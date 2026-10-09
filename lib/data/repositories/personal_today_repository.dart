@@ -25,6 +25,9 @@ class PersonalTodayRepository {
     final planDate = _dateOnly(date ?? DateTime.now());
     final userId = client.auth.currentUser?.id;
     if (userId == null) {
+      // The offline cache only represents the current day. Never display that
+      // cached decision while browsing a different date.
+      if (planDate != _dateOnly(DateTime.now())) return null;
       final cached = await offlineCache.readToday();
       return cached == null ? null : TodayPlan.fromMap(cached);
     }
@@ -66,8 +69,11 @@ class PersonalTodayRepository {
       await _resolveNestedRecipeImage(map);
       return TodayPlan.fromMap(map);
     } catch (_) {
-      final cached = await offlineCache.readToday();
-      if (cached != null) return TodayPlan.fromMap(cached);
+      // A single cached plan has no date key, so it is safe only for Today.
+      if (planDate == _dateOnly(DateTime.now())) {
+        final cached = await offlineCache.readToday();
+        if (cached != null) return TodayPlan.fromMap(cached);
+      }
       rethrow;
     }
   }
