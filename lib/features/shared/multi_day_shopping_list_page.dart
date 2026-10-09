@@ -70,8 +70,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     _observedToday = _dateOnly(DateTime.now());
     _days = _makeDays(_observedToday);
     _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
-    _selected.add(_key(today));
-    _expanded.add(_key(today));
+    _selected.add(_key(_observedToday));
+    _expanded.add(_key(_observedToday));
     load();
   }
 
