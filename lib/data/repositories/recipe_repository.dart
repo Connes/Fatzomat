@@ -169,11 +169,14 @@ class RecipeRepository {
   }
 
   Future<Recipe> getRecipeModel(String id) async {
-    final row = await client
-        .from('recipes')
-        .select('*,recipe_ingredients(*)')
-        .eq('id', id)
-        .single();
+    final row = await AuthSessionService.runWithRefresh(
+      client: client,
+      action: () => client
+          .from('recipes')
+          .select('*,recipe_ingredients(*)')
+          .eq('id', id)
+          .single(),
+    );
     return _withResolvedImage(Recipe.fromMap(Map<String, dynamic>.from(row)));
   }
 
@@ -214,11 +217,14 @@ class RecipeRepository {
 
   Future<Recipe> setRecipeImage(String recipeId, RecipeImageUpload upload) async {
     await AuthSessionService.ensureValidSession(client: client);
-    final current = await client
-        .from('recipes')
-        .select('image_path')
-        .eq('id', recipeId)
-        .single();
+    final current = await AuthSessionService.runWithRefresh(
+      client: client,
+      action: () => client
+          .from('recipes')
+          .select('image_path')
+          .eq('id', recipeId)
+          .single(),
+    );
     final oldPath = current['image_path']?.toString().trim() ?? '';
     await AuthSessionService.runWithRefresh(
       client: client,
