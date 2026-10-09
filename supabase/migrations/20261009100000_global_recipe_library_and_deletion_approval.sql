@@ -88,7 +88,7 @@ begin
   if trim(coalesce(p_recipe->>'name','')) = '' then raise exception 'Ein Rezeptname ist erforderlich.'; end if;
   fp := public.recipe_fingerprint(p_recipe,p_ingredients);
   select id into duplicate_id from public.recipes where recipe_fingerprint=fp order by created_at desc limit 1;
-  if duplicate_id is not null and not coalesce(p_allow_duplicate,false) then
+  if duplicate_id is not null then
     return jsonb_build_object('created',false,'recipe_id',null,'duplicate_recipe_id',duplicate_id);
   end if;
   insert into public.recipes(created_by,name,description,servings,prep_time_minutes,cook_time_minutes,difficulty,instructions,image_url,updated_at,recipe_fingerprint)
