@@ -86,18 +86,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 ## Aktuelle Fehleranalyse: Rezeptbild kann nicht hinzugefügt werden
 
 - Relevante Implementierung: `lib/data/services/recipe_image_service.dart`, `lib/features/recipes/add_recipe_page.dart`, `lib/features/recipes/recipe_detail_page.dart` und `lib/data/repositories/recipe_repository.dart`.
-- Live-Supabase-Prüfung am 2026-10-09: Bucket `recipe-images` existiert, ist privat, erlaubt JPEG/PNG/WebP und hat eine 10-MiB-Grenze. Storage- und Rezept-RLS-Policies weichen teilweise von den versionierten Migrationen ab; der Upload-Fehler ließ sich aus den verfügbaren Logs nicht konkret reproduzieren.
-- Wahrscheinlicher Client-Schwachpunkt: `RecipeImageService.upload` verwendete `file.mimeType` direkt, auch wenn `image_picker` das Bild neu kodiert und der Dateityp nicht mehr zur Dateiendung passt. Zusätzlich wurden Bilder mit 2400 px und Qualität 92 ausgewählt, was bei manchen Fotos die Bucket-Grenze erreichen kann.
-- PR #57 („Fix recipe image upload and session refresh“) wurde am 2026-10-09 gemergt. Squash-Commit: `c41521591f3aa6393bbb4545345f4ed837926a8b`.
-- Uploads werden jetzt mit 1600 px/Qualität 80 vorbereitet, der MIME-Typ wird aus dem erlaubten Zielformat abgeleitet und Dateien über 10 MiB erhalten eine verständliche Fehlermeldung.
-- `AuthSessionService` serialisiert Token-Refreshes, damit parallele Requests nicht konkurrierend dasselbe Refresh-Token verwenden. Das adressiert eine plausible Ursache für „Sitzung konnte nicht verwendet werden“, ist ohne konkrete fehlgeschlagene Upload-Logs aber kein Beweis für die einzige Ursache.
-- Regressionstests und beide CI-Workflows für den Merge-Commit `c41521591f3aa6393bbb4545345f4ed837926a8b` waren erfolgreich. Der Nutzer meldet weiterhin „Die Sitzung konnte nicht verwendet werden“. Bei erneuter Codeprüfung wurde ein weiterer konkreter Schwachpunkt gefunden: `RecipeRepository.setRecipeImage` las `recipes.image_path` vor dem Update ohne `runWithRefresh`; auch `getRecipeModel` führte den Rezept-SELECT ohne Auth-Retry aus. Diese Reads können trotz des Upload-Fixes an einer abgelaufenen/abgelehnten Session scheitern.
-
-## Nächster technischer Schritt
-
-1. PR für `fix/recipe-image-session-retry` prüfen: Auth-Refresh-Retry für die Rezept-Metadaten-Reads ergänzen und Regressionstest ausführen.
-2. Nach grüner CI mergen, Post-Merge-CI verifizieren und `HANDOVER.md` aktualisieren.
-3. Nutzer lokal `git pull` ausführen und Rezeptbild-Upload erneut testen. Falls der Fehler bleibt, nächste Änderung muss die ursprüngliche Exception samt HTTP-Status/Code sicher diagnostizieren; keine Tokens protokollieren.
+- Live-Supabase-Prüfung am 2026-10-09: Bucket `recipe-images` existiert, ist privat, erlaubt JPEG/PNG/WebP und hat eine 10-MiB-Grenze.
+- PR #57 („Fix recipe image upload and session refresh“) wurde am 2026-10-09 gemergt. PR #58 ergänzte Auth-Refresh-Retry für Rezept-Metadaten-Reads. Beide Änderungen waren nicht ausreichend.
+- **Neue konkrete Live-Diagnose am 2026-10-09:** Supabase-Storage-Logs zeigen Upload-Requests auf `/object/recipe-images/<recipe-id>/cover.png`, die mit HTTP 403 / SQLSTATE `42501` abgelehnt werden: `new row violates row-level security policy for table "objects"`. Das ist kein nachgewiesener Session-Refresh-Fehler. Der Storage-Endpunkt protokolliert `operation=storage.object.upload` und `x_upsert=true`; der Client klassifiziert „Unauthorized“ irrtümlich als Authentifizierungsfehler, weil `normalizeAppException` nach dem Teilstring `auth` sucht.
+- Live-DB-Policy-Abfrage zeigte globale Insert-/Update-/Delete-Policies für den Bucket. Die RLS-Ablehnung ist mit diesem sichtbaren Policy-Snapshot nicht vollständig erklärt; den Storage-Upload-Pfad gezielt ändern und danach die neuen Logs prüfen, statt weitere Session-Retries hinzuzufügen.
+- Nächste Änderung: Storage-Uploads nutzen eindeutige Objektnamen und `upsert: false`, damit die fehlschlagende `UpsertObject`-Operation vermieden wird. Authentifizierungsfehler und Storage-Berechtigungsfehler getrennt klassifizieren. Nach grüner CI erneut live testen; bei weiterer 403-Ablehnung die aktiven Storage-Policies samt Storage-Logs prüfen.
+- Keine Secrets, Tokens oder Service-Role-Keys protokollieren oder ausgeben.
 
 ## Sicherheits-/Arbeitsregeln
 

@@ -85,6 +85,14 @@ AppException normalizeAppException(Object error) {
         : 'Der Server konnte die Anfrage nicht verarbeiten.', error);
   }
   final text = error.toString().toLowerCase();
+  // Storage API errors may say "Unauthorized" for an RLS denial. Check
+  // explicit permission failures before the broader auth substring below.
+  if (text.contains('accessdenied') ||
+      text.contains('row-level security policy') ||
+      text.contains('permission denied') ||
+      text.contains('403')) {
+    return AuthorizationException('Der Zugriff auf den Supabase-Speicher wurde verweigert.', error);
+  }
   if (text.contains('jwt') || text.contains('401') || text.contains('auth')) {
     return AuthenticationException('Die Sitzung ist nicht mehr gültig.', error);
   }
