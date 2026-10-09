@@ -17,7 +17,7 @@ class FoodItemImage extends StatelessWidget {
     'Lachs':'🍣','Makrele':'🐟','Pangasius':'🐠','Räucherlachs':'🍣','Rotbarsch':'🐡',
     'Sardellen':'🐟','Thunfisch':'🐟','Wolfsbarsch':'🐠','Krabben':'🦀','Miesmuscheln':'🦪','Tintenfisch':'🦑',
     // Meat
-    'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hackfleisch':'🥩','Hähnchen':'🐔',
+    'Entenbrust':'🦆','Gemischtes Hackfleisch':'🥩','Hähnchen':'🐔',
     'Hähnchenbrust':'🐔','Hähnchenflügel':'🐔','Hähnchenhackfleisch':'🐔','Hähncheninnenfilet':'🐔',
     'Kalbfleisch':'🐄','Kassler':'🐖','Lammhackfleisch':'🐑','Lammkotelett':'🐑','Putenbrust':'🐔',
     'Rinderbraten':'🐄','Rinderfilet':'🐄','Rinderhackfleisch':'🐄','Rinderrouladen':'🐄','Rindersteak':'🐄',
