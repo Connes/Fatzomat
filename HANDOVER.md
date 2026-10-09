@@ -91,12 +91,13 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - PR #57 („Fix recipe image upload and session refresh“) wurde am 2026-10-09 gemergt. Squash-Commit: `c41521591f3aa6393bbb4545345f4ed837926a8b`.
 - Uploads werden jetzt mit 1600 px/Qualität 80 vorbereitet, der MIME-Typ wird aus dem erlaubten Zielformat abgeleitet und Dateien über 10 MiB erhalten eine verständliche Fehlermeldung.
 - `AuthSessionService` serialisiert Token-Refreshes, damit parallele Requests nicht konkurrierend dasselbe Refresh-Token verwenden. Das adressiert eine plausible Ursache für „Sitzung konnte nicht verwendet werden“, ist ohne konkrete fehlgeschlagene Upload-Logs aber kein Beweis für die einzige Ursache.
-- Regressionstests und beide CI-Workflows auf PR-Head `8399161613603975d34a5cb73d580bb999f0345b` waren erfolgreich. Merge-CI noch abschließend prüfen. Live-Bucket und Storage-Policies wurden geprüft; keine Supabase-Migration war für diesen Fix nötig.
+- Regressionstests und beide CI-Workflows für den Merge-Commit `c41521591f3aa6393bbb4545345f4ed837926a8b` waren erfolgreich. Der Nutzer meldet weiterhin „Die Sitzung konnte nicht verwendet werden“. Bei erneuter Codeprüfung wurde ein weiterer konkreter Schwachpunkt gefunden: `RecipeRepository.setRecipeImage` las `recipes.image_path` vor dem Update ohne `runWithRefresh`; auch `getRecipeModel` führte den Rezept-SELECT ohne Auth-Retry aus. Diese Reads können trotz des Upload-Fixes an einer abgelaufenen/abgelehnten Session scheitern.
 
 ## Nächster technischer Schritt
 
-1. Post-Merge-CI für `c41521591f3aa6393bbb4545345f4ed837926a8b` prüfen.
-2. Nutzer lokal `git pull` ausführen und Rezeptbild-Upload erneut testen. Bei erneutem Sitzungsfehler den vollständigen technischen Fehler aus dem Debug-Log erfassen, da der genaue fehlgeschlagene Auth-Refresh in den verfügbaren Live-Logs nicht sichtbar war.
+1. PR für `fix/recipe-image-session-retry` prüfen: Auth-Refresh-Retry für die Rezept-Metadaten-Reads ergänzen und Regressionstest ausführen.
+2. Nach grüner CI mergen, Post-Merge-CI verifizieren und `HANDOVER.md` aktualisieren.
+3. Nutzer lokal `git pull` ausführen und Rezeptbild-Upload erneut testen. Falls der Fehler bleibt, nächste Änderung muss die ursprüngliche Exception samt HTTP-Status/Code sicher diagnostizieren; keine Tokens protokollieren.
 
 ## Sicherheits-/Arbeitsregeln
 
