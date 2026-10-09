@@ -169,7 +169,10 @@ class PersonalTodayRepository {
   }
 
   Future<bool> updateServings(String planId, int servings) async {
-    final result = await client.rpc('update_personal_today_plan_servings', params: {
+    if (servings < 1 || servings > 12) {
+      throw ArgumentError.value(servings, 'servings', 'Muss zwischen 1 und 12 liegen.');
+    }
+    final result = await client.rpc('update_personal_plan_servings', params: {
       'p_plan_id': planId,
       'p_servings': servings,
     });
