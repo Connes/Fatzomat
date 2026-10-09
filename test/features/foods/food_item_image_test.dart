@@ -6,9 +6,10 @@ void main() {
     const foods = <String, String>{
       'Rinderfilet': '🐄', 'Hähnchenflügel': '🐔', 'Dorade': '🐠',
       'Räucherlachs': '🍣', 'Tintenfisch': '🦑', 'Fenchel': '🌿',
-      'Rote Bete': '🟣', 'Zuckerschoten': '🫛', 'Dill': '🌿',
+      'Rote Bete': '🫜', 'Zuckerschoten': '🫛', 'Dill': '🌿',
       'Garam Masala': '🌿', 'Kardamom': '🌿', 'Miesmuscheln': '🦪',
       'Kokosmilch': '🥥', 'Apfel': '🍎', 'Ei': '🥚',
+      'Wassermelone': '🍉', 'Kiwi': '🥝', 'Olive': '🫒', 'Knoblauch': '🧄', 'Limette': '🍋‍🟩',
       'Schweinebraten': '🐖', 'Entenbrust': '🦆', 'Lammkotelett': '🐑', 'Kassler': '🐖',
     };
     for (final entry in foods.entries) {
