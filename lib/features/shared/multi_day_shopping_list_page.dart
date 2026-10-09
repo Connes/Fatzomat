@@ -42,15 +42,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
     load();
   }
 
-  Future<void> load() async {
+  Future<void> load({bool showLoading = true}) async {
     final generation = ++_generation;
-    setState(() { _loading = true; _error = null; });
+    if (showLoading) {
+      setState(() { _loading = true; _error = null; });
+    }
     try {
       final plans = await Future.wait(_days.map(_repo.plannedPlansForDate));
       final ids = plans.expand((day) => day).where((p) => p.isRecipe).map((p) => p.id).toSet();
       final items = await _repo.shoppingItemsForPlans(ids);
       if (!mounted || generation != _generation) return;
-      setState(() { _plans = plans; _items = items; _loading = false; });
+      setState(() { _plans = plans; _items = items; _loading = false; _error = null; });
     } catch (e) {
       if (!mounted || generation != _generation) return;
       setState(() { _error = e; _loading = false; });
@@ -67,7 +69,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> {
       for (final source in item.sources) {
         if (source.checked != checked) await _repo.setShoppingChecked(source.id, checked);
       }
-      await load();
+      await load(showLoading: false);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Einkaufsartikel konnte nicht aktualisiert werden: $e')));
     }
