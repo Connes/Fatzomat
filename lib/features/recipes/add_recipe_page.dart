@@ -297,8 +297,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     if (saving) return;
     setState(() => saving = true);
     try {
-      {
-        final duplicate = await repository.findDuplicateRecipe(_recipe);
+      final duplicate = await repository.findDuplicateRecipe(_recipe);
         if (duplicate != null && mounted) {
           setState(() => saving = false);
           final action = await showDialog<String>(
@@ -318,7 +317,6 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           }
           return;
         }
-      }
 
       final recipeId = await repository.saveRecipeModel(_recipe);
 
