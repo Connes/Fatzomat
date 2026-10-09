@@ -153,6 +153,7 @@ class SavedRecipesPage extends StatefulWidget {
   final String? mainChoice;
   final Set<String> selectedFoodIds;
   final String? decisionRequestId;
+  final DateTime? planDate;
   final RecipeRepository? repository;
 
   const SavedRecipesPage({
@@ -161,6 +162,7 @@ class SavedRecipesPage extends StatefulWidget {
     this.mainChoice,
     this.selectedFoodIds = const <String>{},
     this.decisionRequestId,
+    this.planDate,
     this.repository,
   });
 
@@ -308,6 +310,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         await personalToday.selectRecipeForToday(
           recipe.id!,
           servings: recipe.servings.clamp(1, 12).toInt(),
+          date: widget.planDate,
         );
       }
       if (widget.decisionRequestId != null) {
@@ -426,7 +429,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       );
       if (servings == null || !mounted) return;
 
-      await personalToday.selectRecipeForToday(recipe.id!, servings: servings);
+      await personalToday.selectRecipeForToday(recipe.id!, servings: servings, date: widget.planDate);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Rezept hinzugefügt. Deine persönliche Einkaufsliste ist jetzt vorbereitet.')),
