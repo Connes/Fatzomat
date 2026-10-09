@@ -7,6 +7,7 @@ import '../../core/auth_session_service.dart';
 
 class RecipeImageService {
   static const bucket = 'recipe-images';
+  static const maxUploadBytes = 10 * 1024 * 1024;
   // Signed URLs are deliberately short-lived. Callers resolve them again when
   // loading a recipe after expiry instead of persisting long-lived bearer URLs.
   static const signedUrlLifetimeSeconds = 60 * 60 * 24 * 7;
@@ -17,11 +18,13 @@ class RecipeImageService {
       : client = client ?? Supabase.instance.client;
 
   Future<XFile?> pickImage({ImageSource source = ImageSource.gallery}) {
+    // Keep uploads comfortably below the private bucket's 10 MiB limit.
+    // image_picker re-encodes picked photos when imageQuality is specified.
     return ImagePicker().pickImage(
       source: source,
-      imageQuality: 92,
-      maxWidth: 2400,
-      maxHeight: 2400,
+      imageQuality: 80,
+      maxWidth: 1600,
+      maxHeight: 1600,
     );
   }
 
@@ -29,6 +32,14 @@ class RecipeImageService {
     final extension = _extension(file.name, file.mimeType);
     final path = '$recipeId/cover.$extension';
     final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      throw const FormatException('Das ausgewählte Bild ist leer. Bitte wähle ein anderes Bild.');
+    }
+    if (bytes.length > maxUploadBytes) {
+      throw const FormatException(
+        'Das Bild ist zu groß. Bitte wähle ein kleineres Bild oder mache einen Screenshot davon.',
+      );
+    }
 
     await AuthSessionService.runWithRefresh(
       client: client,
@@ -36,7 +47,10 @@ class RecipeImageService {
         path,
         Uint8List.fromList(bytes),
         fileOptions: FileOptions(
-          contentType: file.mimeType ?? _mimeType(extension),
+          // Use the same allow-listed format as the storage object extension.
+          // Some platforms report the source image's MIME type even though
+          // image_picker has re-encoded the picked image.
+          contentType: _mimeType(extension),
           upsert: true,
         ),
       ),
@@ -74,6 +88,8 @@ class RecipeImageService {
     return switch (mimeType) {
       'image/png' => 'png',
       'image/webp' => 'webp',
+      // image_picker re-encodes picked photos as JPEG, including sources such
+      // as HEIC that Supabase Storage does not allow.
       _ => 'jpg',
     };
   }
