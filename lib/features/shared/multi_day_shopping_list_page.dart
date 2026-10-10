@@ -99,6 +99,19 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     return index < 0 || index >= _plans.length ? const [] : _plans[index];
   }
 
+  String _categoryName(String category) =>
+      category.trim().isEmpty ? 'Weitere Zutaten' : category.trim();
+
+  List<String> _categoryNames(List<AggregatedShoppingItem> items) {
+    final categories = items.map((item) => _categoryName(item.category)).toSet().toList()
+      ..sort((a, b) {
+        if (a == 'Weitere Zutaten') return 1;
+        if (b == 'Weitere Zutaten') return -1;
+        return a.toLowerCase().compareTo(b.toLowerCase());
+      });
+    return categories;
+  }
+
   Future<void> _toggleItem(AggregatedShoppingItem item, bool checked) async {
     if (_updatingItems.contains(item.key) || !mounted) return;
     setState(() => _updatingItems.add(item.key));
@@ -181,21 +194,34 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                       if (aggregated.isEmpty)
                         const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Für die ausgewählten Tage sind keine Zutaten vorhanden.'))
                       else
-                        ...aggregated.map((item) => CheckboxListTile(
-                          value: item.checked,
-                          onChanged: _updatingItems.contains(item.key)
-                              ? null
-                              : (value) => _toggleItem(item, value == true),
-                          title: Text(item.name),
-                          subtitle: Text('${item.quantity} ${item.unit}'.trim()),
-                          secondary: _updatingItems.contains(item.key)
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : Text('${item.sources.length}×'),
-                        )),
+                        for (final category in _categoryNames(aggregated)) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 14, bottom: 4),
+                            child: Text(
+                              category,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ),
+                          ...aggregated
+                              .where((item) => _categoryName(item.category) == category)
+                              .map((item) => CheckboxListTile(
+                                    value: item.checked,
+                                    onChanged: _updatingItems.contains(item.key)
+                                        ? null
+                                        : (value) => _toggleItem(item, value == true),
+                                    title: Text(item.name),
+                                    subtitle: Text('${item.quantity} ${item.unit}'.trim()),
+                                    secondary: _updatingItems.contains(item.key)
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          )
+                                        : Text('${item.sources.length}×'),
+                                  )),
+                        ],
                     ],
                   ),
                 ),
