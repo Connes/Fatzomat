@@ -28,3 +28,21 @@ void main() {
     );
   });
 }
+
+  test('date-aware planning defaults missing recipe servings safely', () {
+    final planningMigration = File(
+      'supabase/migrations/20261010100000_date_aware_personal_planning.sql',
+    ).readAsStringSync();
+    final servingsMigration = File(
+      'supabase/migrations/20261010103000_update_personal_plan_servings.sql',
+    ).readAsStringSync();
+
+    expect(
+      planningMigration,
+      contains('greatest(coalesce(r.servings, 1), 1) INTO base_servings'),
+    );
+    expect(
+      servingsMigration,
+      contains('greatest(coalesce(servings, 1), 1) INTO base_servings'),
+    );
+  });
