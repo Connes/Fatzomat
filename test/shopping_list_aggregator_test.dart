@@ -34,6 +34,16 @@ void main() {
     expect(rows.single.sources.map((row) => row.id), containsAll(['a', 'b']));
   });
 
+  test('normalizes repeated whitespace in the displayed aggregate name', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: '  Rote   Zwiebel ', quantity: 1, unit: 'Stück'),
+      item(id: 'b', name: 'rote zwiebel', quantity: 2, unit: 'Stück'),
+    ]);
+
+    expect(rows, hasLength(1));
+    expect(rows.single.name, 'Rote Zwiebel');
+  });
+
   test('normalizes whitespace around food IDs before grouping', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Tomate', quantity: 2, unit: 'Stück', foodId: ' food-1 '),
