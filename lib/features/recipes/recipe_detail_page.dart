@@ -52,6 +52,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   Recipe? recipe;
   Object? loadError;
   bool loading = true, working = false, personalTodaySelected = false, cookedMarked = false;
+  String? selectedPlanId;
+  int? selectedPlanServings;
   int servings = 2;
   final Set<int> completedSteps = <int>{};
   bool ingredientsExpanded = false;
@@ -62,16 +64,22 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     try {
       final r = await repo.getRecipeModel(widget.recipeId);
       bool selectedForToday = false;
+      String? loadedPlanId;
+      int? loadedPlanServings;
       try {
         final today = await personalToday.todayPlan(date: widget.planDate);
         selectedForToday = today?.isRecipe == true &&
             today?.recipeId == widget.recipeId &&
             today?.status != 'cooked';
+        if (selectedForToday) {
+          loadedPlanId = today!.id;
+          loadedPlanServings = today.servings;
+        }
       } catch (_) {
         // Personal Today state is optional metadata for recipe rendering.
       }
       if (!mounted) return;
-      setState(() { recipe = r; loadError = null; servings = r.servings.clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; loading = false; });
+      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; selectedPlanId = loadedPlanId; selectedPlanServings = loadedPlanServings; loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
@@ -96,6 +104,28 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       MaterialPageRoute(builder: (_) => ManualRecipePage(initialRecipe: recipe)),
     );
     if (changed == true && mounted) await load();
+  }
+
+  Future<void> saveSelectedPlanServings() async {
+    final planId = selectedPlanId;
+    if (!personalTodaySelected || planId == null || working || servings == selectedPlanServings) return;
+    setState(() => working = true);
+    try {
+      final updated = await personalToday.updateServings(planId, servings);
+      if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
+      if (!mounted) return;
+      setState(() => selectedPlanServings = servings);
+      await widget.onTodayPlanChanged?.call();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Personenzahl und Einkaufsmengen wurden aktualisiert.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
   }
 
   Future<void> selectPersonalToday() async {
@@ -618,9 +648,20 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     icon: const Icon(Icons.today_rounded),
                     label: Text(
                       working
-                          ? 'Für heute vorbereiten …'
-                          : 'Für heute festlegen',
+                          ? 'Plan wird gespeichert …'
+                          : widget.planDate == null || _isPlanDateToday
+                              ? 'Für heute festlegen'
+                              : 'Für diesen Tag festlegen',
                     ),
+                  ),
+                )
+              else if (selectedPlanId != null && servings != selectedPlanServings)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: working ? null : saveSelectedPlanServings,
+                    icon: const Icon(Icons.save_outlined),
+                    label: Text(working ? 'Personenzahl wird gespeichert …' : 'Personenzahl und Einkaufsliste aktualisieren'),
                   ),
                 ),
             ],
