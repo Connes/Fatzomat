@@ -45,6 +45,7 @@ void main() {
       contains('greatest(coalesce(servings, 1), 1) INTO base_servings'),
     );
   });
+
   test('recipe shopping sync aggregates duplicate ingredient lines', () {
     final planningMigration = File(
       'supabase/migrations/20261010100000_date_aware_personal_planning.sql',
@@ -73,4 +74,27 @@ void main() {
     expect(servingsMigration, isNot(contains(') ri AND NOT EXISTS (')));
   });
 
+  test('date-aware RPCs revoke public and anonymous execution', () {
+    final planningMigration = File(
+      'supabase/migrations/20261010100000_date_aware_personal_planning.sql',
+    ).readAsStringSync();
+    final servingsMigration = File(
+      'supabase/migrations/20261010103000_update_personal_plan_servings.sql',
+    ).readAsStringSync();
+
+    expect(
+      planningMigration,
+      contains('REVOKE ALL ON FUNCTION public.set_personal_plan_for_date(date, text, text, uuid, integer) FROM PUBLIC, anon;'),
+    );
+    expect(
+      planningMigration,
+      contains('REVOKE ALL ON FUNCTION public.get_personal_plans_for_date(date) FROM PUBLIC, anon;'),
+    );
+    expect(
+      servingsMigration,
+      contains('REVOKE ALL ON FUNCTION public.update_personal_plan_servings(uuid, integer) FROM PUBLIC, anon;'),
+    );
+    expect(planningMigration, contains('TO authenticated;'));
+    expect(servingsMigration, contains('TO authenticated;'));
+  });
 }
