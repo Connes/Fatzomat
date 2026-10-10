@@ -43,6 +43,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   String _label(int index) => index == 0 ? 'Heute' : index == 1 ? 'Morgen' : 'Übermorgen';
 
+  String _dayTitle(int index) {
+    final day = _days[index];
+    final date = '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.'; 
+    return '${_label(index)} · $date';
+  }
+
   void _checkDayBoundary() {
     final today = _dateOnly(DateTime.now());
     if (today == _observedToday || !mounted) return;
@@ -254,7 +260,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 if (value == true) { _selected.add(_key(_days[i])); } else { _selected.remove(_key(_days[i])); }
                               }),
                             ),
-                            title: Text(_label(i), style: const TextStyle(fontWeight: FontWeight.w700)),
+                            title: Text(_dayTitle(i), style: const TextStyle(fontWeight: FontWeight.w700)),
                             subtitle: Text(
                               '${_plansFor(_days[i]).where((p) => p.isRecipe).length} geplante Rezepte · '
                               '${_items.where((item) => _plansFor(_days[i]).any((plan) => plan.isRecipe && plan.id == item.planId)).length} Zutatenpositionen',
