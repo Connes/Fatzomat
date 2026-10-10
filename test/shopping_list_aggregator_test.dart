@@ -55,6 +55,23 @@ void main() {
     expect(rows.single.sources.map((row) => row.id), containsAll(['a', 'b']));
   });
 
+  test('normalizes unit aliases with surrounding whitespace', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: 'Mehl', quantity: 1, unit: ' KG '),
+      item(id: 'b', name: 'mehl', quantity: 250, unit: ' g '),
+      item(id: 'c', name: 'Milch', quantity: 1, unit: ' Liter '),
+      item(id: 'd', name: 'Milch', quantity: 250, unit: ' ml '),
+    ]);
+
+    expect(rows, hasLength(2));
+    final flour = rows.singleWhere((row) => row.name.toLowerCase() == 'mehl');
+    final milk = rows.singleWhere((row) => row.name.toLowerCase() == 'milch');
+    expect(flour.quantity, 1.25);
+    expect(flour.unit, 'kg');
+    expect(milk.quantity, 1.25);
+    expect(milk.unit, 'l');
+  });
+
   test('aggregates liters and milliliters', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Milch', quantity: 1, unit: 'l'),
