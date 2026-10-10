@@ -28,7 +28,7 @@ BEGIN
     SELECT greatest(coalesce(r.servings, 1), 1) INTO base_servings
     FROM public.recipes r
     WHERE r.id = p_recipe_id
-      AND (r.created_by = uid OR EXISTS (
+      AND (r.created_by IS NULL OR r.created_by = uid OR EXISTS (
         SELECT 1 FROM public.recipe_saves rs
         WHERE rs.recipe_id = r.id AND rs.user_id = uid
       ));
