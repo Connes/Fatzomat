@@ -56,6 +56,16 @@ void main() {
     expect(rows.single.unit, 'l');
   });
 
+  test('keeps separate rows with blank names instead of merging them', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: ' ', quantity: 1, unit: 'Stück'),
+      item(id: 'b', name: '', quantity: 2, unit: 'Stück'),
+    ]);
+
+    expect(rows, hasLength(2));
+    expect(rows.map((row) => row.sources.single.id), containsAll(['a', 'b']));
+  });
+
   test('does not merge incompatible or unknown units', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Zucker', quantity: 100, unit: 'g'),
