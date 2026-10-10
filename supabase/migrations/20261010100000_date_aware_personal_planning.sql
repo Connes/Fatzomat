@@ -20,7 +20,7 @@ DECLARE
 BEGIN
   IF uid IS NULL THEN RAISE EXCEPTION 'Keine Supabase-Sitzung vorhanden.'; END IF;
   IF p_plan_date IS NULL THEN RAISE EXCEPTION 'Kein Planungsdatum angegeben.'; END IF;
-  IF normalized_type NOT IN ('recipe', 'order', 'dine_out', 'surprise') THEN
+  IF normalized_type IS NULL OR normalized_type NOT IN ('recipe', 'order', 'dine_out', 'surprise') THEN
     RAISE EXCEPTION 'Ungültiger persönlicher Entscheidungstyp.';
   END IF;
   IF normalized_type = 'recipe' THEN
