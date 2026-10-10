@@ -69,12 +69,17 @@ BEGIN
 
   IF normalized_type = 'recipe' THEN
     -- Keep checked state and row IDs for ingredients that remain in the plan.
+    -- Aggregate duplicate ingredient lines before joining, avoiding nondeterministic UPDATE ... FROM matches.
     UPDATE public.shopping_items si
     SET quantity = round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2)
-    FROM public.recipe_ingredients ri
+    FROM (
+      SELECT recipe_id, food_id, name, min(unit) AS unit, sum(quantity) AS quantity
+      FROM public.recipe_ingredients
+      WHERE recipe_id = p_recipe_id
+      GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
+    ) ri
     WHERE si.personal_today_plan_id = pid
       AND si.source = 'recipe'
-      AND ri.recipe_id = p_recipe_id
       AND si.name = ri.name
       AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
       AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''));
@@ -83,8 +88,12 @@ BEGIN
     SELECT pid, ri.food_id, ri.name,
       round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2),
       ri.unit, 'recipe'
-    FROM public.recipe_ingredients ri
-    WHERE ri.recipe_id = p_recipe_id
+    FROM (
+      SELECT recipe_id, food_id, name, min(unit) AS unit, sum(quantity) AS quantity
+      FROM public.recipe_ingredients
+      WHERE recipe_id = p_recipe_id
+      GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
+    ) ri
       AND NOT EXISTS (
         SELECT 1 FROM public.shopping_items si
         WHERE si.personal_today_plan_id = pid
