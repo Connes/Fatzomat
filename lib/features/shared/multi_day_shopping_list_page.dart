@@ -188,7 +188,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                               : (value) => _toggleItem(item, value == true),
                           title: Text(item.name),
                           subtitle: Text('${item.quantity} ${item.unit}'.trim()),
-                          secondary: Text('${item.sources.length}×'),
+                          secondary: _updatingItems.contains(item.key)
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : Text('${item.sources.length}×'),
                         )),
                     ],
                   ),
