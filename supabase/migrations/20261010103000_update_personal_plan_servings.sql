@@ -26,7 +26,7 @@ BEGIN
     RAISE EXCEPTION 'Für diese Entscheidung können keine Portionen geändert werden.';
   END IF;
 
-  SELECT greatest(servings, 1) INTO base_servings
+  SELECT greatest(coalesce(servings, 1), 1) INTO base_servings
   FROM public.recipes WHERE id = plan_row.recipe_id;
   IF base_servings IS NULL THEN RAISE EXCEPTION 'Rezept ist nicht verfügbar.'; END IF;
 
