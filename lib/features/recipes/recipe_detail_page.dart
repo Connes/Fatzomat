@@ -394,8 +394,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         Icon(Icons.check_circle_rounded, size: 20),
                         SizedBox(width: 8),
                         Text(
-                          'Für heute ausgewählt',
-                          style: TextStyle(fontWeight: FontWeight.w800),
+                          widget.planDate == null || _isPlanDateToday
+                              ? 'Für heute ausgewählt'
+                              : 'Für diesen Tag ausgewählt',
+                          style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
