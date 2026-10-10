@@ -388,11 +388,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       color: AppDesign.secondarySurface,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.check_circle_rounded, size: 20),
-                        SizedBox(width: 8),
+                        const Icon(Icons.check_circle_rounded, size: 20),
+                        const SizedBox(width: 8),
                         Text(
                           widget.planDate == null || _isPlanDateToday
                               ? 'Für heute ausgewählt'
