@@ -8,7 +8,7 @@ void main() {
         .listSync()
         .whereType<File>()
         .map((file) => file.path.split(Platform.pathSeparator).last)
-        .where((name) => RegExp(r'^\\d{14}_.*\\.sql$').hasMatch(name))
+        .where((name) => RegExp(r'^\d{14}_.*\.sql$').hasMatch(name))
         .toList();
     final timestamps = files.map((name) => name.substring(0, 14)).toList();
     expect(timestamps.length, timestamps.toSet().length);
@@ -27,7 +27,6 @@ void main() {
       contains("ELSE\n    DELETE FROM public.shopping_items\n    WHERE personal_today_plan_id = pid AND source = 'recipe'"),
     );
   });
-}
 
   test('date-aware planning defaults missing recipe servings safely', () {
     final planningMigration = File(
@@ -46,3 +45,4 @@ void main() {
       contains('greatest(coalesce(servings, 1), 1) INTO base_servings'),
     );
   });
+}
