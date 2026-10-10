@@ -34,7 +34,11 @@ class ShoppingListAggregator {
       final normalizedFoodId = item.foodId?.trim();
       final identity = (normalizedFoodId?.isNotEmpty ?? false)
           ? 'food:$normalizedFoodId'
-          : 'name:$nameKey';
+          : nameKey.isNotEmpty
+              ? 'name:$nameKey'
+              // Malformed/blank names must not collapse unrelated rows into
+              // one aggregate. Keep them independently addressable by ID.
+              : 'item:${item.id}';
       // Only merge units that have a known conversion. Unknown units are
       // kept separate by their normalized spelling.
       final key = '$identity|$unit|'
