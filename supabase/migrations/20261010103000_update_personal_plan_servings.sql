@@ -30,18 +30,14 @@ BEGIN
   FROM public.recipes WHERE id = plan_row.recipe_id;
   IF base_servings IS NULL THEN RAISE EXCEPTION 'Rezept ist nicht verfügbar.'; END IF;
 
-  -- Update matching rows in place so checked state and item IDs survive.
-  -- Aggregate duplicate ingredient lines before joining, avoiding nondeterministic UPDATE ... FROM matches.
   UPDATE public.shopping_items si
   SET quantity = round((ri.quantity * p_servings::numeric / base_servings::numeric)::numeric, 2)
   FROM (
     SELECT recipe_id, food_id, name, min(unit) AS unit, sum(quantity) AS quantity
-    FROM public.recipe_ingredients
-    WHERE recipe_id = plan_row.recipe_id
+    FROM public.recipe_ingredients WHERE recipe_id = plan_row.recipe_id
     GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
   ) ri
-  WHERE si.personal_today_plan_id = p_plan_id
-    AND si.source = 'recipe'
+  WHERE si.personal_today_plan_id = p_plan_id AND si.source = 'recipe'
     AND si.name = ri.name
     AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
     AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''));
@@ -52,26 +48,22 @@ BEGIN
          ri.unit, 'recipe'
   FROM (
     SELECT recipe_id, food_id, name, min(unit) AS unit, sum(quantity) AS quantity
-    FROM public.recipe_ingredients
-    WHERE recipe_id = plan_row.recipe_id
+    FROM public.recipe_ingredients WHERE recipe_id = plan_row.recipe_id
     GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
   ) ri
   WHERE NOT EXISTS (
-      SELECT 1 FROM public.shopping_items si
-      WHERE si.personal_today_plan_id = p_plan_id
-        AND si.source = 'recipe'
-        AND si.name = ri.name
-        AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
-        AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''))
-    );
+    SELECT 1 FROM public.shopping_items si
+    WHERE si.personal_today_plan_id = p_plan_id AND si.source = 'recipe'
+      AND si.name = ri.name
+      AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
+      AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''))
+  );
 
   DELETE FROM public.shopping_items si
-  WHERE si.personal_today_plan_id = p_plan_id
-    AND si.source = 'recipe'
+  WHERE si.personal_today_plan_id = p_plan_id AND si.source = 'recipe'
     AND NOT EXISTS (
       SELECT 1 FROM public.recipe_ingredients ri
-      WHERE ri.recipe_id = plan_row.recipe_id
-        AND ri.name = si.name
+      WHERE ri.recipe_id = plan_row.recipe_id AND ri.name = si.name
         AND coalesce(ri.food_id::text, '') = coalesce(si.food_id::text, '')
         AND lower(coalesce(ri.unit, '')) = lower(coalesce(si.unit, ''))
     );
@@ -83,4 +75,5 @@ BEGIN
 END;
 $function$;
 
+REVOKE ALL ON FUNCTION public.update_personal_plan_servings(uuid, integer) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.update_personal_plan_servings(uuid, integer) TO authenticated;
