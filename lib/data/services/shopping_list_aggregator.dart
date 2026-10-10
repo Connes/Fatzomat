@@ -31,8 +31,9 @@ class ShoppingListAggregator {
     for (final item in input) {
       final unit = _unitFamily(item.unit);
       final nameKey = item.name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
-      final identity = (item.foodId?.trim().isNotEmpty ?? false)
-          ? 'food:${item.foodId}'
+      final normalizedFoodId = item.foodId?.trim();
+      final identity = (normalizedFoodId?.isNotEmpty ?? false)
+          ? 'food:$normalizedFoodId'
           : 'name:$nameKey';
       // Only merge units that have a known conversion. Unknown units are
       // kept separate by their normalized spelling.
