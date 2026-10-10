@@ -30,6 +30,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   List<List<TodayPlan>> _plans = const [];
   List<ShoppingItem> _items = const [];
   bool _loading = true;
+  String _searchQuery = '';
   Object? _error;
   int _generation = 0;
 
@@ -154,6 +155,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       item.planId,
     )).toList();
     final aggregated = _aggregator.aggregate(visibleItems);
+    final normalizedQuery = _searchQuery.trim().toLowerCase();
+    final filteredItems = normalizedQuery.isEmpty
+        ? aggregated
+        : aggregated.where((item) =>
+            item.name.toLowerCase().contains(normalizedQuery) ||
+            _categoryName(item.category).toLowerCase().contains(normalizedQuery) ||
+            item.unit.toLowerCase().contains(normalizedQuery)).toList();
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -191,10 +199,29 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                         ),
                       const SizedBox(height: 12),
                       Text('Zusammengefasste Zutaten', style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 8),
+                      TextField(
+                        onChanged: (value) => setState(() => _searchQuery = value),
+                        decoration: InputDecoration(
+                          labelText: 'Zutaten suchen',
+                          hintText: 'Name, Kategorie oder Einheit',
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          suffixIcon: _searchQuery.isEmpty
+                              ? null
+                              : IconButton(
+                                  tooltip: 'Suche löschen',
+                                  onPressed: () => setState(() => _searchQuery = ''),
+                                  icon: const Icon(Icons.clear_rounded),
+                                ),
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
                       if (aggregated.isEmpty)
                         const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Für die ausgewählten Tage sind keine Zutaten vorhanden.'))
+                      else if (filteredItems.isEmpty)
+                        const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Keine passenden Zutaten gefunden.'))
                       else
-                        for (final category in _categoryNames(aggregated)) ...[
+                        for (final category in _categoryNames(filteredItems)) ...[
                           Padding(
                             padding: const EdgeInsets.only(top: 14, bottom: 4),
                             child: Text(
@@ -204,7 +231,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                   ),
                             ),
                           ),
-                          ...aggregated
+                          ...filteredItems
                               .where((item) => _categoryName(item.category) == category)
                               .map((item) => CheckboxListTile(
                                     value: item.checked,
