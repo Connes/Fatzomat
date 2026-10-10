@@ -31,6 +31,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   List<ShoppingItem> _items = const [];
   bool _loading = true;
   String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
   Object? _error;
   int _generation = 0;
 
@@ -140,6 +141,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   void dispose() {
     _dayBoundaryTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -162,6 +164,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             item.name.toLowerCase().contains(normalizedQuery) ||
             _categoryName(item.category).toLowerCase().contains(normalizedQuery) ||
             item.unit.toLowerCase().contains(normalizedQuery)).toList();
+    final checkedCount = filteredItems.where((item) => item.checked).length;
+    final progress = filteredItems.isEmpty ? 0.0 : checkedCount / filteredItems.length;
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -201,6 +205,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                       Text('Zusammengefasste Zutaten', style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 8),
                       TextField(
+                        controller: _searchController,
                         onChanged: (value) => setState(() => _searchQuery = value),
                         decoration: InputDecoration(
                           labelText: 'Zutaten suchen',
@@ -210,12 +215,26 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                               ? null
                               : IconButton(
                                   tooltip: 'Suche löschen',
-                                  onPressed: () => setState(() => _searchQuery = ''),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() => _searchQuery = '');
+                                  },
                                   icon: const Icon(Icons.clear_rounded),
                                 ),
                           border: const OutlineInputBorder(),
                         ),
                       ),
+                      if (aggregated.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(child: Text('$checkedCount von ${filteredItems.length} Zutaten erledigt')),
+                            Text('${(progress * 100).round()}%'),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        LinearProgressIndicator(value: progress),
+                      ],
                       if (aggregated.isEmpty)
                         const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Für die ausgewählten Tage sind keine Zutaten vorhanden.'))
                       else if (filteredItems.isEmpty)
