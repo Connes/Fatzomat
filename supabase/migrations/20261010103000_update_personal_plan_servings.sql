@@ -56,7 +56,7 @@ BEGIN
     WHERE recipe_id = plan_row.recipe_id
     GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
   ) ri
-    AND NOT EXISTS (
+  WHERE NOT EXISTS (
       SELECT 1 FROM public.shopping_items si
       WHERE si.personal_today_plan_id = p_plan_id
         AND si.source = 'recipe'
