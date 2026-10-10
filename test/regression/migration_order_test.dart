@@ -14,3 +14,18 @@ void main() {
     expect(timestamps.length, timestamps.toSet().length);
   });
 }
+
+
+  test('date-aware plan updates preserve checked shopping rows', () {
+    final migration = File(
+      'supabase/migrations/20261010100000_date_aware_personal_planning.sql',
+    ).readAsStringSync();
+
+    expect(migration, contains('UPDATE public.shopping_items si'));
+    expect(migration, contains('AND si.source = \'recipe\''));
+    expect(migration, contains('NOT EXISTS'));
+    expect(
+      migration,
+      contains('DELETE FROM public.shopping_items\n    WHERE personal_today_plan_id = pid AND source = \'recipe\''),
+    );
+  });
