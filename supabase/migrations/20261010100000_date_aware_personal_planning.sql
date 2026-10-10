@@ -28,13 +28,10 @@ BEGIN
     SELECT greatest(coalesce(r.servings, 1), 1) INTO base_servings
     FROM public.recipes r
     WHERE r.id = p_recipe_id
-      AND (
-        r.created_by = uid
-        OR EXISTS (
-          SELECT 1 FROM public.recipe_saves rs
-          WHERE rs.recipe_id = r.id AND rs.user_id = uid
-        )
-      );
+      AND (r.created_by = uid OR EXISTS (
+        SELECT 1 FROM public.recipe_saves rs
+        WHERE rs.recipe_id = r.id AND rs.user_id = uid
+      ));
     IF NOT FOUND THEN RAISE EXCEPTION 'Rezept ist nicht verfügbar.'; END IF;
     target_servings := coalesce(p_servings, base_servings);
     IF target_servings < 1 OR target_servings > 12 THEN RAISE EXCEPTION 'Ungültige Personenzahl.'; END IF;
@@ -43,11 +40,7 @@ BEGIN
     target_servings := 1;
   END IF;
 
-  -- Serialize writes for one user's date so concurrent requests cannot create
-  -- duplicate open plans for the same day.
   PERFORM pg_advisory_xact_lock(hashtext(uid::text), hashtext(p_plan_date::text));
-
-  -- One open decision per user and day; completed decisions remain as history.
   SELECT id INTO pid FROM public.personal_today_plans
   WHERE user_id = uid AND plan_date = p_plan_date AND status = 'planned'
   ORDER BY created_at DESC LIMIT 1;
@@ -68,48 +61,39 @@ BEGIN
   END IF;
 
   IF normalized_type = 'recipe' THEN
-    -- Keep checked state and row IDs for ingredients that remain in the plan.
-    -- Aggregate duplicate ingredient lines before joining, avoiding nondeterministic UPDATE ... FROM matches.
     UPDATE public.shopping_items si
     SET quantity = round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2)
     FROM (
       SELECT recipe_id, food_id, name, min(unit) AS unit, sum(quantity) AS quantity
-      FROM public.recipe_ingredients
-      WHERE recipe_id = p_recipe_id
+      FROM public.recipe_ingredients WHERE recipe_id = p_recipe_id
       GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
     ) ri
-    WHERE si.personal_today_plan_id = pid
-      AND si.source = 'recipe'
+    WHERE si.personal_today_plan_id = pid AND si.source = 'recipe'
       AND si.name = ri.name
       AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
       AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''));
 
     INSERT INTO public.shopping_items(personal_today_plan_id, food_id, name, quantity, unit, source)
     SELECT pid, ri.food_id, ri.name,
-      round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2),
-      ri.unit, 'recipe'
+      round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2), ri.unit, 'recipe'
     FROM (
       SELECT recipe_id, food_id, name, min(unit) AS unit, sum(quantity) AS quantity
-      FROM public.recipe_ingredients
-      WHERE recipe_id = p_recipe_id
+      FROM public.recipe_ingredients WHERE recipe_id = p_recipe_id
       GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))
     ) ri
     WHERE NOT EXISTS (
-        SELECT 1 FROM public.shopping_items si
-        WHERE si.personal_today_plan_id = pid
-          AND si.source = 'recipe'
-          AND si.name = ri.name
-          AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
-          AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''))
-      );
+      SELECT 1 FROM public.shopping_items si
+      WHERE si.personal_today_plan_id = pid AND si.source = 'recipe'
+        AND si.name = ri.name
+        AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
+        AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''))
+    );
 
     DELETE FROM public.shopping_items si
-    WHERE si.personal_today_plan_id = pid
-      AND si.source = 'recipe'
+    WHERE si.personal_today_plan_id = pid AND si.source = 'recipe'
       AND NOT EXISTS (
         SELECT 1 FROM public.recipe_ingredients ri
-        WHERE ri.recipe_id = p_recipe_id
-          AND ri.name = si.name
+        WHERE ri.recipe_id = p_recipe_id AND ri.name = si.name
           AND coalesce(ri.food_id::text, '') = coalesce(si.food_id::text, '')
           AND lower(coalesce(ri.unit, '')) = lower(coalesce(si.unit, ''))
       );
@@ -121,6 +105,7 @@ BEGIN
 END;
 $function$;
 
+REVOKE ALL ON FUNCTION public.set_personal_plan_for_date(date, text, text, uuid, integer) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.set_personal_plan_for_date(date, text, text, uuid, integer) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.get_personal_plans_for_date(p_plan_date date)
@@ -134,4 +119,5 @@ AS $function$
   WHERE p.user_id = auth.uid() AND p.plan_date = p_plan_date
   ORDER BY p.created_at DESC;
 $function$;
+REVOKE ALL ON FUNCTION public.get_personal_plans_for_date(date) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.get_personal_plans_for_date(date) TO authenticated;
