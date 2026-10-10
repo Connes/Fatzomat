@@ -25,7 +25,16 @@ BEGIN
   END IF;
   IF normalized_type = 'recipe' THEN
     IF p_recipe_id IS NULL THEN RAISE EXCEPTION 'Keine Recipe-ID vorhanden.'; END IF;
-    SELECT servings INTO base_servings FROM public.recipes WHERE id = p_recipe_id;
+    SELECT r.servings INTO base_servings
+    FROM public.recipes r
+    WHERE r.id = p_recipe_id
+      AND (
+        r.created_by = uid
+        OR EXISTS (
+          SELECT 1 FROM public.recipe_saves rs
+          WHERE rs.recipe_id = r.id AND rs.user_id = uid
+        )
+      );
     IF base_servings IS NULL THEN RAISE EXCEPTION 'Rezept ist nicht verfügbar.'; END IF;
     target_servings := coalesce(p_servings, base_servings);
     IF target_servings < 1 OR target_servings > 12 THEN RAISE EXCEPTION 'Ungültige Personenzahl.'; END IF;
@@ -33,6 +42,10 @@ BEGIN
     IF coalesce(trim(p_decision_value), '') = '' THEN RAISE EXCEPTION 'Die Auswahl darf nicht leer sein.'; END IF;
     target_servings := 1;
   END IF;
+
+  -- Serialize writes for one user's date so concurrent requests cannot create
+  -- duplicate open plans for the same day.
+  PERFORM pg_advisory_xact_lock(hashtext(uid::text), hashtext(p_plan_date::text));
 
   -- One open decision per user and day; completed decisions remain as history.
   SELECT id INTO pid FROM public.personal_today_plans
