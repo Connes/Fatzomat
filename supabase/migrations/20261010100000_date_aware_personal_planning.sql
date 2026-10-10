@@ -67,13 +67,46 @@ BEGIN
       WHERE id = pid AND user_id = uid;
   END IF;
 
-  DELETE FROM public.shopping_items WHERE personal_today_plan_id = pid AND source = 'recipe';
   IF normalized_type = 'recipe' THEN
+    -- Keep checked state and row IDs for ingredients that remain in the plan.
+    UPDATE public.shopping_items si
+    SET quantity = round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2)
+    FROM public.recipe_ingredients ri
+    WHERE si.personal_today_plan_id = pid
+      AND si.source = 'recipe'
+      AND ri.recipe_id = p_recipe_id
+      AND si.name = ri.name
+      AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
+      AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''));
+
     INSERT INTO public.shopping_items(personal_today_plan_id, food_id, name, quantity, unit, source)
     SELECT pid, ri.food_id, ri.name,
       round((ri.quantity * target_servings::numeric / greatest(base_servings, 1))::numeric, 2),
       ri.unit, 'recipe'
-    FROM public.recipe_ingredients ri WHERE ri.recipe_id = p_recipe_id;
+    FROM public.recipe_ingredients ri
+    WHERE ri.recipe_id = p_recipe_id
+      AND NOT EXISTS (
+        SELECT 1 FROM public.shopping_items si
+        WHERE si.personal_today_plan_id = pid
+          AND si.source = 'recipe'
+          AND si.name = ri.name
+          AND coalesce(si.food_id::text, '') = coalesce(ri.food_id::text, '')
+          AND lower(coalesce(si.unit, '')) = lower(coalesce(ri.unit, ''))
+      );
+
+    DELETE FROM public.shopping_items si
+    WHERE si.personal_today_plan_id = pid
+      AND si.source = 'recipe'
+      AND NOT EXISTS (
+        SELECT 1 FROM public.recipe_ingredients ri
+        WHERE ri.recipe_id = p_recipe_id
+          AND ri.name = si.name
+          AND coalesce(ri.food_id::text, '') = coalesce(si.food_id::text, '')
+          AND lower(coalesce(ri.unit, '')) = lower(coalesce(si.unit, ''))
+      );
+  ELSE
+    DELETE FROM public.shopping_items
+    WHERE personal_today_plan_id = pid AND source = 'recipe';
   END IF;
   RETURN pid;
 END;
