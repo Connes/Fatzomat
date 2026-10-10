@@ -54,7 +54,7 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-09 (Rezeptbild-Upload und Sitzungs-Refresh behoben)
+Stand dieses Dokuments: 2026-10-10 (mehrtägige Planung und Einkaufsliste gemergt; Supabase-Migrationen verifiziert)
 
 ### GitHub
 
@@ -62,11 +62,12 @@ Stand dieses Dokuments: 2026-10-09 (Rezeptbild-Upload und Sitzungs-Refresh behob
 - PR #55 („Standardize food emojis and add missing produce“) wurde am 2026-10-09 gemergt. Merge-Commit: `9eb78ff8a1bb743a3a8a314b36fc33d432f9ffff`.
 - Enthalten sind die Emoji-Korrekturen, Wassermelone 🍉, Kiwi 🥝 und Olive 🫒 sowie zugehörige Tests. Limette ist 🍋‍🟩, Rote Bete 🫜. Diese Änderungen sind in `main`.
 - PR #56 („Allow unitless ingredients in imported recipes“) wurde am 2026-10-09 gemergt. Merge-Commit: `1007547a8a52f242f058f486529d7b9ce67801d4`.
+- PR #70 („Add date-aware meal planning foundation“) wurde am 2026-10-10 gemergt. Merge-Commit: `3aefbf2b38b617af6c38220a299b4cb61bda7d86`. Enthalten: datumsbezogene persönliche Planung, Navigation über mehrere Tage, aggregierte Einkaufsliste für drei Tage, Portionen-RPC, Schutz vor Offline-Datumsverwechslung und Regressionstests.
 - Fix: `create_shared_recipe` und `update_shared_recipe` erlauben nun leere Einheiten für Stück-Zutaten, z. B. „2 Zwiebeln“. Supabase-Migration `allow_unitless_recipe_ingredients` wurde auf Projekt `oidxezjdwqktpxuypbfb` angewendet und die Live-Funktionsdefinitionen verifiziert: Die Fehlermeldung „Eine Zutat benötigt eine Einheit.“ ist nicht mehr enthalten.
 
 ### CI
 
-Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren beide Workflows erfolgreich. Für PR #56 waren `Quality Gate` (Analyze und Test) sowie `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) auf dem korrigierten PR-Head erfolgreich. Die nach dem Merge gestarteten Workflows für Merge-Commit `1007547a8a52f242f058f486529d7b9ce67801d4` sowie den Handover-Commit `dde2e4e99a4f8494b3dd99c2e19316316e854ac7` sind inzwischen erfolgreich.
+Der Quality-Gate-Workflow ist `.github/workflows/flutter.yml` mit Repository-Hygiene, `flutter pub get --enforce-lockfile`, Icon-Generierung, `flutter analyze` und `flutter test`. Für PR #55 waren beide Workflows erfolgreich. Für PR #56 waren `Quality Gate` (Analyze und Test) sowie `Flutter quality gate` (Hygiene, Dependencies, Icon-Generierung, Analyze und Test) auf dem korrigierten PR-Head erfolgreich. Für PR #70 waren `Quality Gate` (Run 243) und `Flutter quality gate` (Run 882) auf dem finalen PR-Head `1d1206067f9749d98969f3e32d546923f50dfd56` erfolgreich; beide Prüfungen umfassten Analyze und Tests, der Flutter-Gate zusätzlich Hygiene, Dependencies und Icon-Generierung. Die nach dem Merge gestarteten Workflows für Merge-Commit `1007547a8a52f242f058f486529d7b9ce67801d4` sowie den Handover-Commit `dde2e4e99a4f8494b3dd99c2e19316316e854ac7` sind inzwischen erfolgreich.
 
 Es gibt außerdem `.github/workflows/build-apk.yml`, der manuell oder über einen `v*`-Tag läuft. Dieser Release-Build ist **nicht Teil des gewünschten Standardworkflows** und soll nicht automatisch ausgelöst oder erweitert werden.
 
@@ -78,6 +79,8 @@ Es gibt außerdem `.github/workflows/build-apk.yml`, der manuell oder über eine
 - Edge Function `restaurant-discovery`: bei letzter dokumentierter Prüfung Version 42, ACTIVE, `verify_jwt=false`
 
 Die App verwendet weiterhin den RPC `search_restaurants`, nicht die Edge Function.
+- Am 2026-10-10 wurden die Migrationen `date_aware_personal_planning` und `update_personal_plan_servings` erfolgreich angewendet. Live-Migrationsstände: `20261010095423` und `20261010095430`.
+- Live-Funktionsprüfung bestätigt: `get_personal_plans_for_date` läuft als `SECURITY INVOKER`; die beiden schreibenden RPCs haben festen `search_path` und sind für `authenticated` ausführbar, nicht für `anon`. Migrationen sind damit auf Supabase aktiv.
 
 ### Restaurant Discovery
 
@@ -90,7 +93,7 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - PR #57 und PR #58 waren nicht ausreichend. PR #59 wurde gemergt: eindeutige Bildpfade, `upsert: false` und eine bessere Klassifizierung von Storage-RLS-Fehlern.
 - **Neue Live-Diagnose am 2026-10-09 nach PR #59:** Uploads auf eindeutige Pfade funktionieren nun mit HTTP 200 und `x_upsert=false`. Direkt danach scheitert `POST /object/sign/recipe-images/<recipe-id>/<dateiname>` mit `NoSuchKey` / „Object not found“. Die Zeile ist bereits in `storage.objects` vorhanden. Damit ist der Upload selbst erfolgreich; der Fehler tritt beim Erzeugen der Signed URL auf, bevor das Bild mit `recipes.image_path` verknüpft ist.
 - Die SELECT-Policy für `recipe-images` lässt Objekte nur zu, wenn sie von einem Rezept referenziert werden. Die aktuelle Reihenfolge signiert zu früh, bevor `setRecipeImage` `recipes.image_path` aktualisiert. Der Storage-Endpunkt stellt dies als `NoSuchKey` dar und die App zeigt eine generische Fehlermeldung.
-- **Fix in Arbeit:** Upload liefert nur noch den Storage-Pfad zurück. Der Repository-Ablauf verknüpft den Pfad zuerst mit dem Rezept; die Signed URL wird erst beim anschließenden Laden des Rezepts erzeugt. Regressionstest deckt die Reihenfolge ab. Danach CI prüfen und auf dem Gerät verifizieren.
+- **Implementierungsstatus laut aktuellem `main` erneut prüfen:** Der zuletzt dokumentierte Fix sollte den Storage-Pfad zuerst mit dem Rezept verknüpfen und die Signed URL erst danach erzeugen. Noch keine aktuelle Geräteverifikation dokumentiert.
 - Keine Secrets, Tokens oder Service-Role-Keys protokollieren oder ausgeben.
 
 ## Sicherheits-/Arbeitsregeln
