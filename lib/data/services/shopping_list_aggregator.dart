@@ -91,15 +91,14 @@ class ShoppingListAggregator {
         return 'mass';
       case 'l':
       case 'liter':
-      case 'literer':
-      case 'litern':
+      case 'liters':
       case 'litre':
-      case 'litre':
+      case 'litres':
       case 'ml':
       case 'milliliter':
+      case 'milliliters':
       case 'millilitre':
-      case 'milliliter':
-      case 'millilitre':
+      case 'millilitres':
         return 'volume';
       default:
         return 'other';
@@ -135,7 +134,7 @@ class ShoppingListAggregator {
       {'kg', 'kilogram', 'kilogramm'}.contains(_normalizedUnit(unit));
 
   bool _isLiter(String unit) =>
-      {'l', 'liter', 'litre', 'litern', 'literer'}.contains(_normalizedUnit(unit));
+      {'l', 'liter', 'liters', 'litre', 'litres'}.contains(_normalizedUnit(unit));
 
   String _targetUnit(String family, Iterable<String> units) {
     if (family == 'mass') {
