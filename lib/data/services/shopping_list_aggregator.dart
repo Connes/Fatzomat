@@ -60,7 +60,7 @@ class ShoppingListAggregator {
         key: entry.key,
         name: first.name.trim().isEmpty
             ? 'Unbenannter Artikel (${first.id})'
-            : first.name.trim(),
+            : first.name.trim().replaceAll(RegExp(r'\\s+'), ' '),
         quantity: _round(converted),
         unit: targetUnit,
         checked: sourceItems.every((item) => item.checked),
