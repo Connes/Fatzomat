@@ -26,6 +26,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   Timer? _dayBoundaryTimer;
   final Set<String> _selected = <String>{};
   final Set<String> _expanded = <String>{};
+  final Set<String> _updatingItems = <String>{};
   List<List<TodayPlan>> _plans = const [];
   List<ShoppingItem> _items = const [];
   bool _loading = true;
@@ -99,6 +100,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   }
 
   Future<void> _toggleItem(AggregatedShoppingItem item, bool checked) async {
+    if (_updatingItems.contains(item.key) || !mounted) return;
+    setState(() => _updatingItems.add(item.key));
     try {
       await Future.wait(item.sources
           .where((source) => source.checked != checked)
@@ -114,6 +117,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           content: Text('Einkaufsartikel konnte nicht vollständig aktualisiert werden: $e'),
         ));
       }
+    } finally {
+      if (mounted) setState(() => _updatingItems.remove(item.key));
     }
   }
 
@@ -178,7 +183,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                       else
                         ...aggregated.map((item) => CheckboxListTile(
                           value: item.checked,
-                          onChanged: (value) => _toggleItem(item, value == true),
+                          onChanged: _updatingItems.contains(item.key)
+                              ? null
+                              : (value) => _toggleItem(item, value == true),
                           title: Text(item.name),
                           subtitle: Text('${item.quantity} ${item.unit}'.trim()),
                           secondary: Text('${item.sources.length}×'),
