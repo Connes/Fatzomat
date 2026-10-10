@@ -91,20 +91,27 @@ class ShoppingListAggregator {
     }
   }
 
+  String _normalizedUnit(String raw) => raw.trim().toLowerCase();
+
+  bool _isKilogram(String unit) => _normalizedUnit(unit) == 'kg';
+
+  bool _isLiter(String unit) =>
+      {'l', 'liter', 'litre'}.contains(_normalizedUnit(unit));
+
   String _targetUnit(String family, Iterable<String> units) {
     if (family == 'mass') {
-      return units.any((u) => {'kg'}.contains(u.trim().toLowerCase())) ? 'kg' : 'g';
+      return units.any(_isKilogram) ? 'kg' : 'g';
     }
     if (family == 'volume') {
-      return units.any((u) => {'l', 'liter', 'litre'}.contains(u.trim().toLowerCase())) ? 'l' : 'ml';
+      return units.any(_isLiter) ? 'l' : 'ml';
     }
     return units.first.trim();
   }
 
   num _toBase(num quantity, String rawUnit, String family) {
     final unit = rawUnit.trim().toLowerCase();
-    if (family == 'mass' && unit == 'kg') return quantity * 1000;
-    if (family == 'volume' && {'l', 'liter', 'litre'}.contains(unit)) return quantity * 1000;
+    if (family == 'mass' && _isKilogram(unit)) return quantity * 1000;
+    if (family == 'volume' && _isLiter(unit)) return quantity * 1000;
     return quantity;
   }
 
