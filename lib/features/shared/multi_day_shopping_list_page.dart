@@ -138,22 +138,31 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     }
   }
 
-  Future<void> _checkAllVisible(List<AggregatedShoppingItem> items) async {
+  Future<void> _setVisibleChecked(
+    List<AggregatedShoppingItem> items, {
+    required bool checked,
+  }) async {
     final pending = items.where((item) =>
-        !item.checked && !_updatingItems.contains(item.key)).toList();
+        item.checked != checked && !_updatingItems.contains(item.key)).toList();
     if (pending.isEmpty || !mounted) return;
     final keys = pending.map((item) => item.key).toSet();
     setState(() => _updatingItems.addAll(keys));
     try {
       await Future.wait(pending.expand((item) => item.sources)
-          .where((source) => !source.checked)
-          .map((source) => _repo.setShoppingChecked(source.id, true)));
+          .where((source) => source.checked != checked)
+          .map((source) => _repo.setShoppingChecked(source.id, checked)));
       await load(showLoading: false);
     } catch (e) {
+      // Some writes may have succeeded before another failed. Reload persisted
+      // state so the visible aggregate never pretends the whole batch succeeded.
       await load(showLoading: false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Zutaten konnten nicht vollständig abgehakt werden: $e'),
+          content: Text(
+            checked
+                ? 'Zutaten konnten nicht vollständig abgehakt werden: $e'
+                : 'Zutaten konnten nicht vollständig zurückgesetzt werden: $e',
+          ),
         ));
       }
     } finally {
@@ -287,17 +296,34 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                         ),
                         const SizedBox(height: 6),
                         LinearProgressIndicator(value: progress),
-                        if (searchedItems.any((item) => !item.checked))
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton.icon(
-                              onPressed: _updatingItems.isEmpty
-                                  ? () => _checkAllVisible(searchedItems)
-                                  : null,
-                              icon: const Icon(Icons.done_all_rounded),
-                              label: const Text('Alle Suchtreffer abhaken'),
-                            ),
-                          ),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 0,
+                          children: [
+                            if (searchedItems.any((item) => !item.checked))
+                              TextButton.icon(
+                                onPressed: _updatingItems.isEmpty
+                                    ? () => _setVisibleChecked(
+                                          searchedItems,
+                                          checked: true,
+                                        )
+                                    : null,
+                                icon: const Icon(Icons.done_all_rounded),
+                                label: const Text('Alle abhaken'),
+                              ),
+                            if (searchedItems.any((item) => item.checked))
+                              TextButton.icon(
+                                onPressed: _updatingItems.isEmpty
+                                    ? () => _setVisibleChecked(
+                                          searchedItems,
+                                          checked: false,
+                                        )
+                                    : null,
+                                icon: const Icon(Icons.restart_alt_rounded),
+                                label: const Text('Alle zurücksetzen'),
+                              ),
+                          ],
+                        ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: FilterChip(
