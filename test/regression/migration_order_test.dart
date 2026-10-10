@@ -45,4 +45,18 @@ void main() {
       contains('greatest(coalesce(servings, 1), 1) INTO base_servings'),
     );
   });
+  test('recipe shopping sync aggregates duplicate ingredient lines', () {
+    final planningMigration = File(
+      'supabase/migrations/20261010100000_date_aware_personal_planning.sql',
+    ).readAsStringSync();
+    final servingsMigration = File(
+      'supabase/migrations/20261010103000_update_personal_plan_servings.sql',
+    ).readAsStringSync();
+
+    expect(planningMigration, contains('sum(quantity) AS quantity'));
+    expect(servingsMigration, contains('sum(quantity) AS quantity'));
+    expect(planningMigration, contains("GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))"));
+    expect(servingsMigration, contains("GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))"));
+  });
+
 }
