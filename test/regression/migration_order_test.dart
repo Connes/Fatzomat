@@ -95,7 +95,7 @@ void main() {
       contains('REVOKE ALL ON FUNCTION public.update_personal_plan_servings(uuid, integer) FROM PUBLIC, anon;'),
     );
     expect(planningMigration, contains('normalized_type IS NULL OR normalized_type NOT IN'));
-    expect(planningMigration, contains('r.created_by IS NULL OR r.created_by = uid OR EXISTS'));
+    expect(planningMigration, contains('WHERE r.id = p_recipe_id;'));
     expect(planningMigration, contains('TO authenticated;'));
     expect(servingsMigration, contains('TO authenticated;'));
   });
