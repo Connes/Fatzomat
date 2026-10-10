@@ -31,6 +31,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   List<ShoppingItem> _items = const [];
   bool _loading = true;
   String _searchQuery = '';
+  bool _showOnlyOpen = false;
   final TextEditingController _searchController = TextEditingController();
   Object? _error;
   int _generation = 0;
@@ -158,14 +159,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     )).toList();
     final aggregated = _aggregator.aggregate(visibleItems);
     final normalizedQuery = _searchQuery.trim().toLowerCase();
-    final filteredItems = normalizedQuery.isEmpty
+    final searchedItems = normalizedQuery.isEmpty
         ? aggregated
         : aggregated.where((item) =>
             item.name.toLowerCase().contains(normalizedQuery) ||
             _categoryName(item.category).toLowerCase().contains(normalizedQuery) ||
             item.unit.toLowerCase().contains(normalizedQuery)).toList();
-    final checkedCount = filteredItems.where((item) => item.checked).length;
-    final progress = filteredItems.isEmpty ? 0.0 : checkedCount / filteredItems.length;
+    final filteredItems = _showOnlyOpen
+        ? searchedItems.where((item) => !item.checked).toList()
+        : searchedItems;
+    final checkedCount = searchedItems.where((item) => item.checked).length;
+    final progress = searchedItems.isEmpty ? 0.0 : checkedCount / searchedItems.length;
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -228,17 +232,28 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            Expanded(child: Text('$checkedCount von ${filteredItems.length} Zutaten erledigt')),
+                            Expanded(child: Text('$checkedCount von ${searchedItems.length} Zutaten erledigt')),
                             Text('${(progress * 100).round()}%'),
                           ],
                         ),
                         const SizedBox(height: 6),
                         LinearProgressIndicator(value: progress),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: FilterChip(
+                            label: const Text('Nur offene Zutaten'),
+                            selected: _showOnlyOpen,
+                            avatar: const Icon(Icons.checklist_rounded),
+                            onSelected: (selected) => setState(() => _showOnlyOpen = selected),
+                          ),
+                        ),
                       ],
                       if (aggregated.isEmpty)
                         const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Für die ausgewählten Tage sind keine Zutaten vorhanden.'))
-                      else if (filteredItems.isEmpty)
+                      else if (searchedItems.isEmpty)
                         const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Keine passenden Zutaten gefunden.'))
+                      else if (filteredItems.isEmpty)
+                        const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Alle passenden Zutaten sind bereits erledigt.'))
                       else
                         for (final category in _categoryNames(filteredItems)) ...[
                           Padding(
