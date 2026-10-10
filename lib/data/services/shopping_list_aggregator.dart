@@ -81,8 +81,12 @@ class ShoppingListAggregator {
   String _unitFamily(String raw) {
     switch (_normalizedUnit(raw)) {
       case 'kg':
+      case 'kilogram':
+      case 'kilogramm':
       case 'g':
+      case 'gr':
       case 'gram':
+      case 'gramm':
       case 'grams':
         return 'mass';
       case 'l':
@@ -122,7 +126,8 @@ class ShoppingListAggregator {
     }
   }
 
-  bool _isKilogram(String unit) => _normalizedUnit(unit) == 'kg';
+  bool _isKilogram(String unit) =>
+      {'kg', 'kilogram', 'kilogramm'}.contains(_normalizedUnit(unit));
 
   bool _isLiter(String unit) =>
       {'l', 'liter', 'litre'}.contains(_normalizedUnit(unit));
