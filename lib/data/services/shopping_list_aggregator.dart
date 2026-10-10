@@ -53,7 +53,7 @@ class ShoppingListAggregator {
       final targetUnit = _targetUnit(family, sourceItems.map((i) => i.unit));
       final quantity = sourceItems.fold<num>(
         0,
-        (sum, item) => sum + _toBase(item.quantity, item.unit, family),
+        (sum, item) => sum + _toBase(_safeQuantity(item.quantity), item.unit, family),
       );
       final converted = _fromBase(quantity, targetUnit, family);
       return AggregatedShoppingItem(
@@ -158,6 +158,8 @@ class ShoppingListAggregator {
     if (family == 'volume' && targetUnit == 'l') return quantity / 1000;
     return quantity;
   }
+
+  num _safeQuantity(num value) => value.isFinite ? value : 0;
 
   num _round(num value) {
     final rounded = (value * 1000).round() / 1000;
