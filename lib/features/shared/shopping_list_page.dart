@@ -7,6 +7,7 @@ import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
+import 'multi_day_shopping_list_page.dart';
 import 'today_page.dart';
 import '../recipes/saved_recipes_page.dart';
 
@@ -110,6 +111,13 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   }
 
   void _openPersonal() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MultiDayShoppingListPage()),
+    );
+  }
+
+  void _openPersonalSingleDay() {
     final planId = personalPlanId;
     if (planId == null) return;
     Navigator.push(
@@ -123,6 +131,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           onCompleted: () {
             if (!mounted) return;
             Navigator.pop(context);
+            load();
           },
         ),
       ),
@@ -152,15 +161,33 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
         final recipe = plan['recipes'] is Map
             ? Map<String, dynamic>.from(plan['recipes'] as Map)
             : const <String, dynamic>{};
-        return ShoppingPage(
-          planId: plan['id'].toString(),
-          recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
-          servings: (plan['servings'] as num?)?.toInt() ?? 2,
-          shared: true,
-          onCompleted: () {
-            if (!mounted) return;
-            setState(() => sharedPlan = null);
-          },
+        return TogetherScaffold(
+          backgroundType: TogetherBackgroundType.today,
+          appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
+          body: _EntryCard(
+            icon: Icons.people_outline_rounded,
+            title: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
+            text: 'Die gemeinsame Einkaufsliste ist bereit. Du kannst sie öffnen oder zur persönlichen Mehrtagesplanung wechseln.',
+            actionLabel: 'Gemeinsame Einkaufsliste öffnen',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ShoppingPage(
+                  planId: plan['id'].toString(),
+                  recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
+                  servings: (plan['servings'] as num?)?.toInt() ?? 2,
+                  shared: true,
+                  onCompleted: () {
+                    if (!mounted) return;
+                    Navigator.pop(context);
+                    load();
+                  },
+                ),
+              ),
+            ),
+            secondaryLabel: 'Persönliche Mehrtagesliste öffnen',
+            onSecondaryPressed: _openPersonal,
+          ),
         );
       }
 
@@ -173,42 +200,16 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
           text: 'Wählt zuerst ein gemeinsames Rezept für heute. Danach steht dieselbe Einkaufsliste beiden verbundenen Personen zur Verfügung.',
           actionLabel: 'Gemeinsames Rezept auswählen',
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedRecipesPage())),
-          secondaryLabel: personalPlanId != null ? 'Persönliche Liste öffnen' : null,
-          onSecondaryPressed: personalPlanId != null ? _openPersonal : null,
+          secondaryLabel: personalPlanId != null ? 'Persönliche Liste für heute öffnen' : 'Persönliche Mehrtagesliste öffnen',
+          onSecondaryPressed: personalPlanId != null ? _openPersonalSingleDay : _openPersonal,
         ),
       );
     }
 
-    if (personalPlanId != null) {
-      // ShoppingPage already renders its own page heading. Wrapping it in
-      // another scaffold app bar would show "Einkaufsliste" twice.
-      return ShoppingPage(
-        planId: personalPlanId!,
-        recipeName: personalRecipeName,
-        servings: personalServings,
-        shared: false,
-        onCompleted: () {
-          if (!mounted) return;
-          setState(() {
-            personalPlanId = null;
-            personalRecipeName = 'Einkaufsliste';
-            personalServings = 2;
-          });
-        },
-      );
-    }
+    // Show the multi-day personal list even when Today has no recipe but a
+    // recipe is planned for tomorrow or the day after.
+    return const MultiDayShoppingListPage();
 
-    return TogetherScaffold(
-      backgroundType: TogetherBackgroundType.today,
-      appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
-      body: _EntryCard(
-        icon: Icons.shopping_cart_outlined,
-        title: 'Deine Einkaufsliste ist leer',
-        text: 'Wähle zuerst ein Rezept für heute. Die zugehörigen Zutaten erscheinen anschließend hier.',
-        actionLabel: 'Zu Heute',
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage())),
-      ),
-    );
   }
 }
 

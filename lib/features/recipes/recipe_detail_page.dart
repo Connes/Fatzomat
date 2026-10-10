@@ -23,6 +23,7 @@ class RecipeDetailPage extends StatefulWidget {
   final VoidCallback? onNavigateToShoppingList;
   final bool canMarkCooked;
   final bool viewingTodaySelection;
+  final DateTime? planDate;
   const RecipeDetailPage({
     super.key,
     required this.recipeId,
@@ -31,6 +32,7 @@ class RecipeDetailPage extends StatefulWidget {
     this.onNavigateToShoppingList,
     this.canMarkCooked = false,
     this.viewingTodaySelection = false,
+    this.planDate,
   });
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
@@ -50,6 +52,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   Recipe? recipe;
   Object? loadError;
   bool loading = true, working = false, personalTodaySelected = false, cookedMarked = false;
+  String? selectedPlanId;
+  int? selectedPlanServings;
   int servings = 2;
   final Set<int> completedSteps = <int>{};
   bool ingredientsExpanded = false;
@@ -60,20 +64,33 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     try {
       final r = await repo.getRecipeModel(widget.recipeId);
       bool selectedForToday = false;
+      String? loadedPlanId;
+      int? loadedPlanServings;
       try {
-        final today = await personalToday.todayPlan();
+        final today = await personalToday.todayPlan(date: widget.planDate);
         selectedForToday = today?.isRecipe == true &&
             today?.recipeId == widget.recipeId &&
             today?.status != 'cooked';
+        if (selectedForToday) {
+          loadedPlanId = today!.id;
+          loadedPlanServings = today.servings;
+        }
       } catch (_) {
         // Personal Today state is optional metadata for recipe rendering.
       }
       if (!mounted) return;
-      setState(() { recipe = r; loadError = null; servings = r.servings.clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; loading = false; });
+      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; selectedPlanId = loadedPlanId; selectedPlanServings = loadedPlanServings; loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
     }
+  }
+
+  bool get _isPlanDateToday {
+    final date = widget.planDate;
+    if (date == null) return true;
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
   double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 12).toDouble();
@@ -89,13 +106,37 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     if (changed == true && mounted) await load();
   }
 
+  Future<void> saveSelectedPlanServings() async {
+    final planId = selectedPlanId;
+    if (!personalTodaySelected || planId == null || working || servings == selectedPlanServings) return;
+    setState(() => working = true);
+    try {
+      final updated = await personalToday.updateServings(planId, servings);
+      if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
+      if (!mounted) return;
+      setState(() => selectedPlanServings = servings);
+      await widget.onTodayPlanChanged?.call();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Personenzahl und Einkaufsmengen wurden aktualisiert.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
+  }
+
   Future<void> selectPersonalToday() async {
     if (working) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Für heute festlegen?'),
-        content: const Text('Dieses Rezept wird für heute ausgewählt.'),
+        title: Text(widget.planDate == null || _isPlanDateToday ? 'Für heute festlegen?' : 'Für diesen Tag festlegen?'),
+        content: Text(widget.planDate == null || _isPlanDateToday
+            ? 'Dieses Rezept wird für heute ausgewählt.'
+            : 'Dieses Rezept wird für den ausgewählten Tag eingeplant.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -112,7 +153,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
     setState(() => working = true);
     try {
-      await personalToday.selectRecipeForToday(widget.recipeId, servings: servings);
+      await personalToday.selectRecipeForToday(widget.recipeId, servings: servings, date: widget.planDate);
       // Notify an already-mounted TodayPage immediately. Navigation and
       // Realtime remain fallback paths, but the current page no longer needs
       // to wait for either one to reflect the successful selection.
@@ -125,6 +166,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         final navigateToToday = widget.onNavigateToToday!;
         Navigator.pop(context);
         navigateToToday();
+      } else if (widget.planDate != null) {
+        // A dated plan was opened from the date navigator. Return to that
+        // existing page instead of replacing it with a fresh TodayPage that
+        // silently resets the selected calendar date.
+        Navigator.pop(context);
       } else {
         Navigator.pushReplacement(
           context,
@@ -165,6 +211,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         final navigateToToday = widget.onNavigateToToday!;
         Navigator.pop(context);
         navigateToToday();
+      } else if (widget.planDate != null) {
+        // A dated plan was opened from the date navigator. Return to that
+        // existing page instead of replacing it with a fresh TodayPage that
+        // silently resets the selected calendar date.
+        Navigator.pop(context);
       } else {
         Navigator.pushReplacement(
           context,
@@ -347,14 +398,16 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       color: AppDesign.secondarySurface,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.check_circle_rounded, size: 20),
-                        SizedBox(width: 8),
+                        const Icon(Icons.check_circle_rounded, size: 20),
+                        const SizedBox(width: 8),
                         Text(
-                          'Für heute ausgewählt',
-                          style: TextStyle(fontWeight: FontWeight.w800),
+                          widget.planDate == null || _isPlanDateToday
+                              ? 'Für heute ausgewählt'
+                              : 'Für diesen Tag ausgewählt',
+                          style: const TextStyle(fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
@@ -607,9 +660,20 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     icon: const Icon(Icons.today_rounded),
                     label: Text(
                       working
-                          ? 'Für heute vorbereiten …'
-                          : 'Für heute festlegen',
+                          ? 'Plan wird gespeichert …'
+                          : widget.planDate == null || _isPlanDateToday
+                              ? 'Für heute festlegen'
+                              : 'Für diesen Tag festlegen',
                     ),
+                  ),
+                )
+              else if (selectedPlanId != null && servings != selectedPlanServings)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: working ? null : saveSelectedPlanServings,
+                    icon: const Icon(Icons.save_outlined),
+                    label: Text(working ? 'Personenzahl wird gespeichert …' : 'Personenzahl und Einkaufsliste aktualisieren'),
                   ),
                 ),
             ],

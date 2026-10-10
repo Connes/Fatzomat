@@ -15,6 +15,7 @@ void main() {
     expect(recipe, contains("if (widget.onNavigateToToday != null)"));
     expect(recipe, contains("Navigator.pushReplacement("));
     expect(recipe, contains("MaterialPageRoute(builder: (_) => const TodayPage())"));
+    expect(recipe, contains('else if (widget.planDate != null)'));
     expect(recipe, contains('Navigator.pushReplacement('));
     expect(recipe, contains('onNavigateToToday'));
     expect(recipe, contains('final navigateToToday = widget.onNavigateToToday!;'));
@@ -27,7 +28,7 @@ void main() {
     expect(recipe, contains('FilledButton.icon('));
     expect(recipe, contains('onPressed: working ? null : selectPersonalToday'));
     expect(recipe, contains("label: Text("));
-    expect(recipe, contains("'Für heute vorbereiten …'"));
+    expect(recipe, contains("'Plan wird gespeichert …'"));
     expect(recipe, contains("'Für heute festlegen'"));
     expect(recipe, contains('if (!personalTodaySelected)'));
     expect(recipe, contains('final bool canMarkCooked'));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -37,13 +39,17 @@ class TodayPage extends StatefulWidget {
   State<TodayPage> createState() => _TodayPageState();
 }
 
-class _TodayPageState extends State<TodayPage> {
+class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   final repo = PersonalTodayRepository();
   final recipeRepo = RecipeRepository();
   late final TodayController controller;
   TodayPlan? plan;
+  DateTime _selectedDate = DateTime.now();
+  DateTime _lastObservedDay = DateTime.now();
+  Timer? _dayBoundaryTimer;
   List<TodayPlan> completedPlans = const [];
   bool loading = true;
+  int _loadGeneration = 0;
   Object? loadError;
   RealtimeChannel? channel;
   CollaborationRepository? _collaboration;
@@ -51,16 +57,47 @@ class _TodayPageState extends State<TodayPage> {
   DecisionShare? _pendingDecisionShare;
   bool _decisionShareActionInFlight = false;
 
+  bool get _isSelectedDateToday {
+    final now = DateTime.now();
+    return _selectedDate.year == now.year && _selectedDate.month == now.month && _selectedDate.day == now.day;
+  }
+
   CollaborationRepository get _collaborationRepository =>
       _collaboration ??= CollaborationRepository();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _lastObservedDay = _dateOnly(DateTime.now());
+    _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     controller = TodayController();
     load();
     RecipeCollectionEvents.revision.addListener(_onRecipeCollectionChanged);
     _subscribeRealtime();
+  }
+
+  DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  void _checkDayBoundary() {
+    final nowDay = _dateOnly(DateTime.now());
+    if (nowDay == _lastObservedDay) return;
+    final previousDay = _lastObservedDay;
+    _lastObservedDay = nowDay;
+    // Follow the calendar only when the user was viewing the previous Today.
+    // A future/past date they deliberately selected stays selected.
+    if (_dateOnly(_selectedDate) == previousDay && mounted) {
+      setState(() {
+        _selectedDate = nowDay;
+        loading = true;
+      });
+      load();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _checkDayBoundary();
   }
 
   void _onRecipeCollectionChanged() {
@@ -85,28 +122,39 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<void> load() async {
-    await controller.load();
-    DecisionShare? pendingShare;
-    List<TodayPlan> completed = const [];
+    final generation = ++_loadGeneration;
+    final requestedDate = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     try {
-      completed = await repo.completedTodayPlans();
-    } catch (_) {
-      // Completed history must not block the current decision card.
+      final selectedPlan = await repo.todayPlan(date: requestedDate);
+      DecisionShare? pendingShare;
+      List<TodayPlan> completed = const [];
+      try {
+        if (_isSelectedDateToday) completed = await repo.completedTodayPlans();
+      } catch (_) {
+        // Completed history must not block the current decision card.
+      }
+      try {
+        if (_isSelectedDateToday) {
+          pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
+        }
+      } catch (_) {
+        // Shared decisions are additive UI and must not block the day view.
+      }
+      if (!mounted || generation != _loadGeneration) return;
+      setState(() {
+        plan = selectedPlan;
+        completedPlans = completed;
+        loading = false;
+        loadError = null;
+        _pendingDecisionShare = pendingShare;
+      });
+    } catch (error) {
+      if (!mounted || generation != _loadGeneration) return;
+      setState(() {
+        loading = false;
+        loadError = error;
+      });
     }
-    try {
-      pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
-    } catch (_) {
-      // A pending shared decision is additive UI. Never make Today unusable
-      // because its optional collaboration lookup failed.
-    }
-    if (!mounted) return;
-    setState(() {
-      plan = controller.data;
-      completedPlans = completed;
-      loading = controller.loading;
-      loadError = controller.error;
-      _pendingDecisionShare = pendingShare;
-    });
   }
 
   Future<void> _acceptPendingDecisionShare() async {
@@ -176,6 +224,7 @@ class _TodayPageState extends State<TodayPage> {
           builder: (_) => PersonalizedSurprisePage(
             recommendation: recommendation,
             persistPersonalDecision: true,
+            planDate: _selectedDate,
             service: service,
             savedRecipes: saved,
             preferences: preferences,
@@ -193,7 +242,7 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> _openMode(FoodMode mode) async {
     final selected = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => FoodModePage(mode: mode)),
+      MaterialPageRoute(builder: (_) => FoodModePage(mode: mode, planDate: _selectedDate)),
     );
     if (selected == true && mounted) await load();
   }
@@ -339,6 +388,8 @@ class _TodayPageState extends State<TodayPage> {
 
   @override
   void dispose() {
+    _dayBoundaryTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     if (channel != null) {
       try {
@@ -395,6 +446,33 @@ class _TodayPageState extends State<TodayPage> {
                       ),
                       const SizedBox(height: 14),
                     ],
+                    GestureDetector(
+                      onHorizontalDragEnd: (details) {
+                        final velocity = details.primaryVelocity ?? 0;
+                        if (velocity.abs() < 180) return;
+                        setState(() {
+                          _selectedDate = _selectedDate.add(Duration(days: velocity < 0 ? 1 : -1));
+                          loading = true;
+                        });
+                        load();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(tooltip: 'Vorheriger Tag', onPressed: () { setState(() { _selectedDate = _selectedDate.subtract(const Duration(days: 1)); loading = true; }); load(); }, icon: const Icon(Icons.chevron_left)),
+                            Text(
+                              _selectedDate.year == DateTime.now().year && _selectedDate.month == DateTime.now().month && _selectedDate.day == DateTime.now().day
+                                  ? 'Heute'
+                                  : '${_selectedDate.day.toString().padLeft(2, '0')}.${_selectedDate.month.toString().padLeft(2, '0')}.${_selectedDate.year}',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            IconButton(tooltip: 'Nächster Tag', onPressed: () { setState(() { _selectedDate = _selectedDate.add(const Duration(days: 1)); loading = true; }); load(); }, icon: const Icon(Icons.chevron_right)),
+                          ],
+                        ),
+                      ),
+                    ),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 560),
                       child: plan == null
@@ -455,8 +533,9 @@ class _TodayPageState extends State<TodayPage> {
                                         MaterialPageRoute(
                                           builder: (_) => RecipeDetailPage(
                                             recipeId: plan!.recipeId!,
-                                            canMarkCooked: true,
+                                            canMarkCooked: _isSelectedDateToday,
                                             viewingTodaySelection: true,
+                                            planDate: _selectedDate,
                                             onTodayPlanChanged: load,
                                           ),
                                         ),

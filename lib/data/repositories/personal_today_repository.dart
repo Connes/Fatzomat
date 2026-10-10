@@ -21,9 +21,13 @@ class PersonalTodayRepository {
       : _client = client,
         _offlineCache = offlineCache;
 
-  Future<TodayPlan?> todayPlan() async {
+  Future<TodayPlan?> todayPlan({DateTime? date}) async {
+    final planDate = _dateOnly(date ?? DateTime.now());
     final userId = client.auth.currentUser?.id;
     if (userId == null) {
+      // The offline cache only represents the current day. Never display that
+      // cached decision while browsing a different date.
+      if (planDate != _dateOnly(DateTime.now())) return null;
       final cached = await offlineCache.readToday();
       return cached == null ? null : TodayPlan.fromMap(cached);
     }
@@ -35,7 +39,7 @@ class PersonalTodayRepository {
           .from('personal_today_plans')
           .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
           .eq('user_id', userId)
-          .eq('plan_date', _dateOnly(DateTime.now()))
+          .eq('plan_date', planDate)
           .eq('status', 'planned')
           .order('created_at', ascending: false)
           .limit(1);
@@ -65,19 +69,33 @@ class PersonalTodayRepository {
       await _resolveNestedRecipeImage(map);
       return TodayPlan.fromMap(map);
     } catch (_) {
-      final cached = await offlineCache.readToday();
-      if (cached != null) return TodayPlan.fromMap(cached);
+      // A single cached plan has no date key, so it is safe only for Today.
+      if (planDate == _dateOnly(DateTime.now())) {
+        final cached = await offlineCache.readToday();
+        if (cached != null) return TodayPlan.fromMap(cached);
+      }
       rethrow;
     }
   }
 
-  Future<String> selectRecipeForToday(String recipeId, {int? servings}) async {
+  Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
-    final result = await client.rpc('set_personal_today_plan', params: {
-      'p_recipe_id': recipeId,
-      'p_servings': servings,
-    });
+    final planDate = _dateOnly(date ?? DateTime.now());
+    final isToday = planDate == _dateOnly(DateTime.now());
+    // Preserve the established RPC for Today and older database deployments.
+    // The explicit-date RPC is only needed when planning another day.
+    final result = isToday
+        ? await client.rpc('set_personal_today_plan', params: {
+            'p_recipe_id': recipeId,
+            'p_servings': servings,
+          })
+        : await client.rpc('set_personal_plan_for_date', params: {
+            'p_plan_date': planDate,
+            'p_decision_type': 'recipe',
+            'p_recipe_id': recipeId,
+            'p_servings': servings,
+          });
     final id = result?.toString() ?? '';
     if (id.isEmpty) throw StateError('Der persönliche Tagesplan konnte nicht gespeichert werden.');
     // Any route can create the personal Today plan. Notify the persistent
@@ -93,6 +111,7 @@ class PersonalTodayRepository {
     required String value,
     String? recipeId,
     int? servings,
+    DateTime? date,
   }) async {
     final normalizedType = type.trim();
     if (!{'recipe', 'order', 'dine_out', 'surprise'}.contains(normalizedType)) {
@@ -100,7 +119,7 @@ class PersonalTodayRepository {
     }
     if (normalizedType == 'recipe') {
       if (recipeId == null || recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
-      return selectRecipeForToday(recipeId, servings: servings);
+      return selectRecipeForToday(recipeId, servings: servings, date: date);
     }
     if (value.trim().isEmpty) throw StateError('Die Auswahl darf nicht leer sein.');
     final localDecision = {
@@ -109,12 +128,16 @@ class PersonalTodayRepository {
       'decision_type': normalizedType,
       'decision_value': value.trim(),
       'status': 'planned',
-      'servings': 2,
+      'servings': 1,
       'recipes': const <String, dynamic>{},
     };
 
+    final planDate = _dateOnly(date ?? DateTime.now());
+    final isToday = planDate == _dateOnly(DateTime.now());
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity.contains(ConnectivityResult.none)) {
+      // The legacy offline cache has no date key. Never put a future plan in it.
+      if (!isToday) throw StateError('Zukünftige Entscheidungen benötigen eine Verbindung.');
       await offlineCache.writeToday(localDecision);
       await offlineCache.writePendingTodayDecision({
         'decision_type': normalizedType,
@@ -125,10 +148,16 @@ class PersonalTodayRepository {
 
     if (client.auth.currentUser == null) throw const AuthenticationException();
     try {
-      final result = await client.rpc('set_personal_today_decision', params: {
-        'p_decision_type': normalizedType,
-        'p_decision_value': value.trim(),
-      });
+      final result = isToday
+          ? await client.rpc('set_personal_today_decision', params: {
+              'p_decision_type': normalizedType,
+              'p_decision_value': value.trim(),
+            })
+          : await client.rpc('set_personal_plan_for_date', params: {
+              'p_plan_date': planDate,
+              'p_decision_type': normalizedType,
+              'p_decision_value': value.trim(),
+            });
       final id = result?.toString() ?? '';
       if (id.isEmpty) throw StateError('Die persönliche Entscheidung konnte nicht gespeichert werden.');
       await offlineCache.clearPendingTodayDecision();
@@ -140,7 +169,10 @@ class PersonalTodayRepository {
   }
 
   Future<bool> updateServings(String planId, int servings) async {
-    final result = await client.rpc('update_personal_today_plan_servings', params: {
+    if (servings < 1 || servings > 12) {
+      throw ArgumentError.value(servings, 'servings', 'Muss zwischen 1 und 12 liegen.');
+    }
+    final result = await client.rpc('update_personal_plan_servings', params: {
       'p_plan_id': planId,
       'p_servings': servings,
     });
@@ -184,6 +216,40 @@ class PersonalTodayRepository {
       await _resolveNestedRecipeImage(map);
     }
     return maps.map(TodayPlan.fromMap).toList(growable: false);
+  }
+
+  /// Returns the planned decisions for a specific local calendar date.
+  /// Kept separate from [todayPlan] because the database supports multiple
+  /// decisions for a date and shopping must include every planned recipe.
+  Future<List<TodayPlan>> plannedPlansForDate(DateTime date) async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return const [];
+    final rows = await client
+        .from('personal_today_plans')
+        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
+        .eq('user_id', userId)
+        .eq('plan_date', _dateOnly(date))
+        .eq('status', 'planned')
+        .order('created_at', ascending: true);
+    final maps = rows.map((row) => Map<String, dynamic>.from(row)).toList();
+    for (final map in maps) {
+      await _resolveNestedRecipeImage(map);
+    }
+    return maps.map(TodayPlan.fromMap).toList(growable: false);
+  }
+
+  /// Loads persisted items for multiple selected day plans without changing
+  /// their IDs or checked state. Aggregation is deliberately a presentation
+  /// concern, so each source row can still be checked independently.
+  Future<List<ShoppingItem>> shoppingItemsForPlans(Iterable<String> planIds) async {
+    final ids = planIds.toSet().where((id) => id.trim().isNotEmpty).toList();
+    if (ids.isEmpty) return const [];
+    final rows = await client
+        .from('shopping_items')
+        .select('id,name,quantity,unit,checked,checked_by,food_id,source,personal_today_plan_id,foods(category)')
+        .inFilter('personal_today_plan_id', ids)
+        .order('name');
+    return rows.map((row) => ShoppingItem.fromMap(Map<String, dynamic>.from(row))).toList(growable: false);
   }
 
   Future<List<PersonalHistoryEntry>> history({int limit = 100}) async {

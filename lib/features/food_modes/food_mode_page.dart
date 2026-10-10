@@ -18,6 +18,7 @@ import '../../data/repositories/restaurant_discovery_repository.dart';
 
 class FoodModePage extends StatefulWidget {
   final FoodMode mode;
+  final DateTime? planDate;
   final String? decisionRequestId;
   final LocationService locationService;
   final RestaurantDiscoveryRepository discoveryRepository;
@@ -26,6 +27,7 @@ class FoodModePage extends StatefulWidget {
   const FoodModePage({
     super.key,
     required this.mode,
+    this.planDate,
     this.decisionRequestId,
     this.locationService = const DeviceLocationService(),
     this.discoveryRepository = const SupabaseRestaurantDiscoveryRepository(),
@@ -50,6 +52,7 @@ class _FoodModePageState extends State<FoodModePage> {
         builder: (_) => CookNextStepPage(
           mainChoice: choice,
           decisionRequestId: widget.decisionRequestId,
+          planDate: widget.planDate,
         ),
       ),
     );
@@ -80,6 +83,7 @@ class _FoodModePageState extends State<FoodModePage> {
           await PersonalTodayRepository().selectDecision(
             type: 'order',
             value: choice,
+            date: widget.planDate,
           );
         }
         if (!context.mounted) return;
@@ -376,6 +380,7 @@ class DiscoveryPage extends StatefulWidget {
   final bool surprised;
   final String? decisionRequestId;
   final bool persistPersonalDecision;
+  final DateTime? planDate;
   final LocationService locationService;
   final RestaurantDiscoveryRepository discoveryRepository;
   final Future<void> Function(RestaurantDiscoveryResult result)? onResultSelected;
@@ -387,6 +392,7 @@ class DiscoveryPage extends StatefulWidget {
     this.surprised = false,
     this.decisionRequestId,
     this.persistPersonalDecision = false,
+    this.planDate,
     this.locationService = const DeviceLocationService(),
     this.discoveryRepository = const SupabaseRestaurantDiscoveryRepository(),
     this.onResultSelected,
@@ -454,6 +460,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         await PersonalTodayRepository().selectDecision(
           type: order ? 'order' : 'dine_out',
           value: decisionValue,
+          date: widget.planDate,
         );
       }
       if (!mounted) return;

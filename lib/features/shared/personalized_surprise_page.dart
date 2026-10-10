@@ -17,6 +17,7 @@ class PersonalizedSurprisePage extends StatefulWidget {
   final SurpriseRecommendation recommendation;
   final String? decisionRequestId;
   final bool persistPersonalDecision;
+  final DateTime? planDate;
   final SurpriseRecommendationService service;
   final List<Recipe> savedRecipes;
   final Map<String, String> preferences;
@@ -27,6 +28,7 @@ class PersonalizedSurprisePage extends StatefulWidget {
     required this.recommendation,
     this.decisionRequestId,
     this.persistPersonalDecision = false,
+    this.planDate,
     SurpriseRecommendationService? service,
     this.savedRecipes = const [],
     this.preferences = const {},
@@ -102,6 +104,7 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
           type: type,
           value: value,
           recipeId: recipeId,
+          date: widget.planDate,
         );
       }
       if (!mounted) return;

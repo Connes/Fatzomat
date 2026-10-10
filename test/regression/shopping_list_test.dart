@@ -67,4 +67,16 @@ void main() {
     expect(migration, contains("p.recipe_id is not null"));
     expect(migration, contains('shopping personal insert'));
   });
+
+  test('multi-day aggregated item updates prevent concurrent toggles and unlock on failure', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains("if (_updatingItems.contains(item.key) || !mounted) return;"));
+    expect(page, contains("setState(() => _updatingItems.add(item.key));"));
+    expect(page, contains("finally {\n      if (mounted) setState(() => _updatingItems.remove(item.key));"));
+    expect(page, contains("onChanged: _updatingItems.contains(item.key)"));
+    expect(page, contains('child: CircularProgressIndicator(strokeWidth: 2)'));
+    expect(page, contains("await load(showLoading: false);\n      if (mounted)"));
+  });
+
 }

@@ -7,6 +7,7 @@ class ShoppingItem {
   final String? foodId;
   final String category;
   final String source;
+  final String? planId;
 
   const ShoppingItem({
     required this.id,
@@ -17,6 +18,7 @@ class ShoppingItem {
     this.foodId,
     this.category = 'Weitere Zutaten',
     this.source = 'recipe',
+    this.planId,
   });
 
   factory ShoppingItem.fromMap(Map<String, dynamic> map) => ShoppingItem(
@@ -32,5 +34,6 @@ class ShoppingItem {
             ? (map['foods']['category']?.toString() ?? 'Weitere Zutaten')
             : (map['category']?.toString() ?? 'Weitere Zutaten'),
         source: map['source']?.toString() ?? 'recipe',
+        planId: map['personal_today_plan_id']?.toString(),
       );
 }
