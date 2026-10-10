@@ -59,4 +59,16 @@ void main() {
     expect(servingsMigration, contains("GROUP BY recipe_id, food_id, name, lower(coalesce(unit, ''))"));
   });
 
+  test('aggregated ingredient inserts use a valid WHERE clause', () {
+    final planningMigration = File(
+      'supabase/migrations/20261010100000_date_aware_personal_planning.sql',
+    ).readAsStringSync();
+    final servingsMigration = File(
+      'supabase/migrations/20261010103000_update_personal_plan_servings.sql',
+    ).readAsStringSync();
+
+    expect(planningMigration, contains(') ri\\n    WHERE NOT EXISTS ('));
+    expect(servingsMigration, contains(') ri\\n  WHERE NOT EXISTS ('));
+  });
+
 }
