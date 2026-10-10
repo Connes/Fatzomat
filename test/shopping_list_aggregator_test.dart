@@ -116,6 +116,17 @@ void main() {
     expect(juice.unit, 'l');
   });
 
+  test('recognizes full kilogram and gram names', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: 'Reis', quantity: 1, unit: 'Kilogramm'),
+      item(id: 'b', name: 'reis', quantity: 250, unit: 'Gramm'),
+    ]);
+
+    expect(rows, hasLength(1));
+    expect(rows.single.quantity, 1.25);
+    expect(rows.single.unit, 'kg');
+  });
+
   test('aggregates liters and milliliters', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Milch', quantity: 1, unit: 'l'),
