@@ -255,7 +255,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                               }),
                             ),
                             title: Text(_label(i), style: const TextStyle(fontWeight: FontWeight.w700)),
-                            subtitle: Text('${_plansFor(_days[i]).where((p) => p.isRecipe).length} geplante Rezepte'),
+                            subtitle: Text(
+                              '${_plansFor(_days[i]).where((p) => p.isRecipe).length} geplante Rezepte · '
+                              '${_items.where((item) => _plansFor(_days[i]).any((plan) => plan.isRecipe && plan.id == item.planId)).length} Zutatenpositionen',
+                            ),
                             children: _plansFor(_days[i]).map((plan) => ListTile(
                               leading: const Icon(Icons.restaurant_menu_rounded),
                               title: Text(plan.displayTitle),
