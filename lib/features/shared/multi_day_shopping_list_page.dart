@@ -76,6 +76,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   }
 
   Future<void> load({bool showLoading = true}) async {
+    if (!mounted) return;
     final generation = ++_generation;
     if (showLoading) {
       setState(() { _loading = true; _error = null; });
@@ -99,12 +100,20 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   Future<void> _toggleItem(AggregatedShoppingItem item, bool checked) async {
     try {
-      for (final source in item.sources) {
-        if (source.checked != checked) await _repo.setShoppingChecked(source.id, checked);
-      }
+      await Future.wait(item.sources
+          .where((source) => source.checked != checked)
+          .map((source) => _repo.setShoppingChecked(source.id, checked)));
       await load(showLoading: false);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Einkaufsartikel konnte nicht aktualisiert werden: $e')));
+      // Some requests may already have reached the server when another fails.
+      // Reload regardless, so the aggregate reflects persisted state instead
+      // of leaving a misleading checkbox state on screen.
+      await load(showLoading: false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Einkaufsartikel konnte nicht vollständig aktualisiert werden: $e'),
+        ));
+      }
     }
   }
 
