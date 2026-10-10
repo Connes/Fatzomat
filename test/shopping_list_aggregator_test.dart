@@ -127,6 +127,23 @@ void main() {
     expect(rows.single.unit, 'kg');
   });
 
+  test('recognizes British and plural volume unit names', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: 'Saft', quantity: 1, unit: 'litre'),
+      item(id: 'b', name: 'saft', quantity: 250, unit: 'millilitres'),
+      item(id: 'c', name: 'Wasser', quantity: 1, unit: 'liters'),
+      item(id: 'd', name: 'wasser', quantity: 250, unit: 'milliliters'),
+    ]);
+
+    expect(rows, hasLength(2));
+    final juice = rows.singleWhere((row) => row.name.toLowerCase() == 'saft');
+    final water = rows.singleWhere((row) => row.name.toLowerCase() == 'wasser');
+    expect(juice.quantity, 1.25);
+    expect(juice.unit, 'l');
+    expect(water.quantity, 1.25);
+    expect(water.unit, 'l');
+  });
+
   test('aggregates liters and milliliters', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Milch', quantity: 1, unit: 'l'),
