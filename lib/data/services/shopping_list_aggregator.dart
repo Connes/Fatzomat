@@ -42,7 +42,7 @@ class ShoppingListAggregator {
       // Only merge units that have a known conversion. Unknown units are
       // kept separate by their normalized spelling.
       final key = '$identity|$unit|'
-          '${unit == 'other' ? item.unit.trim().toLowerCase() : ''}';
+          '${unit == 'other' ? _canonicalUnit(item.unit).toLowerCase() : ''}';
       buckets.putIfAbsent(key, () => <ShoppingItem>[]).add(item);
     }
 
@@ -93,6 +93,25 @@ class ShoppingListAggregator {
 
   String _normalizedUnit(String raw) => raw.trim().toLowerCase();
 
+  String _canonicalUnit(String raw) {
+    switch (_normalizedUnit(raw)) {
+      case 'stk':
+      case 'stück':
+      case 'stueck':
+        return 'Stück';
+      case 'el':
+      case 'esslöffel':
+      case 'essloeffel':
+        return 'EL';
+      case 'tl':
+      case 'teelöffel':
+      case 'teeloeffel':
+        return 'TL';
+      default:
+        return raw.trim();
+    }
+  }
+
   bool _isKilogram(String unit) => _normalizedUnit(unit) == 'kg';
 
   bool _isLiter(String unit) =>
@@ -105,7 +124,7 @@ class ShoppingListAggregator {
     if (family == 'volume') {
       return units.any(_isLiter) ? 'l' : 'ml';
     }
-    return units.first.trim();
+    return _canonicalUnit(units.first);
   }
 
   num _toBase(num quantity, String rawUnit, String family) {
