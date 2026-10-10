@@ -67,8 +67,10 @@ void main() {
       'supabase/migrations/20261010103000_update_personal_plan_servings.sql',
     ).readAsStringSync();
 
-    expect(planningMigration, contains(') ri\\n    WHERE NOT EXISTS ('));
-    expect(servingsMigration, contains(') ri\\n  WHERE NOT EXISTS ('));
+    expect(planningMigration, contains('WHERE NOT EXISTS ('));
+    expect(servingsMigration, contains('WHERE NOT EXISTS ('));
+    expect(planningMigration, isNot(contains(') ri AND NOT EXISTS (')));
+    expect(servingsMigration, isNot(contains(') ri AND NOT EXISTS (')));
   });
 
 }
