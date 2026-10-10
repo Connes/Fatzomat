@@ -64,6 +64,10 @@ void main() {
 
     expect(rows, hasLength(2));
     expect(rows.map((row) => row.sources.single.id), containsAll(['a', 'b']));
+    expect(rows.map((row) => row.name), containsAll([
+      'Unbenannter Artikel (a)',
+      'Unbenannter Artikel (b)',
+    ]));
   });
 
   test('does not merge incompatible or unknown units', () {
