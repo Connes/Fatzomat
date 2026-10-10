@@ -15,6 +15,7 @@ void main() {
     expect(recipe, contains("if (widget.onNavigateToToday != null)"));
     expect(recipe, contains("Navigator.pushReplacement("));
     expect(recipe, contains("MaterialPageRoute(builder: (_) => const TodayPage())"));
+    expect(recipe, contains('else if (widget.planDate != null)'));
     expect(recipe, contains('Navigator.pushReplacement('));
     expect(recipe, contains('onNavigateToToday'));
     expect(recipe, contains('final navigateToToday = widget.onNavigateToToday!;'));
