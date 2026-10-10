@@ -206,6 +206,32 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
                     children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${_selected.length} von ${_days.length} Tagen ausgewählt',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => setState(() {
+                              _selected
+                                ..clear()
+                                ..addAll(_days.map(_key));
+                            }),
+                            child: const Text('Alle Tage'),
+                          ),
+                          TextButton(
+                            onPressed: () => setState(() {
+                              _selected
+                                ..clear()
+                                ..add(_key(_days.first));
+                            }),
+                            child: const Text('Nur heute'),
+                          ),
+                        ],
+                      ),
                       for (var i = 0; i < _days.length; i++)
                         Card(
                           child: ExpansionTile(
