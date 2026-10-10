@@ -75,6 +75,7 @@ void main() {
     expect(page, contains("setState(() => _updatingItems.add(item.key));"));
     expect(page, contains("finally {\n      if (mounted) setState(() => _updatingItems.remove(item.key));"));
     expect(page, contains("onChanged: _updatingItems.contains(item.key)"));
+    expect(page, contains('child: CircularProgressIndicator(strokeWidth: 2)'));
     expect(page, contains("await load(showLoading: false);\n      if (mounted)"));
   });
 
