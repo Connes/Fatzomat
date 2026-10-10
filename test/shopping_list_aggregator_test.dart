@@ -78,15 +78,20 @@ void main() {
       item(id: 'b', name: 'äpfel', quantity: 3, unit: ' Stück '),
       item(id: 'c', name: 'Öl', quantity: 1, unit: 'Esslöffel'),
       item(id: 'd', name: 'öl', quantity: 2, unit: 'EL'),
+      item(id: 'e', name: 'Salz', quantity: 1, unit: 'Teelöffel'),
+      item(id: 'f', name: 'salz', quantity: 2, unit: ' TL '),
     ]);
 
-    expect(rows, hasLength(2));
+    expect(rows, hasLength(3));
     final apples = rows.singleWhere((row) => row.name.toLowerCase() == 'äpfel');
     final oil = rows.singleWhere((row) => row.name.toLowerCase() == 'öl');
+    final salt = rows.singleWhere((row) => row.name.toLowerCase() == 'salz');
     expect(apples.quantity, 5);
     expect(apples.unit, 'Stück');
     expect(oil.quantity, 3);
     expect(oil.unit, 'EL');
+    expect(salt.quantity, 3);
+    expect(salt.unit, 'TL');
   });
 
   test('aggregates liters and milliliters', () {
