@@ -179,6 +179,18 @@ void main() {
     expect(rows, hasLength(3));
   });
 
+  test('ignores non-finite quantities instead of breaking aggregation', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: 'Mehl', quantity: 1, unit: 'kg'),
+      item(id: 'b', name: 'mehl', quantity: double.nan, unit: 'g'),
+      item(id: 'c', name: 'MEHL', quantity: double.infinity, unit: 'g'),
+    ]);
+
+    expect(rows, hasLength(1));
+    expect(rows.single.quantity, 1);
+    expect(rows.single.unit, 'kg');
+  });
+
   test('aggregated row is checked only when every source is checked', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Eier', quantity: 2, unit: 'Stück', checked: true),
