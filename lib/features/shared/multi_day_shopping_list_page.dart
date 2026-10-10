@@ -138,6 +138,29 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     }
   }
 
+  Future<void> _checkAllVisible(List<AggregatedShoppingItem> items) async {
+    final pending = items.where((item) =>
+        !item.checked && !_updatingItems.contains(item.key)).toList();
+    if (pending.isEmpty || !mounted) return;
+    final keys = pending.map((item) => item.key).toSet();
+    setState(() => _updatingItems.addAll(keys));
+    try {
+      await Future.wait(pending.expand((item) => item.sources)
+          .where((source) => !source.checked)
+          .map((source) => _repo.setShoppingChecked(source.id, true)));
+      await load(showLoading: false);
+    } catch (e) {
+      await load(showLoading: false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Zutaten konnten nicht vollständig abgehakt werden: $e'),
+        ));
+      }
+    } finally {
+      if (mounted) setState(() => _updatingItems.removeAll(keys));
+    }
+  }
+
   @override
   void dispose() {
     _dayBoundaryTimer?.cancel();
@@ -238,6 +261,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                         ),
                         const SizedBox(height: 6),
                         LinearProgressIndicator(value: progress),
+                        if (searchedItems.any((item) => !item.checked))
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed: _updatingItems.isEmpty
+                                  ? () => _checkAllVisible(searchedItems)
+                                  : null,
+                              icon: const Icon(Icons.done_all_rounded),
+                              label: const Text('Alle Suchtreffer abhaken'),
+                            ),
+                          ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: FilterChip(
