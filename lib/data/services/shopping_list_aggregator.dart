@@ -91,19 +91,23 @@ class ShoppingListAggregator {
     }
   }
 
-  String _normalizedUnit(String raw) => raw.trim().toLowerCase();
+  String _normalizedUnit(String raw) =>
+      raw.trim().toLowerCase().replaceAll('.', '');
 
   String _canonicalUnit(String raw) {
     switch (_normalizedUnit(raw)) {
       case 'stk':
+      case 'st':
       case 'stück':
       case 'stueck':
         return 'Stück';
       case 'el':
+      case 'essl':
       case 'esslöffel':
       case 'essloeffel':
         return 'EL';
       case 'tl':
+      case 'teel':
       case 'teelöffel':
       case 'teeloeffel':
         return 'TL';
