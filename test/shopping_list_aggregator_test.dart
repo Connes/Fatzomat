@@ -34,6 +34,17 @@ void main() {
     expect(rows.single.sources.map((row) => row.id), containsAll(['a', 'b']));
   });
 
+  test('normalizes whitespace around food IDs before grouping', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: 'Tomate', quantity: 2, unit: 'Stück', foodId: ' food-1 '),
+      item(id: 'b', name: 'Tomaten', quantity: 3, unit: 'Stück', foodId: 'food-1'),
+    ]);
+
+    expect(rows, hasLength(1));
+    expect(rows.single.quantity, 5);
+    expect(rows.single.sources.map((row) => row.id), containsAll(['a', 'b']));
+  });
+
   test('aggregates liters and milliliters', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Milch', quantity: 1, unit: 'l'),
