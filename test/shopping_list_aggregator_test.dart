@@ -72,6 +72,23 @@ void main() {
     expect(milk.unit, 'l');
   });
 
+  test('normalizes common German unit aliases', () {
+    final rows = aggregator.aggregate([
+      item(id: 'a', name: 'Äpfel', quantity: 2, unit: 'Stk'),
+      item(id: 'b', name: 'äpfel', quantity: 3, unit: ' Stück '),
+      item(id: 'c', name: 'Öl', quantity: 1, unit: 'Esslöffel'),
+      item(id: 'd', name: 'öl', quantity: 2, unit: 'EL'),
+    ]);
+
+    expect(rows, hasLength(2));
+    final apples = rows.singleWhere((row) => row.name.toLowerCase() == 'äpfel');
+    final oil = rows.singleWhere((row) => row.name.toLowerCase() == 'öl');
+    expect(apples.quantity, 5);
+    expect(apples.unit, 'Stück');
+    expect(oil.quantity, 3);
+    expect(oil.unit, 'EL');
+  });
+
   test('aggregates liters and milliliters', () {
     final rows = aggregator.aggregate([
       item(id: 'a', name: 'Milch', quantity: 1, unit: 'l'),
