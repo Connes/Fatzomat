@@ -128,7 +128,7 @@ class PersonalTodayRepository {
       'decision_type': normalizedType,
       'decision_value': value.trim(),
       'status': 'planned',
-      'servings': 2,
+      'servings': 1,
       'recipes': const <String, dynamic>{},
     };
 
