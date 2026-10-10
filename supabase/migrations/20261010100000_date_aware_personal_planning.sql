@@ -27,11 +27,7 @@ BEGIN
     IF p_recipe_id IS NULL THEN RAISE EXCEPTION 'Keine Recipe-ID vorhanden.'; END IF;
     SELECT greatest(coalesce(r.servings, 1), 1) INTO base_servings
     FROM public.recipes r
-    WHERE r.id = p_recipe_id
-      AND (r.created_by IS NULL OR r.created_by = uid OR EXISTS (
-        SELECT 1 FROM public.recipe_saves rs
-        WHERE rs.recipe_id = r.id AND rs.user_id = uid
-      ));
+    WHERE r.id = p_recipe_id;
     IF NOT FOUND THEN RAISE EXCEPTION 'Rezept ist nicht verfügbar.'; END IF;
     target_servings := coalesce(p_servings, base_servings);
     IF target_servings < 1 OR target_servings > 12 THEN RAISE EXCEPTION 'Ungültige Personenzahl.'; END IF;
