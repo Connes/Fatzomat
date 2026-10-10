@@ -68,12 +68,18 @@ class ShoppingListAggregator {
         sources: List<ShoppingItem>.unmodifiable(sourceItems),
       );
     }).toList()
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      ..sort((a, b) {
+        final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        if (byName != 0) return byName;
+        final byUnit = a.unit.toLowerCase().compareTo(b.unit.toLowerCase());
+        if (byUnit != 0) return byUnit;
+        return a.key.compareTo(b.key);
+      });
     return List<AggregatedShoppingItem>.unmodifiable(result);
   }
 
   String _unitFamily(String raw) {
-    switch (raw.trim().toLowerCase()) {
+    switch (_normalizedUnit(raw)) {
       case 'kg':
       case 'g':
       case 'gram':
@@ -132,7 +138,7 @@ class ShoppingListAggregator {
   }
 
   num _toBase(num quantity, String rawUnit, String family) {
-    final unit = rawUnit.trim().toLowerCase();
+    final unit = _normalizedUnit(rawUnit);
     if (family == 'mass' && _isKilogram(unit)) return quantity * 1000;
     if (family == 'volume' && _isLiter(unit)) return quantity * 1000;
     return quantity;
