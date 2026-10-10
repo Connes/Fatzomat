@@ -58,7 +58,9 @@ class ShoppingListAggregator {
       final converted = _fromBase(quantity, targetUnit, family);
       return AggregatedShoppingItem(
         key: entry.key,
-        name: first.name,
+        name: first.name.trim().isEmpty
+            ? 'Unbenannter Artikel (${first.id})'
+            : first.name.trim(),
         quantity: _round(converted),
         unit: targetUnit,
         checked: sourceItems.every((item) => item.checked),
