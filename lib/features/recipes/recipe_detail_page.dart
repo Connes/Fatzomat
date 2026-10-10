@@ -166,6 +166,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         final navigateToToday = widget.onNavigateToToday!;
         Navigator.pop(context);
         navigateToToday();
+      } else if (widget.planDate != null) {
+        // A dated plan was opened from the date navigator. Return to that
+        // existing page instead of replacing it with a fresh TodayPage that
+        // silently resets the selected calendar date.
+        Navigator.pop(context);
       } else {
         Navigator.pushReplacement(
           context,
@@ -206,6 +211,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         final navigateToToday = widget.onNavigateToToday!;
         Navigator.pop(context);
         navigateToToday();
+      } else if (widget.planDate != null) {
+        // A dated plan was opened from the date navigator. Return to that
+        // existing page instead of replacing it with a fresh TodayPage that
+        // silently resets the selected calendar date.
+        Navigator.pop(context);
       } else {
         Navigator.pushReplacement(
           context,
