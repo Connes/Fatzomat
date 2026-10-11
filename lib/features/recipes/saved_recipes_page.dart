@@ -193,6 +193,19 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     _subscribeRealtime();
   }
 
+  bool get _isSelectedDateToday {
+    final date = widget.planDate;
+    if (date == null) return true;
+    final now = DateTime.now();
+    return date.year == now.year && date.month == now.month && date.day == now.day;
+  }
+
+  String get _selectedDayLabel {
+    if (_isSelectedDateToday) return 'heute';
+    final date = widget.planDate!;
+    return 'am ${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+  }
+
   bool _supabaseAvailable() {
     try {
       Supabase.instance.client;
@@ -271,7 +284,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     // being displayed when one of those secondary requests fails.
     TodayPlan? today;
     try {
-      today = await personalToday.todayPlan();
+      today = await personalToday.todayPlan(date: widget.planDate);
     } catch (_) {
       // Today is auxiliary metadata. A temporary/unavailable collaboration
       // request must not make the saved recipe collection look broken.
@@ -337,7 +350,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       await load();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('„${recipe.name}“ ist für heute ausgewählt.')),
+        SnackBar(content: Text('„${recipe.name}“ ist ${_selectedDayLabel} ausgewählt.')),
       );
     } catch (e) {
       if (mounted) showAppError(context, e);
@@ -405,14 +418,14 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         await showDialog<void>(
           context: context,
           builder: (dialogContext) => AlertDialog(
-            title: const Text('Heute ist schon belegt'),
-            content: Text('„${todayPlan!.name}“ ist bereits für heute festgelegt. Deine persönliche Einkaufsliste gehört zu diesem Plan.'),
+            title: Text(_isSelectedDateToday ? 'Heute ist schon belegt' : 'Dieser Tag ist schon belegt'),
+            content: Text('„${todayPlan!.name}“ ist bereits ${_selectedDayLabel} festgelegt. Deine persönliche Einkaufsliste gehört zu diesem Plan.'),
             actions: [
               TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Schließen')),
               FilledButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const TodayPage()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => TodayPage(initialDate: widget.planDate)));
                 },
                 child: const Text('Heute öffnen'),
               ),
@@ -581,6 +594,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                     MaterialPageRoute(
                       builder: (_) => RecipeDetailPage(
                         recipeId: recipe.id!,
+                        planDate: widget.planDate,
                         onTodayPlanChanged: load,
                         onNavigateToToday: widget.onNavigateToTab == null
                             ? null
@@ -669,7 +683,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Für dich heute', style: Theme.of(context).textTheme.bodyMedium),
+                                    Text('Für dich ${_selectedDayLabel}', style: Theme.of(context).textTheme.bodyMedium),
                                     const SizedBox(height: 2),
                                     Text(todayPlan!.name, style: Theme.of(context).textTheme.titleMedium),
                                   ],
@@ -733,6 +747,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 MaterialPageRoute(
                                   builder: (_) => RecipeDetailPage(
                                     recipeId: recipe.id!,
+                                    planDate: widget.planDate,
                                     onTodayPlanChanged: load,
                                     onNavigateToToday: widget.onNavigateToTab == null
                                         ? null
@@ -770,19 +785,19 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                           child: todayPlan?.isRecipe == true &&
                                                   todayPlan?.recipeId == recipe.id &&
                                                   todayPlan?.status != 'cooked'
-                                              ? const Row(
+                                              ? Row(
                                                   mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Icon(Icons.check_circle_rounded, size: 18, color: AppDesign.primaryDark),
                                                     SizedBox(width: 6),
-                                                    Text('Für heute ausgewählt', style: TextStyle(fontWeight: FontWeight.w700)),
+                                                    Text(_isSelectedDateToday ? 'Für heute ausgewählt' : 'Für diesen Tag ausgewählt', style: TextStyle(fontWeight: FontWeight.w700)),
                                                   ],
                                                 )
                                               : TextButton.icon(
                                                   key: Key('saved-recipe-select-today-${recipe.id}'),
                                                   onPressed: () => selectRecipeForToday(recipe),
                                                   icon: const Icon(Icons.today_rounded, size: 18),
-                                                  label: const Text('Für heute auswählen'),
+                                                  label: Text(_isSelectedDateToday ? 'Für heute auswählen' : 'Für diesen Tag auswählen'),
                                                 ),
                                         ),
                                       ],

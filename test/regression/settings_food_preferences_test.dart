@@ -67,6 +67,6 @@ void main() {
     expect(repository, contains("'p_recipe_id': recipeId"));
     expect(repository, contains("'p_servings': servings"));
     expect(savedRecipes, contains('personalToday.selectRecipeForToday'));
-    expect(savedRecipes, contains("label: const Text('Für heute auswählen')"));
+    expect(savedRecipes, contains("_isSelectedDateToday ? 'Für heute auswählen' : 'Für diesen Tag auswählen'"));
   });
 }
