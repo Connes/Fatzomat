@@ -106,6 +106,15 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - CI auf PR-Head `6b95c2d9d4ac536d6151e3200d999e9358331e00` erfolgreich: Quality Gate Run 248 / Test und Analyze erfolgreich; Flutter quality gate Run 888 / Hygiene, Dependencies, Icon-Generierung, Analyze und Test erfolgreich.
 - Keine Supabase-Migration erforderlich. Nach dem Merge muss der tatsächliche `main`-Stand und die Merge-CI noch verifiziert werden.
 
+## App-Bar-Datumsnavigation und Seitenwechsel (2026-10-11)
+
+- PR #72 („Move day navigation to app bar and animate swipes“) wurde per Squash-Merge in `main` integriert. Merge-Commit: `976410bc2931f686adba090dda0a9101ba17f29d`.
+- Die Tagesnavigation befindet sich jetzt in der oberen App-Bar-Zeile. Der Pfeil für den vorherigen Tag wird nur angezeigt, wenn nicht „Heute“ ausgewählt ist; der Pfeil für den nächsten Tag bleibt sichtbar.
+- Beim Datumswechsel bleibt der bisherige Inhalt sichtbar, während der Plan für das Zieldatum geladen wird. Danach gleitet die bisherige Seite aus dem Blick und die neue Seite gleitet aus der Gegenrichtung hinein.
+- Regressionstest aktualisiert, um die Position der Navigation und den Slide-Übergang abzusichern.
+- **CI-Status offen:** Für PR-Head `c9c4973dfd87ab359a6219002194ae65b8cc1b2e` und Merge-Commit `976410bc2931f686adba090dda0a9101ba17f29d` wurden über die verfügbaren GitHub-Abfragen bislang keine Workflow-Runs oder Commit-Status gefunden. Daher sind `flutter analyze` und `flutter test` für diese Änderung noch nicht als erfolgreich bestätigt. Nachgelagerte CI erneut prüfen.
+- Keine Supabase-Änderung und kein Release-Build.
+
 ## Sicherheits-/Arbeitsregeln
 
 - Keine Secrets oder Service-Role-Keys ausgeben.
