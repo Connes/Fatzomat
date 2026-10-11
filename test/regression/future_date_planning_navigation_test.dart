@@ -57,7 +57,7 @@ void main() {
     expect(today, contains('if (!_isSelectedDateToday)'));
     expect(today, contains('child: AnimatedSwitcher('));
     expect(today, contains('duration: const Duration(milliseconds: 320)'));
-    expect(today, contains('SlideTransition('));
+    expect(today, contains('FractionalTranslation('));
     expect(today, contains('key: ValueKey<DateTime>(_displayedDate)'));
   });
 }
