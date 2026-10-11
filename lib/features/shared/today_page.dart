@@ -33,7 +33,9 @@ import '../../data/models/decision_share.dart';
 import '../../core/services/surprise_recommendation_service.dart';
 
 class TodayPage extends StatefulWidget {
-  const TodayPage({super.key});
+  final DateTime? initialDate;
+
+  const TodayPage({super.key, this.initialDate});
 
   @override
   State<TodayPage> createState() => _TodayPageState();
@@ -44,7 +46,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   final recipeRepo = RecipeRepository();
   late final TodayController controller;
   TodayPlan? plan;
-  DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedDate;
   DateTime _lastObservedDay = DateTime.now();
   Timer? _dayBoundaryTimer;
   List<TodayPlan> completedPlans = const [];
@@ -69,7 +71,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _lastObservedDay = _dateOnly(DateTime.now());
+    final today = _dateOnly(DateTime.now());
+    _selectedDate = _dateOnly(widget.initialDate ?? today);
+    if (_selectedDate.isBefore(today)) _selectedDate = today;
+    _lastObservedDay = today;
     _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     controller = TodayController();
     load();
@@ -78,6 +83,17 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
   DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  void _shiftSelectedDate(int days) {
+    final today = _dateOnly(DateTime.now());
+    final target = _dateOnly(_selectedDate.add(Duration(days: days)));
+    if (target.isBefore(today)) return;
+    setState(() {
+      _selectedDate = target;
+      loading = true;
+    });
+    load();
+  }
 
   void _checkDayBoundary() {
     final nowDay = _dateOnly(DateTime.now());
@@ -402,6 +418,49 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  String _todayDateLabel() {
+    final date = _dateOnly(_selectedDate);
+    const weekdays = [
+      'Montag',
+      'Dienstag',
+      'Mittwoch',
+      'Donnerstag',
+      'Freitag',
+      'Samstag',
+      'Sonntag',
+    ];
+    const months = [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ];
+    return '${weekdays[date.weekday - 1]}, ${date.day}. ${months[date.month - 1]}';
+  }
+
+  PreferredSizeWidget _todayAppBar() {
+    return TogetherAppBar(
+      automaticallyImplyLeading: false,
+      title: Text(
+        _todayDateLabel(),
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Widget page;
@@ -430,8 +489,15 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
           bottom: false,
           child: RefreshIndicator(
             onRefresh: load,
-            child: Center(
-              child: SingleChildScrollView(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onHorizontalDragEnd: (details) {
+                final velocity = details.primaryVelocity ?? 0;
+                if (velocity.abs() < 180) return;
+                _shiftSelectedDate(velocity < 0 ? 1 : -1);
+              },
+              child: Center(
+                child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
                 child: Column(
@@ -446,31 +512,30 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 14),
                     ],
-                    GestureDetector(
-                      onHorizontalDragEnd: (details) {
-                        final velocity = details.primaryVelocity ?? 0;
-                        if (velocity.abs() < 180) return;
-                        setState(() {
-                          _selectedDate = _selectedDate.add(Duration(days: velocity < 0 ? 1 : -1));
-                          loading = true;
-                        });
-                        load();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(tooltip: 'Vorheriger Tag', onPressed: () { setState(() { _selectedDate = _selectedDate.subtract(const Duration(days: 1)); loading = true; }); load(); }, icon: const Icon(Icons.chevron_left)),
-                            Text(
-                              _selectedDate.year == DateTime.now().year && _selectedDate.month == DateTime.now().month && _selectedDate.day == DateTime.now().day
-                                  ? 'Heute'
-                                  : '${_selectedDate.day.toString().padLeft(2, '0')}.${_selectedDate.month.toString().padLeft(2, '0')}.${_selectedDate.year}',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            IconButton(tooltip: 'Nächster Tag', onPressed: () { setState(() { _selectedDate = _selectedDate.add(const Duration(days: 1)); loading = true; }); load(); }, icon: const Icon(Icons.chevron_right)),
-                          ],
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            tooltip: 'Vorheriger Tag',
+                            onPressed: _dateOnly(_selectedDate).isAtSameMomentAs(_dateOnly(DateTime.now()))
+                                ? null
+                                : () => _shiftSelectedDate(-1),
+                            icon: const Icon(Icons.chevron_left),
+                          ),
+                          Text(
+                            _isSelectedDateToday
+                                ? 'Heute'
+                                : '${_selectedDate.day.toString().padLeft(2, '0')}.${_selectedDate.month.toString().padLeft(2, '0')}.${_selectedDate.year}',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          IconButton(
+                            tooltip: 'Nächster Tag',
+                            onPressed: () => _shiftSelectedDate(1),
+                            icon: const Icon(Icons.chevron_right),
+                          ),
+                        ],
                       ),
                     ),
                     ConstrainedBox(
@@ -553,6 +618,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                 ),
               ),
             ),
+            ),
           ),
         ),
       );
@@ -571,49 +637,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
 
-}
-
-String _todayDateLabel() {
-  final now = DateTime.now();
-  const weekdays = [
-    'Montag',
-    'Dienstag',
-    'Mittwoch',
-    'Donnerstag',
-    'Freitag',
-    'Samstag',
-    'Sonntag',
-  ];
-  const months = [
-    'Januar',
-    'Februar',
-    'März',
-    'April',
-    'Mai',
-    'Juni',
-    'Juli',
-    'August',
-    'September',
-    'Oktober',
-    'November',
-    'Dezember',
-  ];
-  return '${weekdays[now.weekday - 1]}, ${now.day}. ${months[now.month - 1]}';
-}
-
-PreferredSizeWidget _todayAppBar() {
-  return TogetherAppBar(
-    automaticallyImplyLeading: false,
-    title: Text(
-      _todayDateLabel(),
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.2,
-      ),
-    ),
-  );
 }
 
 class _IncomingDecisionShareCard extends StatelessWidget {
