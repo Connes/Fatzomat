@@ -185,8 +185,20 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
   Future<void> markCooked() async {
     if (!widget.canMarkCooked || working) return;
+    // Never allow a future-dated detail route to complete today's plan by
+    // accident when the same recipe happens to be selected for both dates.
+    if (!_isPlanDateToday) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Zukünftige Entscheidungen können nicht als gekocht markiert werden.'),
+          ),
+        );
+      }
+      return;
+    }
     try {
-      final today = await personalToday.todayPlan();
+      final today = await personalToday.todayPlan(date: widget.planDate);
       if (today == null || !today.isRecipe || today.recipeId != widget.recipeId) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
