@@ -131,7 +131,8 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Zusätzlich prüft `RecipeDetailPage.markCooked()` das ausgewählte Datum ausdrücklich, bevor es den Status ändern darf. Es lädt den Plan außerdem mit `widget.planDate`, statt bei einem Datumswechsel versehentlich den heutigen Plan zu lesen.
 - Neue Supabase-Migration `prevent_future_plan_completion` ergänzt einen Datenbank-Trigger, der `status = 'cooked'` für ein zukünftiges `plan_date` bei INSERT und UPDATE abweist. Damit ist der Schutz nicht von der Sichtbarkeit eines Buttons oder einem einzelnen Client-Pfad abhängig.
 - Regressionstest `test/regression/future_decision_completion_guard_test.dart` prüft UI-Guard, datumsbezogenes Laden und Datenbank-Trigger.
-- Nach dem Merge die CI auf dem endgültigen `main`-Commit sowie die angewendete Live-Migration verifizieren. Keine Release-Builds erstellen.
+- Live-Migration wurde auf Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet (Version `20261011180842`, `prevent_future_plan_completion`). Die Triggerdefinition wurde live geprüft; `tgenabled = 'O'` bestätigt, dass der Trigger aktiviert ist.
+- Nach dem Merge die CI auf dem endgültigen `main`-Commit verifizieren. Keine Release-Builds erstellen.
 
 ## Sicherheits-/Arbeitsregeln
 
