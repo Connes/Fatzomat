@@ -547,10 +547,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                     );
                   },
                   child: SingleChildScrollView(
-                  key: ValueKey<DateTime>(_displayedDate),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
-                child: Column(
+                    key: ValueKey<DateTime>(_displayedDate),
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
+                    child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (_pendingDecisionShare != null) ...[
@@ -639,12 +639,12 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                       _CompletedTodayDecisions(plans: completedPlans),
                     ],
                   ],
-                ),
                   ),
                 ),
               ),
             ),
           ),
+        ),
       );
     }
 
