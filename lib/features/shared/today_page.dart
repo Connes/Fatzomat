@@ -527,19 +527,30 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   transitionBuilder: (child, animation) {
-                    final isIncoming = child.key == ValueKey<DateTime>(_displayedDate);
-                    final offset = isIncoming
-                        ? Offset(_pageTransitionDirection.toDouble(), 0)
-                        : Offset(-_pageTransitionDirection.toDouble(), 0);
-                    return ClipRect(
-                      child: SlideTransition(
-                        position: animation.drive(
-                          Tween<Offset>(begin: offset, end: Offset.zero).chain(
-                            CurveTween(curve: Curves.easeInOutCubic),
+                    return AnimatedBuilder(
+                      animation: animation,
+                      builder: (context, _) {
+                        final direction = _pageTransitionDirection.toDouble();
+                        final isOutgoing = animation.status == AnimationStatus.reverse;
+                        final tween = isOutgoing
+                            ? Tween<Offset>(
+                                begin: Offset(-direction, 0),
+                                end: Offset.zero,
+                              )
+                            : Tween<Offset>(
+                                begin: Offset(direction, 0),
+                                end: Offset.zero,
+                              );
+                        final position = tween.animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOutCubic,
                           ),
-                        ),
-                        child: child,
-                      ),
+                        );
+                        return ClipRect(
+                          child: SlideTransition(position: position, child: child),
+                        );
+                      },
                     );
                   },
                   child: SingleChildScrollView(
