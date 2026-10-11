@@ -785,7 +785,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                           child: todayPlan?.isRecipe == true &&
                                                   todayPlan?.recipeId == recipe.id &&
                                                   todayPlan?.status != 'cooked'
-                                              ? const Row(
+                                              ? Row(
                                                   mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Icon(Icons.check_circle_rounded, size: 18, color: AppDesign.primaryDark),
