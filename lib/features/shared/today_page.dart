@@ -94,6 +94,9 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     setState(() {
       _selectedDate = target;
       _pageTransitionDirection = days.sign;
+      // Hide the previous day's plan while the target date loads. Otherwise
+      // a removal tap can accidentally act on the stale plan ID.
+      loading = true;
       loadError = null;
     });
     load();
@@ -365,16 +368,20 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     if (plan == null) return;
     if (plan!.status == 'cooked') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Für heute ist schon alles erledigt. Deine Entscheidung ist abgeschlossen.')),
+        SnackBar(content: Text(_isSelectedDateToday
+            ? 'Für heute ist schon alles erledigt. Deine Entscheidung ist abgeschlossen.'
+            : 'Für ${_todayDateLabel()} ist diese Entscheidung bereits abgeschlossen.')),
       );
       return;
     }
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Heutige Entscheidung entfernen?'),
+        title: Text(_isSelectedDateToday
+            ? 'Heutige Entscheidung entfernen?'
+            : 'Entscheidung für ${_todayDateLabel()} entfernen?'),
         content: Text(
-          '„${plan!.displayTitle}“ wird aus deinem heutigen Plan entfernt. Zugehörige persönliche Rezeptartikel verschwinden ebenfalls aus der Einkaufsliste.',
+          '„${plan!.displayTitle}“ wird aus deinem ${_isSelectedDateToday ? 'heutigen Plan' : 'Plan für ${_todayDateLabel()}'} entfernt. Zugehörige persönliche Rezeptartikel verschwinden ebenfalls aus der Einkaufsliste.',
         ),
         actions: [
           TextButton(
@@ -398,7 +405,9 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       await load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Heutige Entscheidung entfernt.')),
+          SnackBar(content: Text(_isSelectedDateToday
+              ? 'Heutige Entscheidung entfernt.'
+              : 'Entscheidung für ${_todayDateLabel()} entfernt.')),
         );
       }
     } catch (e) {

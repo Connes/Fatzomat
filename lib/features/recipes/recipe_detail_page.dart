@@ -167,10 +167,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         Navigator.pop(context);
         navigateToToday();
       } else if (widget.planDate != null) {
-        // A dated plan was opened from the date navigator. Return to that
-        // existing page instead of replacing it with a fresh TodayPage that
-        // silently resets the selected calendar date.
-        Navigator.pop(context);
+        // Return success through pushed recipe/cooking routes so they can
+        // unwind to Today without resetting the selected calendar date.
+        Navigator.pop(context, true);
       } else {
         Navigator.pushReplacement(
           context,

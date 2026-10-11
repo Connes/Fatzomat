@@ -60,4 +60,30 @@ void main() {
     expect(today, contains('FractionalTranslation('));
     expect(today, contains('key: ValueKey<DateTime>(_displayedDate)'));
   });
+
+
+  test('changing day hides the old plan while the target date loads', () {
+    final today = File('lib/features/shared/today_page.dart').readAsStringSync();
+    final shiftStart = today.indexOf('void _shiftSelectedDate(int days)');
+    final shiftEnd = today.indexOf('void _checkDayBoundary()', shiftStart);
+    expect(shiftStart, isNonNegative);
+    expect(shiftEnd, greaterThan(shiftStart));
+    expect(today.substring(shiftStart, shiftEnd), contains('loading = true;'));
+  });
+
+  test('cancelling a plan is scoped by its ID, not by the current date', () {
+    final migration = File('supabase/migrations/20261011100000_date_aware_plan_cancellation.sql').readAsStringSync();
+    expect(migration, contains('WHERE id = p_plan_id'));
+    expect(migration, contains('AND user_id = uid'));
+    expect(migration, contains("AND status = 'planned'"));
+    final functionBody = migration.substring(migration.indexOf('BEGIN'));
+    expect(functionBody, isNot(contains('plan_date = current_date')));
+    expect(migration, contains('DELETE FROM public.shopping_items'));
+  });
+
+  test('selecting a saved recipe returns to Today', () {
+    final saved = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+    expect(saved, contains('widget.onNavigateToTab!(0);'));
+    expect(saved, contains('Navigator.pop(context, true);'));
+  });
 }

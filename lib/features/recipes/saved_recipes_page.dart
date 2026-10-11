@@ -349,6 +349,18 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       // `_history.isNotEmpty` assertion. Refresh the tab state instead.
       await load();
       if (!mounted) return;
+
+      // Navigate to Today after a personal selection. This page is either a
+      // persistent tab or a pushed route inside the cooking flow.
+      if (widget.decisionRequestId == null) {
+        if (widget.onNavigateToTab != null) {
+          widget.onNavigateToTab!(0);
+        } else {
+          Navigator.pop(context, true);
+        }
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('„${recipe.name}“ ist ${_selectedDayLabel} ausgewählt.')),
       );
