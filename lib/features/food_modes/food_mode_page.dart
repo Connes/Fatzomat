@@ -106,6 +106,7 @@ class _FoodModePageState extends State<FoodModePage> {
           preference: choice,
           decisionRequestId: widget.decisionRequestId,
           persistPersonalDecision: widget.decisionRequestId == null,
+          planDate: widget.planDate,
           locationService: widget.locationService,
           discoveryRepository: widget.discoveryRepository,
           onResultSelected: widget.onResultSelected,
