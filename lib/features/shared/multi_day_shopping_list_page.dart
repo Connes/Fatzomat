@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
@@ -30,11 +31,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   List<List<TodayPlan>> _plans = const [];
   List<ShoppingItem> _items = const [];
   bool _loading = true;
-  String _searchQuery = '';
   bool _showOnlyOpen = false;
-  final TextEditingController _searchController = TextEditingController();
   Object? _error;
   int _generation = 0;
+  RealtimeChannel? _channel;
 
   DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
   List<DateTime> _makeDays(DateTime today) =>
@@ -43,11 +43,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   String _label(int index) => index == 0 ? 'Heute' : index == 1 ? 'Morgen' : 'Übermorgen';
 
-  String _dayTitle(int index) {
-    final day = _days[index];
-    final date = '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.'; 
-    return '${_label(index)} · $date';
+  String _dayTitle(DateTime day) {
+    final index = _days.indexWhere((candidate) => _key(candidate) == _key(day));
+    final date = '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.';
+    return '${_label(index < 0 ? 0 : index)} · $date';
   }
+
+  List<DateTime> get _activeDays => [
+        for (var i = 0; i < _days.length; i++)
+          if (i < _plans.length && _plans[i].any((plan) => plan.isRecipe))
+            _days[i],
+      ];
 
   void _checkDayBoundary() {
     final today = _dateOnly(DateTime.now());
@@ -56,6 +62,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     final newTodayKey = _key(today);
     setState(() {
       _days = _makeDays(today);
+      _plans = const [];
+      _items = const [];
       // Carry the default selection forward with the calendar. Preserve any
       // explicitly selected future day that remains in the new three-day view.
       final hadOnlyTodaySelected = _selected.length == 1 && _selected.contains(oldTodayKey);
@@ -82,7 +90,31 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     _selected.add(_key(_observedToday));
     _expanded.add(_key(_observedToday));
+    _subscribe();
     load();
+  }
+
+  void _subscribe() {
+    try {
+      final client = Supabase.instance.client;
+      _channel = client.channel('personal-shopping-list');
+      _channel!
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'personal_today_plans',
+            callback: (_) => load(showLoading: false),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'shopping_items',
+            callback: (_) => load(showLoading: false),
+          )
+          .subscribe();
+    } on AssertionError {
+      // Widget tests/previews may mount before Supabase is initialized.
+    }
   }
 
   Future<void> load({bool showLoading = true}) async {
@@ -96,7 +128,21 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       final ids = plans.expand((day) => day).where((p) => p.isRecipe).map((p) => p.id).toSet();
       final items = await _repo.shoppingItemsForPlans(ids);
       if (!mounted || generation != _generation) return;
-      setState(() { _plans = plans; _items = items; _loading = false; _error = null; });
+      setState(() {
+        _plans = plans;
+        _items = items;
+        final activeKeys = _activeDays.map(_key).toSet();
+        _selected.removeWhere((key) => !activeKeys.contains(key));
+        if (!_selected.any(activeKeys.contains) && activeKeys.isNotEmpty) {
+          _selected.add(activeKeys.first);
+        }
+        _expanded.removeWhere((key) => !activeKeys.contains(key));
+        if (!_expanded.any(activeKeys.contains) && activeKeys.isNotEmpty) {
+          _expanded.add(activeKeys.first);
+        }
+        _loading = false;
+        _error = null;
+      });
     } catch (e) {
       if (!mounted || generation != _generation) return;
       setState(() { _error = e; _loading = false; });
@@ -180,34 +226,36 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   void dispose() {
     _dayBoundaryTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
-    _searchController.dispose();
+    if (_channel != null) {
+      try {
+        Supabase.instance.client.removeChannel(_channel!);
+      } on AssertionError {
+        // Ignore unavailable Supabase in previews/tests.
+      }
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedPlanIds = <String>{};
-    for (final day in _days.where((d) => _selected.contains(_key(d)))) {
-      selectedPlanIds.addAll(_plansFor(day).where((p) => p.isRecipe).map((p) => p.id));
-    }
-    final visibleItems = _items.where((item) => selectedPlanIds.contains(
-      // Each persisted item retains its originating personal plan ID so
-      // only ingredients from selected days contribute to the aggregate.
-      item.planId,
-    )).toList();
+    final activeDays = _activeDays;
+    final activeKeys = activeDays.map(_key).toSet();
+    final selectedDays = activeDays
+        .where((day) => _selected.contains(_key(day)))
+        .toList(growable: false);
+    final selectedPlanIds = <String>{
+      for (final day in selectedDays)
+        ..._plansFor(day).where((plan) => plan.isRecipe).map((plan) => plan.id),
+    };
+    final visibleItems = _items
+        .where((item) => selectedPlanIds.contains(item.planId))
+        .toList(growable: false);
     final aggregated = _aggregator.aggregate(visibleItems);
-    final normalizedQuery = _searchQuery.trim().toLowerCase();
-    final searchedItems = normalizedQuery.isEmpty
-        ? aggregated
-        : aggregated.where((item) =>
-            item.name.toLowerCase().contains(normalizedQuery) ||
-            _categoryName(item.category).toLowerCase().contains(normalizedQuery) ||
-            item.unit.toLowerCase().contains(normalizedQuery)).toList();
     final filteredItems = _showOnlyOpen
-        ? searchedItems.where((item) => !item.checked).toList()
-        : searchedItems;
-    final checkedCount = searchedItems.where((item) => item.checked).length;
-    final progress = searchedItems.isEmpty ? 0.0 : checkedCount / searchedItems.length;
+        ? aggregated.where((item) => !item.checked).toList(growable: false)
+        : aggregated;
+    final checkedCount = aggregated.where((item) => item.checked).length;
+    final progress = aggregated.isEmpty ? 0.0 : checkedCount / aggregated.length;
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -215,173 +263,305 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [Text('Einkaufsliste konnte nicht geladen werden.'), const SizedBox(height: 12), FilledButton(onPressed: load, child: const Text('Erneut versuchen'))])))
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Einkaufsliste konnte nicht geladen werden.'),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: load,
+                          child: const Text('Erneut versuchen'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               : RefreshIndicator(
                   onRefresh: load,
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '${_selected.length} von ${_days.length} Tagen ausgewählt',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => setState(() {
-                              _selected
-                                ..clear()
-                                ..addAll(_days.map(_key));
-                            }),
-                            child: const Text('Alle Tage'),
-                          ),
-                          TextButton(
-                            onPressed: () => setState(() {
-                              _selected
-                                ..clear()
-                                ..add(_key(_days.first));
-                            }),
-                            child: const Text('Nur heute'),
-                          ),
-                        ],
-                      ),
-                      for (var i = 0; i < _days.length; i++)
-                        Card(
-                          child: ExpansionTile(
-                            key: PageStorageKey(_key(_days[i])),
-                            initiallyExpanded: _expanded.contains(_key(_days[i])),
-                            onExpansionChanged: (open) => setState(() { if (open) { _expanded.add(_key(_days[i])); } else { _expanded.remove(_key(_days[i])); } }),
-                            leading: Checkbox(
-                              value: _selected.contains(_key(_days[i])),
-                              activeColor: AppDesign.primaryDark,
-                              onChanged: (value) => setState(() {
-                                if (value == true) { _selected.add(_key(_days[i])); } else { _selected.remove(_key(_days[i])); }
-                              }),
-                            ),
-                            title: Text(_dayTitle(i), style: const TextStyle(fontWeight: FontWeight.w700)),
-                            subtitle: Text(
-                              '${_plansFor(_days[i]).where((p) => p.isRecipe).length} geplante Rezepte · '
-                              '${_items.where((item) => _plansFor(_days[i]).any((plan) => plan.isRecipe && plan.id == item.planId)).length} Zutatenpositionen',
-                            ),
-                            children: _plansFor(_days[i]).map((plan) => ListTile(
-                              leading: const Icon(Icons.restaurant_menu_rounded),
-                              title: Text(plan.displayTitle),
-                              subtitle: Text('${plan.servings} Portionen'),
-                            )).toList(),
-                          ),
-                        ),
-                      const SizedBox(height: 12),
-                      Text('Zusammengefasste Zutaten', style: Theme.of(context).textTheme.titleLarge),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _searchController,
-                        onChanged: (value) => setState(() => _searchQuery = value),
-                        decoration: InputDecoration(
-                          labelText: 'Zutaten suchen',
-                          hintText: 'Name, Kategorie oder Einheit',
-                          prefixIcon: const Icon(Icons.search_rounded),
-                          suffixIcon: _searchQuery.isEmpty
-                              ? null
-                              : IconButton(
-                                  tooltip: 'Suche löschen',
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    setState(() => _searchQuery = '');
-                                  },
-                                  icon: const Icon(Icons.clear_rounded),
+                      if (activeDays.isEmpty)
+                        AppSurface(
+                          color: AppDesign.surface,
+                          bordered: false,
+                          padding: const EdgeInsets.fromLTRB(24, 32, 24, 30),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(
+                                  color: AppDesign.primarySoft,
+                                  borderRadius: BorderRadius.circular(AppDesign.radiusXl),
                                 ),
-                          border: const OutlineInputBorder(),
+                                child: const Icon(
+                                  Icons.shopping_basket_outlined,
+                                  size: 30,
+                                  color: AppDesign.primaryDark,
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Text(
+                                'Noch keine Einkaufsliste',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      color: AppDesign.text,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Sobald du ein Rezept für heute oder einen der nächsten Tage auswählst, erscheinen hier nur die dafür benötigten Zutaten.',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: AppDesign.secondaryText,
+                                      height: 1.45,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else ...[
+                        AppSurface(
+                          color: AppDesign.surface,
+                          bordered: false,
+                          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '${selectedDays.length} von ${activeDays.length} Tagen ausgewählt',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: AppDesign.text,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => setState(() {
+                                  _selected
+                                    ..clear()
+                                    ..addAll(activeKeys);
+                                }),
+                                child: const Text('Alle Tage'),
+                              ),
+                              TextButton(
+                                onPressed: () => setState(() {
+                                  _selected
+                                    ..clear()
+                                    ..add(_key(activeDays.first));
+                                }),
+                                child: const Text('Erster Tag'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      if (aggregated.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(child: Text('$checkedCount von ${searchedItems.length} Zutaten erledigt')),
-                            Text('${(progress * 100).round()}%'),
-                          ],
-                        ),
+                        const SizedBox(height: 10),
+                        for (final day in activeDays)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Card(
+                              color: AppDesign.surface,
+                              surfaceTintColor: Colors.transparent,
+                              child: ExpansionTile(
+                                key: PageStorageKey(_key(day)),
+                                initiallyExpanded: _expanded.contains(_key(day)),
+                                onExpansionChanged: (open) => setState(() {
+                                  if (open) {
+                                    _expanded.add(_key(day));
+                                  } else {
+                                    _expanded.remove(_key(day));
+                                  }
+                                }),
+                                leading: Checkbox(
+                                  value: _selected.contains(_key(day)),
+                                  activeColor: AppDesign.primaryDark,
+                                  onChanged: (value) => setState(() {
+                                    if (value == true) {
+                                      _selected.add(_key(day));
+                                    } else {
+                                      _selected.remove(_key(day));
+                                    }
+                                  }),
+                                ),
+                                title: Text(
+                                  _dayTitle(day),
+                                  style: const TextStyle(
+                                    color: AppDesign.text,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  '${_plansFor(day).where((plan) => plan.isRecipe).length} geplante Rezepte · '
+                                  '${_items.where((item) => _plansFor(day).any((plan) => plan.isRecipe && plan.id == item.planId)).length} Zutatenpositionen',
+                                  style: const TextStyle(color: AppDesign.secondaryText),
+                                ),
+                                children: _plansFor(day)
+                                    .where((plan) => plan.isRecipe)
+                                    .map((plan) => ListTile(
+                                          leading: const Icon(
+                                            Icons.restaurant_menu_rounded,
+                                            color: AppDesign.primaryDark,
+                                          ),
+                                          title: Text(
+                                            plan.displayTitle,
+                                            style: const TextStyle(color: AppDesign.text),
+                                          ),
+                                          subtitle: Text(
+                                            '${plan.servings} Portionen',
+                                            style: const TextStyle(color: AppDesign.secondaryText),
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                            ),
+                          ),
                         const SizedBox(height: 6),
-                        LinearProgressIndicator(value: progress),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 0,
-                          children: [
-                            if (searchedItems.any((item) => !item.checked))
-                              TextButton.icon(
-                                onPressed: _updatingItems.isEmpty
-                                    ? () => _setVisibleChecked(
-                                          searchedItems,
-                                          checked: true,
-                                        )
-                                    : null,
-                                icon: const Icon(Icons.done_all_rounded),
-                                label: const Text('Alle abhaken'),
+                        AppSurface(
+                          color: AppDesign.surface,
+                          bordered: false,
+                          padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Zusammengefasste Zutaten',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      color: AppDesign.text,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                               ),
-                            if (searchedItems.any((item) => item.checked))
-                              TextButton.icon(
-                                onPressed: _updatingItems.isEmpty
-                                    ? () => _setVisibleChecked(
-                                          searchedItems,
-                                          checked: false,
-                                        )
-                                    : null,
-                                icon: const Icon(Icons.restart_alt_rounded),
-                                label: const Text('Alle zurücksetzen'),
-                              ),
-                          ],
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: FilterChip(
-                            label: const Text('Nur offene Zutaten'),
-                            selected: _showOnlyOpen,
-                            avatar: const Icon(Icons.checklist_rounded),
-                            onSelected: (selected) => setState(() => _showOnlyOpen = selected),
+                              const SizedBox(height: 10),
+                              if (aggregated.isNotEmpty) ...[
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '$checkedCount von ${aggregated.length} Zutaten erledigt',
+                                        style: const TextStyle(color: AppDesign.text),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${(progress * 100).round()}%',
+                                      style: const TextStyle(
+                                        color: AppDesign.primaryDark,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(AppDesign.radiusPill),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    minHeight: 7,
+                                    backgroundColor: AppDesign.surfaceSoft,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 0,
+                                  children: [
+                                    if (aggregated.any((item) => !item.checked))
+                                      TextButton.icon(
+                                        onPressed: _updatingItems.isEmpty
+                                            ? () => _setVisibleChecked(aggregated, checked: true)
+                                            : null,
+                                        icon: const Icon(Icons.done_all_rounded),
+                                        label: const Text('Alle abhaken'),
+                                      ),
+                                    if (aggregated.any((item) => item.checked))
+                                      TextButton.icon(
+                                        onPressed: _updatingItems.isEmpty
+                                            ? () => _setVisibleChecked(aggregated, checked: false)
+                                            : null,
+                                        icon: const Icon(Icons.restart_alt_rounded),
+                                        label: const Text('Alle zurücksetzen'),
+                                      ),
+                                  ],
+                                ),
+                                FilterChip(
+                                  label: const Text('Nur offene Zutaten'),
+                                  selected: _showOnlyOpen,
+                                  avatar: const Icon(Icons.checklist_rounded),
+                                  onSelected: (selected) => setState(() => _showOnlyOpen = selected),
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                              if (aggregated.isEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 20),
+                                  child: Text(
+                                    'Für die ausgewählten Tage sind keine Zutaten vorhanden.',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          color: AppDesign.secondaryText,
+                                        ),
+                                  ),
+                                )
+                              else if (filteredItems.isEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 20),
+                                  child: Text(
+                                    'Alle Zutaten sind bereits erledigt.',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          color: AppDesign.secondaryText,
+                                        ),
+                                  ),
+                                )
+                              else
+                                for (final category in _categoryNames(filteredItems)) ...[
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 14, bottom: 4),
+                                    child: Text(
+                                      category,
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            color: AppDesign.text,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ),
+                                  ...filteredItems
+                                      .where((item) => _categoryName(item.category) == category)
+                                      .map((item) => CheckboxListTile(
+                                            contentPadding: EdgeInsets.zero,
+                                            value: item.checked,
+                                            onChanged: _updatingItems.contains(item.key)
+                                                ? null
+                                                : (value) => _toggleItem(item, value == true),
+                                            title: Text(
+                                              item.name,
+                                              style: const TextStyle(color: AppDesign.text),
+                                            ),
+                                            subtitle: Text(
+                                              '${item.quantity} ${item.unit}'.trim(),
+                                              style: const TextStyle(color: AppDesign.secondaryText),
+                                            ),
+                                            secondary: _updatingItems.contains(item.key)
+                                                ? const SizedBox(
+                                                    width: 20,
+                                                    height: 20,
+                                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                                  )
+                                                : Text(
+                                                    '${item.sources.length}×',
+                                                    style: const TextStyle(color: AppDesign.secondaryText),
+                                                  ),
+                                          )),
+                                ],
+                            ],
                           ),
                         ),
                       ],
-                      if (aggregated.isEmpty)
-                        const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Für die ausgewählten Tage sind keine Zutaten vorhanden.'))
-                      else if (searchedItems.isEmpty)
-                        const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Keine passenden Zutaten gefunden.'))
-                      else if (filteredItems.isEmpty)
-                        const Padding(padding: EdgeInsets.symmetric(vertical: 20), child: Text('Alle passenden Zutaten sind bereits erledigt.'))
-                      else
-                        for (final category in _categoryNames(filteredItems)) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(top: 14, bottom: 4),
-                            child: Text(
-                              category,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                            ),
-                          ),
-                          ...filteredItems
-                              .where((item) => _categoryName(item.category) == category)
-                              .map((item) => CheckboxListTile(
-                                    value: item.checked,
-                                    onChanged: _updatingItems.contains(item.key)
-                                        ? null
-                                        : (value) => _toggleItem(item, value == true),
-                                    title: Text(item.name),
-                                    subtitle: Text('${item.quantity} ${item.unit}'.trim()),
-                                    secondary: _updatingItems.contains(item.key)
-                                        ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          )
-                                        : Text('${item.sources.length}×'),
-                                  )),
-                        ],
                     ],
                   ),
                 ),
     );
   }
-
 }
