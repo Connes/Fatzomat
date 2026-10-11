@@ -34,5 +34,6 @@ void main() {
     expect(migration, contains("NEW.status = 'cancelled'"));
     expect(migration, contains('DELETE FROM public.shopping_items'));
     expect(migration, contains('personal_today_plan_id = OLD.id'));
+    expect(migration, contains('REVOKE ALL ON FUNCTION'));
   });
 }
