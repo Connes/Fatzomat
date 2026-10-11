@@ -532,23 +532,16 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                       builder: (context, _) {
                         final direction = _pageTransitionDirection.toDouble();
                         final isOutgoing = animation.status == AnimationStatus.reverse;
-                        final tween = isOutgoing
-                            ? Tween<Offset>(
-                                begin: Offset(-direction, 0),
-                                end: Offset.zero,
-                              )
-                            : Tween<Offset>(
-                                begin: Offset(direction, 0),
-                                end: Offset.zero,
-                              );
-                        final position = tween.animate(
-                          CurvedAnimation(
-                            parent: animation,
-                            curve: Curves.easeInOutCubic,
-                          ),
-                        );
+                        final progress = Curves.easeInOutCubic.transform(animation.value);
+                        final remaining = 1 - progress;
+                        final horizontalOffset = isOutgoing
+                            ? -direction * remaining
+                            : direction * remaining;
                         return ClipRect(
-                          child: SlideTransition(position: position, child: child),
+                          child: FractionalTranslation(
+                            translation: Offset(horizontalOffset, 0),
+                            child: child,
+                          ),
                         );
                       },
                     );
