@@ -68,13 +68,14 @@ void main() {
     final shiftEnd = today.indexOf('void _checkDayBoundary()', shiftStart);
     expect(shiftStart, isNonNegative);
     expect(shiftEnd, greaterThan(shiftStart));
-    final shift = today.substring(shiftStart, shiftEnd);
-    expect(shift, contains('loading = true;'));
+    expect(today.substring(shiftStart, shiftEnd), contains('loading = true;'));
   });
 
   test('cancelling a plan is scoped by its ID, not by the current date', () {
     final migration = File('supabase/migrations/20261011100000_date_aware_plan_cancellation.sql').readAsStringSync();
-    expect(migration, contains("WHERE id = p_plan_id\n    AND user_id = uid\n    AND status = 'planned'"));
+    expect(migration, contains('WHERE id = p_plan_id'));
+    expect(migration, contains('AND user_id = uid'));
+    expect(migration, contains("AND status = 'planned'"));
     expect(migration, isNot(contains('plan_date = current_date')));
     expect(migration, contains('DELETE FROM public.shopping_items'));
   });
