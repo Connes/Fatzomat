@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
@@ -33,6 +34,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   bool _showOnlyOpen = false;
   Object? _error;
   int _generation = 0;
+  RealtimeChannel? _channel;
 
   DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
   List<DateTime> _makeDays(DateTime today) =>
@@ -88,7 +90,31 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     _selected.add(_key(_observedToday));
     _expanded.add(_key(_observedToday));
+    _subscribe();
     load();
+  }
+
+  void _subscribe() {
+    try {
+      final client = Supabase.instance.client;
+      _channel = client.channel('personal-shopping-list');
+      _channel!
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'personal_today_plans',
+            callback: (_) => load(showLoading: false),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'shopping_items',
+            callback: (_) => load(showLoading: false),
+          )
+          .subscribe();
+    } on AssertionError {
+      // Widget tests/previews may mount before Supabase is initialized.
+    }
   }
 
   Future<void> load({bool showLoading = true}) async {
@@ -200,6 +226,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   void dispose() {
     _dayBoundaryTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    if (_channel != null) {
+      try {
+        Supabase.instance.client.removeChannel(_channel!);
+      } on AssertionError {
+        // Ignore unavailable Supabase in previews/tests.
+      }
+    }
     super.dispose();
   }
 
