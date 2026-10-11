@@ -152,4 +152,9 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Tageseinträge und Zutatenbereiche verwenden deckende, helle Flächen mit kontrastreicher Textfarbe, damit der Hintergrund die Lesbarkeit nicht beeinträchtigt.
 - Die Migration `cleanup_cancelled_plan_shopping_items` entfernt Einkaufsartikel zuverlässig bei jeder Stornierung oder Löschung eines persönlichen Plans, unabhängig vom Datum; sie bereinigt auch zuvor zurückgebliebene Artikel stornierter Pläne.
 - Regressionstest: `test/regression/shopping_list_active_plans_test.dart`.
-- Nach PR-Merge CI und den Live-Trigger auf Supabase verifizieren. Keine Release-Builds erstellen.
+- PR #75 („Show only active shopping lists and improve readability“) wurde nach erfolgreichen PR-Prüfungen gemergt. Squash-Merge-Commit: `3383ba7f99f7a3e49777af456a9712d937649445`.
+- CI auf dem finalen PR-Head `38c19f7c4cdc93979fa60663b7fa0761a62acde3` erfolgreich: Quality Gate Run 274 sowie Flutter quality gate Run 913; Analyze und Test waren erfolgreich.
+- Live-Supabase-Migrationen auf Projekt `oidxezjdwqktpxuypbfb`: `cleanup_cancelled_plan_shopping_items` Version `20261011181919` und `restrict_cleanup_trigger_function` Version `20261011182135`.
+- Trigger `cleanup_personal_plan_shopping_items` ist aktiviert (`tgenabled = 'O'`). Er entfernt Einkaufsartikel bei Statuswechsel auf `cancelled` und bei direkter Planlöschung. Bereinigung alter stornierter Pläne abgeschlossen: 0 zurückgebliebene Einkaufsartikel.
+- Funktion ist nicht als RPC für `anon` oder `authenticated` ausführbar. Die Rechte wurden live geprüft.
+- Der Post-Merge-CI-Status auf dem exakten Merge-Commit war über die GitHub-Schnittstelle bei Prüfung noch nicht sichtbar. Keine Release-Builds erstellen.
