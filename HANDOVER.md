@@ -54,7 +54,7 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 
 ## Aktueller Übergabestand
 
-Stand dieses Dokuments: 2026-10-10 (mehrtägige Planung und Einkaufsliste gemergt; Supabase-Migrationen verifiziert)
+Stand dieses Dokuments: 2026-10-11 (mehrtägige Planung, Navigation und Datumsauswahl korrigiert; PR #71 gemergt)
 
 ### GitHub
 
@@ -95,6 +95,16 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die SELECT-Policy für `recipe-images` lässt Objekte nur zu, wenn sie von einem Rezept referenziert werden. Die aktuelle Reihenfolge signiert zu früh, bevor `setRecipeImage` `recipes.image_path` aktualisiert. Der Storage-Endpunkt stellt dies als `NoSuchKey` dar und die App zeigt eine generische Fehlermeldung.
 - **Implementierungsstatus laut aktuellem `main` erneut prüfen:** Der zuletzt dokumentierte Fix sollte den Storage-Pfad zuerst mit dem Rezept verknüpfen und die Signed URL erst danach erzeugen. Noch keine aktuelle Geräteverifikation dokumentiert.
 - Keine Secrets, Tokens oder Service-Role-Keys protokollieren oder ausgeben.
+
+## Mehrtägige Planung: Navigations- und Datumskorrektur (2026-10-11)
+
+- PR #71 („Fix future-day planning navigation and recipe selection“) wurde nach erfolgreichen Qualitätsprüfungen gemergt. Squash-Merge-Commit: `b1e331ce0994e1ca994c61d71b34aca7f5e6f054`.
+- `TodayPage` beginnt heute; Initialdaten aus der Vergangenheit werden auf heute begrenzt. Zurück-Navigation ist heute deaktiviert, und Pfeile/Wischgesten können nicht in die Vergangenheit führen.
+- Horizontale Wischgesten funktionieren über den Hauptinhalt. Die App-Leiste zeigt das ausgewählte Datum.
+- Gespeicherte Rezepte laden den persönlichen Plan für das ausgewählte Datum und geben dieses Datum an beide Rezeptdetail-Navigationspfade weiter. Die Restaurant-Discovery erhält nun ebenfalls `planDate`, sodass Entscheidungen für den richtigen Tag gespeichert werden.
+- Regressionstests decken Datumssperre, Wischgesten, Datumstransport und Datumsanzeige ab. Ein bestehender Test wurde an den neuen datumsabhängigen Auswahltext angepasst.
+- CI auf PR-Head `6b95c2d9d4ac536d6151e3200d999e9358331e00` erfolgreich: Quality Gate Run 248 / Test und Analyze erfolgreich; Flutter quality gate Run 888 / Hygiene, Dependencies, Icon-Generierung, Analyze und Test erfolgreich.
+- Keine Supabase-Migration erforderlich. Nach dem Merge muss der tatsächliche `main`-Stand und die Merge-CI noch verifiziert werden.
 
 ## Sicherheits-/Arbeitsregeln
 
