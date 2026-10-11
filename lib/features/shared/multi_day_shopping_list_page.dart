@@ -532,4 +532,3 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     );
   }
 }
-}
