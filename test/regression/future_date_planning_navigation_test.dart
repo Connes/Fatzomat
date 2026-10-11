@@ -60,8 +60,6 @@ void main() {
     expect(today, contains('FractionalTranslation('));
     expect(today, contains('key: ValueKey<DateTime>(_displayedDate)'));
   });
-}
-
 
 
   test('changing day hides the old plan while the target date loads', () {
