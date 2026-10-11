@@ -125,6 +125,14 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Regressionstests ergänzt/angepasst. PR-CI auf Head `e924c15b2c05bb2f02f7f5d374f50fbb0bafa642` erfolgreich: Quality Gate Run 38161623620 und Flutter quality gate Run 38161623583.
 - Post-Merge-CI für Merge-Commit `dfcac9256b081ab24ac2c1fe6db634ad012f27fc` bei Erstellung dieses Eintrags noch abschließend prüfen. Keine Release-Builds erstellt.
 
+## Schutz vor vorzeitigem Abschluss zukünftiger Entscheidungen (2026-10-11)
+
+- Der Abschlussstatus einer Entscheidung entspricht in der Datenbank `status = 'cooked'`. Die bestehende RPC `update_personal_today_status` akzeptiert bereits nur Pläne mit `plan_date = current_date`; diese serverseitige Datumsprüfung bleibt bestehen.
+- Zusätzlich prüft `RecipeDetailPage.markCooked()` das ausgewählte Datum ausdrücklich, bevor es den Status ändern darf. Es lädt den Plan außerdem mit `widget.planDate`, statt bei einem Datumswechsel versehentlich den heutigen Plan zu lesen.
+- Neue Supabase-Migration `prevent_future_plan_completion` ergänzt einen Datenbank-Trigger, der `status = 'cooked'` für ein zukünftiges `plan_date` bei INSERT und UPDATE abweist. Damit ist der Schutz nicht von der Sichtbarkeit eines Buttons oder einem einzelnen Client-Pfad abhängig.
+- Regressionstest `test/regression/future_decision_completion_guard_test.dart` prüft UI-Guard, datumsbezogenes Laden und Datenbank-Trigger.
+- Nach dem Merge die CI auf dem endgültigen `main`-Commit sowie die angewendete Live-Migration verifizieren. Keine Release-Builds erstellen.
+
 ## Sicherheits-/Arbeitsregeln
 
 - Keine Secrets oder Service-Role-Keys ausgeben.
