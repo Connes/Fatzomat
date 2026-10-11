@@ -112,7 +112,7 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die Tagesnavigation befindet sich jetzt in der oberen App-Bar-Zeile. Der Pfeil für den vorherigen Tag wird nur angezeigt, wenn nicht „Heute“ ausgewählt ist; der Pfeil für den nächsten Tag bleibt sichtbar.
 - Beim Datumswechsel bleibt der bisherige Inhalt sichtbar, während der Plan für das Zieldatum geladen wird. Danach gleitet die bisherige Seite aus dem Blick und die neue Seite gleitet aus der Gegenrichtung hinein.
 - Regressionstest aktualisiert, um die Position der Navigation und den Slide-Übergang abzusichern.
-- **CI-Status offen:** Für PR-Head `c9c4973dfd87ab359a6219002194ae65b8cc1b2e` und Merge-Commit `976410bc2931f686adba090dda0a9101ba17f29d` wurden über die verfügbaren GitHub-Abfragen bislang keine Workflow-Runs oder Commit-Status gefunden. Daher sind `flutter analyze` und `flutter test` für diese Änderung noch nicht als erfolgreich bestätigt. Nachgelagerte CI erneut prüfen.
+- **CI-Status:** Der erste Push-Workflow fand einen fehlenden schließenden Klammerausdruck in `today_page.dart`; der Fehler wurde korrigiert. Auf dem aktuellen `main`-Commit `03b35f68e715bf2998435bdab3d331b5db99684a` sind Repository-Hygiene, Dependencies und Icon-Generierung erfolgreich; `flutter analyze` ist erfolgreich. `flutter test` läuft noch (Runs 38159962826 und 38159963032). Nachgelagerte CI abschließend prüfen.
 - Keine Supabase-Änderung und kein Release-Build.
 
 ## Sicherheits-/Arbeitsregeln
