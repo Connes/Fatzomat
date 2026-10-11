@@ -9,7 +9,9 @@ void main() {
     expect(today, contains('_selectedDate = _dateOnly(widget.initialDate ?? today);'));
     expect(today, contains('if (_selectedDate.isBefore(today)) _selectedDate = today;'));
     expect(today, contains('if (target.isBefore(today)) return;'));
-    expect(today, contains('onPressed: _dateOnly(_selectedDate).isAtSameMomentAs(_dateOnly(DateTime.now()))'));
+    expect(today, contains('if (!_isSelectedDateToday)'));
+    expect(today, contains("tooltip: 'Vorheriger Tag'"));
+    expect(today, contains("tooltip: 'Nächster Tag'"));
   });
 
   test('horizontal swipes change the selected day from the main content area', () {
