@@ -47,6 +47,8 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   late final TodayController controller;
   TodayPlan? plan;
   late DateTime _selectedDate;
+  late DateTime _displayedDate;
+  int _pageTransitionDirection = 1;
   DateTime _lastObservedDay = DateTime.now();
   Timer? _dayBoundaryTimer;
   List<TodayPlan> completedPlans = const [];
@@ -74,6 +76,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     final today = _dateOnly(DateTime.now());
     _selectedDate = _dateOnly(widget.initialDate ?? today);
     if (_selectedDate.isBefore(today)) _selectedDate = today;
+    _displayedDate = _selectedDate;
     _lastObservedDay = today;
     _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     controller = TodayController();
@@ -90,7 +93,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     if (target.isBefore(today)) return;
     setState(() {
       _selectedDate = target;
-      loading = true;
+      _pageTransitionDirection = days.sign;
     });
     load();
   }
@@ -105,7 +108,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     if (_dateOnly(_selectedDate) == previousDay && mounted) {
       setState(() {
         _selectedDate = nowDay;
-        loading = true;
+        _pageTransitionDirection = 1;
       });
       load();
     }
@@ -158,6 +161,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       }
       if (!mounted || generation != _loadGeneration) return;
       setState(() {
+        _displayedDate = requestedDate;
         plan = selectedPlan;
         completedPlans = completed;
         loading = false;
@@ -449,14 +453,34 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   PreferredSizeWidget _todayAppBar() {
     return TogetherAppBar(
       automaticallyImplyLeading: false,
-      title: Text(
-        _todayDateLabel(),
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.2,
-        ),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (!_isSelectedDateToday)
+            IconButton(
+              tooltip: 'Vorheriger Tag',
+              onPressed: () => _shiftSelectedDate(-1),
+              icon: const Icon(Icons.chevron_left),
+            ),
+          Flexible(
+            child: Text(
+              _todayDateLabel(),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Nächster Tag',
+            onPressed: () => _shiftSelectedDate(1),
+            icon: const Icon(Icons.chevron_right),
+          ),
+        ],
       ),
     );
   }
@@ -497,8 +521,29 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                 _shiftSelectedDate(velocity < 0 ? 1 : -1);
               },
               child: Center(
-                child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 320),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    final isIncoming = child.key == ValueKey<DateTime>(_displayedDate);
+                    final offset = isIncoming
+                        ? Offset(_pageTransitionDirection.toDouble(), 0)
+                        : Offset(-_pageTransitionDirection.toDouble(), 0);
+                    return ClipRect(
+                      child: SlideTransition(
+                        position: animation.drive(
+                          Tween<Offset>(begin: offset, end: Offset.zero).chain(
+                            CurveTween(curve: Curves.easeInOutCubic),
+                          ),
+                        ),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: SingleChildScrollView(
+                  key: ValueKey<DateTime>(_displayedDate),
+                  physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -512,32 +557,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 14),
                     ],
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            tooltip: 'Vorheriger Tag',
-                            onPressed: _dateOnly(_selectedDate).isAtSameMomentAs(_dateOnly(DateTime.now()))
-                                ? null
-                                : () => _shiftSelectedDate(-1),
-                            icon: const Icon(Icons.chevron_left),
-                          ),
-                          Text(
-                            _isSelectedDateToday
-                                ? 'Heute'
-                                : '${_selectedDate.day.toString().padLeft(2, '0')}.${_selectedDate.month.toString().padLeft(2, '0')}.${_selectedDate.year}',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          IconButton(
-                            tooltip: 'Nächster Tag',
-                            onPressed: () => _shiftSelectedDate(1),
-                            icon: const Icon(Icons.chevron_right),
-                          ),
-                        ],
-                      ),
-                    ),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 560),
                       child: plan == null
@@ -616,11 +635,11 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                     ],
                   ],
                 ),
+                  ),
+                ),
               ),
             ),
-            ),
           ),
-        ),
       );
     }
 
