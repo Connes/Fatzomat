@@ -33,6 +33,10 @@ ON public.personal_today_plans
 FOR EACH ROW
 EXECUTE FUNCTION public.cleanup_personal_plan_shopping_items();
 
+-- This function is trigger-only and must not be callable through PostgREST RPC.
+REVOKE ALL ON FUNCTION public.cleanup_personal_plan_shopping_items()
+  FROM PUBLIC, anon, authenticated;
+
 -- Remove shopping rows left behind by earlier cancellation paths.
 DELETE FROM public.shopping_items AS item
 USING public.personal_today_plans AS plan
