@@ -639,6 +639,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                       _CompletedTodayDecisions(plans: completedPlans),
                     ],
                   ],
+                    ),
                   ),
                 ),
               ),
