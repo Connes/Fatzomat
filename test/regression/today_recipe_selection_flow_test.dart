@@ -23,10 +23,12 @@ void main() {
     expect(savedSource, contains('PersonalTodayRepository'));
     expect(savedSource, contains('personalToday.selectRecipeForToday'));
     expect(savedSource, isNot(contains('_ensureConnectionForToday')));
+    expect(savedSource, contains('if (widget.onNavigateToTab != null)'));
+    expect(savedSource, contains('widget.onNavigateToTab!(0);'));
     expect(
       savedSource,
-      isNot(contains('Navigator.pop(context, true);')),
-      reason: 'SavedRecipesPage is an IndexedStack tab and must not pop the root Navigator after selecting a recipe.',
+      contains('Navigator.pop(context, true);'),
+      reason: 'Only a pushed SavedRecipesPage route returns success; the persistent tab navigates through its tab callback.',
     );
 
     expect(todaySource, contains('final repo = PersonalTodayRepository();'));
