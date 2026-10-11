@@ -76,7 +76,18 @@ void main() {
     expect(migration, contains('WHERE id = p_plan_id'));
     expect(migration, contains('AND user_id = uid'));
     expect(migration, contains("AND status = 'planned'"));
-    expect(migration, isNot(contains('plan_date = current_date')));
+    final functionBody = migration.substring(migration.indexOf('AS $function
+    expect(migration, contains('DELETE FROM public.shopping_items'));
+  });
+
+  test('selecting a saved recipe returns to Today', () {
+    final saved = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+    expect(saved, contains('widget.onNavigateToTab!(0);'));
+    expect(saved, contains('Navigator.pop(context, true);'));
+  });
+}
+));
+    expect(functionBody, isNot(contains('plan_date = current_date')));
     expect(migration, contains('DELETE FROM public.shopping_items'));
   });
 
