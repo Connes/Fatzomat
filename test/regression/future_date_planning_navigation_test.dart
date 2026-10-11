@@ -24,6 +24,19 @@ void main() {
     expect(today, contains('_shiftSelectedDate(velocity < 0 ? 1 : -1);'));
   });
 
+  test('restaurant discovery receives the selected date before saving a decision', () {
+    final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
+    final discoveryStart = foodMode.indexOf('builder: (_) => DiscoveryPage(');
+    final discoveryEnd = foodMode.indexOf('),\n      ),', discoveryStart);
+    expect(discoveryStart, isNonNegative);
+    expect(discoveryEnd, greaterThan(discoveryStart));
+    expect(
+      foodMode.substring(discoveryStart, discoveryEnd),
+      contains('planDate: widget.planDate,'),
+    );
+    expect(foodMode, contains('date: widget.planDate,'));
+  });
+
   test('saved recipe selection and recipe details keep the selected planning date', () {
     final saved = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
