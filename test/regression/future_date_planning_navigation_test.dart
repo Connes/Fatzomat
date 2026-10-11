@@ -63,7 +63,7 @@ void main() {
 }
 
 
-void mainDateAwareRemovalAndRecipeNavigationRegression() {
+
   test('changing day hides the old plan while the target date loads', () {
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
     final shiftStart = today.indexOf('void _shiftSelectedDate(int days)');
