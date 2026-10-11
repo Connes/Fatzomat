@@ -94,6 +94,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     setState(() {
       _selectedDate = target;
       _pageTransitionDirection = days.sign;
+      loadError = null;
     });
     load();
   }
