@@ -142,3 +142,14 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Bei neuen Änderungen zuerst den tatsächlichen Repository-Stand prüfen.
 - Änderungen in nachvollziehbaren Commits/PRs halten.
 - Niemals Release-Builds oder App-Veröffentlichung als Teil des Standardworkflows durchführen.
+
+
+## Einkaufsliste: aktive Pläne und Lesbarkeit (2026-10-11)
+
+- Die Mehrtages-Einkaufsliste zeigt ausschließlich Tage mit mindestens einer aktiven Rezeptentscheidung; leere Tage und reine Nicht-Rezept-Entscheidungen werden nicht als Einkaufsliste angeboten.
+- Die Auswahl wird auf Tage mit tatsächlich vorhandenen Rezeptplänen beschränkt. Wenn kein aktives Rezept im Dreitagesfenster existiert, erscheint ein klarer leerer Zustand.
+- Die Zutaten-Suchleiste wurde entfernt. Die Filterung nach offenen Zutaten und das Abhaken mehrerer Einträge bleiben erhalten.
+- Tageseinträge und Zutatenbereiche verwenden deckende, helle Flächen mit kontrastreicher Textfarbe, damit der Hintergrund die Lesbarkeit nicht beeinträchtigt.
+- Die Migration `cleanup_cancelled_plan_shopping_items` entfernt Einkaufsartikel zuverlässig bei jeder Stornierung oder Löschung eines persönlichen Plans, unabhängig vom Datum; sie bereinigt auch zuvor zurückgebliebene Artikel stornierter Pläne.
+- Regressionstest: `test/regression/shopping_list_active_plans_test.dart`.
+- Nach PR-Merge CI und den Live-Trigger auf Supabase verifizieren. Keine Release-Builds erstellen.
