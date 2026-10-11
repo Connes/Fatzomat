@@ -115,6 +115,16 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - **CI-Status:** Der erste Push-Workflow fand einen fehlenden schließenden Klammerausdruck in `today_page.dart`; der Fehler wurde korrigiert. Auf dem aktuellen `main`-Commit `03b35f68e715bf2998435bdab3d331b5db99684a` sind Repository-Hygiene, Dependencies und Icon-Generierung erfolgreich; `flutter analyze` ist erfolgreich. `flutter test` läuft noch (Runs 38159962826 und 38159963032). Nachgelagerte CI abschließend prüfen.
 - Keine Supabase-Änderung und kein Release-Build.
 
+## Korrektur der datumsbezogenen Planlöschung und Rezeptnavigation (2026-10-11)
+
+- PR #73 („Fix date-aware plan removal and recipe selection navigation“) wurde nach erfolgreichen PR-Qualitätsprüfungen gemergt. Merge-Commit: `dfcac9256b081ab24ac2c1fe6db634ad012f27fc`.
+- Ursache 1: Beim Wechsel des ausgewählten Datums blieb der vorherige Plan während des Ladevorgangs interaktiv. `TodayPage` blendet jetzt den Inhalt aus, bis der Plan für das Ziel-Datum geladen ist.
+- Ursache 2: `cancel_personal_today_plan` beschränkte das Update auf `plan_date = current_date` und löschte Einkaufsartikel vor der Prüfung, ob ein Plan aktualisiert wurde. Die neue Funktion aktualisiert den eigenen aktiven Plan per ID und löscht Einkaufsartikel erst nach erfolgreicher Aktualisierung.
+- Die Migration `date_aware_plan_cancellation` wurde auf Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet. Die Live-Funktionsdefinition wurde mit `pg_get_functiondef` geprüft.
+- Nach dem Festlegen eines gespeicherten Rezepts navigiert die Rezepte-Tab-Auswahl jetzt zu „Heute“. Bei einer verschachtelten Rezeptsuche im Kochablauf wird der Erfolg an die Elternrouten zurückgegeben, die dann zu „Heute“ zurückkehren.
+- Regressionstests ergänzt/angepasst. PR-CI auf Head `e924c15b2c05bb2f02f7f5d374f50fbb0bafa642` erfolgreich: Quality Gate Run 38161623620 und Flutter quality gate Run 38161623583.
+- Post-Merge-CI für Merge-Commit `dfcac9256b081ab24ac2c1fe6db634ad012f27fc` bei Erstellung dieses Eintrags noch abschließend prüfen. Keine Release-Builds erstellt.
+
 ## Sicherheits-/Arbeitsregeln
 
 - Keine Secrets oder Service-Role-Keys ausgeben.
