@@ -21,6 +21,9 @@ void main() {
     expect(page, contains('AppSurface('));
     expect(page, contains('color: AppDesign.surface'));
     expect(page, contains('surfaceTintColor: Colors.transparent'));
+    expect(page, contains("table: 'personal_today_plans'"));
+    expect(page, contains("table: 'shopping_items'"));
+    expect(page, contains('load(showLoading: false)'));
   });
 
   test('cancelled personal decisions clean up their shopping items in the database', () {
