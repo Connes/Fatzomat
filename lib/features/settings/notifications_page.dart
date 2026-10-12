@@ -156,20 +156,22 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
 
     if (item.decisionShareId != null || item.type == 'decision_message') {
+      DateTime? targetDate;
       if (item.decisionShareId != null) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const TodayPage()),
-        );
-      } else {
-        // Compatibility fallback for installations where the V85
-        // decision_share_id column is not available yet. The notification
-        // remains usable instead of turning the inbox into an error screen.
-        await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const TodayPage()),
-        );
+        try {
+          final share = await repo.decisionShare(item.decisionShareId!);
+          targetDate = share?.planDate;
+        } catch (_) {
+          // Keep notifications usable if the share is no longer accessible.
+        }
       }
+      if (!mounted) return;
+      // Open the date attached to the shared decision, not an unrelated Today.
+      // Legacy notifications without a share ID retain the current-day fallback.
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => TodayPage(initialDate: targetDate)),
+      );
       await load();
       return;
     }
