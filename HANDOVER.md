@@ -305,3 +305,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die Aktion entfernt die Tagesentscheidung, aktualisiert Rezept-Markierungen und kehrt zur Tagesansicht zurück.
 - Normale Restaurantdetails behalten „Für heute auswählen“.
 - CI/PR ausstehend; keine Supabase-Änderungen und keine Release-Builds.
+
+
+## Letzte Änderung: Navigation zwischen offenen Entscheidungen
+
+- Heute-Seite: Doppelpfeil rechts springt zum nächsten Datum mit einer aktiven persönlichen Entscheidung (Status `planned`); Tage ohne offene Entscheidung werden übersprungen.
+- Auf zukünftigen Tagen erscheint zusätzlich ein Doppelpfeil links. Er springt zur vorherigen offenen Entscheidung, aber niemals vor Heute; wenn keine frühere offene Entscheidung existiert, führt er zurück zu Heute.
+- Einfache Pfeile und Wisch-Navigation bleiben unverändert.
+- Regressionstest ergänzt. CI muss nach dem PR noch bestätigt werden.
