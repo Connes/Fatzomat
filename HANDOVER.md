@@ -175,3 +175,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Wird ein gespeichertes Rezept aus „Wir kochen“ für den ausgewählten Tag übernommen, schaltet der AppShell-Navigator explizit auf den Heute-Tab und räumt die darüberliegenden Koch-Routen ab. So bleibt man nicht auf „Meine Rezepte“ hängen.
 - Regressionstest: `test/regression/cook_saved_recipe_returns_to_today_test.dart`.
 - PR-CI prüfen; keine Release-Builds erstellen.
+
+
+## Navigation nach Rezeptauswahl: Routen explizit leeren (2026-10-12)
+
+- Nach Rückmeldung aus der Nutzung wurde der Navigationspfad erneut geprüft: Der Callback allein war nicht ausreichend zuverlässig, um die aufgeschobenen Koch-Routen sichtbar zu verlassen.
+- SavedRecipesPage leert im Koch-Flow jetzt explizit den aktuellen Navigator bis zur ersten Route und schaltet danach auf „Heute“.
+- Regressionstest prüft jetzt auch das explizite Leeren des Navigationsstapels. PR-CI abwarten; keine Release-Builds erstellen.
