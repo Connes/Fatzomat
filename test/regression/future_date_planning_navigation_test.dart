@@ -27,7 +27,7 @@ void main() {
     expect(repository, contains(".eq('status', 'planned')"));
     expect(repository, contains(".gt('plan_date', from)"));
     expect(repository, contains(".gte('plan_date', today)"));
-    expect(repository, contains('if (row == null) return today;'));
+    expect(repository, contains('if (row == null) return DateTime(todayDate.year, todayDate.month, todayDate.day);'));
   });
 
   test('horizontal swipes change the selected day from the main content area', () {
