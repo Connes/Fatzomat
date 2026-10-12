@@ -229,15 +229,21 @@ class PushNotificationService with WidgetsBindingObserver {
       _pendingRecipeId = null;
 
       if (shareId != null) {
+        DateTime? targetDate;
+        try {
+          final share = await CollaborationRepository().decisionShare(shareId);
+          targetDate = share?.planDate;
+        } catch (_) {
+          // Fall back to Today if the share was removed or is no longer readable.
+        }
         if (id != null) {
           try {
             await CollaborationRepository().markNotificationRead(id);
           } catch (_) {
-            // The Today page remains the primary action even if read-state
-            // synchronization fails.
+            // The target date remains the primary action if read-state sync fails.
           }
         }
-        navigator.push(MaterialPageRoute(builder: (_) => const TodayPage()));
+        navigator.push(MaterialPageRoute(builder: (_) => TodayPage(initialDate: targetDate)));
         return;
       }
 

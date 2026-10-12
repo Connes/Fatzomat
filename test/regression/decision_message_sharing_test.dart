@@ -37,9 +37,11 @@ void main() {
     expect(notification, contains('decisionShareId'));
     expect(repo, contains("'accept_decision_share'"));
     expect(repo, contains("'reject_decision_share'"));
-    expect(pushService, contains("const TodayPage()"));
+    expect(pushService, contains("decisionShare(shareId)"));
+    expect(pushService, contains("TodayPage(initialDate: targetDate)"));
     expect(pushService, isNot(contains('DecisionSharePage')));
-    expect(notificationsPage, contains('const TodayPage()'));
+    expect(notificationsPage, contains('repo.decisionShare(item.decisionShareId!)'));
+    expect(notificationsPage, contains('TodayPage(initialDate: targetDate)'));
     expect(notificationsPage, isNot(contains('DecisionSharePage')));
 
     expect(migration, contains("if p_message_type = 'share' then"));
