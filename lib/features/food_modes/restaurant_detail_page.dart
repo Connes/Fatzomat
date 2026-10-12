@@ -39,7 +39,7 @@ class RestaurantDetailPage extends StatelessWidget {
   }
 
   String _formatOpeningHours(String value) {
-    final dayNames = <String, String>{
+    const dayNames = <String, String>{
       'Mo': 'Mo',
       'Tu': 'Di',
       'We': 'Mi',
@@ -55,31 +55,58 @@ class RestaurantDetailPage extends StatelessWidget {
           var formatted = entry.trim();
           for (final replacement in dayNames.entries) {
             formatted = formatted.replaceAll(
-              RegExp(r'\b' + replacement.key + r'\b'),
+              RegExp(r'\\b' + replacement.key + r'\\b'),
               replacement.value,
             );
           }
           return formatted.replaceAll(',', ', ');
         })
         .where((entry) => entry.isNotEmpty)
-        .join('\n');
+        .join('\\n');
   }
 
-  Widget _infoCard({
+  Widget _contactSection({
     required IconData icon,
     required String title,
-    required Widget child,
+    required String value,
     VoidCallback? onTap,
     Widget? trailing,
   }) {
-    return Card(
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        leading: Icon(icon),
-        title: Text(title),
-        subtitle: child,
-        trailing: trailing,
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 42,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Icon(icon, color: Colors.blueGrey),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 18)),
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: onTap == null ? Colors.blueGrey : null,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (trailing != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 8, top: 8),
+              child: trailing,
+            ),
+        ],
       ),
     );
   }
@@ -87,12 +114,25 @@ class RestaurantDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final addressParts = <String>[
-      if (result.address != null) result.address!,
+      if (result.address?.trim().isNotEmpty == true) result.address!.trim(),
       if (result.postalCode != null || result.city != null)
-        [result.postalCode, result.city].whereType<String>().join(' '),
+        [result.postalCode, result.city]
+            .whereType<String>()
+            .where((part) => part.trim().isNotEmpty)
+            .join(' '),
     ].where((part) => part.isNotEmpty).toList();
+    if (result.formattedDistance.isNotEmpty) {
+      addressParts.add(result.formattedDistance);
+    }
 
-    final hasAddress = result.address != null || result.postalCode != null;
+    final address = addressParts.isEmpty ? 'Nicht verfügbar' : addressParts.join('\\n');
+    final phone = result.phone?.trim().isNotEmpty == true
+        ? result.phone!.trim()
+        : 'Nicht verfügbar';
+    final website = result.website == null ? 'Nicht verfügbar' : result.website!.host;
+    final openingHours = result.openingHours?.trim().isNotEmpty == true
+        ? _formatOpeningHours(result.openingHours!.trim())
+        : 'Nicht verfügbar';
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
@@ -100,90 +140,69 @@ class RestaurantDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
         children: [
-          if (hasAddress)
-            _infoCard(
-              icon: Icons.location_on_rounded,
-              title: 'Anschrift',
-              child: Text([
-                ...addressParts,
-                result.formattedDistance,
-              ].join('\n')),
-            ),
-          if (!hasAddress)
-            _infoCard(
-              icon: Icons.near_me_rounded,
-              title: 'Entfernung',
-              child: Text(result.formattedDistance),
-            ),
-          if (result.phone != null) ...[
-            const SizedBox(height: 10),
-            _infoCard(
-              icon: Icons.phone_rounded,
-              title: 'Telefon',
-              child: Text(result.phone!),
-              trailing: const Icon(Icons.call_rounded),
-              onTap: () => _call(context, result.phone!),
-            ),
-          ],
-          if (result.website != null) ...[
-            const SizedBox(height: 10),
-            _infoCard(
-              icon: Icons.language_rounded,
-              title: 'Webseite',
-              child: Text(
-                result.website!.host,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: const Icon(Icons.open_in_new_rounded),
-              onTap: () => _open(context, result.website!),
-            ),
-          ],
-          if (order && result.orderUri != null) ...[
-            const SizedBox(height: 10),
-            _infoCard(
-              icon: Icons.shopping_bag_rounded,
-              title: 'Bestellen / Lieferung',
-              child: Text(
-                result.orderUri!.host,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: const Icon(Icons.open_in_new_rounded),
-              onTap: () => _open(context, result.orderUri!),
-            ),
-          ],
-          if (result.openingHours != null) ...[
-            const SizedBox(height: 10),
-            _infoCard(
-              icon: Icons.schedule_rounded,
-              title: 'Öffnungszeiten',
-              child: Text(_formatOpeningHours(result.openingHours!)),
-            ),
-          ],
-          if (!hasAddress &&
-              result.phone == null &&
-              result.website == null &&
-              result.openingHours == null &&
-              (!order || result.orderUri == null))
-            const Card(
-              child: ListTile(
-                leading: Icon(Icons.info_outline_rounded),
-                title: Text('Keine Kontaktdaten verfügbar'),
-                subtitle: Text(
-                  'Die externe Datenquelle liefert für diesen Anbieter derzeit keine Kontaktdaten.',
-                ),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+              child: Column(
+                children: [
+                  _contactSection(
+                    icon: Icons.location_on_rounded,
+                    title: 'Anschrift',
+                    value: address,
+                  ),
+                  const Divider(height: 1),
+                  _contactSection(
+                    icon: Icons.phone_rounded,
+                    title: 'Telefon',
+                    value: phone,
+                    onTap: result.phone?.trim().isNotEmpty == true
+                        ? () => _call(context, result.phone!.trim())
+                        : null,
+                    trailing: result.phone?.trim().isNotEmpty == true
+                        ? const Icon(Icons.call_rounded, color: Colors.blueGrey)
+                        : null,
+                  ),
+                  const Divider(height: 1),
+                  _contactSection(
+                    icon: Icons.language_rounded,
+                    title: 'Webseite',
+                    value: website,
+                    onTap: result.website == null
+                        ? null
+                        : () => _open(context, result.website!),
+                    trailing: result.website == null
+                        ? null
+                        : const Icon(Icons.open_in_new_rounded, color: Colors.blueGrey),
+                  ),
+                  const Divider(height: 1),
+                  _contactSection(
+                    icon: Icons.schedule_rounded,
+                    title: 'Öffnungszeiten',
+                    value: openingHours,
+                  ),
+                  if (order && result.orderUri != null) ...[
+                    const Divider(height: 1),
+                    _contactSection(
+                      icon: Icons.shopping_bag_rounded,
+                      title: 'Bestellen / Lieferung',
+                      value: result.orderUri!.host,
+                      onTap: () => _open(context, result.orderUri!),
+                      trailing: const Icon(Icons.open_in_new_rounded, color: Colors.blueGrey),
+                    ),
+                  ],
+                  if (order && result.deliveryAvailable) ...[
+                    const Divider(height: 1),
+                    _contactSection(
+                      icon: Icons.check_circle_rounded,
+                      title: 'Lieferung',
+                      value: 'Laut Datenquelle verfügbar',
+                    ),
+                  ],
+                ],
               ),
             ),
-          if (order && result.deliveryAvailable) ...[
-            const SizedBox(height: 10),
-            const Card(
-              child: ListTile(
-                leading: Icon(Icons.check_circle_rounded),
-                title: Text('Lieferung verfügbar'),
-              ),
-            ),
-          ],
+          ),
           if (onSelect != null) ...[
             const SizedBox(height: 20),
             FilledButton.icon(
