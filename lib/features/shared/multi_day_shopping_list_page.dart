@@ -49,7 +49,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   List<DateTime> get _activeDays => [
         for (var i = 0; i < _days.length; i++)
-          if (i < _plans.length && _plans[i].any((plan) => plan.isRecipe))
+          if (i < _plans.length &&
+              _plans[i].where((plan) => plan.isRecipe).any(
+                    (plan) => _items.any((item) => item.planId == plan.id),
+                  ))
             _days[i],
       ];
 
