@@ -735,7 +735,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
 
   String get _planDateLabel {
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-    return '\${share.planDate.day}. \${months[share.planDate.month - 1]}';
+    return '${share.planDate.day}. ${months[share.planDate.month - 1]}';
   }
 
   String get _typeLabel {
@@ -780,7 +780,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Deine verbundene Person hat für den \$_planDateLabel entschieden.',
+              'Deine verbundene Person hat für den $_planDateLabel entschieden.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
