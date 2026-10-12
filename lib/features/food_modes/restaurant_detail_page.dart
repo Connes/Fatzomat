@@ -9,12 +9,14 @@ class RestaurantDetailPage extends StatelessWidget {
   final RestaurantDiscoveryResult result;
   final bool order;
   final VoidCallback? onSelect;
+  final VoidCallback? onComplete;
 
   const RestaurantDetailPage({
     super.key,
     required this.result,
     required this.order,
     this.onSelect,
+    this.onComplete,
   });
 
   Future<void> _open(BuildContext context, Uri uri) async {
@@ -202,7 +204,14 @@ class RestaurantDetailPage extends StatelessWidget {
               ),
             ),
           ),
-          if (onSelect != null) ...[
+          if (onComplete != null) ...[
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: onComplete,
+              icon: const Icon(Icons.check_circle_outline_rounded),
+              label: const Text('Entscheidung abschließen'),
+            ),
+          ] else if (onSelect != null) ...[
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: onSelect,
