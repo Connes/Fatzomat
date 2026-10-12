@@ -210,10 +210,10 @@ class PersonalTodayRepository {
     // received its realtime refresh yet.
     final sharedRows = await client
         .from('shared_recipe_plans')
-        .select('plan_date,status,recipes(name)')
+        .select('plan_date,status,recipes(name),created_at')
         .gte('plan_date', startDate)
         .lte('plan_date', endDate)
-        .neq('status', 'cancelled')
+        .eq('status', 'planned')
         .order('created_at', ascending: false);
 
     for (final row in sharedRows) {
