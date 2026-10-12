@@ -272,3 +272,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Push-Taps auf geteilte Entscheidungen öffnen jetzt `AppShell(initialDate: targetDate)`. `AppShell` reicht das Ziel-Datum an `TodayPage` weiter; damit bleiben die untere Navigationsleiste und die richtige Tagesauswahl erhalten.
 - Regressionstests prüfen den Push-Zielpfad und die Datumsweitergabe in `AppShell`.
 - PR und CI ausstehend. Keine Supabase-Änderung und keine Release-Builds.
+
+
+## Bestätigungsdialog beim Entfernen von Entscheidungen (2026-10-12)
+
+- Der Hinweis auf persönliche Rezeptartikel und die Einkaufsliste erscheint beim Entfernen nur noch für echte Rezeptentscheidungen (`plan.isRecipe`).
+- Bei „Wir bestellen“, „Wir gehen essen“ und anderen Nicht-Rezept-Entscheidungen enthält der Dialog nur noch die Information, dass die Entscheidung aus dem Plan entfernt wird.
+- Regressionstest in `test/regression/personal_today_decision_types_test.dart` ergänzt.
+- PR/CI ausstehend. Keine Supabase-Änderung und keine Release-Builds.
