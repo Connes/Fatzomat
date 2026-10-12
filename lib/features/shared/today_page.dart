@@ -188,9 +188,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         // Completed history must not block the current decision card.
       }
       try {
-        if (_isSelectedDateToday) {
-          pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
-        }
+        pendingShare = await _collaborationRepository.pendingDecisionShareForDate(requestedDate);
       } catch (_) {
         // Shared decisions are additive UI and must not block the day view.
       }
@@ -361,6 +359,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         imageUrl: plan!.imageUrl,
         recipeId: plan!.recipeId,
         servings: plan!.servings,
+        sourcePlanId: plan!.id,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
