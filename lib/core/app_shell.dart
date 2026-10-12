@@ -24,6 +24,7 @@ class _AppShellState extends State<AppShell> {
   final GlobalKey<NavigatorState> _contentNavigatorKey = GlobalKey<NavigatorState>();
   final ValueNotifier<int> _contentIndex = ValueNotifier<int>(0);
   final ValueNotifier<int> _todayResetSignal = ValueNotifier<int>(0);
+  final ValueNotifier<int> _todayResetSignal = ValueNotifier<int>(0);
 
   @override
   void initState() {
