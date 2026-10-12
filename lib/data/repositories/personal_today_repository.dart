@@ -92,7 +92,7 @@ class PersonalTodayRepository {
 
     final today = _dateOnly(DateTime.now());
     final from = _dateOnly(fromDate);
-    if (!forward && !from.isAfter(today)) return null;
+    if (!forward && from.compareTo(today) <= 0) return null;
 
     final dynamic row;
     if (forward) {
@@ -116,14 +116,14 @@ class PersonalTodayRepository {
           .order('plan_date', ascending: false)
           .limit(1)
           .maybeSingle();
-      if (row == null) return today;
+      if (row == null) return DateTime.now().year == 0 ? null : DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     }
 
     if (row == null) return null;
     final rawDate = row['plan_date']?.toString();
     if (rawDate == null || rawDate.isEmpty) return null;
     final parsed = DateTime.tryParse(rawDate);
-    return parsed == null ? null : _dateOnly(parsed);
+    return parsed == null ? null : parsed;
   }
 
   Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
