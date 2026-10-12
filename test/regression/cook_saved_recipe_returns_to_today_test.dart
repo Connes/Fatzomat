@@ -10,7 +10,8 @@ void main() {
     final cooking = File('lib/features/food_modes/cook_next_step_page.dart').readAsStringSync();
     final recipes = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
-    expect(shell, contains('TodayPage(onNavigateToTab: _selectTab)'));
+    expect(shell, contains('TodayPage('));
+    expect(shell, contains('resetToTodaySignal: _todayResetSignal'));
     expect(today, contains('onNavigateToToday: widget.onNavigateToTab == null'));
     expect(mode, contains('onNavigateToToday: widget.onNavigateToToday'));
     expect(cooking, contains('onNavigateToToday: widget.onNavigateToToday'));
