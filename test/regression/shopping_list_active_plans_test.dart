@@ -49,6 +49,15 @@ void main() {
     expect(page, contains('_repo.deleteShoppingItem(item.id)'));
   });
 
+  test('shopping list completion requires every aggregated ingredient to be checked', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('items.any((item) => !item.checked)'));
+    expect(page, contains('aggregated.isNotEmpty && aggregated.every((item) => item.checked)'));
+    expect(page, contains('onPressed: _completingList || !canCompleteList'));
+    expect(page, contains('Hake zuerst alle Zutaten ab, um die Einkaufsliste abzuschließen.'));
+  });
+
   test('cancelled personal decisions clean up their shopping items in the database', () {
     final migration = File('supabase/migrations/20261011190000_cleanup_cancelled_plan_shopping_items.sql')
         .readAsStringSync();
