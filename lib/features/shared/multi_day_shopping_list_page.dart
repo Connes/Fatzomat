@@ -192,7 +192,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   }
 
   Future<void> _completeShoppingList(List<AggregatedShoppingItem> items) async {
-    if (_completingList || items.isEmpty || !mounted) return;
+    if (_completingList ||
+        items.isEmpty ||
+        items.any((item) => !item.checked) ||
+        !mounted) {
+      return;
+    }
     final sources = items.expand((item) => item.sources).toList(growable: false);
     final uniqueSources = {for (final item in sources) item.id: item}.values.toList();
     setState(() => _completingList = true);
@@ -282,6 +287,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         : aggregated;
     final checkedCount = aggregated.where((item) => item.checked).length;
     final progress = aggregated.isEmpty ? 0.0 : checkedCount / aggregated.length;
+    final canCompleteList =
+        aggregated.isNotEmpty && aggregated.every((item) => item.checked);
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -518,7 +525,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 SizedBox(
                                   width: double.infinity,
                                   child: FilledButton.icon(
-                                    onPressed: _completingList || aggregated.isEmpty
+                                    onPressed: _completingList || !canCompleteList
                                         ? null
                                         : () => _completeShoppingList(aggregated),
                                     icon: _completingList
@@ -531,6 +538,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     label: const Text('Einkaufsliste erledigt'),
                                   ),
                                 ),
+                                if (!canCompleteList) ...[
+                                  const SizedBox(height: 6),
+                                  const Text(
+                                    'Hake zuerst alle Zutaten ab, um die Einkaufsliste abzuschließen.',
+                                    style: TextStyle(color: AppDesign.secondaryText),
+                                  ),
+                                ],
                                 const SizedBox(height: 8),
                               ],
                               if (aggregated.isEmpty)
