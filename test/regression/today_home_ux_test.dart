@@ -8,7 +8,8 @@ void main() {
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
 
     expect(shell, contains('int index = 0;'));
-    expect(shell, contains('TodayPage(onNavigateToTab: _selectTab)'));
+    expect(shell, contains('TodayPage('));
+    expect(shell, contains('resetToTodaySignal: _todayResetSignal'));
     expect(shell, contains("label: 'Heute'"));
     expect(shell, isNot(contains("label: 'Start'")));
     expect(shell, isNot(contains('const HomePage()')));
