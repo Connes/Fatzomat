@@ -20,6 +20,7 @@ import '../recipes/add_recipe_page.dart';
 class CookNextStepPage extends StatefulWidget {
   final String mainChoice;
   final DateTime? planDate;
+  final VoidCallback? onNavigateToToday;
   final String? decisionRequestId;
   final FoodRepository? repository;
 
@@ -27,6 +28,7 @@ class CookNextStepPage extends StatefulWidget {
     super.key,
     required this.mainChoice,
     this.planDate,
+    this.onNavigateToToday,
     this.decisionRequestId,
     this.repository,
   });
@@ -96,6 +98,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           decisionRequestId: widget.decisionRequestId,
           selectForToday: true,
           planDate: widget.planDate,
+          onNavigateToToday: widget.onNavigateToToday,
         ),
       ),
     );
