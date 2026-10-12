@@ -19,6 +19,7 @@ import '../../data/repositories/restaurant_discovery_repository.dart';
 class FoodModePage extends StatefulWidget {
   final FoodMode mode;
   final DateTime? planDate;
+  final VoidCallback? onNavigateToToday;
   final String? decisionRequestId;
   final LocationService locationService;
   final RestaurantDiscoveryRepository discoveryRepository;
@@ -28,6 +29,7 @@ class FoodModePage extends StatefulWidget {
     super.key,
     required this.mode,
     this.planDate,
+    this.onNavigateToToday,
     this.decisionRequestId,
     this.locationService = const DeviceLocationService(),
     this.discoveryRepository = const SupabaseRestaurantDiscoveryRepository(),
@@ -53,6 +55,7 @@ class _FoodModePageState extends State<FoodModePage> {
           mainChoice: choice,
           decisionRequestId: widget.decisionRequestId,
           planDate: widget.planDate,
+          onNavigateToToday: widget.onNavigateToToday,
         ),
       ),
     );
