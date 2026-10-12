@@ -32,6 +32,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   List<ShoppingItem> _items = const [];
   bool _loading = true;
   bool _showOnlyOpen = false;
+  bool _completingList = false;
   Object? _error;
   int _generation = 0;
   RealtimeChannel? _channel;
@@ -41,12 +42,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       List.generate(3, (i) => today.add(Duration(days: i)));
 
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  String _label(int index) => index == 0 ? 'Heute' : index == 1 ? 'Morgen' : 'Übermorgen';
-
   String _dayTitle(DateTime day) {
-    final index = _days.indexWhere((candidate) => _key(candidate) == _key(day));
     final date = '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.';
-    return '${_label(index < 0 ? 0 : index)} · $date';
+    return date;
   }
 
   List<DateTime> get _activeDays => [
@@ -187,6 +185,31 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       }
     } finally {
       if (mounted) setState(() => _updatingItems.remove(item.key));
+    }
+  }
+
+  Future<void> _completeShoppingList(List<AggregatedShoppingItem> items) async {
+    if (_completingList || items.isEmpty || !mounted) return;
+    final sources = items.expand((item) => item.sources).toList(growable: false);
+    final uniqueSources = {for (final item in sources) item.id: item}.values.toList();
+    setState(() => _completingList = true);
+    try {
+      await Future.wait(uniqueSources.map((item) => _repo.deleteShoppingItem(item.id)));
+      await load(showLoading: false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Einkaufsliste erledigt und entfernt.')),
+        );
+      }
+    } catch (e) {
+      await load(showLoading: false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Einkaufsliste konnte nicht vollständig entfernt werden: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _completingList = false);
     }
   }
 
@@ -396,11 +419,6 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                subtitle: Text(
-                                  '${_plansFor(day).where((plan) => plan.isRecipe).length} geplante Rezepte · '
-                                  '${_items.where((item) => _plansFor(day).any((plan) => plan.isRecipe && plan.id == item.planId)).length} Zutatenpositionen',
-                                  style: const TextStyle(color: AppDesign.secondaryText),
-                                ),
                                 children: _plansFor(day)
                                     .where((plan) => plan.isRecipe)
                                     .map((plan) => ListTile(
@@ -494,6 +512,23 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                   onSelected: (selected) => setState(() => _showOnlyOpen = selected),
                                 ),
                                 const SizedBox(height: 8),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: FilledButton.icon(
+                                    onPressed: _completingList || aggregated.isEmpty
+                                        ? null
+                                        : () => _completeShoppingList(aggregated),
+                                    icon: _completingList
+                                        ? const SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          )
+                                        : const Icon(Icons.check_circle_outline_rounded),
+                                    label: const Text('Einkaufsliste erledigt'),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
                               ],
                               if (aggregated.isEmpty)
                                 Padding(
@@ -537,11 +572,25 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                 : (value) => _toggleItem(item, value == true),
                                             title: Text(
                                               item.name,
-                                              style: const TextStyle(color: AppDesign.text),
+                                              style: TextStyle(
+                                                color: item.checked
+                                                    ? AppDesign.secondaryText
+                                                    : AppDesign.text,
+                                                decoration: item.checked
+                                                    ? TextDecoration.lineThrough
+                                                    : TextDecoration.none,
+                                                decorationColor: AppDesign.secondaryText,
+                                              ),
                                             ),
                                             subtitle: Text(
                                               '${item.quantity} ${item.unit}'.trim(),
-                                              style: const TextStyle(color: AppDesign.secondaryText),
+                                              style: TextStyle(
+                                                color: AppDesign.secondaryText,
+                                                decoration: item.checked
+                                                    ? TextDecoration.lineThrough
+                                                    : TextDecoration.none,
+                                                decorationColor: AppDesign.secondaryText,
+                                              ),
                                             ),
                                             secondary: _updatingItems.contains(item.key)
                                                 ? const SizedBox(

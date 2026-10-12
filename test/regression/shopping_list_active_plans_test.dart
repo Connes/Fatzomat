@@ -26,6 +26,17 @@ void main() {
     expect(page, contains('load(showLoading: false)'));
   });
 
+  test('day rows show only the date and checked ingredients are struck through', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('return date;'));
+    expect(page, isNot(contains('Zutatenpositionen')));
+    expect(page, isNot(contains('geplante Rezepte ·')));
+    expect(page, contains('TextDecoration.lineThrough'));
+    expect(page, contains("const Text('Einkaufsliste erledigt')"));
+    expect(page, contains('_repo.deleteShoppingItem(item.id)'));
+  });
+
   test('cancelled personal decisions clean up their shopping items in the database', () {
     final migration = File('supabase/migrations/20261011190000_cleanup_cancelled_plan_shopping_items.sql')
         .readAsStringSync();

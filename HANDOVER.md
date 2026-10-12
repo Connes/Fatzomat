@@ -158,3 +158,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Trigger `cleanup_personal_plan_shopping_items` ist aktiviert (`tgenabled = 'O'`). Er entfernt Einkaufsartikel bei Statuswechsel auf `cancelled` und bei direkter Planlöschung. Bereinigung alter stornierter Pläne abgeschlossen: 0 zurückgebliebene Einkaufsartikel.
 - Funktion ist nicht als RPC für `anon` oder `authenticated` ausführbar. Die Rechte wurden live geprüft.
 - Der Post-Merge-CI-Status auf dem exakten Merge-Commit war über die GitHub-Schnittstelle bei Prüfung noch nicht sichtbar. Keine Release-Builds erstellen.
+
+
+## Einkaufsliste: Tagesanzeige und Abschluss (2026-10-12)
+
+- Tageskarten zeigen nur das Datum im Format `TT.MM.`; die Unterzeile mit Rezeptanzahl und Zutatenpositionen ist entfernt.
+- Abgehakte Zutaten zeigen Zutatenname und Mengenangabe durchgestrichen und in zurückhaltender Textfarbe.
+- Die Schaltfläche „Einkaufsliste erledigt“ löscht die Einkaufsartikel der aktuell ausgewählten aktiven Rezeptpläne. Nach dem Abschluss wird die Liste neu geladen; Fehler werden sichtbar gemeldet und der gespeicherte Zustand erneut geladen.
+- Regressionstest ergänzt in `test/regression/shopping_list_active_plans_test.dart`.
+- PR-CI vor Merge prüfen; keine Release-Builds erstellen.
