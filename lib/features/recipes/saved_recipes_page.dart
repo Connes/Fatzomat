@@ -318,60 +318,126 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   }
 
 
+  String _dateKey(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  String _formatPlanDate(DateTime date) =>
+      '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+
+  Future<DateTime?> _choosePlanDate() async {
+    final today = DateTime.now();
+    final startDate = DateTime(today.year, today.month, today.day);
+    final endDate = startDate.add(const Duration(days: 6));
+    try {
+      final occupiedDays = await personalToday.plannedDayLabels(startDate, endDate);
+      if (!mounted) return null;
+      return showDialog<DateTime>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Für welchen Tag möchtest du kochen?'),
+          contentPadding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: 7,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (_, index) {
+                final date = startDate.add(Duration(days: index));
+                final label = occupiedDays[_dateKey(date)];
+                final weekdays = const [
+                  'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag',
+                  'Freitag', 'Samstag', 'Sonntag',
+                ];
+                final isToday = index == 0;
+                return ListTile(
+                  key: Key('recipe-plan-date-${_dateKey(date)}'),
+                  enabled: label == null,
+                  leading: Icon(
+                    label == null ? Icons.calendar_today_rounded : Icons.event_busy_rounded,
+                    color: label == null ? null : Theme.of(dialogContext).disabledColor,
+                  ),
+                  title: Text(isToday ? 'Heute · ${_formatPlanDate(date)}' : '${weekdays[date.weekday - 1]} · ${_formatPlanDate(date)}'),
+                  subtitle: label == null
+                      ? const Text('Frei')
+                      : Text('Belegt · $label'),
+                  onTap: label == null ? () => Navigator.pop(dialogContext, date) : null,
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Abbrechen'),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (mounted) showAppError(context, error);
+      return null;
+    }
+  }
+
   Future<void> selectRecipeForToday(Recipe recipe) async {
     if (recipe.id == null) return;
+    DateTime? selectedDate = widget.planDate;
+    if (widget.decisionRequestId == null) {
+      selectedDate = await _choosePlanDate();
+      if (selectedDate == null || !mounted) return;
+    }
+    final planDate = selectedDate ?? DateTime.now();
     try {
       if (widget.decisionRequestId == null) {
         await personalToday.selectRecipeForToday(
           recipe.id!,
           servings: recipe.servings.clamp(1, 12).toInt(),
-          date: widget.planDate,
+          date: planDate,
+        );
+      } else {
+        await collaboration.resolveDecisionRequest(
+          requestId: widget.decisionRequestId!,
+          decisionMode: 'cook',
+          resultType: 'recipe',
+          resultId: recipe.id!,
+          servings: recipe.servings,
         );
       }
-      if (widget.decisionRequestId != null) {
-        try {
-          await collaboration.resolveDecisionRequest(
-            requestId: widget.decisionRequestId!,
-            decisionMode: 'cook',
-            resultType: 'recipe',
-            resultId: recipe.id!,
-            servings: recipe.servings,
-          );
-        } catch (error) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Rezept für heute gesetzt. Die gemeinsame Anfrage konnte noch nicht aktualisiert werden: ${friendlyError(error)}')),
-          );
-        }
-      }
       if (!mounted) return;
-      // Refresh saved recipes and Today metadata before leaving this page.
       await load();
       if (!mounted) return;
 
-      // In the cooking flow this page is pushed above FoodModePage and
-      // CookNextStepPage. Clear those routes explicitly before switching tabs;
-      // changing the selected tab alone can leave the recipe route visible.
       if (widget.decisionRequestId == null) {
-        final navigateToToday = widget.onNavigateToToday;
-        if (navigateToToday != null) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          navigateToToday();
+        final today = DateTime.now();
+        final isToday = planDate.year == today.year &&
+            planDate.month == today.month &&
+            planDate.day == today.day;
+        if (isToday) {
+          final navigateToToday = widget.onNavigateToToday;
+          if (navigateToToday != null) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            navigateToToday();
+            return;
+          }
+          if (widget.onNavigateToTab != null) {
+            widget.onNavigateToTab!(0);
+          } else {
+            Navigator.pop(context, true);
+          }
           return;
         }
-        if (widget.onNavigateToTab != null) {
-          widget.onNavigateToTab!(0);
-        } else {
-          Navigator.pop(context, true);
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('„${recipe.name}“ ist für den ${_formatPlanDate(planDate)} geplant.')),
+        );
         return;
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('„${recipe.name}“ ist ${_selectedDayLabel} ausgewählt.')),
+        SnackBar(content: Text('„${recipe.name}“ ist für die gemeinsame Entscheidung ausgewählt.')),
       );
-    } catch (e) {
-      if (mounted) showAppError(context, e);
+    } catch (error) {
+      if (mounted) showAppError(context, error);
     }
   }
 
@@ -473,8 +539,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 
   bool get hasSelectionFilter => widget.mainChoice != null || widget.selectedFoodIds.isNotEmpty;
-
-  bool get hasActiveTodayPlan => todayPlan != null && todayPlan!.status != 'cooked';
 
   List<Recipe> get visibleRecipes {
     final normalizedQuery = query.trim().toLowerCase();
@@ -673,47 +737,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                if (hasActiveTodayPlan)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
-                    child: Material(
-                      color: const Color(0xFFDDF3E7),
-                      borderRadius: BorderRadius.circular(24),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
-                        onTap: () {
-                          if (widget.onNavigateToTab != null) {
-                            widget.onNavigateToTab!(0);
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const TodayPage()),
-                            ).then((_) => load());
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.favorite_rounded, color: AppDesign.primaryDark),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Für dich ${_selectedDayLabel}', style: Theme.of(context).textTheme.bodyMedium),
-                                    const SizedBox(height: 2),
-                                    Text(todayPlan!.name, style: Theme.of(context).textTheme.titleMedium),
-                                  ],
-                                ),
-                              ),
-                              const Icon(Icons.arrow_forward_rounded, size: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
                   child: TextField(
@@ -800,23 +823,12 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                         const SizedBox(height: 8),
                                         Align(
                                           alignment: Alignment.centerLeft,
-                                          child: todayPlan?.isRecipe == true &&
-                                                  todayPlan?.recipeId == recipe.id &&
-                                                  todayPlan?.status != 'cooked'
-                                              ? Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Icon(Icons.check_circle_rounded, size: 18, color: AppDesign.primaryDark),
-                                                    SizedBox(width: 6),
-                                                    Text(_isSelectedDateToday ? 'Für heute ausgewählt' : 'Für diesen Tag ausgewählt', style: TextStyle(fontWeight: FontWeight.w700)),
-                                                  ],
-                                                )
-                                              : TextButton.icon(
-                                                  key: Key('saved-recipe-select-today-${recipe.id}'),
-                                                  onPressed: () => selectRecipeForToday(recipe),
-                                                  icon: const Icon(Icons.today_rounded, size: 18),
-                                                  label: Text(_isSelectedDateToday ? 'Für heute auswählen' : 'Für diesen Tag auswählen'),
-                                                ),
+                                          child: TextButton.icon(
+                                            key: Key('saved-recipe-select-today-${recipe.id}'),
+                                            onPressed: () => selectRecipeForToday(recipe),
+                                            icon: const Icon(Icons.event_available_rounded, size: 18),
+                                            label: const Text('Auswählen'),
+                                          ),
                                         ),
                                       ],
                                     ),
