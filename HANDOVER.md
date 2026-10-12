@@ -233,3 +233,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Ein Tipp öffnet zuerst einen Bestätigungsdialog mit „Bestellung abschließen?“ sowie „Abbrechen“ und „Bestellung abschließen“. Der Bestellstatus wird nur nach ausdrücklicher Bestätigung geändert.
 - Regressionstest: `test/regression/delivery_order_confirmation_test.dart`.
 - Keine Supabase-Änderung und keine Release-Builds.
+
+
+## Willkommensüberschrift im Lebensmittel-Onboarding (2026-10-12)
+
+- Die Überschrift lautet „Willkommen“ ohne Ausrufezeichen und ist zentriert.
+- Regressionstest in `test/regression/food_onboarding_intro_visual_test.dart` aktualisiert.
+- Keine Änderung am weiteren Onboarding-Ablauf, keine Supabase-Änderung und kein Release-Build.
