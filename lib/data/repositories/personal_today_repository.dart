@@ -82,7 +82,6 @@ class PersonalTodayRepository {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
     final planDate = _dateOnly(date ?? DateTime.now());
-    final isToday = planDate == _dateOnly(DateTime.now());
     // Use the date-aware RPC for every day, including today. It serializes
     // competing selections and rejects an already occupied day instead of
     // silently replacing the existing decision.
