@@ -80,7 +80,7 @@ class _AppShellState extends State<AppShell> {
 
   Widget _buildShell(BuildContext context) {
     final pages = [
-      const TodayPage(),
+      TodayPage(onNavigateToTab: _selectTab),
       SavedRecipesPage(onNavigateToTab: _selectTab),
       const ShoppingListPage(),
       const SettingsPage(),

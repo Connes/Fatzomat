@@ -150,6 +150,7 @@ class _RecipeCardImageState extends State<_RecipeCardImage> {
 
 class SavedRecipesPage extends StatefulWidget {
   final ValueChanged<int>? onNavigateToTab;
+  final VoidCallback? onNavigateToToday;
   final String? mainChoice;
   final Set<String> selectedFoodIds;
   final String? decisionRequestId;
@@ -159,6 +160,7 @@ class SavedRecipesPage extends StatefulWidget {
   const SavedRecipesPage({
     super.key,
     this.onNavigateToTab,
+    this.onNavigateToToday,
     this.mainChoice,
     this.selectedFoodIds = const <String>{},
     this.decisionRequestId,
@@ -353,6 +355,12 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       // Navigate to Today after a personal selection. This page is either a
       // persistent tab or a pushed route inside the cooking flow.
       if (widget.decisionRequestId == null) {
+        // The cooking flow needs to return to the Today tab, not merely reveal
+        // whichever tab was active before its routes were pushed.
+        if (widget.onNavigateToToday != null) {
+          widget.onNavigateToToday!();
+          return;
+        }
         if (widget.onNavigateToTab != null) {
           widget.onNavigateToTab!(0);
         } else {

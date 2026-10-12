@@ -11,7 +11,7 @@ void main() {
     expect(pubspec, contains('version: 1.13.46+262'));
     expect(shell, contains('int index = 0;'));
     expect(shell, contains("NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'Heute')"));
-    expect(shell, contains('const TodayPage()'));
+    expect(shell, contains('TodayPage(onNavigateToTab: _selectTab)'));
     expect(today, isNot(contains("'Entscheidung ändern'")));
     expect(today, contains("'Entscheidung entfernen'"));
     expect(today, contains("'Wir kochen'"));

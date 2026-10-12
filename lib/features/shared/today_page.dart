@@ -34,8 +34,9 @@ import '../../core/services/surprise_recommendation_service.dart';
 
 class TodayPage extends StatefulWidget {
   final DateTime? initialDate;
+  final ValueChanged<int>? onNavigateToTab;
 
-  const TodayPage({super.key, this.initialDate});
+  const TodayPage({super.key, this.initialDate, this.onNavigateToTab});
 
   @override
   State<TodayPage> createState() => _TodayPageState();
@@ -266,7 +267,15 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   Future<void> _openMode(FoodMode mode) async {
     final selected = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => FoodModePage(mode: mode, planDate: _selectedDate)),
+      MaterialPageRoute(
+        builder: (_) => FoodModePage(
+          mode: mode,
+          planDate: _selectedDate,
+          onNavigateToToday: widget.onNavigateToTab == null
+              ? null
+              : () => widget.onNavigateToTab!(0),
+        ),
+      ),
     );
     if (selected == true && mounted) await load();
   }
