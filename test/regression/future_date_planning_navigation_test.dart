@@ -14,6 +14,22 @@ void main() {
     expect(today, contains("tooltip: 'Nächster Tag'"));
   });
 
+  test('double arrows jump between open decisions and keep Today as the backward boundary', () {
+    final today = File('lib/features/shared/today_page.dart').readAsStringSync();
+    final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
+
+    expect(today, contains("tooltip: 'Vorherige offene Entscheidung'"));
+    expect(today, contains("tooltip: 'Nächste offene Entscheidung'"));
+    expect(today, contains('Icons.keyboard_double_arrow_left'));
+    expect(today, contains('Icons.keyboard_double_arrow_right'));
+    expect(today, contains('_jumpToOpenDecision(forward: false)'));
+    expect(today, contains('_jumpToOpenDecision(forward: true)'));
+    expect(repository, contains(".eq('status', 'planned')"));
+    expect(repository, contains(".gt('plan_date', from)"));
+    expect(repository, contains(".gte('plan_date', today)"));
+    expect(repository, contains('if (row == null) return today;'));
+  });
+
   test('horizontal swipes change the selected day from the main content area', () {
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
 
