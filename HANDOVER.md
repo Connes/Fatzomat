@@ -166,4 +166,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Abgehakte Zutaten zeigen Zutatenname und Mengenangabe durchgestrichen und in zurückhaltender Textfarbe.
 - Die Schaltfläche „Einkaufsliste erledigt“ löscht die Einkaufsartikel der aktuell ausgewählten aktiven Rezeptpläne. Nach dem Abschluss wird die Liste neu geladen; Fehler werden sichtbar gemeldet und der gespeicherte Zustand erneut geladen.
 - Regressionstest ergänzt in `test/regression/shopping_list_active_plans_test.dart`.
-- PR-CI vor Merge prüfen; keine Release-Builds erstellen.
+- PR #76 wurde nach erfolgreichen Quality-Gate- und Flutter-quality-gate-Läufen für Head `82da34d2f1268270ba0d71facea044908700e88e` gemergt. Merge-Commit: `fea7e9c7a3afd288969a8b8223cb5140f0d10b9d`. Keine Release-Builds erstellen.
+
+
+## Navigation nach Rezeptauswahl aus „Wir kochen“ (2026-10-12)
+
+- `TodayPage` erhält den Tab-Wechsel-Callback aus `AppShell` und reicht eine explizite Navigation-zur-Heute-Seite-Callback-Kette über `FoodModePage`, `CookNextStepPage` bis `SavedRecipesPage` weiter.
+- Wird ein gespeichertes Rezept aus „Wir kochen“ für den ausgewählten Tag übernommen, schaltet der AppShell-Navigator explizit auf den Heute-Tab und räumt die darüberliegenden Koch-Routen ab. So bleibt man nicht auf „Meine Rezepte“ hängen.
+- Regressionstest: `test/regression/cook_saved_recipe_returns_to_today_test.dart`.
+- PR-CI prüfen; keine Release-Builds erstellen.
