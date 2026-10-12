@@ -140,9 +140,10 @@ class CollaborationRepository {
     String? imageUrl,
     String? recipeId,
     int? servings,
+    String? sourcePlanId,
   }) async {
     try {
-      // V85.1 accepts the exact Today snapshot. This avoids a second read of
+      // V85.1 accepts the exact selected plan snapshot. This avoids a second read of
       // personal_today_plans and is the preferred path on current backends.
       await client.rpc('send_decision_message', params: {
         'p_message_type': type,
@@ -152,6 +153,7 @@ class CollaborationRepository {
         'p_image_url': imageUrl,
         'p_recipe_id': recipeId,
         'p_servings': servings,
+        'p_source_plan_id': sourcePlanId,
       });
     } on PostgrestException catch (error) {
       // Existing installations may have V85 deployed but not V85.1 yet.
@@ -169,6 +171,7 @@ class CollaborationRepository {
           text.contains('function public.send_decision_message') && text.contains('does not exist');
       if (!signatureUnavailable) rethrow;
 
+      if (type == 'share') rethrow;
       await client.rpc('send_decision_message', params: {
         'p_message_type': type,
       });
@@ -184,15 +187,16 @@ class CollaborationRepository {
     return row == null ? null : DecisionShare.fromMap(Map<String, dynamic>.from(row));
   }
 
-  Future<DecisionShare?> pendingDecisionShareForToday() async {
+  Future<DecisionShare?> pendingDecisionShareForDate(DateTime date) async {
     final userId = client.auth.currentUser?.id;
     if (userId == null) return null;
+    final planDate = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     final row = await client
         .from('decision_shares')
         .select('id,connection_id,sender_id,recipient_id,message_type,plan_date,source_plan_id,decision_type,decision_value,decision_name,image_url,recipe_id,servings,accepted_at,rejected_at,cancelled_at,created_at')
         .eq('recipient_id', userId)
         .eq('message_type', 'share')
-        .eq('plan_date', DateTime.now().toIso8601String().substring(0, 10))
+        .eq('plan_date', planDate)
         .isFilter('accepted_at', null)
         .isFilter('rejected_at', null)
         .isFilter('cancelled_at', null)
