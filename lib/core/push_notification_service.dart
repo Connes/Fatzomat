@@ -8,7 +8,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../data/repositories/collaboration_repository.dart';
 import '../data/repositories/push_device_repository.dart';
 import '../features/settings/notifications_page.dart';
-import '../features/shared/today_page.dart';
 import 'app_shell.dart';
 import '../features/recipes/recipe_detail_page.dart';
 import '../data/repositories/recipe_repository.dart';
