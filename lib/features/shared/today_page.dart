@@ -188,9 +188,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         // Completed history must not block the current decision card.
       }
       try {
-        if (_isSelectedDateToday) {
-          pendingShare = await _collaborationRepository.pendingDecisionShareForToday();
-        }
+        pendingShare = await _collaborationRepository.pendingDecisionShareForDate(requestedDate);
       } catch (_) {
         // Shared decisions are additive UI and must not block the day view.
       }
@@ -361,6 +359,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         imageUrl: plan!.imageUrl,
         recipeId: plan!.recipeId,
         servings: plan!.servings,
+        sourcePlanId: plan!.id,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -731,7 +730,12 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     if (name != null && name.isNotEmpty) return name;
     final value = share.decisionValue?.trim();
     if (value != null && value.isNotEmpty) return value;
-    return 'Heutige Entscheidung';
+    return 'Entscheidung für diesen Tag';
+  }
+
+  String get _planDateLabel {
+    const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+    return '${share.planDate.day}. ${months[share.planDate.month - 1]}';
   }
 
   String get _typeLabel {
@@ -776,7 +780,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Deine verbundene Person hat heute entschieden.',
+              'Deine verbundene Person hat für den $_planDateLabel entschieden.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[

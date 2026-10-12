@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('V85 supports sharing the current personal Today decision at any time', () {
+  test('V85 supports sharing personal decisions for the selected date', () {
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
     final repo = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
     final model = File('lib/data/models/decision_share.dart').readAsStringSync();
@@ -21,14 +21,14 @@ void main() {
     expect(today, contains('decisionValue: plan!.decisionValue'));
     expect(today, contains('decisionName: plan!.displayTitle'));
     expect(today, contains("label: const Text('Entscheidung teilen')"));
-    expect(today, contains('pendingDecisionShareForToday'));
+    expect(today, contains('pendingDecisionShareForDate'));
     expect(today, contains('onPressed: onDecide'));
     expect(today, isNot(contains('onPressed: hasConnection ? onDecide : null')));
     expect(today, contains('Noch keine Connection vorhanden.'));
     expect(today, contains('rejectDecisionShare'));
     expect(today, isNot(contains('Geteilte Entscheidung abgelehnt.')));
     expect(repo, contains('Future<DecisionShare?> decisionShare'));
-    expect(repo, contains('pendingDecisionShareForToday'));
+    expect(repo, contains('pendingDecisionShareForDate'));
     expect(repo, contains('rejectDecisionShare'));
     expect(repo, contains('PGRST202'));
     expect(repo, contains("'p_message_type': type"));
