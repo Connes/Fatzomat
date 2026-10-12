@@ -55,7 +55,12 @@ void main() {
     expect(source, contains("ValueKey<String>('food_onboarding_brand_title')"));
     expect(source, contains("'SCHMACKOFATZ'"));
     expect(source, contains('textAlign: TextAlign.center'));
-    expect(source, contains("'Willkommen!'"));
+    expect(source, contains("'Willkommen'"));
+    expect(source, isNot(contains("'Willkommen!'")));
+    expect(
+      source,
+      contains("'Willkommen',\n                        textAlign: TextAlign.center,"),
+    );
     expect(source, contains("ValueKey<String>('food_onboarding_welcome_box')"));
     expect(source, contains("onStart: () => setState(() => showSetup = true)"));
     expect(source, contains('Richte zuerst deine Lebensmittel und Vorlieben ein.'));
