@@ -46,6 +46,7 @@ void main() {
     expect(migration, contains('insert into public.profiles(id, display_name)'));
     expect(migration, contains('connection_member_display_name'));
     expect(page, contains('Dein Name für diese Verbindung'));
+    expect(page, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
     expect(page, contains("repo.createConnection(name)"));
     expect(page, contains("repo.joinConnection(value, name)"));
     expect(repository, contains("'p_display_name': displayName.trim()"));
