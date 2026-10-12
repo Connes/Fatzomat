@@ -197,3 +197,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Live-Supabase-Migration wurde angewendet und verifiziert. Die tatsächliche Migrationsversion in Supabase lautet 20261012083523 (`prevent_overwriting_planned_days`); die Funktionsdefinition enthält die Konfliktprüfung und Advisory Lock. `authenticated` darf die RPC ausführen, `anon` nicht.
 - Nach dem Merge wurde der neue Auswahl-Dialog auf `main` verifiziert. Keine Release-Builds erstellt.
 
+## Einkaufsliste: erledigte Tage ausblenden (2026-10-12)
+
+- PR #80 („Hide completed shopping days and refresh selection count“) wurde nach erfolgreichem Flutter quality gate gemergt. Merge-Commit: bc7eb52ffec6678a0b067b8cd7b8df910b913882.
+- Die sichtbaren Einkaufstage werden nun aus aktiven Rezeptplänen abgeleitet, für die noch mindestens ein Einkaufsartikel vorhanden ist. Sobald „Einkaufsliste erledigt“ die letzten Artikel eines Tages löscht, verschwindet auch dessen Datumsüberschrift.
+- Nach dem Neuladen werden nicht mehr aktive Tage aus `_selected` und `_expanded` entfernt. Der Zähler „X von Y Tagen ausgewählt“ verwendet die aktualisierte Liste aktiver Tage.
+- Regressionstest in `test/regression/shopping_list_active_plans_test.dart` ergänzt.
+- Flutter quality gate Run 938 auf finalem PR-Head `2af0f6b9f087a8492eb083513c1501283f5f4753` erfolgreich: Repository-Hygiene, Dependencies, Icon-Generierung, Analyze und Test.
+- Nach dem Merge wurde die neue Getter-Logik und der Regressionstest auf `main` verifiziert. Keine Release-Builds erstellt.
+
