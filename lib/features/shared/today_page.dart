@@ -746,20 +746,6 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     return '${share.planDate.day}. ${months[share.planDate.month - 1]}';
   }
 
-  String get _typeLabel {
-    switch (share.decisionType) {
-      case 'recipe':
-        return 'Rezept';
-      case 'order':
-        return 'Bestellung';
-      case 'dine_out':
-        return 'Restaurant';
-      case 'surprise':
-        return 'Überraschung';
-      default:
-        return 'Geteilte Entscheidung';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
