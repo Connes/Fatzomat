@@ -11,9 +11,10 @@ void main() {
     expect(today, contains('PersonalTodayRepository'));
     expect(today, isNot(contains('CollaborationRepository')));
     expect(personal, contains("from('personal_today_plans')"));
-    expect(personal, contains("rpc('set_personal_today_plan'"));
+    expect(personal, contains("rpc('set_personal_plan_for_date'"));
     expect(personal, isNot(contains('current_connection_id')));
-    expect(personal, isNot(contains('shared_recipe_plans')));
+    expect(personal, contains('plannedDayLabels'));
+    expect(personal, contains('shared_recipe_plans'));
     expect(collaboration, contains('shareRecipeForToday'));
     expect(collaboration, isNot(contains('selectRecipeForToday')));
     expect(collaboration, isNot(contains('Future<TodayPlan?> todayPlan')));
