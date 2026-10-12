@@ -9,7 +9,7 @@ void main() {
     expect(today, contains('_selectedDate = _dateOnly(widget.initialDate ?? today);'));
     expect(today, contains('if (_selectedDate.isBefore(today)) _selectedDate = today;'));
     expect(today, contains('if (target.isBefore(today)) return;'));
-    expect(today, contains('if (!_isSelectedDateToday)'));
+    expect(today, contains('final showBackwardControls = !_isSelectedDateToday;'));
     expect(today, contains('final showBackwardControls = !_isSelectedDateToday;'));
     expect(today, contains('alignment: Alignment.centerLeft'));
     expect(today, contains('alignment: Alignment.centerRight'));
@@ -87,7 +87,7 @@ void main() {
     expect(today, contains('String _todayDateLabel() {'));
     expect(today, contains('final date = _dateOnly(_selectedDate);'));
     expect(today, contains('_todayDateLabel(),'));
-    expect(today, contains('if (!_isSelectedDateToday)'));
+    expect(today, contains('final showBackwardControls = !_isSelectedDateToday;'));
     expect(today, contains('child: AnimatedSwitcher('));
     expect(today, contains('duration: const Duration(milliseconds: 320)'));
     expect(today, contains('FractionalTranslation('));
