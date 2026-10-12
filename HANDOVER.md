@@ -206,3 +206,13 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Flutter quality gate Run 938 auf finalem PR-Head `2af0f6b9f087a8492eb083513c1501283f5f4753` erfolgreich: Repository-Hygiene, Dependencies, Icon-Generierung, Analyze und Test.
 - Nach dem Merge wurde die neue Getter-Logik und der Regressionstest auf `main` verifiziert. Keine Release-Builds erstellt.
 
+
+
+## Einkaufsliste: Abschluss erst nach Abhaken aller Zutaten (2026-10-12)
+
+- PR #81 (Require all ingredients checked before completing shopping list) wurde nach erfolgreichen Qualitätsprüfungen gemergt. Squash-Merge-Commit: `3e9c691c8a0514e9b7967366fd7051a03c29cac9`.
+- Die Schaltfläche „Einkaufsliste erledigt“ ist nur aktiv, wenn die zusammengefasste Einkaufsliste mindestens einen Eintrag hat und alle Einträge abgehakt sind.
+- Die Abschlussmethode prüft dieselbe Bedingung zusätzlich, bevor Einkaufsartikel gelöscht werden. Bei offenen Zutaten erklärt ein Hinweis, warum der Abschluss noch nicht möglich ist.
+- Regressionstest in `test/regression/shopping_list_active_plans_test.dart` ergänzt.
+- CI auf PR-Head `d67c6ddcaed11d6a2b233ebd19eead4d84ced4ac` erfolgreich: Quality Gate Run 302 (Analyze und Test) sowie Flutter quality gate Run 941 (Repository-Hygiene, Dependencies, Icon-Generierung, Analyze und Test).
+- Die Implementierung und der Regressionstest wurden nach dem Merge auf `main` verifiziert. Keine Release-Builds erstellt.
