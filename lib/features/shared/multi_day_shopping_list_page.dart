@@ -42,12 +42,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       List.generate(3, (i) => today.add(Duration(days: i)));
 
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  String _label(int index) => index == 0 ? 'Heute' : index == 1 ? 'Morgen' : 'Übermorgen';
-
   String _dayTitle(DateTime day) {
     final index = _days.indexWhere((candidate) => _key(candidate) == _key(day));
     final date = '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.';
-    return '${_label(index < 0 ? 0 : index)} · $date';
+    return date;
   }
 
   List<DateTime> get _activeDays => [
