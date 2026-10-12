@@ -44,8 +44,8 @@ void main() {
 
     expect(saved, contains('today = await personalToday.todayPlan(date: widget.planDate);'));
     expect(RegExp(r'planDate: widget\.planDate').allMatches(saved), hasLength(2));
-    expect(saved, contains('date: widget.planDate,'));
-    expect(saved, contains("label: Text(_isSelectedDateToday ? 'Für heute auswählen' : 'Für diesen Tag auswählen')"));
+    expect(saved, contains('date: planDate,'));
+    expect(saved, contains("label: const Text('Auswählen')"));
   });
 
   test('the Today app bar displays the selected date and day controls', () {
