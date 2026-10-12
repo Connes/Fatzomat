@@ -256,3 +256,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Eingehende Freigaben werden für das ausgewählte Datum geladen. Übernehmen erstellt die persönliche und gemeinsame Planung für genau dieses Datum; Ablehnen funktioniert ebenfalls für zukünftige Tage. Vergangene Freigaben können nicht mehr übernommen werden.
 - Regressionstest: `test/regression/date_aware_decision_sharing_test.dart`.
 - Migration ist für PR/CI vorbereitet und muss nach erfolgreichem Merge auf Supabase angewendet und live verifiziert werden. Keine Release-Builds.
+
+
+## Navigation zu geteilten Entscheidungen (2026-10-12)
+
+- Beim Öffnen einer Entscheidungsbenachrichtigung wird nun die zugehörige `decision_shares.plan_date` geladen und `TodayPage(initialDate: ...)` mit diesem Datum geöffnet.
+- Dieselbe Datumsnavigation gilt für Push-Notifications bei App-Start, App im Hintergrund und lokale Benachrichtigungen. Falls eine alte Benachrichtigung keine Share-ID mehr hat oder die Freigabe nicht mehr lesbar ist, bleibt der Fallback auf Heute erhalten.
+- Regressionstest in `test/regression/decision_message_sharing_test.dart` prüft beide Navigationspfade.
+- Keine Datenbankänderung nötig; wartet auf CI und Merge. Keine Release-Builds.
