@@ -135,6 +135,35 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     load();
   }
 
+  Future<void> _jumpToOpenDecision({required bool forward}) async {
+    if (loading) return;
+    try {
+      final target = await repo.nextOpenDecisionDate(
+        fromDate: _selectedDate,
+        forward: forward,
+      );
+      if (!mounted) return;
+      if (target == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Keine weitere offene Entscheidung gefunden.')),
+        );
+        return;
+      }
+      setState(() {
+        _selectedDate = _dateOnly(target);
+        _pageTransitionDirection = forward ? 1 : -1;
+        loading = true;
+        loadError = null;
+      });
+      await load();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(friendlyError(error))),
+      );
+    }
+  }
+
   void _checkDayBoundary() {
     final nowDay = _dateOnly(DateTime.now());
     if (nowDay == _lastObservedDay) return;
@@ -511,12 +540,18 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (!_isSelectedDateToday)
+          if (!_isSelectedDateToday) ...[
             IconButton(
               tooltip: 'Vorheriger Tag',
               onPressed: () => _shiftSelectedDate(-1),
               icon: const Icon(Icons.chevron_left),
             ),
+            IconButton(
+              tooltip: 'Vorherige offene Entscheidung',
+              onPressed: loading ? null : () => _jumpToOpenDecision(forward: false),
+              icon: const Icon(Icons.keyboard_double_arrow_left),
+            ),
+          ],
           Flexible(
             child: Text(
               _todayDateLabel(),
@@ -534,6 +569,11 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
             tooltip: 'Nächster Tag',
             onPressed: () => _shiftSelectedDate(1),
             icon: const Icon(Icons.chevron_right),
+          ),
+          IconButton(
+            tooltip: 'Nächste offene Entscheidung',
+            onPressed: loading ? null : () => _jumpToOpenDecision(forward: true),
+            icon: const Icon(Icons.keyboard_double_arrow_right),
           ),
         ],
       ),
