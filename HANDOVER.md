@@ -192,5 +192,8 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die Rezeptauswahl verwendet für heute und zukünftige Tage die RPC set_personal_plan_for_date. Die Migration 20261012100000_prevent_overwriting_planned_days ergänzt eine serverseitige Konfliktprüfung mit Advisory Lock und verhindert, dass diese Auswahl bestehende persönliche oder gemeinsame Planungen still ersetzt.
 - Bei Auswahl von heute navigiert die App wie bisher zurück zu „Heute“. Bei einem zukünftigen Datum bleibt sie in der Rezeptbibliothek und bestätigt das konkrete Datum, statt fälschlich „heute“ zu melden.
 - Regressionstest: test/regression/recipe_date_picker_availability_test.dart.
-- Änderung befindet sich auf Branch feat/recipe-selection-date-availability; PR und CI noch ausstehend. Migration erst nach erfolgreicher Prüfung/Integration auf das Live-Supabase-Projekt anwenden. Keine Release-Builds erstellen.
+- PR #79 („Add date-aware recipe selection and occupied-day protection“) wurde nach erfolgreichen Qualitätsprüfungen gemergt. Merge-Commit: 8332ae3f855f4d84a70d085a78f22a85cf1b0bbf.
+- CI auf dem finalen PR-Head db5ac61e54ffb7305fdf2d3054c23684cad74b84 erfolgreich: Quality Gate Run 296 (Analyze und Test) sowie Flutter quality gate Run 935 (Repository-Hygiene, Dependencies, Icon-Generierung, Analyze und Test).
+- Live-Supabase-Migration wurde angewendet und verifiziert. Die tatsächliche Migrationsversion in Supabase lautet 20261012083523 (`prevent_overwriting_planned_days`); die Funktionsdefinition enthält die Konfliktprüfung und Advisory Lock. `authenticated` darf die RPC ausführen, `anon` nicht.
+- Nach dem Merge wurde der neue Auswahl-Dialog auf `main` verifiziert. Keine Release-Builds erstellt.
 
