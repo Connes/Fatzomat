@@ -80,6 +80,8 @@ void main() {
     expect(find.text('Trattoria Test'), findsOneWidget);
     expect(find.text('+497231123'), findsOneWidget);
     expect(find.text('Webseite'), findsOneWidget);
-    expect(find.text('Entfernung'), findsOneWidget);
+    expect(find.text('Anschrift'), findsOneWidget);
+    expect(find.text('Öffnungszeiten'), findsOneWidget);
+    expect(find.text('Nicht verfügbar'), findsOneWidget);
   });
 }

@@ -187,9 +187,12 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: RestaurantDetailPage(result: result, order: false)));
     await tester.pumpAndSettle();
 
-    expect(find.text('Keine Kontaktdaten verfügbar'), findsOneWidget);
-    expect(find.text('Telefon'), findsNothing);
-    expect(find.text('Webseite'), findsNothing);
+    expect(find.text('Keine Kontaktdaten verfügbar'), findsNothing);
+    expect(find.text('Anschrift'), findsOneWidget);
+    expect(find.text('Telefon'), findsOneWidget);
+    expect(find.text('Webseite'), findsOneWidget);
+    expect(find.text('Öffnungszeiten'), findsOneWidget);
+    expect(find.textContaining('Nicht verfügbar'), findsNWidgets(4));
   });
 
   test('Restaurantsuche aktualisiert die Supabase-Sitzung und nutzt die Datenbank-Suche', () {

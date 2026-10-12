@@ -280,3 +280,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Bei „Wir bestellen“, „Wir gehen essen“ und anderen Nicht-Rezept-Entscheidungen enthält der Dialog nur noch die Information, dass die Entscheidung aus dem Plan entfernt wird.
 - Regressionstest in `test/regression/personal_today_decision_types_test.dart` ergänzt.
 - PR/CI ausstehend. Keine Supabase-Änderung und keine Release-Builds.
+
+
+## Restaurantdetail: einheitliche Kontaktkarte (2026-10-12)
+
+- Anschrift, Telefon, Webseite und Öffnungszeiten werden für jedes Restaurant immer angezeigt, in einer gemeinsamen Karte mit getrennten Bereichen und feinen Trennlinien.
+- Fehlt ein Feld in den gelieferten Daten, steht in diesem Bereich „Nicht verfügbar“, statt den gesamten Bereich auszublenden.
+- Telefonnummer und Webseite bleiben antippbar, sofern vorhanden. Bestelllink und Lieferstatus werden bei Bedarf ebenfalls innerhalb derselben Karte dargestellt.
+- Regressionstests in `test/regression/restaurant_discovery_test.dart` decken vollständige und fehlende Kontaktdaten ab.
+- PR/CI ausstehend. Keine Supabase-Änderung und keine Release-Builds.
