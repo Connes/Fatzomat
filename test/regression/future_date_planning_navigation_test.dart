@@ -10,6 +10,10 @@ void main() {
     expect(today, contains('if (_selectedDate.isBefore(today)) _selectedDate = today;'));
     expect(today, contains('if (target.isBefore(today)) return;'));
     expect(today, contains('if (!_isSelectedDateToday)'));
+    expect(today, contains('final showBackwardControls = !_isSelectedDateToday;'));
+    expect(today, contains('alignment: Alignment.centerLeft'));
+    expect(today, contains('alignment: Alignment.centerRight'));
+    expect(today, contains('child: Stack('));
     expect(today, contains("tooltip: 'Vorheriger Tag'"));
     expect(today, contains("tooltip: 'Nächster Tag'"));
   });
