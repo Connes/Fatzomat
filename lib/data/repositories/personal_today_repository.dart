@@ -90,7 +90,8 @@ class PersonalTodayRepository {
     final userId = client.auth.currentUser?.id;
     if (userId == null) return null;
 
-    final today = _dateOnly(DateTime.now());
+    final todayDate = DateTime.now();
+    final today = _dateOnly(todayDate);
     final from = _dateOnly(fromDate);
     if (!forward && from.compareTo(today) <= 0) return null;
 
@@ -116,14 +117,14 @@ class PersonalTodayRepository {
           .order('plan_date', ascending: false)
           .limit(1)
           .maybeSingle();
-      if (row == null) return DateTime.now().year == 0 ? null : DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+      if (row == null) return DateTime(todayDate.year, todayDate.month, todayDate.day);
     }
 
     if (row == null) return null;
     final rawDate = row['plan_date']?.toString();
     if (rawDate == null || rawDate.isEmpty) return null;
     final parsed = DateTime.tryParse(rawDate);
-    return parsed == null ? null : parsed;
+    return parsed == null ? null : DateTime(parsed.year, parsed.month, parsed.day);
   }
 
   Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
