@@ -149,7 +149,7 @@ class RestaurantDetailPage extends StatelessWidget {
                   _contactSection(
                     icon: Icons.location_on_rounded,
                     title: 'Anschrift',
-                    value: address,
+                    value: addressWithDistance,
                   ),
                   const Divider(height: 1),
                   _contactSection(
