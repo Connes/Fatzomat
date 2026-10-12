@@ -15,6 +15,7 @@ void main() {
     final rejectMigration = File('supabase/migrations/20261007091500_reject_decision_share.sql').readAsStringSync();
     final responseMigration = File('supabase/migrations/20261007110000_decision_share_response_notifications.sql').readAsStringSync();
     final pushService = File('lib/core/push_notification_service.dart').readAsStringSync();
+    final appShell = File('lib/core/app_shell.dart').readAsStringSync();
 
     expect(today, contains("sendDecisionMessage("));
     expect(today, contains('decisionType: plan!.decisionType'));
@@ -38,7 +39,8 @@ void main() {
     expect(repo, contains("'accept_decision_share'"));
     expect(repo, contains("'reject_decision_share'"));
     expect(pushService, contains("decisionShare(shareId)"));
-    expect(pushService, contains("TodayPage(initialDate: targetDate)"));
+    expect(pushService, contains("AppShell(initialDate: targetDate)"));
+    expect(appShell, contains('initialDate: widget.initialDate'));
     expect(pushService, isNot(contains('DecisionSharePage')));
     expect(notificationsPage, contains('repo.decisionShare(item.decisionShareId!)'));
     expect(notificationsPage, contains('TodayPage(initialDate: targetDate)'));

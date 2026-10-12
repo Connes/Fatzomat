@@ -264,3 +264,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Dieselbe Datumsnavigation gilt für Push-Notifications bei App-Start, App im Hintergrund und lokale Benachrichtigungen. Falls eine alte Benachrichtigung keine Share-ID mehr hat oder die Freigabe nicht mehr lesbar ist, bleibt der Fallback auf Heute erhalten.
 - Regressionstest in `test/regression/decision_message_sharing_test.dart` prüft beide Navigationspfade.
 - Keine Datenbankänderung nötig; wartet auf CI und Merge. Keine Release-Builds.
+
+
+## Navigationsleiste bei Push-Rückmeldungen zu Entscheidungen (2026-10-12)
+
+- Ursache: Der Push-Handler öffnete `TodayPage` direkt über den globalen Root-Navigator. Dadurch wurde `AppShell` samt unterer Navigation vollständig überdeckt.
+- Push-Taps auf geteilte Entscheidungen öffnen jetzt `AppShell(initialDate: targetDate)`. `AppShell` reicht das Ziel-Datum an `TodayPage` weiter; damit bleiben die untere Navigationsleiste und die richtige Tagesauswahl erhalten.
+- Regressionstests prüfen den Push-Zielpfad und die Datumsweitergabe in `AppShell`.
+- PR und CI ausstehend. Keine Supabase-Änderung und keine Release-Builds.

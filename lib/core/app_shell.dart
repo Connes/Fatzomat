@@ -10,7 +10,9 @@ import '../features/shared/today_page.dart';
 import '../features/shared/shopping_list_page.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+  final DateTime? initialDate;
+
+  const AppShell({super.key, this.initialDate});
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -88,6 +90,7 @@ class _AppShellState extends State<AppShell> {
   Widget _buildShell(BuildContext context) {
     final pages = [
       TodayPage(
+        initialDate: widget.initialDate,
         onNavigateToTab: _selectTab,
         resetToTodaySignal: _todayResetSignal,
       ),

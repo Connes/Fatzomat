@@ -8,6 +8,7 @@ void main() {
     final main = File('lib/main.dart').readAsStringSync();
     final app = File('lib/core/app.dart').readAsStringSync();
     final service = File('lib/core/push_notification_service.dart').readAsStringSync();
+    final shell = File('lib/core/app_shell.dart').readAsStringSync();
     final migration = File('supabase/migrations/20260925153000_push_notifications.sql').readAsStringSync();
     final function = File('supabase/functions/push-notification/index.ts').readAsStringSync();
     final common = File('scripts/common.sh').readAsStringSync();
@@ -35,7 +36,9 @@ void main() {
     expect(service, contains('getInitialMessage'));
     expect(service, contains('NotificationsPage(initialNotificationId: id)'));
     expect(service, contains('decisionShare(shareId)'));
-    expect(service, contains('TodayPage(initialDate: targetDate)'));
+    expect(service, contains('AppShell(initialDate: targetDate)'));
+    expect(shell, contains('initialDate: widget.initialDate'));
+    expect(shell, contains('bottomNavigationBar: SafeArea('));
     expect(service, isNot(contains('DecisionSharePage')));
     expect(service, contains("decision_share_id"));
     expect(service, contains("_pendingDecisionShareId"));
