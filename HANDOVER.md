@@ -328,3 +328,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - In der Heute-Ansicht werden beide Rückwärts-Pfeile ausgeblendet. Auf zukünftigen Tagen erscheinen sie links; die Vorwärts-Pfeile bleiben rechts.
 - Regressionstest für die zentrierte Anzeige und die bedingten Rückwärts-Steuerelemente ergänzt.
 - PR/CI ausstehend. Keine Release-Builds.
+
+## Gemeinsame Entscheidungsabschlüsse synchronisieren (2026-10-12)
+
+- Neue Migration `20261012160000_sync_shared_decision_completion.sql`: Wenn eine akzeptierte geteilte Entscheidung auf einem Gerät auf `cooked` gesetzt wird, setzt ein Datenbank-Trigger auch die verknüpfte persönliche Kopie des Partners auf `cooked`.
+- Die Änderung läuft serverseitig und löst dadurch auf beiden Geräten die vorhandene Realtime-Aktualisierung der persönlichen Tagespläne aus. Der Trigger ist idempotent.
+- Regressionstest für die Trigger-/Migrationserwartungen ergänzt.
+- PR/CI ausstehend. Die Migration muss nach dem Merge separat in Supabase angewendet und dort verifiziert werden. Keine Release-Builds.
