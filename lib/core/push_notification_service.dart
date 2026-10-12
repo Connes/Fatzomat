@@ -9,6 +9,7 @@ import '../data/repositories/collaboration_repository.dart';
 import '../data/repositories/push_device_repository.dart';
 import '../features/settings/notifications_page.dart';
 import '../features/shared/today_page.dart';
+import 'app_shell.dart';
 import '../features/recipes/recipe_detail_page.dart';
 import '../data/repositories/recipe_repository.dart';
 
@@ -243,7 +244,7 @@ class PushNotificationService with WidgetsBindingObserver {
             // The target date remains the primary action if read-state sync fails.
           }
         }
-        navigator.push(MaterialPageRoute(builder: (_) => TodayPage(initialDate: targetDate)));
+        navigator.push(MaterialPageRoute(builder: (_) => AppShell(initialDate: targetDate)));
         return;
       }
 
