@@ -121,11 +121,10 @@ class RestaurantDetailPage extends StatelessWidget {
             .where((part) => part.trim().isNotEmpty)
             .join(' '),
     ].where((part) => part.isNotEmpty).toList();
-    if (result.formattedDistance.isNotEmpty) {
-      addressParts.add(result.formattedDistance);
-    }
-
     final address = addressParts.isEmpty ? 'Nicht verfügbar' : addressParts.join('\n');
+    final addressWithDistance = result.formattedDistance.isEmpty
+        ? address
+        : '$address\n${result.formattedDistance}';
     final phone = result.phone?.trim().isNotEmpty == true
         ? result.phone!.trim()
         : 'Nicht verfügbar';
