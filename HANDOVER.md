@@ -297,3 +297,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Überschrift zeigt den Anzeigenamen der verbundenen Person, sofern verfügbar. Für „Wir gehen essen“ wird der Restaurantname darunter gezeigt; Typ- und Personenzahl-Zusatz entfallen.
 - Nach Übernehmen/Ablehnen wird neu geladen und die normale Tagesansicht erscheint wieder.
 - CI/PR ausstehend; keine Supabase-Änderungen und keine Release-Builds.
+
+
+## Restaurantentscheidung abschließen (2026-10-12)
+
+- Wird die Restaurantdetailseite aus einer bereits ausgewählten Tagesentscheidung geöffnet, erscheint unten „Entscheidung abschließen“.
+- Die Aktion entfernt die Tagesentscheidung, aktualisiert Rezept-Markierungen und kehrt zur Tagesansicht zurück.
+- Normale Restaurantdetails behalten „Für heute auswählen“.
+- CI/PR ausstehend; keine Supabase-Änderungen und keine Release-Builds.
