@@ -78,6 +78,54 @@ class PersonalTodayRepository {
     }
   }
 
+  /// Finds the next day with an active personal decision (status = planned).
+  ///
+  /// Forward navigation only considers dates after [fromDate]. Backward
+  /// navigation never goes before today and falls back to today when there is
+  /// no earlier open decision, keeping Today as the navigation boundary.
+  Future<DateTime?> nextOpenDecisionDate({
+    required DateTime fromDate,
+    required bool forward,
+  }) async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return null;
+
+    final today = _dateOnly(DateTime.now());
+    final from = _dateOnly(fromDate);
+    if (!forward && !from.isAfter(today)) return null;
+
+    final dynamic row;
+    if (forward) {
+      row = await client
+          .from('personal_today_plans')
+          .select('plan_date')
+          .eq('user_id', userId)
+          .eq('status', 'planned')
+          .gt('plan_date', from)
+          .order('plan_date', ascending: true)
+          .limit(1)
+          .maybeSingle();
+    } else {
+      row = await client
+          .from('personal_today_plans')
+          .select('plan_date')
+          .eq('user_id', userId)
+          .eq('status', 'planned')
+          .gte('plan_date', today)
+          .lt('plan_date', from)
+          .order('plan_date', ascending: false)
+          .limit(1)
+          .maybeSingle();
+      if (row == null) return today;
+    }
+
+    if (row == null) return null;
+    final rawDate = row['plan_date']?.toString();
+    if (rawDate == null || rawDate.isEmpty) return null;
+    final parsed = DateTime.tryParse(rawDate);
+    return parsed == null ? null : _dateOnly(parsed);
+  }
+
   Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
