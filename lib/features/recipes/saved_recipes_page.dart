@@ -345,20 +345,18 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         }
       }
       if (!mounted) return;
-      // SavedRecipesPage is a persistent tab inside AppShell's IndexedStack,
-      // not a route pushed onto the Navigator stack. Popping here can therefore
-      // empty the root Navigator history and trigger Flutter's
-      // `_history.isNotEmpty` assertion. Refresh the tab state instead.
+      // Refresh saved recipes and Today metadata before leaving this page.
       await load();
       if (!mounted) return;
 
-      // Navigate to Today after a personal selection. This page is either a
-      // persistent tab or a pushed route inside the cooking flow.
+      // In the cooking flow this page is pushed above FoodModePage and
+      // CookNextStepPage. Clear those routes explicitly before switching tabs;
+      // changing the selected tab alone can leave the recipe route visible.
       if (widget.decisionRequestId == null) {
-        // The cooking flow needs to return to the Today tab, not merely reveal
-        // whichever tab was active before its routes were pushed.
-        if (widget.onNavigateToToday != null) {
-          widget.onNavigateToToday!();
+        final navigateToToday = widget.onNavigateToToday;
+        if (navigateToToday != null) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          navigateToToday();
           return;
         }
         if (widget.onNavigateToTab != null) {
