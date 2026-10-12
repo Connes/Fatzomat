@@ -68,6 +68,15 @@ void main() {
     expect(saved, contains("label: const Text('Auswählen')"));
   });
 
+  test('date label uses compact German weekday abbreviations and full month names', () {
+    final today = File('lib/features/shared/today_page.dart').readAsStringSync();
+
+    expect(today, contains("const weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];"));
+    expect(today, contains("return '\${weekdays[date.weekday - 1]}, \${date.day}. \${months[date.month - 1]}';"));
+    expect(today, contains('softWrap: false'));
+    expect(today, contains('overflow: TextOverflow.visible'));
+  });
+
   test('the Today app bar displays the selected date and day controls', () {
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
 
