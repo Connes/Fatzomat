@@ -240,3 +240,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die Überschrift lautet „Willkommen“ ohne Ausrufezeichen und ist zentriert.
 - Regressionstest in `test/regression/food_onboarding_intro_visual_test.dart` aktualisiert.
 - Keine Änderung am weiteren Onboarding-Ablauf, keine Supabase-Änderung und kein Release-Build.
+
+## Lesbarkeit der Seite „Gemeinsam nutzen“ (2026-10-12)
+
+- Die Erklärung „Optional zu zweit“ und die Steuerelemente zum Erstellen oder Eingeben eines Verbindungscodes liegen auf undurchsichtigen weißen Karten statt direkt auf dem dekorativen Hintergrund.
+- Die bestehende Karte für den Verbindungsstatus bleibt erhalten; Geschäftslogik und Verbindungsablauf sind unverändert.
+- Regressionstest in `test/regression/connection_personal_first_readiness_test.dart` ergänzt.
+- Keine Supabase-Änderung und keine Release-Builds.
