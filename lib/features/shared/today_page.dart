@@ -664,6 +664,20 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                                   cuisine: data['cuisine']?.toString(),
                                                 ),
                                                 order: false,
+                                                onComplete: () async {
+                                                  try {
+                                                    await repo.removeTodayPlan(plan!.id);
+                                                    RecipeCollectionEvents.notifyChanged();
+                                                    if (!mounted) return;
+                                                    Navigator.of(context).pop();
+                                                    await load();
+                                                  } catch (error) {
+                                                    if (!mounted) return;
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text(friendlyError(error))),
+                                                    );
+                                                  }
+                                                },
                                               ),
                                             ),
                                           );
