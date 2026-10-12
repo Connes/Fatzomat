@@ -180,7 +180,7 @@ class PersonalTodayRepository {
 
     final personalRows = await client
         .from('personal_today_plans')
-        .select('plan_date,decision_type,decision_value,recipes(name)')
+        .select('id,plan_date,decision_type,decision_value,status,servings,recipes(name,servings)')
         .eq('user_id', userId)
         .gte('plan_date', startDate)
         .lte('plan_date', endDate)
@@ -191,18 +191,7 @@ class PersonalTodayRepository {
       final map = Map<String, dynamic>.from(row);
       final date = map['plan_date']?.toString();
       if (date == null || labels.containsKey(date)) continue;
-      final type = map['decision_type']?.toString() ?? 'recipe';
-      final recipe = map['recipes'] is Map
-          ? Map<String, dynamic>.from(map['recipes'] as Map)
-          : const <String, dynamic>{};
-      final recipeName = recipe['name']?.toString().trim() ?? '';
-      final value = map['decision_value']?.toString().trim() ?? '';
-      labels[date] = switch (type) {
-        'order' => 'Wir bestellen${value.isEmpty ? '' : ' · $value'}',
-        'dine_out' => 'Wir gehen essen${value.isEmpty ? '' : ' · $value'}',
-        'surprise' => 'Überraschungsentscheidung',
-        _ => recipeName.isEmpty ? 'Rezept geplant' : recipeName,
-      };
+      labels[date] = TodayPlan.fromMap(map).displayTitle;
     }
 
     // The shared-plan table is protected by RLS and returns only plans visible
