@@ -320,3 +320,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Datumsformat auf `Mo, 12. Oktober` umgestellt: zweibuchstabige deutsche Wochentagskürzel, ausgeschriebener Monatsname.
 - Navigation in der App-Leiste angeordnet: Doppelpfeile außen, einfache Tagespfeile innen; Touch-Flächen auf 40 px Breite reduziert, um mehr Platz für das Datum zu schaffen.
 - Regressionstest für das Datumsformat ergänzt. PR/CI ausstehend; keine Release-Builds.
+
+
+## Datumsnavigation zentrieren (2026-10-12)
+
+- Die Datumsanzeige ist unabhängig von den Navigationspfeilen exakt mittig ausgerichtet.
+- In der Heute-Ansicht werden beide Rückwärts-Pfeile ausgeblendet. Auf zukünftigen Tagen erscheinen sie links; die Vorwärts-Pfeile bleiben rechts.
+- Regressionstest für die zentrierte Anzeige und die bedingten Rückwärts-Steuerelemente ergänzt.
+- PR/CI ausstehend. Keine Release-Builds.

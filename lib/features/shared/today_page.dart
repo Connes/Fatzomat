@@ -527,55 +527,77 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
   PreferredSizeWidget _todayAppBar() {
+    final showBackwardControls = !_isSelectedDateToday;
     return TogetherAppBar(
       automaticallyImplyLeading: false,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (!_isSelectedDateToday)
-            IconButton(
-              tooltip: 'Vorherige offene Entscheidung',
-              constraints: const BoxConstraints.tightFor(width: 40, height: 48),
-              padding: EdgeInsets.zero,
-              onPressed: loading ? null : () => _jumpToOpenDecision(forward: false),
-              icon: const Icon(Icons.keyboard_double_arrow_left),
-            ),
-          IconButton(
-            tooltip: 'Vorheriger Tag',
-            constraints: const BoxConstraints.tightFor(width: 40, height: 48),
-            padding: EdgeInsets.zero,
-            onPressed: () => _shiftSelectedDate(-1),
-            icon: const Icon(Icons.chevron_left),
-          ),
-          Flexible(
-            child: Text(
-              _todayDateLabel(),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.visible,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0,
+      title: SizedBox(
+        height: 48,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 80),
+              child: Text(
+                _todayDateLabel(),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.visible,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0,
+                ),
               ),
             ),
-          ),
-          IconButton(
-            tooltip: 'Nächster Tag',
-            constraints: const BoxConstraints.tightFor(width: 40, height: 48),
-            padding: EdgeInsets.zero,
-            onPressed: () => _shiftSelectedDate(1),
-            icon: const Icon(Icons.chevron_right),
-          ),
-          IconButton(
-            tooltip: 'Nächste offene Entscheidung',
-            constraints: const BoxConstraints.tightFor(width: 40, height: 48),
-            padding: EdgeInsets.zero,
-            onPressed: loading ? null : () => _jumpToOpenDecision(forward: true),
-            icon: const Icon(Icons.keyboard_double_arrow_right),
-          ),
-        ],
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showBackwardControls) ...[
+                    IconButton(
+                      tooltip: 'Vorherige offene Entscheidung',
+                      constraints: const BoxConstraints.tightFor(width: 40, height: 48),
+                      padding: EdgeInsets.zero,
+                      onPressed: loading ? null : () => _jumpToOpenDecision(forward: false),
+                      icon: const Icon(Icons.keyboard_double_arrow_left),
+                    ),
+                    IconButton(
+                      tooltip: 'Vorheriger Tag',
+                      constraints: const BoxConstraints.tightFor(width: 40, height: 48),
+                      padding: EdgeInsets.zero,
+                      onPressed: () => _shiftSelectedDate(-1),
+                      icon: const Icon(Icons.chevron_left),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: 'Nächster Tag',
+                    constraints: const BoxConstraints.tightFor(width: 40, height: 48),
+                    padding: EdgeInsets.zero,
+                    onPressed: () => _shiftSelectedDate(1),
+                    icon: const Icon(Icons.chevron_right),
+                  ),
+                  IconButton(
+                    tooltip: 'Nächste offene Entscheidung',
+                    constraints: const BoxConstraints.tightFor(width: 40, height: 48),
+                    padding: EdgeInsets.zero,
+                    onPressed: loading ? null : () => _jumpToOpenDecision(forward: true),
+                    icon: const Icon(Icons.keyboard_double_arrow_right),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
