@@ -63,10 +63,10 @@ void main() {
     final repository = read('lib/data/repositories/personal_today_repository.dart');
     final savedRecipes = read('lib/features/recipes/saved_recipes_page.dart');
 
-    expect(repository, contains("rpc('set_personal_today_plan'"));
+    expect(repository, contains("rpc('set_personal_plan_for_date'"));
     expect(repository, contains("'p_recipe_id': recipeId"));
     expect(repository, contains("'p_servings': servings"));
     expect(savedRecipes, contains('personalToday.selectRecipeForToday'));
-    expect(savedRecipes, contains("_isSelectedDateToday ? 'Für heute auswählen' : 'Für diesen Tag auswählen'"));
+    expect(savedRecipes, contains("label: const Text('Auswählen')"));
   });
 }
