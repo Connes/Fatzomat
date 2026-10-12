@@ -9,7 +9,7 @@ void main() {
     expect(page, contains('Für welchen Tag möchtest du kochen?'));
     expect(page, contains('itemCount: 7'));
     expect(page, contains('enabled: label == null'));
-    expect(page, contains("Text('Belegt · $label')"));
+    expect(page, contains("Text('Belegt · \$label')"));
     expect(page, contains("label: const Text('Auswählen')"));
     expect(page, isNot(contains("Text('Für dich ${_selectedDayLabel}')")));
   });
