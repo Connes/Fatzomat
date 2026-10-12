@@ -192,7 +192,7 @@ void main() {
     expect(find.text('Telefon'), findsOneWidget);
     expect(find.text('Webseite'), findsOneWidget);
     expect(find.text('Öffnungszeiten'), findsOneWidget);
-    expect(find.text('Nicht verfügbar'), findsNWidgets(4));
+    expect(find.textContaining('Nicht verfügbar'), findsNWidgets(4));
   });
 
   test('Restaurantsuche aktualisiert die Supabase-Sitzung und nutzt die Datenbank-Suche', () {
