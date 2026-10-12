@@ -287,6 +287,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         : aggregated;
     final checkedCount = aggregated.where((item) => item.checked).length;
     final progress = aggregated.isEmpty ? 0.0 : checkedCount / aggregated.length;
+    final canCompleteList =
+        aggregated.isNotEmpty && aggregated.every((item) => item.checked);
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -463,8 +465,6 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     ),
                               ),
                               const SizedBox(height: 10),
-                              final canCompleteList =
-                                  aggregated.isNotEmpty && aggregated.every((item) => item.checked);
                               if (aggregated.isNotEmpty) ...[
                                 Row(
                                   children: [
