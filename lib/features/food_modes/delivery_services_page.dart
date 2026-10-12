@@ -60,6 +60,28 @@ class DeliveryServicesPage extends StatelessWidget {
     );
   }
 
+  Future<void> _confirmAndCompleteOrder(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Bestellung abschließen?'),
+        content: const Text('Möchtest du die Bestellung wirklich als abgeschlossen markieren?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Bestellung abschließen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    await _completeOrder(context);
+  }
+
   Future<void> _completeOrder(BuildContext context) async {
     try {
       final completed = await PersonalTodayRepository().updateStatus(planId, 'cooked');
@@ -103,9 +125,9 @@ class DeliveryServicesPage extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: () => _completeOrder(context),
+                      onPressed: () => _confirmAndCompleteOrder(context),
                       icon: const Icon(Icons.check_circle_outline_rounded),
-                      label: const Text('Bestellung abgeschlossen'),
+                      label: const Text('Bestellung abschließen?'),
                     ),
                   ),
                 ],

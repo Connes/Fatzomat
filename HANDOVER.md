@@ -225,3 +225,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die bestehende Navigation mit Tagespfeilen und Wischgesten bleibt erhalten.
 - Regressionstest: `test/regression/today_tab_resets_date_test.dart`.
 - CI und Post-Merge-Stand nach dem Merge verifizieren. Keine Supabase-Änderungen und keine Release-Builds.
+
+ 
+## Lieferdienste: Bestellabschluss bestätigen (2026-10-12)
+
+- Die Schaltfläche auf der Lieferdienste-Seite heißt „Bestellung abschließen?“.
+- Ein Tipp öffnet zuerst einen Bestätigungsdialog mit „Bestellung abschließen?“ sowie „Abbrechen“ und „Bestellung abschließen“. Der Bestellstatus wird nur nach ausdrücklicher Bestätigung geändert.
+- Regressionstest: `test/regression/delivery_order_confirmation_test.dart`.
+- Keine Supabase-Änderung und keine Release-Builds.
