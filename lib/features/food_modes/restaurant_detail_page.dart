@@ -55,14 +55,14 @@ class RestaurantDetailPage extends StatelessWidget {
           var formatted = entry.trim();
           for (final replacement in dayNames.entries) {
             formatted = formatted.replaceAll(
-              RegExp(r'\\b' + replacement.key + r'\\b'),
+              RegExp(r'\b' + replacement.key + r'\b'),
               replacement.value,
             );
           }
           return formatted.replaceAll(',', ', ');
         })
         .where((entry) => entry.isNotEmpty)
-        .join('\\n');
+        .join('\n');
   }
 
   Widget _contactSection({
@@ -125,7 +125,7 @@ class RestaurantDetailPage extends StatelessWidget {
       addressParts.add(result.formattedDistance);
     }
 
-    final address = addressParts.isEmpty ? 'Nicht verfügbar' : addressParts.join('\\n');
+    final address = addressParts.isEmpty ? 'Nicht verfügbar' : addressParts.join('\n');
     final phone = result.phone?.trim().isNotEmpty == true
         ? result.phone!.trim()
         : 'Nicht verfügbar';
