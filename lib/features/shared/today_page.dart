@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -35,8 +36,14 @@ import '../../core/services/surprise_recommendation_service.dart';
 class TodayPage extends StatefulWidget {
   final DateTime? initialDate;
   final ValueChanged<int>? onNavigateToTab;
+  final ValueListenable<int>? resetToTodaySignal;
 
-  const TodayPage({super.key, this.initialDate, this.onNavigateToTab});
+  const TodayPage({
+    super.key,
+    this.initialDate,
+    this.onNavigateToTab,
+    this.resetToTodaySignal,
+  });
 
   @override
   State<TodayPage> createState() => _TodayPageState();
@@ -74,6 +81,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    widget.resetToTodaySignal?.addListener(_resetToToday);
     final today = _dateOnly(DateTime.now());
     _selectedDate = _dateOnly(widget.initialDate ?? today);
     if (_selectedDate.isBefore(today)) _selectedDate = today;
@@ -87,6 +95,28 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
   DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  void _resetToToday() {
+    if (!mounted) return;
+    final today = _dateOnly(DateTime.now());
+    final direction = today.isBefore(_selectedDate) ? -1 : 1;
+    setState(() {
+      _selectedDate = today;
+      _pageTransitionDirection = direction;
+      loading = true;
+      loadError = null;
+    });
+    load();
+  }
+
+  @override
+  void didUpdateWidget(covariant TodayPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.resetToTodaySignal != widget.resetToTodaySignal) {
+      oldWidget.resetToTodaySignal?.removeListener(_resetToToday);
+      widget.resetToTodaySignal?.addListener(_resetToToday);
+    }
+  }
 
   void _shiftSelectedDate(int days) {
     final today = _dateOnly(DateTime.now());
@@ -429,6 +459,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   void dispose() {
     _dayBoundaryTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
+    widget.resetToTodaySignal?.removeListener(_resetToToday);
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     if (channel != null) {
       try {

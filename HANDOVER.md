@@ -216,3 +216,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Regressionstest in `test/regression/shopping_list_active_plans_test.dart` ergänzt.
 - CI auf PR-Head `d67c6ddcaed11d6a2b233ebd19eead4d84ced4ac` erfolgreich: Quality Gate Run 302 (Analyze und Test) sowie Flutter quality gate Run 941 (Repository-Hygiene, Dependencies, Icon-Generierung, Analyze und Test).
 - Die Implementierung und der Regressionstest wurden nach dem Merge auf `main` verifiziert. Keine Release-Builds erstellt.
+
+
+## Heute-Navigation: Rücksprung auf aktuelles Datum (2026-10-12)
+
+- PR #83 („Reset the selected date when tapping Heute“) ergänzt ein explizites Reset-Signal von `AppShell` an `TodayPage`.
+- Jeder Tipp auf den Heute-Tab setzt das ausgewählte Datum auf das aktuelle lokale Datum zurück und lädt den Tagesplan dafür neu, auch wenn der Heute-Tab bereits ausgewählt ist.
+- Die bestehende Navigation mit Tagespfeilen und Wischgesten bleibt erhalten.
+- Regressionstest: `test/regression/today_tab_resets_date_test.dart`.
+- CI und Post-Merge-Stand nach dem Merge verifizieren. Keine Supabase-Änderungen und keine Release-Builds.
