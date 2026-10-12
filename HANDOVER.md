@@ -289,3 +289,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Telefonnummer und Webseite bleiben antippbar, sofern vorhanden. Bestelllink und Lieferstatus werden bei Bedarf ebenfalls innerhalb derselben Karte dargestellt.
 - Regressionstests in `test/regression/restaurant_discovery_test.dart` decken vollständige und fehlende Kontaktdaten ab.
 - PR/CI ausstehend. Keine Supabase-Änderung und keine Release-Builds.
+
+
+## Eingehende geteilte Entscheidung: fokussierte Ansicht (2026-10-12)
+
+- Bei einer ausstehenden geteilten Entscheidung zeigt die Tagesansicht ausschließlich die Annahme-/Ablehnungskarte; die normalen Entscheidungsbereiche und erledigten Entscheidungen bleiben bis zur Aktion ausgeblendet.
+- Überschrift zeigt den Anzeigenamen der verbundenen Person, sofern verfügbar. Für „Wir gehen essen“ wird der Restaurantname darunter gezeigt; Typ- und Personenzahl-Zusatz entfallen.
+- Nach Übernehmen/Ablehnen wird neu geladen und die normale Tagesansicht erscheint wieder.
+- CI/PR ausstehend; keine Supabase-Änderungen und keine Release-Builds.

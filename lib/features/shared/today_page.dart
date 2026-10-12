@@ -67,6 +67,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   CollaborationRepository? _collaboration;
   bool _loadingDecisionMessage = false;
   DecisionShare? _pendingDecisionShare;
+  String? _partnerDisplayName;
   bool _decisionShareActionInFlight = false;
 
   bool get _isSelectedDateToday {
@@ -189,6 +190,8 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       }
       try {
         pendingShare = await _collaborationRepository.pendingDecisionShareForDate(requestedDate);
+        final connection = await _collaborationRepository.connectionInfo();
+        _partnerDisplayName = connection?.partnerDisplayName?.trim();
       } catch (_) {
         // Shared decisions are additive UI and must not block the day view.
       }
@@ -606,13 +609,14 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                     if (_pendingDecisionShare != null) ...[
                       _IncomingDecisionShareCard(
                         share: _pendingDecisionShare!,
+                        partnerDisplayName: _partnerDisplayName,
                         busy: _decisionShareActionInFlight,
                         onAccept: _acceptPendingDecisionShare,
                         onReject: _rejectPendingDecisionShare,
                       ),
                       const SizedBox(height: 14),
                     ],
-                    ConstrainedBox(
+                    if (_pendingDecisionShare == null) ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 560),
                       child: plan == null
                           ? _TodayDecisionCard(
@@ -684,7 +688,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                   : null,
                             ),
                     ),
-                    if (completedPlans.isNotEmpty) ...[
+                    if (_pendingDecisionShare == null && completedPlans.isNotEmpty) ...[
                       const SizedBox(height: 22),
                       _CompletedTodayDecisions(plans: completedPlans),
                     ],
@@ -719,12 +723,14 @@ class _IncomingDecisionShareCard extends StatelessWidget {
   final bool busy;
   final VoidCallback onAccept;
   final VoidCallback onReject;
+  final String? partnerDisplayName;
 
   const _IncomingDecisionShareCard({
     required this.share,
     required this.busy,
     required this.onAccept,
     required this.onReject,
+    this.partnerDisplayName,
   });
 
   String get _decisionLabel {
@@ -740,20 +746,6 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     return '${share.planDate.day}. ${months[share.planDate.month - 1]}';
   }
 
-  String get _typeLabel {
-    switch (share.decisionType) {
-      case 'recipe':
-        return 'Rezept';
-      case 'order':
-        return 'Bestellung';
-      case 'dine_out':
-        return 'Restaurant';
-      case 'surprise':
-        return 'Überraschung';
-      default:
-        return 'Geteilte Entscheidung';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -771,7 +763,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Geteilte Entscheidung',
+                    partnerDisplayName?.isNotEmpty == true ? partnerDisplayName! : 'Geteilte Entscheidung',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: AppDesign.primaryDark,
@@ -782,7 +774,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Deine verbundene Person hat für den $_planDateLabel entschieden.',
+              'Hat für den $_planDateLabel entschieden.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
@@ -805,11 +797,9 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 4),
-            Text(_typeLabel),
-            if (share.servings != null) ...[
-              const SizedBox(height: 4),
-              Text('${share.servings} Personen'),
-            ],
+            if (share.decisionType == 'dine_out')
+              Text(share.decisionValue?.trim().isNotEmpty == true ? share.decisionValue!.trim() : 'Restaurant'),
+
             const SizedBox(height: 16),
             Row(
               children: [
