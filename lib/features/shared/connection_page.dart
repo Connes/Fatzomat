@@ -206,12 +206,34 @@ class _ConnectionPageState extends State<ConnectionPage> {
               : ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Icon(memberCount >= 2 ? Icons.people_alt_rounded : Icons.person_add_alt_1_rounded, size: 56, color: AppDesign.primaryDark),
-          const SizedBox(height: 16),
-          Text('Optional zu zweit', style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
-          const SizedBox(height: 8),
-          const Text('Die App funktioniert alleine. Wenn ihr verbunden seid, könnt ihr Rezepte vorschlagen und gemeinsame Mahlzeiten planen.', textAlign: TextAlign.center),
-          const SizedBox(height: 28),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Icon(
+                    memberCount >= 2
+                        ? Icons.people_alt_rounded
+                        : Icons.person_add_alt_1_rounded,
+                    size: 56,
+                    color: AppDesign.primaryDark,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Optional zu zweit',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Die App funktioniert alleine. Wenn ihr verbunden seid, könnt ihr Rezepte vorschlagen und gemeinsame Mahlzeiten planen.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           if (myCode != null) ...[
             Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(children: [
               Icon(memberCount >= 2 ? Icons.people : Icons.person_add_alt_1, size: 36),
@@ -262,13 +284,38 @@ class _ConnectionPageState extends State<ConnectionPage> {
               OutlinedButton.icon(onPressed: working ? null : disconnect, icon: const Icon(Icons.link_off), label: const Text('Verbindung trennen')),
             ]))),
           ] else ...[
-            FilledButton.icon(onPressed: working ? null : create, icon: const Icon(Icons.add_link), label: const Text('Verbindungscode erstellen')),
-            const SizedBox(height: 24),
-            const Center(child: Text('oder')),
-            const SizedBox(height: 12),
-            TextField(controller: code, textCapitalization: TextCapitalization.characters, decoration: const InputDecoration(labelText: 'Verbindungscode', prefixIcon: Icon(Icons.link))),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(onPressed: working ? null : join, icon: const Icon(Icons.group_add_outlined), label: const Text('Mit Person verbinden')),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: working ? null : create,
+                      icon: const Icon(Icons.add_link),
+                      label: const Text('Verbindungscode erstellen'),
+                    ),
+                    const SizedBox(height: 24),
+                    const Center(child: Text('oder')),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: code,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(
+                        labelText: 'Verbindungscode',
+                        prefixIcon: Icon(Icons.link),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: working ? null : join,
+                      icon: const Icon(Icons.group_add_outlined),
+                      label: const Text('Mit Person verbinden'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ],
       ),
