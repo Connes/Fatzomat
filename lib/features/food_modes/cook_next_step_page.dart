@@ -98,7 +98,6 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           decisionRequestId: widget.decisionRequestId,
           selectForToday: true,
           planDate: widget.planDate,
-          onNavigateToToday: widget.onNavigateToToday,
         ),
       ),
     );
@@ -114,6 +113,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           selectedFoodIds: Set<String>.from(selectedFoodIds),
           decisionRequestId: widget.decisionRequestId,
           planDate: widget.planDate,
+          onNavigateToToday: widget.onNavigateToToday,
         ),
       ),
     );
