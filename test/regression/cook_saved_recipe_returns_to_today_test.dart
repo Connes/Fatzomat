@@ -14,7 +14,8 @@ void main() {
     expect(today, contains('onNavigateToToday: widget.onNavigateToTab == null'));
     expect(mode, contains('onNavigateToToday: widget.onNavigateToToday'));
     expect(cooking, contains('onNavigateToToday: widget.onNavigateToToday'));
-    expect(recipes, contains('if (widget.onNavigateToToday != null)'));
-    expect(recipes, contains('widget.onNavigateToToday!();'));
+    expect(recipes, contains('Navigator.of(context).popUntil((route) => route.isFirst)'));
+    expect(recipes, contains('final navigateToToday = widget.onNavigateToToday'));
+    expect(recipes, contains('navigateToToday();'));
   });
 }
