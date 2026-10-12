@@ -9,7 +9,8 @@ void main() {
     expect(page, contains('List<DateTime> get _activeDays'));
     expect(page, contains('if (activeDays.isEmpty)'));
     expect(page, contains('for (final day in activeDays)'));
-    expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
+    expect(page, contains('_plans[i].where((plan) => plan.isRecipe).any('));
+    expect(page, contains('_items.any((item) => item.planId == plan.id)'));
     expect(page, contains('selectedPlanIds.contains(item.planId)'));
   });
 
@@ -34,6 +35,17 @@ void main() {
     expect(page, isNot(contains('geplante Rezepte ·')));
     expect(page, contains('TextDecoration.lineThrough'));
     expect(page, contains("const Text('Einkaufsliste erledigt')"));
+    expect(page, contains('_repo.deleteShoppingItem(item.id)'));
+  });
+
+
+  test('completed shopping days disappear and the selected-day count is recalculated', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('_items.any((item) => item.planId == plan.id)'));
+    expect(page, contains('_selected.removeWhere((key) => !activeKeys.contains(key))'));
+    expect(page, contains("'\${selectedDays.length} von \${activeDays.length} Tagen ausgewählt'"));
+    expect(page, contains('await load(showLoading: false);'));
     expect(page, contains('_repo.deleteShoppingItem(item.id)'));
   });
 
