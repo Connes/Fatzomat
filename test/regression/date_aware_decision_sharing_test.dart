@@ -18,6 +18,6 @@ void main() {
     expect(repository, contains(".eq('plan_date', planDate)"));
     expect(todayPage, contains('pendingDecisionShareForDate(requestedDate)'));
     expect(todayPage, contains('sourcePlanId: plan!.id'));
-    expect(todayPage, contains('für den $_planDateLabel entschieden.'));
+    expect(todayPage, contains('für den \\$_planDateLabel entschieden.'));
   });
 }
