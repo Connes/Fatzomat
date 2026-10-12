@@ -313,3 +313,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Auf zukünftigen Tagen erscheint zusätzlich ein Doppelpfeil links. Er springt zur vorherigen offenen Entscheidung, aber niemals vor Heute; wenn keine frühere offene Entscheidung existiert, führt er zurück zu Heute.
 - Einfache Pfeile und Wisch-Navigation bleiben unverändert.
 - Regressionstest ergänzt. CI muss nach dem PR noch bestätigt werden.
+
+
+## Kompakte Datumsleiste (2026-10-12)
+
+- Datumsformat auf `Mo, 12. Oktober` umgestellt: zweibuchstabige deutsche Wochentagskürzel, ausgeschriebener Monatsname.
+- Navigation in der App-Leiste angeordnet: Doppelpfeile außen, einfache Tagespfeile innen; Touch-Flächen auf 40 px Breite reduziert, um mehr Platz für das Datum zu schaffen.
+- Regressionstest für das Datumsformat ergänzt. PR/CI ausstehend; keine Release-Builds.
