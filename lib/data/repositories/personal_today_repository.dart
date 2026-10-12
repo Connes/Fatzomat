@@ -82,20 +82,15 @@ class PersonalTodayRepository {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
     final planDate = _dateOnly(date ?? DateTime.now());
-    final isToday = planDate == _dateOnly(DateTime.now());
-    // Preserve the established RPC for Today and older database deployments.
-    // The explicit-date RPC is only needed when planning another day.
-    final result = isToday
-        ? await client.rpc('set_personal_today_plan', params: {
-            'p_recipe_id': recipeId,
-            'p_servings': servings,
-          })
-        : await client.rpc('set_personal_plan_for_date', params: {
-            'p_plan_date': planDate,
-            'p_decision_type': 'recipe',
-            'p_recipe_id': recipeId,
-            'p_servings': servings,
-          });
+    // Use the date-aware RPC for every day, including today. It serializes
+    // competing selections and rejects an already occupied day instead of
+    // silently replacing the existing decision.
+    final result = await client.rpc('set_personal_plan_for_date', params: {
+      'p_plan_date': planDate,
+      'p_decision_type': 'recipe',
+      'p_recipe_id': recipeId,
+      'p_servings': servings,
+    });
     final id = result?.toString() ?? '';
     if (id.isEmpty) throw StateError('Der persönliche Tagesplan konnte nicht gespeichert werden.');
     // Any route can create the personal Today plan. Notify the persistent
@@ -166,6 +161,63 @@ class PersonalTodayRepository {
       // Keep real server errors intact. Only a detected offline state gets the local fallback.
       rethrow;
     }
+  }
+
+  /// Returns every occupied day in an inclusive date range.
+  ///
+  /// Personal decisions include recipes, dining out and ordering. Active shared
+  /// recipe plans are included as well, so the recipe picker cannot offer a day
+  /// that is already committed in either planning view.
+  Future<Map<String, String>> plannedDayLabels(
+    DateTime start,
+    DateTime end,
+  ) async {
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) throw const AuthenticationException();
+    final startDate = _dateOnly(start);
+    final endDate = _dateOnly(end);
+    final labels = <String, String>{};
+
+    final personalRows = await client
+        .from('personal_today_plans')
+        .select('id,plan_date,decision_type,decision_value,status,servings,recipes(name,servings)')
+        .eq('user_id', userId)
+        .gte('plan_date', startDate)
+        .lte('plan_date', endDate)
+        .eq('status', 'planned')
+        .order('created_at', ascending: false);
+
+    for (final row in personalRows) {
+      final map = Map<String, dynamic>.from(row);
+      final date = map['plan_date']?.toString();
+      if (date == null || labels.containsKey(date)) continue;
+      labels[date] = TodayPlan.fromMap(map).displayTitle;
+    }
+
+    // The shared-plan table is protected by RLS and returns only plans visible
+    // to this user. Keep these days occupied even if the personal view has not
+    // received its realtime refresh yet.
+    final sharedRows = await client
+        .from('shared_recipe_plans')
+        .select('plan_date,status,recipes(name),created_at')
+        .gte('plan_date', startDate)
+        .lte('plan_date', endDate)
+        .eq('status', 'planned')
+        .order('created_at', ascending: false);
+
+    for (final row in sharedRows) {
+      final map = Map<String, dynamic>.from(row);
+      final date = map['plan_date']?.toString();
+      if (date == null || labels.containsKey(date)) continue;
+      final recipe = map['recipes'] is Map
+          ? Map<String, dynamic>.from(map['recipes'] as Map)
+          : const <String, dynamic>{};
+      final name = recipe['name']?.toString().trim() ?? '';
+      labels[date] = name.isEmpty
+          ? 'Gemeinsamer Essensplan'
+          : 'Gemeinsam geplant · $name';
+    }
+    return labels;
   }
 
   Future<bool> updateServings(String planId, int servings) async {

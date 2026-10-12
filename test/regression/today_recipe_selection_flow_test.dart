@@ -11,15 +11,16 @@ void main() {
     final todaySource = File('lib/features/shared/today_page.dart').readAsStringSync();
 
     expect(personal, contains("from('personal_today_plans')"));
-    expect(personal, contains("rpc('set_personal_today_plan'"));
+    expect(personal, contains("rpc('set_personal_plan_for_date'"));
     expect(personal, isNot(contains('current_connection_id')));
-    expect(personal, isNot(contains('shared_recipe_plans')));
+    expect(personal, contains('plannedDayLabels'));
+    expect(personal, contains('shared_recipe_plans'));
 
     expect(importSource, contains('selectForToday: widget.selectForToday || widget.decisionRequestId != null'));
     expect(importSource, isNot(contains('_ensureConnectionForToday')));
     expect(importSource, contains('PersonalTodayRepository().selectRecipeForToday'));
 
-    expect(savedSource, contains("'Für heute auswählen'"));
+    expect(savedSource, contains("label: const Text('Auswählen')"));
     expect(savedSource, contains('PersonalTodayRepository'));
     expect(savedSource, contains('personalToday.selectRecipeForToday'));
     expect(savedSource, isNot(contains('_ensureConnectionForToday')));

@@ -3,16 +3,15 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('V87 shows already-selected state instead of an active today action', () {
+  test('recipe library uses date selection instead of a Today-specific state', () {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
-    expect(source, contains('todayPlan?.isRecipe == true'));
-    expect(source, contains('todayPlan?.recipeId == recipe.id'));
-    expect(source, contains("todayPlan?.status != 'cooked'"));
-    expect(source, contains("'Für heute ausgewählt'"));
-    expect(source, contains("key: Key('saved-recipe-select-today-"));
-    expect(source, contains("onPressed: () => selectRecipeForToday(recipe)"));
-    expect(source, contains("bool get hasActiveTodayPlan => todayPlan != null && todayPlan!.status != 'cooked';"));
-    expect(source, contains('if (hasActiveTodayPlan)'));
+    expect(source, contains("label: const Text('Auswählen')"));
+    expect(source, contains('Future<DateTime?> _choosePlanDate()'));
+    expect(source, contains('itemCount: 7'));
+    expect(source, contains('enabled: label == null'));
+    expect(source, isNot(contains('todayPlan?.isRecipe == true')));
+    expect(source, isNot(contains('Für heute ausgewählt')));
+    expect(source, isNot(contains('if (hasActiveTodayPlan)')));
   });
 }

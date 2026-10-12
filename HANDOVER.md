@@ -182,3 +182,15 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Nach Rückmeldung aus der Nutzung wurde der Navigationspfad erneut geprüft: Der Callback allein war nicht ausreichend zuverlässig, um die aufgeschobenen Koch-Routen sichtbar zu verlassen.
 - SavedRecipesPage leert im Koch-Flow jetzt explizit den aktuellen Navigator bis zur ersten Route und schaltet danach auf „Heute“.
 - Regressionstest prüft jetzt auch das explizite Leeren des Navigationsstapels. PR-CI abwarten; keine Release-Builds erstellen.
+
+## Rezeptbibliothek und belegte Planungstage (2026-10-12)
+
+- Die Rezeptbibliothek soll nur Rezepte verwalten; der Abschnitt „Für dich heute“ wurde aus „Meine Rezepte“ entfernt.
+- Jede Rezeptkarte bietet „Auswählen“. Die Auswahl öffnet einen Dialog mit den nächsten sieben Tagen.
+- Bereits belegte Tage werden mit dem vorhandenen Rezept, „Wir gehen essen“ oder „Wir bestellen“ angezeigt und sind deaktiviert. Aktive gemeinsame Rezeptpläne werden ebenfalls als belegt berücksichtigt.
+- Die Belegung wird vor Anzeige des Dialogs aus Supabase geladen. Fehler beim Laden blockieren die Auswahl, statt fälschlich freie Tage anzubieten.
+- Die Rezeptauswahl verwendet für heute und zukünftige Tage die RPC set_personal_plan_for_date. Die Migration 20261012100000_prevent_overwriting_planned_days ergänzt eine serverseitige Konfliktprüfung mit Advisory Lock und verhindert, dass diese Auswahl bestehende persönliche oder gemeinsame Planungen still ersetzt.
+- Bei Auswahl von heute navigiert die App wie bisher zurück zu „Heute“. Bei einem zukünftigen Datum bleibt sie in der Rezeptbibliothek und bestätigt das konkrete Datum, statt fälschlich „heute“ zu melden.
+- Regressionstest: test/regression/recipe_date_picker_availability_test.dart.
+- Änderung befindet sich auf Branch feat/recipe-selection-date-availability; PR und CI noch ausstehend. Migration erst nach erfolgreicher Prüfung/Integration auf das Live-Supabase-Projekt anwenden. Keine Release-Builds erstellen.
+
