@@ -247,3 +247,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die bestehende Karte für den Verbindungsstatus bleibt erhalten; Geschäftslogik und Verbindungsablauf sind unverändert.
 - Regressionstest in `test/regression/connection_personal_first_readiness_test.dart` ergänzt.
 - Keine Supabase-Änderung und keine Release-Builds.
+
+
+## Datumsbezogenes Teilen von Entscheidungen (2026-10-12)
+
+- Fehlerursache: `send_decision_message` las immer den Plan mit `plan_date = current_date`, obwohl die Heute-Seite auch zukünftige ausgewählte Tage darstellt. Dadurch verglich der RPC die falsche Entscheidung und meldete „Deine heutige Entscheidung hat sich geändert“.
+- Die App übergibt nun die ID des tatsächlich angezeigten Plans. Die neue Migration `20261012140000_date_aware_decision_sharing` validiert diesen Plan serverseitig und speichert das korrekte Plan-Datum in der Freigabe.
+- Eingehende Freigaben werden für das ausgewählte Datum geladen. Übernehmen erstellt die persönliche und gemeinsame Planung für genau dieses Datum; Ablehnen funktioniert ebenfalls für zukünftige Tage. Vergangene Freigaben können nicht mehr übernommen werden.
+- Regressionstest: `test/regression/date_aware_decision_sharing_test.dart`.
+- Migration ist für PR/CI vorbereitet und muss nach erfolgreichem Merge auf Supabase angewendet und live verifiziert werden. Keine Release-Builds.
