@@ -9,7 +9,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/async_error.dart';
 import '../../core/app_design.dart';
-import '../../core/error_text.dart';
 import '../../core/recipe_collection_events.dart';
 
 import '../../data/models/today_plan.dart';
@@ -331,7 +330,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     try {
       final occupiedDays = await personalToday.plannedDayLabels(startDate, endDate);
       if (!mounted) return null;
-      return showDialog<DateTime>(
+      return await showDialog<DateTime>(
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('Für welchen Tag möchtest du kochen?'),
