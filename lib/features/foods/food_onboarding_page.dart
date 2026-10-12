@@ -364,7 +364,8 @@ class _FoodOnboardingIntro extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Willkommen!',
+                        'Willkommen',
+                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 10),
