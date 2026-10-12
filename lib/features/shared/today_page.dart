@@ -419,7 +419,9 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
             ? 'Heutige Entscheidung entfernen?'
             : 'Entscheidung für ${_todayDateLabel()} entfernen?'),
         content: Text(
-          '„${plan!.displayTitle}“ wird aus deinem ${_isSelectedDateToday ? 'heutigen Plan' : 'Plan für ${_todayDateLabel()}'} entfernt. Zugehörige persönliche Rezeptartikel verschwinden ebenfalls aus der Einkaufsliste.',
+          plan!.isRecipe
+              ? '„${plan!.displayTitle}“ wird aus deinem ${_isSelectedDateToday ? 'heutigen Plan' : 'Plan für ${_todayDateLabel()}'} entfernt. Zugehörige persönliche Rezeptartikel verschwinden ebenfalls aus der Einkaufsliste.'
+              : '„${plan!.displayTitle}“ wird aus deinem ${_isSelectedDateToday ? 'heutigen Plan' : 'Plan für ${_todayDateLabel()}'} entfernt.',
         ),
         actions: [
           TextButton(
