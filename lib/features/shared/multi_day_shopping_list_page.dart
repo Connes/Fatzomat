@@ -43,7 +43,6 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   String _dayTitle(DateTime day) {
-    final index = _days.indexWhere((candidate) => _key(candidate) == _key(day));
     final date = '${day.day.toString().padLeft(2, '0')}.${day.month.toString().padLeft(2, '0')}.';
     return date;
   }
