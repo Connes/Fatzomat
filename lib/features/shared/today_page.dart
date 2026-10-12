@@ -57,6 +57,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   late DateTime _selectedDate;
   late DateTime _displayedDate;
   int _pageTransitionDirection = 1;
+  double _dragOffset = 0;
   DateTime _lastObservedDay = DateTime.now();
   Timer? _dayBoundaryTimer;
   List<TodayPlan> completedPlans = const [];
@@ -569,12 +570,32 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
             onRefresh: load,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
+              onHorizontalDragUpdate: (details) {
+                setState(() {
+                  _dragOffset = (_dragOffset + details.delta.dx).clamp(
+                    -MediaQuery.sizeOf(context).width * 0.8,
+                    MediaQuery.sizeOf(context).width * 0.8,
+                  );
+                });
+              },
               onHorizontalDragEnd: (details) {
                 final velocity = details.primaryVelocity ?? 0;
-                if (velocity.abs() < 180) return;
-                _shiftSelectedDate(velocity < 0 ? 1 : -1);
+                final width = MediaQuery.sizeOf(context).width;
+                final draggedFarEnough = _dragOffset.abs() >= width * 0.18;
+                final flicked = velocity.abs() >= 180;
+                final shouldChangeDate = draggedFarEnough || flicked;
+                final direction = _dragOffset.abs() >= width * 0.08
+                    ? (_dragOffset < 0 ? 1 : -1)
+                    : (velocity < 0 ? 1 : -1);
+                setState(() => _dragOffset = 0);
+                if (shouldChangeDate) _shiftSelectedDate(direction);
               },
-              child: Center(
+              onHorizontalDragCancel: () {
+                setState(() => _dragOffset = 0);
+              },
+              child: Transform.translate(
+                offset: Offset(_dragOffset, 0),
+                child: Center(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 320),
                   switchInCurve: Curves.easeOutCubic,
@@ -710,6 +731,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
+              ),
               ),
             ),
           ),

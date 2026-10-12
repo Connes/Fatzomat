@@ -23,7 +23,11 @@ void main() {
     expect(refresh, isNonNegative);
     expect(gesture, greaterThan(refresh));
     expect(scroll, greaterThan(gesture));
-    expect(today, contains('_shiftSelectedDate(velocity < 0 ? 1 : -1);'));
+    expect(today, contains('onHorizontalDragUpdate: (details)'));
+    expect(today, contains('_dragOffset = (_dragOffset + details.delta.dx).clamp('));
+    expect(today, contains('final shouldChangeDate = draggedFarEnough || flicked;'));
+    expect(today, contains('_shiftSelectedDate(direction)'));
+    expect(today, contains('Transform.translate('));
   });
 
   test('restaurant discovery receives the selected date before saving a decision', () {
