@@ -11,7 +11,7 @@ void main() {
     expect(page, contains('enabled: label == null'));
     expect(page, contains("Text('Belegt · \$label')"));
     expect(page, contains("label: const Text('Auswählen')"));
-    expect(page, isNot(contains("Text('Für dich ${_selectedDayLabel}')")));
+    expect(page, isNot(contains("Text('Für dich \${_selectedDayLabel}')")));
   });
 
   test('availability includes personal decisions and active shared recipe plans', () {
