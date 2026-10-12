@@ -20,8 +20,7 @@ void main() {
     expect(repository, contains('Future<Map<String, String>> plannedDayLabels'));
     expect(repository, contains(".from('personal_today_plans')"));
     expect(repository, contains(".from('shared_recipe_plans')"));
-    expect(repository, contains("'order' => 'Wir bestellen"));
-    expect(repository, contains("'dine_out' => 'Wir gehen essen"));
+    expect(repository, contains('TodayPlan.fromMap(map).displayTitle'));
   });
 
   test('date-aware recipe planning rejects occupied days instead of updating them', () {
