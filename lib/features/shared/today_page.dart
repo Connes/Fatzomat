@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -839,21 +840,48 @@ class _IncomingDecisionShareCard extends StatelessWidget {
   });
 
   String get _decisionLabel {
-    final name = share.decisionName?.trim();
-    if (name != null && name.isNotEmpty) return name;
-    final value = share.decisionValue?.trim();
-    if (value != null && value.isNotEmpty) return value;
-    return 'Entscheidung für diesen Tag';
+    switch (share.decisionType) {
+      case 'dine_out':
+        return 'Wir gehen essen';
+      case 'order':
+        return 'Wir bestellen';
+      case 'cook':
+      case 'recipe':
+        return 'Wir kochen';
+      default:
+        final name = share.decisionName?.trim();
+        if (name != null && name.isNotEmpty) return name;
+        return 'Entscheidung für diesen Tag';
+    }
   }
 
-  String get _planDateLabel {
+  String? get _restaurantName {
+    if (share.decisionType != 'dine_out') return null;
+    final raw = share.decisionValue?.trim();
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        final name = decoded['name']?.toString().trim();
+        if (name != null && name.isNotEmpty) return name;
+      }
+    } catch (_) {
+      // Older shares may contain a plain-text restaurant name.
+    }
+    if (!raw.startsWith('{')) return raw;
+    return null;
+  }
+
+  String _planDateLabel() {
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
     return '${share.planDate.day}. ${months[share.planDate.month - 1]}';
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final isDineOut = share.decisionType == 'dine_out';
+    final restaurantName = _restaurantName;
+
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.98),
       clipBehavior: Clip.antiAlias,
@@ -879,10 +907,38 @@ class _IncomingDecisionShareCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Hat für den $_planDateLabel entschieden.',
+              'Hat für den ${_planDateLabel()} entschieden.',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              _decisionLabel,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            if (isDineOut && restaurantName != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                restaurantName,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppDesign.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+            if (isDineOut) ...[
+              const SizedBox(height: 14),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(
+                  'assets/together/clean/icons/icon_restaurant.png',
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ] else if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
               const SizedBox(height: 14),
               ClipRRect(
                 borderRadius: BorderRadius.circular(18),
@@ -891,20 +947,10 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
             ],
-            const SizedBox(height: 14),
-            Text(
-              _decisionLabel,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            if (share.decisionType == 'dine_out')
-              Text(share.decisionValue?.trim().isNotEmpty == true ? share.decisionValue!.trim() : 'Restaurant'),
-
             const SizedBox(height: 16),
             Row(
               children: [
