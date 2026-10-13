@@ -13,7 +13,6 @@ class TodayPlan {
   final String? imagePath;
   final bool isShared;
   final bool isSharedAccepted;
-  final DateTime? shoppingListCompletedAt;
 
   const TodayPlan({
     required this.id,
@@ -28,7 +27,6 @@ class TodayPlan {
     this.imagePath,
     this.isShared = false,
     this.isSharedAccepted = false,
-    this.shoppingListCompletedAt,
   });
 
   bool get isRecipe => decisionType == 'recipe' && recipeId != null;
@@ -89,9 +87,6 @@ class TodayPlan {
       imagePath: recipe['image_path']?.toString(),
       isShared: map['is_shared'] == true,
       isSharedAccepted: map['is_shared_accepted'] == true,
-      shoppingListCompletedAt: map['shopping_list_completed_at'] == null
-          ? null
-          : DateTime.tryParse(map['shopping_list_completed_at'].toString()),
     );
   }
 }
