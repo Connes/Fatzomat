@@ -285,6 +285,15 @@ class PersonalTodayRepository {
     return result == true;
   }
 
+  Future<void> completeShoppingList(String planId) async {
+    final result = await client.rpc('complete_personal_shopping_list', params: {
+      'p_plan_id': planId,
+    });
+    if (result != true) {
+      throw StateError('Die Einkaufsliste konnte nicht als erledigt gespeichert werden.');
+    }
+  }
+
   Future<bool> updateStatus(String planId, String status) async {
     final result = await client.rpc('update_personal_today_status', params: {
       'p_plan_id': planId,
@@ -327,10 +336,10 @@ class PersonalTodayRepository {
     if (userId == null) return const [];
     final rows = await client
         .from('personal_today_plans')
-        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
+        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,shopping_list_completed_at,created_at,recipes(name,description,servings,image_url,image_path)')
         .eq('user_id', userId)
         .eq('plan_date', _dateOnly(date))
-        .eq('status', 'planned')
+        .inFilter('status', ['planned', 'cooked'])
         .order('created_at', ascending: true);
     final maps = rows.map((row) => Map<String, dynamic>.from(row)).toList();
     for (final map in maps) {
