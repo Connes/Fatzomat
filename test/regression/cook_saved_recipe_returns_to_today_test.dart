@@ -16,6 +16,7 @@ void main() {
     expect(mode, contains('onNavigateToToday: widget.onNavigateToToday'));
     expect(cooking, contains('onNavigateToToday: widget.onNavigateToToday'));
     expect(shell, contains('_contentNavigatorKey.currentState?.popUntil((route) => route.isFirst)'));
+    expect(recipes, contains('onNavigateToToday: widget.onNavigateToToday ??'));
     expect(recipes, contains('final navigateToToday = widget.onNavigateToToday'));
     expect(recipes, contains('navigateToToday();'));
   });
