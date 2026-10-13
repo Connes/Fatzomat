@@ -335,3 +335,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die Änderung läuft serverseitig und löst dadurch auf beiden Geräten die vorhandene Realtime-Aktualisierung der persönlichen Tagespläne aus. Der Trigger ist idempotent.
 - Regressionstest für die Trigger-/Migrationserwartungen ergänzt.
 - PR/CI ausstehend. Die Migration muss nach dem Merge separat in Supabase angewendet und dort verifiziert werden. Keine Release-Builds.
+
+
+## Gemeinsame Entscheidungen: Löschung synchronisieren (2026-10-13)
+
+- Die bisherige Migration synchronisiert nur den Abschlussstatus `cooked`; sie synchronisiert keine Löschungen.
+- Neue Migration `20261013153000_sync_shared_decision_deletion.sql`: Ein `BEFORE DELETE`-Trigger auf `personal_today_plans` sucht nur aktive, angenommene Freigaben mit beiden Plan-IDs, markiert die Verknüpfung vorab als storniert und löscht die verknüpfte persönliche Kopie serverseitig. Der zweite Triggerlauf findet dadurch keine aktive Freigabe mehr. Private Pläne, offene Einladungen und bereits stornierte Freigaben lösen keine Gegenlöschung aus.
+- Regressionstest: `test/regression/shared_decision_deletion_sync_test.dart`.
+- PR und CI ausstehend. Die Migration muss nach erfolgreichem PR-Review in Supabase angewendet und die tatsächliche Triggerdefinition live geprüft werden. Keine Release-Builds.
