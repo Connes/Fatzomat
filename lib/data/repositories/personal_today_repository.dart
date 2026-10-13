@@ -327,10 +327,10 @@ class PersonalTodayRepository {
     if (userId == null) return const [];
     final rows = await client
         .from('personal_today_plans')
-        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
+        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,shopping_list_completed_at,recipes(name,description,servings,image_url,image_path)')
         .eq('user_id', userId)
         .eq('plan_date', _dateOnly(date))
-        .eq('status', 'planned')
+        .inFilter('status', ['planned', 'cooked'])
         .order('created_at', ascending: true);
     final maps = rows.map((row) => Map<String, dynamic>.from(row)).toList();
     for (final map in maps) {
@@ -417,6 +417,12 @@ class PersonalTodayRepository {
 
   Future<void> deleteShoppingItem(String itemId) async {
     await client.from('shopping_items').delete().eq('id', itemId);
+  }
+
+  Future<void> completeShoppingList(Iterable<String> planIds) async {
+    final ids = planIds.toSet().where((id) => id.trim().isNotEmpty).toList();
+    if (ids.isEmpty) throw ArgumentError('Keine Einkaufslisten ausgewählt.');
+    await client.rpc('complete_shared_shopping_list', params: {'p_plan_ids': ids});
   }
 
 
