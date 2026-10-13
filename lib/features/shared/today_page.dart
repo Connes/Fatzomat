@@ -1492,7 +1492,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
     if (loadError != null) {
       return TogetherScaffold(
         backgroundType: TogetherBackgroundType.today,
-        appBar: TogetherAppBar(title: Text(widget.shared ? 'Gemeinsame Einkaufsliste' : 'Einkaufsliste')),
+        appBar: TogetherAppBar(title: const Text('Einkaufsliste')),
         body: AppErrorView(error: loadError!, onRetry: load),
       );
     }
@@ -1503,7 +1503,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
       appBar: TogetherAppBar(
-        title: Text(widget.shared ? 'Gemeinsame Einkaufsliste' : 'Einkaufsliste'),
+        title: const Text('Einkaufsliste'),
         actions: [
           AppBadge(
             label: widget.shared ? 'Gemeinsam' : 'Persönlich',
