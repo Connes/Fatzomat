@@ -353,3 +353,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Regressionstest: `test/regression/connection_disconnect_both_members_test.dart`.
 - Wichtig: Eine reine App-Deinstallation sendet kein Ereignis an den Server und kann nicht unmittelbar erkannt werden. Die serverseitige Bereinigung greift bei tatsächlicher Kontolöschung oder expliziter Trennung.
 - PR/CI und Live-Migration ausstehend. Keine Release-Builds.
+
+
+## „Entscheide Du“ für das ausgewählte Datum (2026-10-13)
+
+- Fehlerursache: `_askPartnerToDecide()` sendete nur `type: 'ask'`; die Supabase-RPC setzte `decision_shares.plan_date` und den Push-Text deshalb immer auf `current_date`.
+- Die App übergibt nun `_selectedDate`. Die RPC nimmt `p_plan_date` entgegen, lehnt vergangene Tage serverseitig ab und verwendet das Datum sowohl für `decision_shares.plan_date` als auch für den Benachrichtigungstext. Damit führt der Push-Tap über die vorhandene Share-ID-/planDate-Navigation zum ausgewählten Tag.
+- Regressionstest in `test/regression/date_aware_decision_sharing_test.dart` erweitert.
+- PR/CI ausstehend. Nach erfolgreichem Merge Supabase-Migration anwenden und Live-Funktionsdefinition sowie CI prüfen. Keine Release-Builds.
