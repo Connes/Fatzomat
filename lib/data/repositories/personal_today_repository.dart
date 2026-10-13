@@ -344,6 +344,17 @@ class PersonalTodayRepository {
     final maps = rows.map((row) => Map<String, dynamic>.from(row)).toList();
     for (final map in maps) {
       await _resolveNestedRecipeImage(map);
+      final planId = map['id'].toString();
+      final activeShares = await client
+          .from('decision_shares')
+          .select('id,accepted_at,created_at')
+          .or('source_plan_id.eq.$planId,accepted_plan_id.eq.$planId')
+          .eq('message_type', 'share')
+          .isFilter('cancelled_at', null)
+          .order('created_at', ascending: false)
+          .limit(10);
+      map['is_shared'] = activeShares.isNotEmpty;
+      map['is_shared_accepted'] = activeShares.any((share) => share['accepted_at'] != null);
     }
     return maps.map(TodayPlan.fromMap).toList(growable: false);
   }
