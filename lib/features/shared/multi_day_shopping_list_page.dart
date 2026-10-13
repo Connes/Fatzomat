@@ -138,9 +138,6 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           _selected.add(activeKeys.first);
         }
         _expanded.removeWhere((key) => !activeKeys.contains(key));
-        if (!_expanded.any(activeKeys.contains) && activeKeys.isNotEmpty) {
-          _expanded.add(activeKeys.first);
-        }
         _loading = false;
         _error = null;
       });
@@ -191,29 +188,35 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     }
   }
 
+  bool _isDayCompleted(DateTime day) {
+    final plans = _plansFor(day).where((plan) => plan.isRecipe &&
+        _items.any((item) => item.planId == plan.id)).toList();
+    return plans.isNotEmpty && plans.every((plan) => plan.shoppingListCompletedAt != null);
+  }
+
   Future<void> _completeShoppingList(List<AggregatedShoppingItem> items) async {
-    if (_completingList ||
-        items.isEmpty ||
-        items.any((item) => !item.checked) ||
-        !mounted) {
-      return;
-    }
-    final sources = items.expand((item) => item.sources).toList(growable: false);
-    final uniqueSources = {for (final item in sources) item.id: item}.values.toList();
+    if (_completingList || items.isEmpty || items.any((item) => !item.checked) || !mounted) return;
+    final planIds = items.expand((item) => item.sources).map((item) => item.planId).whereType<String>().toSet();
     setState(() => _completingList = true);
     try {
-      await Future.wait(uniqueSources.map((item) => _repo.deleteShoppingItem(item.id)));
+      await Future.wait(planIds.map(_repo.completeShoppingList));
+      setState(() {
+        for (final day in _activeDays) {
+          final ids = _plansFor(day).where((plan) => plan.isRecipe).map((plan) => plan.id).toSet();
+          if (ids.isNotEmpty && ids.every(planIds.contains)) _expanded.remove(_key(day));
+        }
+      });
       await load(showLoading: false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Einkaufsliste erledigt und entfernt.')),
+          const SnackBar(content: Text('Einkaufsliste erledigt. Die Zutaten bleiben gespeichert.')),
         );
       }
     } catch (e) {
       await load(showLoading: false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Einkaufsliste konnte nicht vollständig entfernt werden: $e')),
+          SnackBar(content: Text('Einkaufsliste konnte nicht als erledigt gespeichert werden: $e')),
         );
       }
     } finally {
@@ -429,6 +432,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
+                                subtitle: _isDayCompleted(day)
+                                    ? const Text('Erledigt')
+                                    : null,
                                 children: _plansFor(day)
                                     .where((plan) => plan.isRecipe)
                                     .map((plan) => ListTile(

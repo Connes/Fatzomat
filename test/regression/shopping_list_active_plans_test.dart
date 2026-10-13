@@ -35,18 +35,20 @@ void main() {
     expect(page, isNot(contains('geplante Rezepte ·')));
     expect(page, contains('TextDecoration.lineThrough'));
     expect(page, contains("const Text('Einkaufsliste erledigt')"));
-    expect(page, contains('_repo.deleteShoppingItem(item.id)'));
+    expect(page, contains('_repo.completeShoppingList'));
   });
 
 
-  test('completed shopping days disappear and the selected-day count is recalculated', () {
+  test('completed shopping days remain visible and can be reopened', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(page, contains('_items.any((item) => item.planId == plan.id)'));
     expect(page, contains('_selected.removeWhere((key) => !activeKeys.contains(key))'));
     expect(page, contains("'\${selectedDays.length} von \${activeDays.length} Tagen ausgewählt'"));
     expect(page, contains('await load(showLoading: false);'));
-    expect(page, contains('_repo.deleteShoppingItem(item.id)'));
+    expect(page, contains('_isDayCompleted(day)'));
+    expect(page, contains("const Text('Erledigt')"));
+    expect(page, isNot(contains('_repo.deleteShoppingItem(item.id)')));
   });
 
   test('shopping list completion requires every aggregated ingredient to be checked', () {
