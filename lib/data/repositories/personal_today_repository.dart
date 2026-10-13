@@ -327,7 +327,7 @@ class PersonalTodayRepository {
     if (userId == null) return const [];
     final rows = await client
         .from('personal_today_plans')
-        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,shopping_list_completed_at,recipes(name,description,servings,image_url,image_path)')
+        .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,created_at,recipes(name,description,servings,image_url,image_path)')
         .eq('user_id', userId)
         .eq('plan_date', _dateOnly(date))
         .inFilter('status', ['planned', 'cooked'])
@@ -422,7 +422,10 @@ class PersonalTodayRepository {
   Future<void> completeShoppingList(Iterable<String> planIds) async {
     final ids = planIds.toSet().where((id) => id.trim().isNotEmpty).toList();
     if (ids.isEmpty) throw ArgumentError('Keine Einkaufslisten ausgewählt.');
-    await client.rpc('complete_shared_shopping_list', params: {'p_plan_ids': ids});
+    final results = await Future.wait(ids.map((id) => updateStatus(id, 'cooked')));
+    if (results.any((updated) => !updated)) {
+      throw StateError('Nicht alle gemeinsamen Einkaufslisten konnten abgeschlossen werden.');
+    }
   }
 
 
