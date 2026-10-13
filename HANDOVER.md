@@ -343,3 +343,13 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Neue Migration `20261013153000_sync_shared_decision_deletion.sql`: Ein `BEFORE DELETE`-Trigger auf `personal_today_plans` sucht nur aktive, angenommene Freigaben mit beiden Plan-IDs, markiert die Verknüpfung vorab als storniert und löscht die verknüpfte persönliche Kopie serverseitig. Der zweite Triggerlauf findet dadurch keine aktive Freigabe mehr. Private Pläne, offene Einladungen und bereits stornierte Freigaben lösen keine Gegenlöschung aus.
 - Regressionstest: `test/regression/shared_decision_deletion_sync_test.dart`.
 - PR und CI ausstehend. Die Migration muss nach erfolgreichem PR-Review in Supabase angewendet und die tatsächliche Triggerdefinition live geprüft werden. Keine Release-Builds.
+
+
+## Verbindung bei Trennung beidseitig auflösen (2026-10-13)
+
+- Live-Prüfung: `disconnect_connection()` entfernte bislang nur den aufrufenden Eintrag aus `connection_members`. Die `connections`-Zeile blieb bestehen, solange der andere Mitgliedseintrag existierte. Daher zeigte die Gegenseite weiter eine Verbindung mit nur einem Mitglied an.
+- Neue Migration `20261013170000_disconnect_connection_for_both_members.sql`: `disconnect_connection()` löscht die Verbindung selbst, nachdem geprüft wurde, dass der Aufrufer Mitglied ist. Fremdschlüssel entfernen beide Mitgliedseinträge innerhalb derselben Transaktion.
+- Zusätzlicher `AFTER DELETE`-Trigger bereinigt verwaiste Verbindungen, wenn ein Mitglied über `auth.users ON DELETE CASCADE` gelöscht wird. Fällt die Mitgliedszahl unter zwei, wird die Verbindung einschließlich des verbleibenden Mitglieds entfernt. Persönliche Pläne, Rezepte und Favoriten werden durch diese Migration nicht gelöscht.
+- Regressionstest: `test/regression/connection_disconnect_both_members_test.dart`.
+- Wichtig: Eine reine App-Deinstallation sendet kein Ereignis an den Server und kann nicht unmittelbar erkannt werden. Die serverseitige Bereinigung greift bei tatsächlicher Kontolöschung oder expliziter Trennung.
+- PR/CI und Live-Migration ausstehend. Keine Release-Builds.
