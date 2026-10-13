@@ -125,7 +125,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       setState(() { _loading = true; _error = null; });
     }
     try {
-      final plans = await Future.wait(_days.map(_repo.plannedPlansForDate));
+      final loadedPlans = await Future.wait(_days.map(_repo.plannedPlansForDate));
+      // Accepted shared recipes belong exclusively to the shared shopping list.
+      // Keep the personal plan and its ingredients in storage; only exclude them
+      // from this private list's presentation and aggregation.
+      final plans = loadedPlans
+          .map((day) => day.where((plan) => !plan.isSharedAccepted).toList(growable: false))
+          .toList(growable: false);
       final ids = plans.expand((day) => day).where((p) => p.isRecipe).map((p) => p.id).toSet();
       final items = await _repo.shoppingItemsForPlans(ids);
       if (!mounted || generation != _generation) return;
