@@ -359,5 +359,7 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 
 - Fehlerursache: `_askPartnerToDecide()` sendete nur `type: 'ask'`; die Supabase-RPC setzte `decision_shares.plan_date` und den Push-Text deshalb immer auf `current_date`.
 - Die App übergibt nun `_selectedDate`. Die RPC nimmt `p_plan_date` entgegen, lehnt vergangene Tage serverseitig ab und verwendet das Datum sowohl für `decision_shares.plan_date` als auch für den Benachrichtigungstext. Damit führt der Push-Tap über die vorhandene Share-ID-/planDate-Navigation zum ausgewählten Tag.
-- Regressionstest in `test/regression/date_aware_decision_sharing_test.dart` erweitert.
-- PR/CI ausstehend. Nach erfolgreichem Merge Supabase-Migration anwenden und Live-Funktionsdefinition sowie CI prüfen. Keine Release-Builds.
+- Zwei bestehende Regressionstests wurden an den neuen Aufruf angepasst; der neue Datums-Regressionsfall bleibt enthalten.
+- PR #101 am 2026-10-13 gemergt: `a38d3326c3e20a5845ed7f5f06049250c1c168e3`. Beide PR-Quality-Gates waren erfolgreich (Analyze und Tests).
+- Supabase-Migration `date_aware_decide_for_me` auf Projekt `oidxezjdwqktpxuypbfb` angewendet. Live verifiziert: Die Funktion `send_decision_message(..., p_plan_date date)` ist vorhanden und ihre Definition nutzt das übergebene Datum für `decision_shares.plan_date` sowie den Benachrichtigungstext.
+- Keine Release-Builds.
