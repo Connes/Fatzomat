@@ -37,12 +37,14 @@ import '../../core/services/surprise_recommendation_service.dart';
 class TodayPage extends StatefulWidget {
   final DateTime? initialDate;
   final ValueChanged<int>? onNavigateToTab;
+  final VoidCallback? onNavigateToToday;
   final ValueListenable<int>? resetToTodaySignal;
 
   const TodayPage({
     super.key,
     this.initialDate,
     this.onNavigateToTab,
+    this.onNavigateToToday,
     this.resetToTodaySignal,
   });
 
@@ -333,9 +335,8 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         builder: (_) => FoodModePage(
           mode: mode,
           planDate: _selectedDate,
-          onNavigateToToday: widget.onNavigateToTab == null
-              ? null
-              : () => widget.onNavigateToTab!(0),
+          onNavigateToToday: widget.onNavigateToToday ??
+              (widget.onNavigateToTab == null ? null : () => widget.onNavigateToTab!(0)),
         ),
       ),
     );

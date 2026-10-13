@@ -12,10 +12,10 @@ void main() {
 
     expect(shell, contains('TodayPage('));
     expect(shell, contains('resetToTodaySignal: _todayResetSignal'));
-    expect(today, contains('onNavigateToToday: widget.onNavigateToTab == null'));
+    expect(today, contains('onNavigateToToday: widget.onNavigateToToday ??'));
     expect(mode, contains('onNavigateToToday: widget.onNavigateToToday'));
     expect(cooking, contains('onNavigateToToday: widget.onNavigateToToday'));
-    expect(recipes, contains('Navigator.of(context).popUntil((route) => route.isFirst)'));
+    expect(shell, contains('_contentNavigatorKey.currentState?.popUntil((route) => route.isFirst)'));
     expect(recipes, contains('final navigateToToday = widget.onNavigateToToday'));
     expect(recipes, contains('navigateToToday();'));
   });

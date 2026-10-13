@@ -414,7 +414,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         if (navigateToToday != null) {
           // Unwind the recipe-search flow to the existing TodayPage. Its
           // selected date is intentionally preserved, including future dates.
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          // The shell callback owns both stack unwinding and tab selection.
+          // It deliberately does not emit the explicit "reset to today" signal.
           navigateToToday();
           return;
         }

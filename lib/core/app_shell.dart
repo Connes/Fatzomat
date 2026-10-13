@@ -34,6 +34,17 @@ class _AppShellState extends State<AppShell> {
     _network.start();
   }
 
+  // Recipe selection returns to Today without resetting the date the user chose.
+  void _returnToTodayPreservingDate() {
+    _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    if (index != 0) {
+      setState(() {
+        index = 0;
+        _contentIndex.value = 0;
+      });
+    }
+  }
+
   void _selectTab(int value) {
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     if (value == 0) {
@@ -92,6 +103,7 @@ class _AppShellState extends State<AppShell> {
       TodayPage(
         initialDate: widget.initialDate,
         onNavigateToTab: _selectTab,
+        onNavigateToToday: _returnToTodayPreservingDate,
         resetToTodaySignal: _todayResetSignal,
       ),
       SavedRecipesPage(onNavigateToTab: _selectTab),
