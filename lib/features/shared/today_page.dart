@@ -855,21 +855,31 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     }
   }
 
-  String? get _restaurantName {
+  Map<String, dynamic>? get _restaurantData {
     if (share.decisionType != 'dine_out') return null;
     final raw = share.decisionValue?.trim();
     if (raw == null || raw.isEmpty) return null;
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is Map) {
-        final name = decoded['name']?.toString().trim();
-        if (name != null && name.isNotEmpty) return name;
-      }
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
     } catch (_) {
-      // Older shares may contain a plain-text restaurant name.
+      // Older shares may store only the restaurant name.
     }
-    if (!raw.startsWith('{')) return raw;
     return null;
+  }
+
+  String? get _restaurantName {
+    final data = _restaurantData;
+    final name = data?['name']?.toString().trim();
+    if (name != null && name.isNotEmpty) return name;
+    final raw = share.decisionValue?.trim();
+    if (raw != null && raw.isNotEmpty && !raw.startsWith('{')) return raw;
+    return null;
+  }
+
+  String? get _cuisine {
+    final cuisine = _restaurantData?['cuisine']?.toString().trim();
+    return cuisine == null || cuisine.isEmpty ? null : cuisine;
   }
 
   String _planDateLabel() {
@@ -881,6 +891,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDineOut = share.decisionType == 'dine_out';
     final restaurantName = _restaurantName;
+    final cuisine = _cuisine;
 
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.98),
@@ -911,45 +922,68 @@ class _IncomingDecisionShareCard extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 14),
-            Text(
-              _decisionLabel,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            if (isDineOut && restaurantName != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                restaurantName,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppDesign.text,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
             if (isDineOut) ...[
-              const SizedBox(height: 14),
               ClipRRect(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(22),
                 child: Image.asset(
-                  'assets/together/clean/icons/icon_restaurant.png',
-                  height: 120,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ] else if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
-              const SizedBox(height: 14),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Image.network(
-                  share.imageUrl!,
+                  FoodChoiceAssetService.assetFor(FoodMode.dineOut, cuisine ?? '') ??
+                      'assets/together/clean/icons/icon_restaurant.png',
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
+              const SizedBox(height: 16),
+              if (cuisine != null) ...[
+                Text(
+                  cuisine,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppDesign.primaryDark.withValues(alpha: 0.72),
+                      ),
+                ),
+                const SizedBox(height: 6),
+              ],
+              Text(
+                'Wir gehen essen',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppDesign.primaryDark,
+                    ),
+              ),
+              if (restaurantName != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  restaurantName,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppDesign.text,
+                      ),
+                ),
+              ],
+            ] else ...[
+              Text(
+                _decisionLabel,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              if (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty) ...[
+                const SizedBox(height: 14),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: Image.network(
+                    share.imageUrl!,
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  ),
+                ),
+              ],
             ],
             const SizedBox(height: 16),
             Row(
