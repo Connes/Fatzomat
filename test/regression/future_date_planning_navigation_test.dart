@@ -114,9 +114,19 @@ void main() {
     expect(migration, contains('DELETE FROM public.shopping_items'));
   });
 
-  test('selecting a saved recipe returns to Today', () {
+  test('selecting a saved recipe returns to Today without resetting its selected date', () {
     final saved = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
-    expect(saved, contains('widget.onNavigateToTab!(0);'));
-    expect(saved, contains('Navigator.pop(context, true);'));
+    final shell = File('lib/core/app_shell.dart').readAsStringSync();
+    final today = File('lib/features/shared/today_page.dart').readAsStringSync();
+
+    expect(saved, contains('navigateToToday();'));
+    expect(shell, contains('onNavigateToToday: _returnToTodayPreservingDate,'));
+    final returnStart = shell.indexOf('void _returnToTodayPreservingDate()');
+    final returnEnd = shell.indexOf('void _selectTab(int value)', returnStart);
+    expect(returnStart, isNonNegative);
+    expect(returnEnd, greaterThan(returnStart));
+    expect(shell.substring(returnStart, returnEnd), contains('_contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);'));
+    expect(shell.substring(returnStart, returnEnd), isNot(contains('_todayResetSignal.value++')));
+    expect(today, contains('resetToTodaySignal: _todayResetSignal'));
   });
 }
