@@ -59,12 +59,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   bool _isDayCompleted(DateTime day) {
     final plans = _plansFor(day).where((plan) => plan.isRecipe &&
         _items.any((item) => item.planId == plan.id)).toList();
-    return plans.isNotEmpty && plans.every((plan) => plan.shoppingListCompletedAt != null);
+    return plans.isNotEmpty && plans.every((plan) => plan.status == 'cooked');
   }
 
   bool _isPlanListCompleted(String planId) => _plans
       .expand((plans) => plans)
-      .any((plan) => plan.id == planId && plan.shoppingListCompletedAt != null);
+      .any((plan) => plan.id == planId && plan.status == 'cooked');
 
   void _checkDayBoundary() {
     final today = _dateOnly(DateTime.now());
