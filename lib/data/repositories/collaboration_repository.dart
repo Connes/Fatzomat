@@ -132,6 +132,9 @@ class CollaborationRepository {
     await client.rpc('cancel_decision_request', params: {'p_request_id': requestId});
   }
 
+  String _dateOnlyIso(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
   Future<void> sendDecisionMessage({
     required String type,
     String? decisionType,
@@ -141,6 +144,7 @@ class CollaborationRepository {
     String? recipeId,
     int? servings,
     String? sourcePlanId,
+    DateTime? planDate,
   }) async {
     try {
       // V85.1 accepts the exact selected plan snapshot. This avoids a second read of
@@ -154,6 +158,7 @@ class CollaborationRepository {
         'p_recipe_id': recipeId,
         'p_servings': servings,
         'p_source_plan_id': sourcePlanId,
+        'p_plan_date': _dateOnlyIso(planDate ?? DateTime.now()),
       });
     } on PostgrestException catch (error) {
       // Existing installations may have V85 deployed but not V85.1 yet.
