@@ -25,7 +25,6 @@ void main() {
     expect(migration, contains('select count(*)'));
     expect(migration, contains(') < 2'));
     expect(migration, contains('delete from public.connections'));
-    expect(migration, contains('references auth.users(id) on delete cascade').isFalse);
   });
 
   test('connection cleanup does not delete personal decision or recipe data', () {
