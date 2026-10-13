@@ -42,7 +42,8 @@ void main() {
     expect(today, contains("assets/together/clean/icons/icon_restaurant.png"));
     expect(today, contains("assets/together/clean/icons/icon_surprise.png"));
     // "Entscheide Du" is now a durable message, not a DecisionRequest lifecycle.
-    expect(today, contains("sendDecisionMessage(type: 'ask')"));
+    expect(today, contains("type: 'ask',"));
+    expect(today, contains('planDate: _selectedDate'));
     expect(today, isNot(contains('activeDecisionRequestCreatedByMe')));
     expect(today, isNot(contains('createDecisionRequest(assignedTo: partner)')));
     expect(today, contains("table: 'personal_today_plans'"));
