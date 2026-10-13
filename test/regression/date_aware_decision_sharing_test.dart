@@ -14,6 +14,10 @@ void main() {
     expect(migration, contains('plan_date >= current_date'));
     expect(migration, isNot(contains('share_row.plan_date <> current_date')));
     expect(repository, contains("'p_source_plan_id': sourcePlanId"));
+    expect(repository, contains("'p_plan_date': _dateOnlyIso(planDate ?? DateTime.now())"));
+    expect(todayPage, contains("sendDecisionMessage(\n        type: 'ask',\n        planDate: _selectedDate,"));
+    expect(migration, contains('p_plan_date date default current_date'));
+    expect(migration, contains("to_char(p_plan_date, 'DD.MM.YYYY')"));
     expect(repository, contains('pendingDecisionShareForDate(DateTime date)'));
     expect(repository, contains(".eq('plan_date', planDate)"));
     expect(todayPage, contains('pendingDecisionShareForDate(requestedDate)'));
