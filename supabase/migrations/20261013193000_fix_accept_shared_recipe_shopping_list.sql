@@ -43,9 +43,15 @@ begin
     select * into source_recipe from public.recipes where id = share_row.recipe_id for share;
     if source_recipe.id is null then raise exception 'Das geteilte Rezept ist nicht mehr verfügbar.'; end if;
 
+    select id into shared_plan_id
+    from public.shared_recipe_plans
+    where connection_id = share_row.connection_id
+      and plan_date = share_row.plan_date
+      and status <> 'cancelled'
+    order by created_at desc limit 1;
+
     -- Do not let a pre-existing personal plan abort acceptance. Reuse it only
-    -- when it already represents the accepted recipe; otherwise preserve it
-    -- and still create the shared plan.
+    -- when it already represents the accepted recipe; otherwise preserve it.
     select id into personal_plan_id
     from public.personal_today_plans
     where user_id = uid
@@ -62,21 +68,13 @@ begin
       ) then
         personal_plan_id := null;
       end if;
-    else
-      -- This must happen before creating shared_recipe_plans because the
-      -- personal-plan RPC correctly rejects dates already occupied by a
-      -- shared plan.
+    elsif shared_plan_id is null then
+      -- Create the personal mirror only if no shared plan already occupies
+      -- this date; the personal-plan RPC correctly rejects shared dates.
       personal_plan_id := public.set_personal_plan_for_date(
         share_row.plan_date, 'recipe', null, share_row.recipe_id, share_row.servings
       );
     end if;
-
-    select id into shared_plan_id
-    from public.shared_recipe_plans
-    where connection_id = share_row.connection_id
-      and plan_date = share_row.plan_date
-      and status <> 'cancelled'
-    order by created_at desc limit 1;
 
     if shared_plan_id is null then
       insert into public.shared_recipe_plans(connection_id,recipe_id,shared_by,plan_date,status,servings)
