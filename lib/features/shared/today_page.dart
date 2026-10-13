@@ -922,7 +922,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
               Text(
                 restaurantName,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppDesign.textPrimary,
+                      color: AppDesign.text,
                       fontWeight: FontWeight.w600,
                     ),
               ),
