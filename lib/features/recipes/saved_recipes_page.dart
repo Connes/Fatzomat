@@ -391,6 +391,25 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     final planDate = selectedDate ?? DateTime.now();
     try {
       if (widget.decisionRequestId == null) {
+        await personalToday.selectRecipeForToday(
+          recipe.id!,
+          servings: recipe.servings.clamp(1, 12).toInt(),
+          date: planDate,
+        );
+      } else {
+        await collaboration.resolveDecisionRequest(
+          requestId: widget.decisionRequestId!,
+          decisionMode: 'cook',
+          resultType: 'recipe',
+          resultId: recipe.id!,
+          servings: recipe.servings,
+        );
+      }
+      if (!mounted) return;
+      await load();
+      if (!mounted) return;
+
+      if (widget.decisionRequestId == null) {
         final navigateToToday = widget.onNavigateToToday;
         if (navigateToToday != null) {
           // Unwind the recipe-search flow to the existing TodayPage. Its
