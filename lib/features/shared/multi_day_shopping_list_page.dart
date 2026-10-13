@@ -196,7 +196,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   Future<void> _completeShoppingList(List<AggregatedShoppingItem> items) async {
     if (_completingList || items.isEmpty || items.any((item) => !item.checked) || !mounted) return;
-    final planIds = items.expand((item) => item.sources).map((item) => item.planId).toSet();
+    final planIds = items.expand((item) => item.sources).map((item) => item.planId).whereType<String>().toSet();
     setState(() => _completingList = true);
     try {
       await Future.wait(planIds.map(_repo.completeShoppingList));
