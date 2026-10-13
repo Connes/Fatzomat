@@ -35,7 +35,9 @@ void main() {
     expect(page, isNot(contains('geplante Rezepte ·')));
     expect(page, contains('TextDecoration.lineThrough'));
     expect(page, contains("const Text('Einkaufsliste erledigt')"));
-    expect(page, contains('_repo.deleteShoppingItem(item.id)'));
+    expect(page, contains('_repo.completeShoppingList(planIds)'));
+    expect(page, contains('shoppingListCompletedAt != null'));
+    expect(page, contains("Text('Erledigt'"));
   });
 
 
@@ -46,7 +48,9 @@ void main() {
     expect(page, contains('_selected.removeWhere((key) => !activeKeys.contains(key))'));
     expect(page, contains("'\${selectedDays.length} von \${activeDays.length} Tagen ausgewählt'"));
     expect(page, contains('await load(showLoading: false);'));
-    expect(page, contains('_repo.deleteShoppingItem(item.id)'));
+    expect(page, contains('_repo.completeShoppingList(planIds)'));
+    expect(page, contains('_isDayCompleted(day)'));
+    expect(page, contains("Text('Erledigt'"));
   });
 
   test('shopping list completion requires every aggregated ingredient to be checked', () {
