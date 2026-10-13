@@ -56,6 +56,16 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             _days[i],
       ];
 
+  bool _isDayCompleted(DateTime day) {
+    final plans = _plansFor(day).where((plan) => plan.isRecipe &&
+        _items.any((item) => item.planId == plan.id)).toList();
+    return plans.isNotEmpty && plans.every((plan) => plan.shoppingListCompletedAt != null);
+  }
+
+  bool _isPlanListCompleted(String planId) => _plans
+      .expand((plans) => plans)
+      .any((plan) => plan.id == planId && plan.shoppingListCompletedAt != null);
+
   void _checkDayBoundary() {
     final today = _dateOnly(DateTime.now());
     if (today == _observedToday || !mounted) return;
@@ -137,8 +147,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         if (!_selected.any(activeKeys.contains) && activeKeys.isNotEmpty) {
           _selected.add(activeKeys.first);
         }
-        _expanded.removeWhere((key) => !activeKeys.contains(key));
-        if (!_expanded.any(activeKeys.contains) && activeKeys.isNotEmpty) {
+        _expanded.removeWhere((key) => !activeKeys.contains(key) ||
+            _isDayCompleted(_days.firstWhere((day) => _key(day) == key)));
+        if (!_expanded.any(activeKeys.contains) && activeKeys.isNotEmpty &&
+            !activeKeys.every((key) => _isDayCompleted(_days.firstWhere((day) => _key(day) == key)))) {
           _expanded.add(activeKeys.first);
         }
         _loading = false;
@@ -191,6 +203,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     }
   }
 
+  List<DateTime> selectedDaysForPlanIds(Set<String> planIds) => _days
+      .where((day) => _plansFor(day).any((plan) => planIds.contains(plan.id)))
+      .toList(growable: false);
+
   Future<void> _completeShoppingList(List<AggregatedShoppingItem> items) async {
     if (_completingList ||
         items.isEmpty ||
@@ -198,15 +214,20 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         !mounted) {
       return;
     }
-    final sources = items.expand((item) => item.sources).toList(growable: false);
-    final uniqueSources = {for (final item in sources) item.id: item}.values.toList();
+    final planIds = items.expand((item) => item.sources)
+        .map((item) => item.planId).whereType<String>().toSet();
     setState(() => _completingList = true);
     try {
-      await Future.wait(uniqueSources.map((item) => _repo.deleteShoppingItem(item.id)));
+      await _repo.completeShoppingList(planIds);
       await load(showLoading: false);
       if (mounted) {
+        setState(() {
+          for (final day in selectedDaysForPlanIds(planIds)) {
+            _expanded.remove(_key(day));
+          }
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Einkaufsliste erledigt und entfernt.')),
+          const SnackBar(content: Text('Einkaufsliste als erledigt markiert. Sie bleibt für diesen Tag gespeichert.')),
         );
       }
     } catch (e) {
@@ -287,8 +308,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         : aggregated;
     final checkedCount = aggregated.where((item) => item.checked).length;
     final progress = aggregated.isEmpty ? 0.0 : checkedCount / aggregated.length;
-    final canCompleteList =
-        aggregated.isNotEmpty && aggregated.every((item) => item.checked);
+    final canCompleteList = aggregated.isNotEmpty &&
+        aggregated.every((item) => item.checked) &&
+        aggregated.expand((item) => item.sources).map((item) => item.planId)
+            .whereType<String>().toSet().any((id) => !_isPlanListCompleted(id));
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.today,
@@ -429,6 +452,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
+                                subtitle: _isDayCompleted(day)
+                                    ? const Text('Erledigt', style: TextStyle(
+                                        color: AppDesign.primaryDark,
+                                        fontWeight: FontWeight.w600,
+                                      ))
+                                    : null,
                                 children: _plansFor(day)
                                     .where((plan) => plan.isRecipe)
                                     .map((plan) => ListTile(
