@@ -446,7 +446,10 @@ class CollaborationRepository {
     final result = await client.rpc('cancel_shared_decision_for_plan', params: {
       'p_plan_id': id,
     });
-    return result == true;
+    if (result != true) {
+      throw StateError('Die gemeinsame Tagesentscheidung konnte nicht entfernt werden.');
+    }
+    return true;
   }
 
   Future<bool> removeSharedRecipePlan(String planId) async {
