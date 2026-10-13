@@ -70,4 +70,14 @@ void main() {
     expect(migration, contains('personal_today_plan_id = OLD.id'));
     expect(migration, contains('REVOKE ALL ON FUNCTION'));
   });
+  test('accepted shared recipes are excluded from the private shopping list', () {
+    final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(repository, contains("from('decision_shares')"));
+    expect(repository, contains("map['is_shared_accepted'] = activeShares.any"));
+    expect(page, contains('day.where((plan) => !plan.isSharedAccepted)'));
+    expect(page, contains('Accepted shared recipes belong exclusively to the shared shopping list'));
+  });
+
 }
