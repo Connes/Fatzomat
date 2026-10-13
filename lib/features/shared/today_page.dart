@@ -473,7 +473,11 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     );
     if (confirmed != true) return;
     try {
-      await repo.removeTodayPlan(plan!.id);
+      if (plan!.isSharedAccepted) {
+        await _collaborationRepository.cancelSharedDecisionForPlan(plan!.id);
+      } else {
+        await repo.removeTodayPlan(plan!.id);
+      }
       // The Recipes tab also shows the current Today plan. Notify it directly
       // so the "Für dich heute" marker disappears immediately, even if the
       // Supabase Realtime event arrives later.
