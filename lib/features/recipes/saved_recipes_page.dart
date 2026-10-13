@@ -382,7 +382,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   Future<void> selectRecipeForToday(Recipe recipe) async {
     if (recipe.id == null) return;
     DateTime? selectedDate = widget.planDate;
-    if (widget.decisionRequestId == null) {
+    // When opened from the Today flow, TodayPage already owns the chosen date.
+    // Only standalone recipe browsing needs to ask the user for a date.
+    if (widget.decisionRequestId == null && selectedDate == null) {
       selectedDate = await _choosePlanDate();
       if (selectedDate == null || !mounted) return;
     }
@@ -408,27 +410,20 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       if (!mounted) return;
 
       if (widget.decisionRequestId == null) {
-        final today = DateTime.now();
-        final isToday = planDate.year == today.year &&
-            planDate.month == today.month &&
-            planDate.day == today.day;
-        if (isToday) {
-          final navigateToToday = widget.onNavigateToToday;
-          if (navigateToToday != null) {
-            Navigator.of(context).popUntil((route) => route.isFirst);
-            navigateToToday();
-            return;
-          }
-          if (widget.onNavigateToTab != null) {
-            widget.onNavigateToTab!(0);
-          } else {
-            Navigator.pop(context, true);
-          }
+        final navigateToToday = widget.onNavigateToToday;
+        if (navigateToToday != null) {
+          // Unwind the recipe-search flow to the existing TodayPage. Its
+          // selected date is intentionally preserved, including future dates.
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          navigateToToday();
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('„${recipe.name}“ ist für den ${_formatPlanDate(planDate)} geplant.')),
-        );
+        if (widget.onNavigateToTab != null) {
+          widget.onNavigateToTab!(0);
+        }
+        // Bubble success through SavedRecipesPage, CookNextStepPage and
+        // FoodModePage so the caller can refresh the exact date it opened.
+        Navigator.pop(context, true);
         return;
       }
 
