@@ -352,7 +352,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         await _showNoConnectionDialog();
         return;
       }
-      await _collaborationRepository.sendDecisionMessage(type: 'ask');
+      await _collaborationRepository.sendDecisionMessage(\n        type: 'ask',\n        planDate: _selectedDate,\n      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nachricht „Entscheide Du“ gesendet.')),
