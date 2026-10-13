@@ -127,6 +127,7 @@ void main() {
     expect(returnEnd, greaterThan(returnStart));
     expect(shell.substring(returnStart, returnEnd), contains('_contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);'));
     expect(shell.substring(returnStart, returnEnd), isNot(contains('_todayResetSignal.value++')));
+    expect(today, contains('onNavigateToToday: widget.onNavigateToToday ??'));
     expect(today, contains('resetToTodaySignal: _todayResetSignal'));
   });
 }
