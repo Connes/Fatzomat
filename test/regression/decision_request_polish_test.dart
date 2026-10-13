@@ -16,7 +16,8 @@ void main() {
     expect(home, contains("'Entscheide Du'"));
     expect(home, isNot(contains("sendDecisionMessage(type: 'share')")));
     expect(home, isNot(contains('activeDecisionRequestCreatedByMe')));
-    expect(today, contains("sendDecisionMessage(type: 'ask')"));
+    expect(today, contains("type: 'ask',"));
+    expect(today, contains('planDate: _selectedDate'));
     expect(today, contains('sendDecisionMessage('));
     expect(today, contains('decisionType: plan!.decisionType'));
     expect(today, contains('decisionValue: plan!.decisionValue'));
