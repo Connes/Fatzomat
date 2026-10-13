@@ -33,10 +33,9 @@ begin
     raise exception 'Keine aktive gemeinsame Tagesentscheidung zu diesem Plan gefunden.';
   end if;
 
-  -- Hide the shared plan from both members and prevent it from continuing to
-  -- occupy the date. Keep the share row as history, but mark it cancelled.
   update public.decision_shares
-  set cancelled_at = now()
+  set cancelled_at = now(),
+      cancelled_by = coalesce(cancelled_by, uid)
   where id = share_row.id;
 
   if share_row.shared_recipe_plan_id is not null then
@@ -49,10 +48,9 @@ begin
     where shared_recipe_plan_id = share_row.shared_recipe_plan_id;
   end if;
 
-  -- The sender's source plan and the recipient's accepted mirror are two
-  -- personal rows representing one shared decision. Cancel both together.
   update public.personal_today_plans
-  set status = 'cancelled'
+  set status = 'cancelled',
+      updated_at = now()
   where id in (share_row.source_plan_id, share_row.accepted_plan_id)
     and status = 'planned';
 
@@ -65,5 +63,4 @@ $$;
 
 revoke all on function public.cancel_shared_decision_for_plan(uuid) from public, anon;
 grant execute on function public.cancel_shared_decision_for_plan(uuid) to authenticated;
-
 notify pgrst, 'reload schema';
