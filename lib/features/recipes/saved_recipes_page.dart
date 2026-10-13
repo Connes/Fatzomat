@@ -786,9 +786,10 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                     recipeId: recipe.id!,
                                     planDate: widget.planDate,
                                     onTodayPlanChanged: load,
-                                    onNavigateToToday: widget.onNavigateToTab == null
-                                        ? null
-                                        : () => widget.onNavigateToTab!(0),
+                                    onNavigateToToday: widget.onNavigateToToday ??
+                                        (widget.onNavigateToTab == null
+                                            ? null
+                                            : () => widget.onNavigateToTab!(0)),
                                     onNavigateToShoppingList: widget.onNavigateToTab == null
                                         ? null
                                         : () => widget.onNavigateToTab!(2),
