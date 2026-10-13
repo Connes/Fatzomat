@@ -130,27 +130,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
   Future<void> selectPersonalToday() async {
     if (working) return;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(widget.planDate == null || _isPlanDateToday ? 'Für heute festlegen?' : 'Für diesen Tag festlegen?'),
-        content: Text(widget.planDate == null || _isPlanDateToday
-            ? 'Dieses Rezept wird für heute ausgewählt.'
-            : 'Dieses Rezept wird für den ausgewählten Tag eingeplant.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Abbrechen'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Festlegen'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
     setState(() => working = true);
     try {
       await personalToday.selectRecipeForToday(widget.recipeId, servings: servings, date: widget.planDate);
