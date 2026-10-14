@@ -12,7 +12,7 @@ void main() {
     for (final field in ['name', 'cuisine', 'address', 'phone', 'website', 'opening_hours']) {
       expect(source, contains("'$field'"));
     }
-    expect(source, contains('10 Kilometern'));
+    expect(source, contains('in der Nähe des folgenden Ausgangspunkts'));
     expect(source, contains('FilePicker.pickFiles'));
     expect(source, contains('Unbekanntes JSON-Format'));
     expect(source, contains('Als heutigen Vorschlag übernehmen'));

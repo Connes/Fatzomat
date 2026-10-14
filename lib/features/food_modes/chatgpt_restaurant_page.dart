@@ -100,8 +100,8 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
         ? 'Der aktuelle Standort konnte von Fatzomat nicht ermittelt werden. Verwende keine erfundene Position; weise darauf hin, dass der Standortzugriff aktiviert werden muss.'
         : 'Ausgangspunkt für die Suche (aktueller Gerätestandort): $location.';
     return '''
-Finde aktuelle Restaurants mit Küche „$_cuisine“ in einem Radius von 10 Kilometern um folgenden Ausgangspunkt: $start
-Recherchiere mithilfe aktueller Webquellen. Bevorzuge offizielle Restaurant-Webseiten und verlässliche Quellen. Nenne zuerst eine übersichtliche Auswahl passender Restaurants. Gib nur Restaurants innerhalb des 10-km-Radius aus; wenn die Entfernung nicht zuverlässig überprüfbar ist, kennzeichne den Treffer nicht als bestätigt innerhalb des Radius.
+Finde aktuelle Restaurants mit Küche „$_cuisine“ in der Nähe des folgenden Ausgangspunkts: $start
+Recherchiere mithilfe aktueller Webquellen. Bevorzuge offizielle Restaurant-Webseiten und verlässliche Quellen. Nenne zuerst eine übersichtliche Auswahl passender Restaurants. 
 Ermittle ausschließlich diese Daten: Name, Küche, Adresse, Telefonnummer, Webseite und Öffnungszeiten. Erfinde keine Angaben. Nicht verifizierbare oder unbekannte Telefonnummern, Webseiten oder Öffnungszeiten müssen null sein.
 Wenn ich ein Restaurant ausgewählt habe und ausdrücklich die Fatzomat-Importdatei anfordere, gib ausschließlich gültiges JSON ohne Markdown-Codeblock und ohne zusätzliche Erklärung aus. Verwende exakt dieses Schema und keine weiteren Felder:
 {
@@ -116,7 +116,7 @@ Wenn ich ein Restaurant ausgewählt habe und ausdrücklich die Fatzomat-Importda
     "opening_hours": null
   }
 }
-name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sein. phone, website und opening_hours sind optionale Strings oder null. website muss eine vollständige HTTP(S)-URL sein. opening_hours soll, wenn bekannt, die Wochentage und Zeiträume als Text enthalten. Gib keine Bewertungen, Preise, Entfernung, Beschreibung, Fotos oder andere Felder aus. Die JSON-Datei wird direkt in Fatzomat importiert und muss syntaktisch gültig sein.
+name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sein. phone, website und opening_hours sind optionale Strings oder null. website muss eine vollständige HTTP(S)-URL sein. opening_hours soll, wenn bekannt, die Wochentage und Zeiträume als Text enthalten. Gib keine Bewertungen, Preise, Beschreibung, Fotos oder andere Felder aus. Die JSON-Datei wird direkt in Fatzomat importiert und muss syntaktisch gültig sein.
 '''.trim();
   }
 
@@ -300,7 +300,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
                 decoration: const InputDecoration(
                   labelText: 'Ermittelter Standort (änderbar)',
                   hintText: 'Wird automatisch ermittelt',
-                  helperText: 'Dein aktueller Standort ist vorausgefüllt und wird als Mittelpunkt des 10-km-Radius verwendet.',
+                  helperText: 'Dein aktueller Standort ist vorausgefüllt und kann angepasst werden.',
                 ),
               ),
               const SizedBox(height: 16),

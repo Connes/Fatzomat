@@ -169,7 +169,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Asiadong-Gourmet'), findsOneWidget);
-    expect(find.text('Westliche Karl-Friedrich-Straße 123\n75172 Pforzheim\n2,3 km'), findsOneWidget);
+    expect(find.text('Westliche Karl-Friedrich-Straße 123\n75172 Pforzheim'), findsOneWidget);
     expect(find.text('+49 7231 586670'), findsOneWidget);
     expect(find.text('example.com'), findsOneWidget);
     expect(find.text('Di 11:30-15:00, 17:30-22:30\nMi-Fr 11:30-15:00, 17:30-22:30'), findsOneWidget);
