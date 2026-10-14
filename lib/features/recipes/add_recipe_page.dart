@@ -909,16 +909,16 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
           : error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(error!, textAlign: TextAlign.center)))
               : ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 88),
                   children: [
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 1.45,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 1.82,
                       ),
                       itemCount: choices.length,
                       itemBuilder: (context, index) {
@@ -933,7 +933,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                               children: [
                                 Center(
                                   child: Padding(
-                                    padding: const EdgeInsets.all(16),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
@@ -947,11 +947,11 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                                           )
                                         else
                                           const Expanded(child: SizedBox()),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 4),
                                         Text(
                                           choice,
                                           textAlign: TextAlign.center,
-                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                                         ),
                                       ],
                                     ),
@@ -959,9 +959,9 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                                 ),
                                 if (selected)
                                   const Positioned(
-                                    top: 10,
-                                    right: 10,
-                                    child: Icon(Icons.check_circle_rounded, size: 22),
+                                    top: 5,
+                                    right: 5,
+                                    child: Icon(Icons.check_circle_rounded, size: 18),
                                   ),
                               ],
                             ),
