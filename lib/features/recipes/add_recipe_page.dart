@@ -951,10 +951,15 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                                       children: [
                                         if (asset != null)
                                           Expanded(
-                                            child: Image.asset(
-                                              asset,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (_, __, ___) => Icon(_icon(choice), size: 44),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) => Image.asset(
+                                                asset,
+                                                fit: BoxFit.cover,
+                                                alignment: Alignment.center,
+                                                width: constraints.maxWidth,
+                                                height: constraints.maxHeight,
+                                                errorBuilder: (_, __, ___) => Icon(_icon(choice), size: 44),
+                                              ),
                                             ),
                                           )
                                         else
@@ -975,7 +980,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         );
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     FilledButton.icon(
                       onPressed: _selectIngredients,
                       icon: const Icon(Icons.add_circle_outline_rounded),
@@ -984,15 +989,6 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         minimumSize: const Size.fromHeight(54),
                       ),
                     ),
-                    if (selectedCount > 0) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        selectedFoodIds
-                            .map((id) => foods.where((food) => food.id == id).firstOrNull?.name)
-                            .whereType<String>()
-                            .join(', '),
-                      ),
-                    ],
                     const SizedBox(height: 10),
                     FilledButton.icon(
                       onPressed: _importRecipeFile,
