@@ -30,6 +30,6 @@ void main() {
     expect(repo, contains('RecipeDuplicateException'));
     expect(model, contains('updatedAt'));
     expect(saved, contains("table: 'recipes'"));
-    expect(saved, contains("title: const Text('Meine Rezepte')"));
+    expect(saved, contains("const Flexible(child: Text('Meine Rezepte'))"));
   });
 }
