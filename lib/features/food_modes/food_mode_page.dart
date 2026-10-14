@@ -599,20 +599,47 @@ class _DiscoveryError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.location_off_rounded, size: 52),
-            const SizedBox(height: 16),
-            const Text('Suche nicht möglich', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 18),
-            FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Erneut versuchen')),
-          ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(maxWidth: 420),
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          decoration: BoxDecoration(
+            color: colors.surface.withValues(alpha: .97),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: colors.outlineVariant.withValues(alpha: .7)),
+            boxShadow: [
+              BoxShadow(color: colors.shadow.withValues(alpha: .08), blurRadius: 24, offset: const Offset(0, 8)),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(color: AppDesign.secondarySurface, borderRadius: BorderRadius.circular(20)),
+                child: Icon(Icons.location_off_rounded, size: 32, color: AppDesign.primaryDark),
+              ),
+              const SizedBox(height: 18),
+              Text('Suche nicht möglich', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: colors.onSurface), textAlign: TextAlign.center),
+              const SizedBox(height: 10),
+              Text(message, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colors.onSurfaceVariant, height: 1.45), textAlign: TextAlign.center),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Erneut versuchen'),
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -628,20 +655,55 @@ class _DiscoveryEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded, size: 52),
-            const SizedBox(height: 16),
-            Text('Keine passenden ${order ? 'Restaurants zum Bestellen' : 'Restaurants'} gefunden', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
-            const SizedBox(height: 8),
-            Text('Für „$cuisine“ wurden innerhalb von 10 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.', textAlign: TextAlign.center),
-            const SizedBox(height: 18),
-            OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Erneut suchen')),
-          ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(maxWidth: 420),
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          decoration: BoxDecoration(
+            color: colors.surface.withValues(alpha: .97),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: colors.outlineVariant.withValues(alpha: .7)),
+            boxShadow: [
+              BoxShadow(color: colors.shadow.withValues(alpha: .08), blurRadius: 24, offset: const Offset(0, 8)),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(color: AppDesign.secondarySurface, borderRadius: BorderRadius.circular(20)),
+                child: Icon(order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded, size: 32, color: AppDesign.primaryDark),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'Keine passenden ${order ? 'Restaurants zum Bestellen' : 'Restaurants'} gefunden',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: colors.onSurface),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Für „$cuisine“ wurden innerhalb von 10 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colors.onSurfaceVariant, height: 1.45),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Erneut suchen'),
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
