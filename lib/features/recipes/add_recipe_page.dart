@@ -909,7 +909,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
           : error != null
               ? Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(error!, textAlign: TextAlign.center)))
               : ListView(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 88),
+                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
                   children: [
                     GridView.builder(
                       shrinkWrap: true,
@@ -927,6 +927,18 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         final asset = FoodChoiceAssetService.assetFor(FoodMode.cook, choice);
                         return Card(
                           clipBehavior: Clip.antiAlias,
+                          color: selected
+                              ? AppDesign.secondarySurface
+                              : Theme.of(context).colorScheme.surface,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+                            side: BorderSide(
+                              color: selected
+                                  ? AppDesign.primaryDark.withValues(alpha: .45)
+                                  : Colors.transparent,
+                              width: selected ? 1.5 : 0,
+                            ),
+                          ),
                           child: InkWell(
                             onTap: () => setState(() => mainChoice = choice),
                             child: Stack(
@@ -957,26 +969,23 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                                     ),
                                   ),
                                 ),
-                                if (selected)
-                                  const Positioned(
-                                    top: 5,
-                                    right: 5,
-                                    child: Icon(Icons.check_circle_rounded, size: 18),
-                                  ),
                               ],
                             ),
                           ),
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     FilledButton.icon(
                       onPressed: _selectIngredients,
                       icon: const Icon(Icons.add_circle_outline_rounded),
                       label: Text(selectedCount == 0 ? 'Zutaten auswählen' : 'Zutaten ändern ($selectedCount)'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(54),
+                      ),
                     ),
                     if (selectedCount > 0) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Text(
                         selectedFoodIds
                             .map((id) => foods.where((food) => food.id == id).firstOrNull?.name)
@@ -984,24 +993,28 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                             .join(', '),
                       ),
                     ],
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
                     FilledButton.icon(
                       onPressed: _importRecipeFile,
                       icon: const Icon(Icons.file_upload_rounded),
                       label: const Text('Erstellte JSON-Datei importieren'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(54),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton.icon(
+                      onPressed: opening ? null : _copyPromptAndOpenChatGpt,
+                      icon: opening
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.auto_awesome_rounded),
+                      label: const Text('Prompt kopieren & ChatGPT öffnen'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(54),
+                      ),
                     ),
                   ],
                 ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-          child: FilledButton.icon(
-            onPressed: opening ? null : _copyPromptAndOpenChatGpt,
-            icon: opening ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.auto_awesome_rounded),
-            label: const Text('Prompt kopieren & ChatGPT öffnen'),
-          ),
-        ),
-      ),
     );
   }
 }
