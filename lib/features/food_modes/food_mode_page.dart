@@ -360,6 +360,7 @@ class _OptionCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          key: ValueKey<String>('food_choice_tap_${mode.name}_${option.label}'),
           borderRadius: BorderRadius.circular(18),
           onTap: onTap,
           child: Ink(
