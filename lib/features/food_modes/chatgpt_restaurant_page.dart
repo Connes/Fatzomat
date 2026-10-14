@@ -140,9 +140,19 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     );
   }
 
+  Future<bool> _tryLaunchChatGpt() async {
+    try {
+      final uri = Uri.https('chatgpt.com', '/', {'q': _prompt});
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // Missing platform handlers and unsupported launchers must not crash
+      // the restaurant flow. The prompt remains available for manual sharing.
+      return false;
+    }
+  }
+
   Future<void> _launchChatGptWithPrompt() async {
-    final uri = Uri.https('chatgpt.com', '/', {'q': _prompt});
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final launched = await _tryLaunchChatGpt();
     if (!launched && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('ChatGPT konnte nicht automatisch geöffnet werden. Du kannst den Prompt unten manuell öffnen.')),
@@ -151,9 +161,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
   }
 
   Future<void> _openChatGpt() async {
-    final uri = Uri.https('chatgpt.com', '/', {'q': _prompt});
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (launched) return;
+    if (await _tryLaunchChatGpt()) return;
     await SharePlus.instance.share(
       ShareParams(
         text: _prompt,
