@@ -980,7 +980,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         );
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     FilledButton.icon(
                       onPressed: _selectIngredients,
                       icon: const Icon(Icons.add_circle_outline_rounded),
