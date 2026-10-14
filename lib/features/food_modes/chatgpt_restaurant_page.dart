@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/app_design.dart';
@@ -34,6 +36,59 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
   String? _error;
   Map<String, dynamic>? _restaurant;
   bool _importing = false;
+  bool _locating = false;
+  String? _locationStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _determineCurrentLocation();
+  }
+
+  Future<void> _determineCurrentLocation() async {
+    if (!mounted) return;
+    setState(() {
+      _locating = true;
+      _locationStatus = 'Aktuellen Standort wird ermittelt …';
+    });
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        throw Exception('Standortdienste sind deaktiviert. Bitte aktiviere sie in den Geräteeinstellungen.');
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        throw Exception('Standortzugriff wurde nicht erlaubt. Bitte erteile Fatzomat die Standortberechtigung in den Einstellungen.');
+      }
+      final position = await Geolocator.getCurrentPosition();
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      final place = placemarks.isNotEmpty ? placemarks.first : null;
+      final parts = <String?>[
+        place?.street,
+        place?.subLocality,
+        place?.locality,
+        place?.postalCode,
+      ].whereType<String>().map((part) => part.trim()).where((part) => part.isNotEmpty).toList();
+      final resolved = parts.toSet().join(', ');
+      final location = resolved.isNotEmpty
+          ? resolved
+          : '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
+      if (!mounted) return;
+      _locationController.text = location;
+      setState(() => _locationStatus = 'Aktueller Standort wird als Suchmittelpunkt verwendet.');
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _locationStatus = error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -44,8 +99,8 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
   String get _prompt {
     final location = _locationController.text.trim();
     final start = location.isEmpty
-        ? 'Ermittle meinen Standort nicht selbst. Frage mich zuerst nach meinem Ort oder meiner Adresse und fahre erst nach meiner Antwort fort.'
-        : 'Ausgangspunkt für die Suche: $location.';
+        ? 'Der aktuelle Standort konnte von Fatzomat nicht ermittelt werden. Verwende keine erfundene Position; weise darauf hin, dass der Standortzugriff aktiviert werden muss.'
+        : 'Ausgangspunkt für die Suche (aktueller Gerätestandort): $location.';
     return '''
 Finde aktuelle Restaurants mit Küche „$_cuisine“ in einem Radius von 10 Kilometern um folgenden Ausgangspunkt: $start
 Recherchiere mithilfe aktueller Webquellen. Bevorzuge offizielle Restaurant-Webseiten und verlässliche Quellen. Nenne zuerst eine übersichtliche Auswahl passender Restaurants. Gib nur Restaurants innerhalb des 10-km-Radius aus; wenn die Entfernung nicht zuverlässig überprüfbar ist, kennzeichne den Treffer nicht als bestätigt innerhalb des Radius.
@@ -228,12 +283,24 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
                 onChanged: (value) => setState(() => _cuisine = value ?? _cuisine),
               ),
               const SizedBox(height: 12),
+              if (_locating) const LinearProgressIndicator(),
+              if (_locationStatus != null) ...[
+                Text(_locationStatus!, style: Theme.of(context).textTheme.bodySmall),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: _locating ? null : _determineCurrentLocation,
+                    icon: const Icon(Icons.my_location),
+                    label: const Text('Aktuellen Standort erneut ermitteln'),
+                  ),
+                ),
+              ],
               TextField(
                 controller: _locationController,
                 decoration: const InputDecoration(
-                  labelText: 'Ort oder Adresse',
-                  hintText: 'z. B. Pforzheim',
-                  helperText: 'Wird für den 10-km-Suchradius in den Prompt übernommen.',
+                  labelText: 'Ermittelter Standort (änderbar)',
+                  hintText: 'Wird automatisch ermittelt',
+                  helperText: 'Dein aktueller Standort ist vorausgefüllt und wird als Mittelpunkt des 10-km-Radius verwendet.',
                 ),
               ),
               const SizedBox(height: 16),
