@@ -126,6 +126,18 @@ class _FoodModePageState extends State<FoodModePage> {
     _resolveAndOpen(context, choice);
   }
 
+  void _openChatGptForCuisine(BuildContext context, String cuisine) {
+    Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => ChatGptRestaurantPage(
+          planDate: widget.planDate,
+          initialCuisine: cuisine,
+          autoOpenChatGpt: true,
+        ),
+      ),
+    );
+  }
+
   Widget _choiceGrid(List<_ModeOption> options) {
     return GridView.builder(
       shrinkWrap: true,
@@ -143,7 +155,9 @@ class _FoodModePageState extends State<FoodModePage> {
         return _OptionCard(
           mode: widget.mode,
           option: option,
-          onTap: () => _select(context, option.label),
+          onTap: () => widget.mode == FoodMode.dineOut
+                              ? _openChatGptForCuisine(context, option.label)
+                              : _select(context, option.label),
         );
       },
     );
@@ -335,12 +349,14 @@ class _OptionCard extends StatelessWidget {
     }
 
     return Semantics(
+      key: ValueKey<String>('food_choice_${mode.name}_${option.label}'),
       container: true,
       button: true,
       label: option.label,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          key: ValueKey<String>('food_choice_tap_${mode.name}_${option.label}'),
           borderRadius: BorderRadius.circular(18),
           onTap: onTap,
           child: Ink(
