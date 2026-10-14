@@ -467,7 +467,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             'name': result.name,
             'address': result.address,
             'city': result.city,
-            'distance_km': result.distanceKm,
             'latitude': result.latitude,
             'longitude': result.longitude,
             'phone': result.phone,
@@ -606,7 +605,6 @@ class _RestaurantListCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (result.city != null) Text(result.city!),
-              Text(result.formattedDistance),
               if (order && result.deliveryAvailable)
                 const Text('Lieferung laut Datenquelle verfügbar'),
             ],
@@ -715,7 +713,7 @@ class _DiscoveryEmpty extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Für „$cuisine“ wurden innerhalb von 10 km keine passenden Einträge aus der aktuellen Datenquelle gefunden.',
+                'Für „$cuisine“ wurden keine passenden Einträge aus der aktuellen Datenquelle gefunden.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: colors.onSurfaceVariant, height: 1.45),
                 textAlign: TextAlign.center,
               ),
