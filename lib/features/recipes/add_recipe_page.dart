@@ -216,7 +216,6 @@ class RecipeImportPreviewPage extends StatefulWidget {
   final Recipe recipe;
   final String? decisionRequestId;
   final bool selectForToday;
-  final bool autoOpenPrompt;
   final DateTime? planDate;
 
   const RecipeImportPreviewPage({
@@ -224,7 +223,6 @@ class RecipeImportPreviewPage extends StatefulWidget {
     required this.recipe,
     this.decisionRequestId,
     this.selectForToday = false,
-    this.autoOpenPrompt = false,
     this.planDate,
   });
 
