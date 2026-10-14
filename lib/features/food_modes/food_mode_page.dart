@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/app_design.dart';
@@ -127,6 +128,9 @@ class _FoodModePageState extends State<FoodModePage> {
   }
 
   Future<void> _openChatGptForCuisine(BuildContext context, String cuisine) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString('fatzomat_pending_restaurant_import_cuisine', cuisine);
+    if (!context.mounted) return;
     final selected = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => ChatGptRestaurantPage(
