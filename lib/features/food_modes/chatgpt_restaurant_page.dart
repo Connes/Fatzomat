@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_design.dart';
-import '../../core/food_mode.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/personal_today_repository.dart';
@@ -88,7 +87,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       _importing = true;
     });
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['json'],
         withData: true,
