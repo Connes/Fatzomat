@@ -704,6 +704,20 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                               '${recipe.servings} Personen · $total Min. · ${_difficulty(recipe.difficulty)}',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
+                            const SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                key: Key('cook-search-select-recipe-${recipe.id}'),
+                                onPressed: () => selectRecipeForToday(recipe),
+                                icon: const Icon(Icons.event_available_rounded, size: 18),
+                                label: Text(
+                                  widget.planDate == null || _isSelectedDateToday
+                                      ? 'Für heute auswählen'
+                                      : 'Für diesen Tag auswählen',
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
