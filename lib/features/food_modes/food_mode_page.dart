@@ -127,7 +127,7 @@ class _FoodModePageState extends State<FoodModePage> {
   }
 
   void _openChatGptForCuisine(BuildContext context, String cuisine) {
-    Navigator.of(context).push<bool>(
+    Navigator.of(context, rootNavigator: true).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) => ChatGptRestaurantPage(
           planDate: widget.planDate,
