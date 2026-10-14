@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
@@ -15,7 +16,14 @@ import '../../data/repositories/personal_today_repository.dart';
 
 class ChatGptRestaurantPage extends StatefulWidget {
   final DateTime? planDate;
-  const ChatGptRestaurantPage({super.key, this.planDate});
+  final String initialCuisine;
+  final bool autoOpenChatGpt;
+  const ChatGptRestaurantPage({
+    super.key,
+    this.planDate,
+    this.initialCuisine = 'Griechisch',
+    this.autoOpenChatGpt = false,
+  });
 
   @override
   State<ChatGptRestaurantPage> createState() => _ChatGptRestaurantPageState();
@@ -29,7 +37,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
     'Libanesisch', 'Portugiesisch', 'Vegetarisch', 'Vegan',
   ];
 
-  String _cuisine = 'Griechisch';
+  late String _cuisine;
   final _locationController = TextEditingController();
   String? _error;
   Map<String, dynamic>? _restaurant;
@@ -40,6 +48,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
   @override
   void initState() {
     super.initState();
+    _cuisine = widget.initialCuisine;
     _determineCurrentLocation();
   }
 
@@ -85,6 +94,9 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       setState(() => _locationStatus = error.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _locating = false);
+      if (mounted && widget.autoOpenChatGpt) {
+        await _launchChatGptWithPrompt();
+      }
     }
   }
 
@@ -128,7 +140,20 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     );
   }
 
+  Future<void> _launchChatGptWithPrompt() async {
+    final uri = Uri.https('chatgpt.com', '/', {'q': _prompt});
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ChatGPT konnte nicht automatisch geöffnet werden. Du kannst den Prompt unten manuell öffnen.')),
+      );
+    }
+  }
+
   Future<void> _openChatGpt() async {
+    final uri = Uri.https('chatgpt.com', '/', {'q': _prompt});
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (launched) return;
     await SharePlus.instance.share(
       ShareParams(
         text: _prompt,
