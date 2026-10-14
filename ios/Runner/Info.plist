@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Schmackofatz verwendet deinen Standort, um Restaurants und Lieferanbieter im Umkreis von 20 km zu finden.</string>
+	<string>Fatzomat verwendet deinen aktuellen Standort, um Restaurants in deiner Nähe zu finden.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Schmackofatz benötigt die Kamera, um ein Rezeptfoto für die Rezeptübernahme aufzunehmen.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
