@@ -647,6 +647,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
   final Set<String> initialSelectedFoodIds;
   final String? decisionRequestId;
   final bool selectForToday;
+  final bool autoOpenPrompt;
   final DateTime? planDate;
 
   const ChatGptRecipeSetupPage({
@@ -655,6 +656,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
     this.initialSelectedFoodIds = const <String>{},
     this.decisionRequestId,
     this.selectForToday = false,
+    this.autoOpenPrompt = false,
     this.planDate,
   });
 
