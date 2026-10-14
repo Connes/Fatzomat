@@ -105,7 +105,11 @@ void main() {
       // grid inside a scroll view, whose hit-test geometry is unreliable in
       // this widget test; this still exercises the production navigation path.
       tester.widget<InkWell>(tapTarget).onTap!.call();
-      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      // Location lookup intentionally shows a progress indicator and may not
+      // settle in widget tests without native geolocation platform channels.
+      // Pump the route transition for a bounded duration instead of waiting
+      // for every animation in the new page to become idle.
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(ChatGptRestaurantPage), findsOneWidget);
