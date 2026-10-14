@@ -17,5 +17,8 @@ void main() {
     expect(source, contains('&& !done && nextStep'));
     expect(source, isNot(contains('Icons.soup_kitchen_rounded')));
     expect(source, isNot(contains("Schritten erledigt")));
+    expect(source, isNot(contains("Für heute festlegen")));
+    expect(source, isNot(contains("Für heute ausgewählt")));
+    expect(source, isNot(contains("Für diesen Tag ausgewählt")));
   });
 }
