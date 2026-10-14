@@ -150,6 +150,12 @@ test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutaten
     expect(source, contains('crossAxisSpacing: 10'));
     expect(source, contains('childAspectRatio: 1.82'));
     expect(source, contains('padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7)'));
+    expect(source, contains('color: selected\n                              ? AppDesign.secondarySurface'));
+    expect(source, isNot(contains('Icons.check_circle_rounded, size: 18')));
+    expect(source, contains("label: const Text('Prompt kopieren & ChatGPT öffnen')"));
+    expect(source, contains('minimumSize: const Size.fromHeight(54)'));
+    expect(source, contains('padding: const EdgeInsets.fromLTRB(14, 10, 14, 20)'));
+
   });
 
 test('Import-Vorschau bietet Bearbeiten vor dem Speichern an', () {
