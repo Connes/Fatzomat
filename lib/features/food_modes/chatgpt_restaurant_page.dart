@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_design.dart';
@@ -235,6 +236,8 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
         }),
         date: widget.planDate,
       );
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.remove('fatzomat_pending_restaurant_import_cuisine');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Restaurant wurde als Tagesvorschlag übernommen.')),
