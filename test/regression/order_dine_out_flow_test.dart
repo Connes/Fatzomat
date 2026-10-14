@@ -83,76 +83,6 @@ const _dineOutChoices = [
 ];
 
 void main() {
-  Future<void> verifyChoiceFlow(
-    WidgetTester tester, {
-    required FoodMode mode,
-    required String choice,
-  }) async {
-    final repository = _FakeDiscoveryRepository([_restaurant(choice)]);
-    var selected = false;
-
-    await tester.pumpWidget(MaterialApp(
-      home: FoodModePage(
-        mode: mode,
-        locationService: _FakeLocationService(
-          const UserLocation(latitude: 48.89, longitude: 8.70),
-        ),
-        discoveryRepository: repository,
-        onResultSelected: (_) async => selected = true,
-      ),
-    ));
-    await tester.pumpAndSettle();
-
-    final choiceFinder = find.text(choice).first;
-    expect(choiceFinder, findsOneWidget, reason: '$mode: Auswahl $choice fehlt');
-    await tester.ensureVisible(choiceFinder);
-    await tester.tap(choiceFinder);
-    await tester.pumpAndSettle();
-
-    expect(
-      find.byType(DiscoveryPage),
-      findsOneWidget,
-      reason: '$mode/$choice öffnet keine Discovery-Seite',
-    );
-    expect(
-      find.text('$choice Testrestaurant'),
-      findsWidgets,
-      reason: '$mode/$choice liefert keine Trefferseite',
-    );
-    expect(repository.cuisine, choice);
-    expect(repository.deliveryOnly, mode == FoodMode.order);
-    expect(find.textContaining('Suche nicht möglich'), findsNothing);
-    expect(find.textContaining('Keine passenden'), findsNothing);
-
-    final restaurantFinder = find.text('$choice Testrestaurant').last;
-    await tester.ensureVisible(restaurantFinder);
-    await tester.tap(restaurantFinder);
-    await tester.pumpAndSettle();
-
-    expect(
-      find.byType(RestaurantDetailPage),
-      findsOneWidget,
-      reason: '$mode/$choice öffnet keine Restaurantdetails',
-    );
-    expect(find.text('$choice Testrestaurant'), findsWidgets);
-    expect(find.text('Für heute auswählen'), findsOneWidget);
-
-    final selectFinder = find.text('Für heute auswählen');
-    await tester.ensureVisible(selectFinder);
-    await tester.tap(selectFinder);
-    await tester.pumpAndSettle();
-    expect(
-      selected,
-      isTrue,
-      reason: '$mode/$choice speichert die Auswahl nicht über den vollständigen Pfad',
-    );
-    expect(
-      find.byType(FoodModePage),
-      findsNothing,
-      reason: '$mode/$choice bleibt nach der Auswahl fälschlich auf der Auswahlseite',
-    );
-  }
-
   for (final choice in _dineOutChoices) {
     testWidgets('Wir gehen essen: $choice öffnet ChatGPT mit der gewählten Küche', (tester) async {
       await tester.pumpWidget(MaterialApp(
@@ -166,10 +96,14 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final choiceFinder = find.text(choice).first;
+      final choiceFinder = find.text(choice).last;
       expect(choiceFinder, findsOneWidget, reason: 'Auswahl $choice fehlt');
       await tester.ensureVisible(choiceFinder);
-      await tester.tap(choiceFinder);
+      final choiceCard = find.ancestor(
+        of: choiceFinder,
+        matching: find.byType(InkWell),
+      ).first;
+      await tester.tap(choiceCard);
       // The restaurant page starts device-location lookup asynchronously and
       // may show an indeterminate progress indicator, so don't use pumpAndSettle.
       await tester.pump(const Duration(milliseconds: 100));
