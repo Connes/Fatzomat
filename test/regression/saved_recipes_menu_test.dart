@@ -3,6 +3,20 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('saved recipes expose a subtle main ingredient filter with all five categories', () {
+    final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+
+    expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));
+    expect(source, contains("PopupMenuItem(value: 'Alle', child: Text('Alle Rezepte'))"));
+    expect(source, contains("PopupMenuItem(value: 'Schwein', child: Text('Schwein'))"));
+    expect(source, contains("PopupMenuItem(value: 'Rind', child: Text('Rind'))"));
+    expect(source, contains("PopupMenuItem(value: 'Huhn', child: Text('Huhn'))"));
+    expect(source, contains("PopupMenuItem(value: 'Vegetarisch', child: Text('Vegetarisch'))"));
+    expect(source, contains("PopupMenuItem(value: 'Fisch', child: Text('Fisch'))"));
+    expect(source, contains('mainIngredientFilter'));
+    expect(source, contains('mainChoice: mainIngredientFilter'));
+  });
+
   test('V86 keeps the saved recipe overflow menu focused on recipe actions', () {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
