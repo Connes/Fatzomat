@@ -25,6 +25,29 @@ class AdditionalIngredientsPage extends StatefulWidget {
 
 class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
   late final Set<String> selectedFoodIds = {...widget.initialSelectedFoodIds};
+  late final FoodRepository repository = widget.repository ?? FoodRepository();
+  List<Food> foods = <Food>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFoods();
+  }
+
+  Future<void> _loadFoods() async {
+    try {
+      final result = await repository.foods();
+      if (!mounted) return;
+      setState(() => foods = result);
+    } catch (_) {
+      // Keep the selection usable even if names cannot be loaded.
+    }
+  }
+
+  List<Food> get selectedFoods => selectedFoodIds
+      .map((id) => foods.where((food) => food.id == id).firstOrNull)
+      .whereType<Food>()
+      .toList(growable: false);
 
   Future<void> _openCategory(IngredientCategory category) async {
     final result = await Navigator.push<Set<String>>(
@@ -98,16 +121,33 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
                   color: AppDesign.secondarySurface,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        '${selectedFoodIds.length} Zutat${selectedFoodIds.length == 1 ? '' : 'en'} ausgewählt',
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
+                    Row(
+                      children: [
+                        const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Ausgewählte Zutaten (${selectedFoodIds.length})',
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
                     ),
+                    if (selectedFoods.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      ...selectedFoods.map(
+                        (food) => Padding(
+                          padding: const EdgeInsets.only(left: 36, bottom: 6),
+                          child: Text('• ${food.name}'),
+                        ),
+                      ),
+                    ] else ...[
+                      const SizedBox(height: 8),
+                      const Text('Zutaten werden geladen …'),
+                    ],
                   ],
                 ),
               ),
