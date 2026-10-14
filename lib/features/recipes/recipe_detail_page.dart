@@ -380,30 +380,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (personalTodaySelected || widget.viewingTodaySelection) ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    margin: const EdgeInsets.only(bottom: 14),
-                    decoration: BoxDecoration(
-                      color: AppDesign.secondarySurface,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.check_circle_rounded, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.planDate == null || _isPlanDateToday
-                              ? 'Für heute ausgewählt'
-                              : 'Für diesen Tag ausgewählt',
-                          style: const TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
                 Align(
                   alignment: Alignment.center,
                   child: Text(
@@ -643,22 +619,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (!personalTodaySelected)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: working ? null : selectPersonalToday,
-                    icon: const Icon(Icons.today_rounded),
-                    label: Text(
-                      working
-                          ? 'Plan wird gespeichert …'
-                          : widget.planDate == null || _isPlanDateToday
-                              ? 'Für heute festlegen'
-                              : 'Für diesen Tag festlegen',
-                    ),
-                  ),
-                )
-              else if (selectedPlanId != null && servings != selectedPlanServings)
+              if (personalTodaySelected &&
+                  selectedPlanId != null &&
+                  servings != selectedPlanServings)
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
