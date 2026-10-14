@@ -951,12 +951,15 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                                       children: [
                                         if (asset != null)
                                           Expanded(
-                                            child: Image.asset(
-                                              asset,
-                                              fit: BoxFit.contain,
-                                              alignment: Alignment.center,
-                                              width: double.infinity,
-                                              errorBuilder: (_, __, ___) => Icon(_icon(choice), size: 44),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) => Image.asset(
+                                                asset,
+                                                fit: BoxFit.cover,
+                                                alignment: Alignment.center,
+                                                width: constraints.maxWidth,
+                                                height: constraints.maxHeight,
+                                                errorBuilder: (_, __, ___) => Icon(_icon(choice), size: 44),
+                                              ),
                                             ),
                                           )
                                         else
