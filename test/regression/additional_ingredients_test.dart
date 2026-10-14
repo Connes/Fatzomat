@@ -24,6 +24,25 @@ void main() {
     expect(find.text('Hauptauswahl:'), findsNothing);
   });
 
+  testWidgets('Ausgewählte Zutaten werden namentlich statt nur als Anzahl angezeigt', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AdditionalIngredientsPage(
+          mainChoice: 'Huhn',
+          initialSelectedFoodIds: const {'rice', 'broccoli', 'potato'},
+          repository: _FakeFoodRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ausgewählte Zutaten (3)'), findsOneWidget);
+    expect(find.text('• Reis'), findsOneWidget);
+    expect(find.text('• Brokkoli'), findsOneWidget);
+    expect(find.text('• Kartoffel'), findsOneWidget);
+    expect(find.text('3 Zutaten ausgewählt'), findsNothing);
+  });
+
   testWidgets('V92 Kategorieauswahl zeigt keinen unboxed Untertitel und nutzt extendBody', (tester) async {
     await _openCategory(tester, 'Beilage');
 
