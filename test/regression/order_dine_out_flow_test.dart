@@ -94,7 +94,10 @@ void main() {
           discoveryRepository: _FakeDiscoveryRepository([_restaurant(choice)]),
         ),
       ));
-      await tester.pumpAndSettle();
+      // The app scaffold can keep an indeterminate animation alive, so
+      // avoid pumpAndSettle here; this test only needs the initial layout.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       final choiceCard = find.byKey(ValueKey<String>('food_choice_dineOut_$choice'));
       expect(choiceCard, findsOneWidget, reason: 'Auswahl $choice fehlt');
