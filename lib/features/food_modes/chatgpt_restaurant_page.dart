@@ -295,6 +295,21 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
 
   @override
   Widget build(BuildContext context) {
+    // While Android/iOS asks for location permission, keep the app behind
+    // the system dialog visually neutral instead of exposing the restaurant UI.
+    if (widget.autoOpenChatGpt && _locating) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF7F7F7),
+        body: Center(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: CircularProgressIndicator(strokeWidth: 2.5),
+          ),
+        ),
+      );
+    }
+
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(title: const Text('Mit ChatGPT suchen')),
