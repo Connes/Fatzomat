@@ -102,9 +102,9 @@ void main() {
       expect(tapTarget, findsOneWidget, reason: 'Klickziel für $choice fehlt');
       await tester.ensureVisible(tapTarget);
       await tester.tap(tapTarget);
-      // The restaurant page starts device-location lookup asynchronously and
-      // may show an indeterminate progress indicator, so don't use pumpAndSettle.
-      await tester.pump(const Duration(milliseconds: 100));
+      // Allow the MaterialPageRoute transition to finish. Location lookup and
+      // the external URL launch are asynchronous, so avoid pumpAndSettle.
+      await tester.pump(const Duration(milliseconds: 500));
 
       expect(find.byType(ChatGptRestaurantPage), findsOneWidget);
       final cuisineField = tester.widget<DropdownButtonFormField<String>>(
