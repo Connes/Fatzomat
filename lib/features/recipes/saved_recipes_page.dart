@@ -742,36 +742,90 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PopupMenuButton<String>(
-              tooltip: 'Rezepte nach Hauptzutat filtern',
-              initialValue: mainIngredientFilter ?? 'Alle',
-              onSelected: (value) => setState(
-                () => mainIngredientFilter = value == 'Alle' ? null : value,
-              ),
-              icon: Icon(
-                Icons.filter_list_rounded,
-                size: 22,
-                color: mainIngredientFilter == null
-                    ? Theme.of(context).colorScheme.onSurfaceVariant
-                    : Theme.of(context).colorScheme.primary,
-              ),
-              itemBuilder: (_) => const [
-                PopupMenuItem(value: 'Alle', child: Text('Alle Rezepte')),
-                PopupMenuDivider(),
-                PopupMenuItem(value: 'Schwein', child: Text('Schwein')),
-                PopupMenuItem(value: 'Rind', child: Text('Rind')),
-                PopupMenuItem(value: 'Huhn', child: Text('Huhn')),
-                PopupMenuItem(value: 'Vegetarisch', child: Text('Vegetarisch')),
-                PopupMenuItem(value: 'Fisch', child: Text('Fisch')),
-              ],
+        leading: PopupMenuButton<String>(
+          tooltip: 'Rezepte nach Hauptzutat filtern',
+          initialValue: mainIngredientFilter ?? 'Alle',
+          onSelected: (value) => setState(
+            () => mainIngredientFilter = value == 'Alle' ? null : value,
+          ),
+          icon: Icon(
+            Icons.tune_rounded,
+            size: 22,
+            color: mainIngredientFilter == null
+                ? Theme.of(context).colorScheme.onSurfaceVariant
+                : Theme.of(context).colorScheme.primary,
+          ),
+          color: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          elevation: 8,
+          shadowColor: Colors.black.withValues(alpha: .12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
             ),
-            const SizedBox(width: 2),
-            const Flexible(child: Text('Meine Rezepte')),
-          ],
+          ),
+          constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+          menuPadding: const EdgeInsets.symmetric(vertical: 8),
+          itemBuilder: (_) {
+            const options = <(String, IconData)>[
+              ('Alle', Icons.grid_view_rounded),
+              ('Schwein', Icons.restaurant_rounded),
+              ('Rind', Icons.restaurant_rounded),
+              ('Huhn', Icons.restaurant_rounded),
+              ('Vegetarisch', Icons.eco_rounded),
+              ('Fisch', Icons.set_meal_rounded),
+            ];
+            final selected = mainIngredientFilter ?? 'Alle';
+            return options.map((option) {
+              final value = option.$1;
+              final isSelected = selected == value;
+              return PopupMenuItem<String>(
+                value: value,
+                height: 48,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppDesign.secondarySurface
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        option.$2,
+                        size: 20,
+                        color: isSelected
+                            ? AppDesign.primaryDark
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          value == 'Alle' ? 'Alle Rezepte' : value,
+                          style: TextStyle(
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected
+                                ? AppDesign.primaryDark
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        const Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: AppDesign.primaryDark,
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList();
+          },
         ),
+        title: const Text('Meine Rezepte'),
         actions: [
           IconButton(
             tooltip: 'Rezept hinzufügen',
