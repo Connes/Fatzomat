@@ -96,36 +96,24 @@ class PhotoRecipeChatGptPage extends StatefulWidget {
 
 class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
   final ImagePicker _picker = ImagePicker();
+  final List<XFile> selectedImages = [];
   bool working = false;
 
-  Future<void> _pick(ImageSource source, BuildContext shareContext) async {
+  Future<void> _pickCameraPhoto() async {
     if (working) return;
     setState(() => working = true);
     try {
-      final image = await _picker.pickImage(source: source, imageQuality: 92, maxWidth: 2400);
+      final image = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 92,
+        maxWidth: 2400,
+      );
       if (image == null || !mounted) return;
-
-      final prompt = TogetherChatGptPrompt.buildPhotoImportPrompt();
-      await Clipboard.setData(ClipboardData(text: prompt));
-
-      final box = shareContext.findRenderObject() as RenderBox?;
-      await SharePlus.instance.share(
-        ShareParams(
-          text: prompt,
-          files: [XFile(image.path)],
-          subject: 'Rezeptfoto für Schmackofatz',
-          title: 'Rezeptfoto an ChatGPT',
-          sharePositionOrigin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
-        ),
-      );
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Foto und Prompt wurden zum Teilen vorbereitet. Wähle ChatGPT aus und importiere danach die erzeugte together_recipe.json in Schmackofatz.'),
-          duration: Duration(seconds: 5),
-        ),
-      );
+      setState(() {
+        if (!selectedImages.any((existing) => existing.path == image.path)) {
+          selectedImages.add(image);
+        }
+      });
     } catch (e) {
       if (mounted) showAppError(context, e);
     } finally {
@@ -133,7 +121,30 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
     }
   }
 
-  Future<void> _chooseSource(BuildContext shareContext) async {
+  Future<void> _pickGalleryPhotos() async {
+    if (working) return;
+    setState(() => working = true);
+    try {
+      final images = await _picker.pickMultiImage(
+        imageQuality: 92,
+        maxWidth: 2400,
+      );
+      if (!mounted || images.isEmpty) return;
+      setState(() {
+        for (final image in images) {
+          if (!selectedImages.any((existing) => existing.path == image.path)) {
+            selectedImages.add(image);
+          }
+        }
+      });
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
+  }
+
+  Future<void> _chooseSource() async {
     if (working) return;
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
@@ -143,26 +154,68 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
-              title: const Text('Foto aufnehmen'),
+              title: const Text('Weiteres Foto aufnehmen'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded),
-              title: const Text('Foto aus Galerie wählen'),
+              title: const Text('Mehrere Fotos aus Galerie wählen'),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ],
         ),
       ),
     );
-    if (source != null) await _pick(source, shareContext);
+    if (source == ImageSource.camera) {
+      await _pickCameraPhoto();
+    } else if (source == ImageSource.gallery) {
+      await _pickGalleryPhotos();
+    }
+  }
+
+  Future<void> _sharePhotos(BuildContext shareContext) async {
+    if (working || selectedImages.isEmpty) return;
+    setState(() => working = true);
+    try {
+      final prompt = TogetherChatGptPrompt.buildPhotoImportPrompt();
+      await Clipboard.setData(ClipboardData(text: prompt));
+
+      final box = shareContext.findRenderObject() as RenderBox?;
+      await SharePlus.instance.share(
+        ShareParams(
+          text: prompt,
+          files: List<XFile>.unmodifiable(selectedImages),
+          subject: 'Rezept aus mehreren Fotos für Schmackofatz',
+          title: 'Rezeptfotos an ChatGPT',
+          sharePositionOrigin: box == null
+              ? null
+              : box.localToGlobal(Offset.zero) & box.size,
+        ),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${selectedImages.length} Fotos und der Prompt wurden zum Teilen vorbereitet. '
+            'ChatGPT soll Überlappungen zusammenführen und doppelte Zutaten vermeiden. '
+            'Importiere danach together_recipe.json in Schmackofatz.',
+          ),
+          duration: const Duration(seconds: 6),
+        ),
+      );
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    } finally {
+      if (mounted) setState(() => working = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
-      appBar: const TogetherAppBar(title: Text('Rezept aus Foto erstellen')),
+      appBar: const TogetherAppBar(title: Text('Rezept aus Fotos erstellen')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
         children: [
@@ -177,22 +230,74 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
               children: [
                 const Icon(Icons.document_scanner_rounded, size: 46, color: AppDesign.primaryDark),
                 const SizedBox(height: 16),
-                Text('Rezeptfoto an ChatGPT übergeben', style: Theme.of(context).textTheme.headlineSmall),
+                Text('Rezeptfotos an ChatGPT übergeben', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 10),
-                const Text('Schmackofatz verwendet einen festen Import-Prompt. ChatGPT liest das Foto aus und erstellt daraus eine together_recipe.json. Prüfe das Rezept anschließend in der Vorschau, bevor es in eure gemeinsame Sammlung gespeichert wird.'),
-                const SizedBox(height: 18),
-                Builder(
-                  builder: (buttonContext) => FilledButton.icon(
-                    onPressed: working ? null : () => _chooseSource(buttonContext),
-                    icon: working
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.photo_camera_rounded),
-                    label: Text(working ? 'Wird vorbereitet …' : 'Foto auswählen'),
-                    style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
-                  ),
+                const Text(
+                  'Füge alle Fotos hinzu, auf denen das Rezept verteilt ist. '
+                  'ChatGPT soll sie gemeinsam auslesen, überlappende Bereiche erkennen, '
+                  'angeschnittene Zeilen verbinden und doppelte Zutaten nur einmal übernehmen. '
+                  'Danach erstellt ChatGPT eine einzige together_recipe.json.',
                 ),
+                const SizedBox(height: 18),
+                OutlinedButton.icon(
+                  onPressed: working ? null : _chooseSource,
+                  icon: const Icon(Icons.add_photo_alternate_outlined),
+                  label: const Text('Fotos hinzufügen'),
+                  style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                ),
+                if (selectedImages.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Ausgewählte Fotos (${selectedImages.length})',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 10),
+                  ...List.generate(selectedImages.length, (index) {
+                    final image = selectedImages[index];
+                    return Card(
+                      child: ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(image.path),
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        title: Text('Foto ${index + 1}'),
+                        subtitle: Text(image.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        trailing: IconButton(
+                          tooltip: 'Foto entfernen',
+                          onPressed: working ? null : () => setState(() => selectedImages.removeAt(index)),
+                          icon: const Icon(Icons.close_rounded),
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 10),
+                  Builder(
+                    builder: (buttonContext) => FilledButton.icon(
+                      onPressed: working ? null : () => _sharePhotos(buttonContext),
+                      icon: working
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(Icons.chat_rounded),
+                      label: Text(
+                        working
+                            ? 'Wird vorbereitet …'
+                            : ' ${selectedImages.length} Fotos an ChatGPT übergeben',
+                      ),
+                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
-                Text('Der Teilen-Dialog übergibt Foto und Prompt. Falls ChatGPT nicht als Ziel angeboten wird, kann das Foto dort manuell angehängt und der kopierte Prompt eingefügt werden.', style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  'Du kannst Fotos aus der Galerie gesammelt auswählen oder mehrere Bilder nacheinander aufnehmen. '
+                  'Der Teilen-Dialog übergibt alle ausgewählten Bilder zusammen mit dem kopierten Prompt. '
+                  'Prüfe das importierte Rezept anschließend in der Vorschau.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
           ),
@@ -201,7 +306,6 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
     );
   }
 }
-
 
 List<(String?, List<RecipeIngredient>)> _ingredientSections(List<RecipeIngredient> ingredients) {
   final groups = <String?, List<RecipeIngredient>>{};
