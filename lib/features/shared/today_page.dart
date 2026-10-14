@@ -1112,7 +1112,6 @@ class _TodayResultCard extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(width >= 700 ? 28 : 18, 20, width >= 700 ? 28 : 18, 22),
         child: Column(
           children: [
-            const SizedBox(height: 22),
             Material(
               color: Colors.transparent,
               child: InkWell(
@@ -1204,16 +1203,39 @@ class _TodayResultCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                       ],
-                      Text(
-                        plan.displayTitle,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              fontSize: titleSize,
-                              height: 1.05,
-                              fontWeight: FontWeight.w800,
-                              color: AppDesign.primaryDark,
-                            ),
-                      ),
+                      if (plan.decisionType == 'dine_out') ...[
+                        Text(
+                          'Wir gehen essen',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                fontSize: titleSize,
+                                height: 1.05,
+                                fontWeight: FontWeight.w800,
+                                color: AppDesign.primaryDark,
+                              ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          plan.restaurantName,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                fontSize: titleSize,
+                                height: 1.05,
+                                fontWeight: FontWeight.w800,
+                                color: AppDesign.primaryDark,
+                              ),
+                        ),
+                      ] else
+                        Text(
+                          plan.displayTitle,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                fontSize: titleSize,
+                                height: 1.05,
+                                fontWeight: FontWeight.w800,
+                                color: AppDesign.primaryDark,
+                              ),
+                        ),
                     ],
                   ),
                 ),
