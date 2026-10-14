@@ -15,9 +15,7 @@ import '../../data/repositories/personal_today_repository.dart';
 
 class ChatGptRestaurantPage extends StatefulWidget {
   final DateTime? planDate;
-  final VoidCallback? onNavigateToToday;
-
-  const ChatGptRestaurantPage({super.key, this.planDate, this.onNavigateToToday});
+  const ChatGptRestaurantPage({super.key, this.planDate});
 
   @override
   State<ChatGptRestaurantPage> createState() => _ChatGptRestaurantPageState();
@@ -239,7 +237,9 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Restaurant wurde als Tagesvorschlag übernommen.')),
       );
-      widget.onNavigateToToday?.call();
+      // Let FoodModePage handle returning to Today after this route returns.
+      // Navigating to Today here clears the stack before the parent resumes,
+      // so the parent's subsequent pop can hit an empty Navigator history.
       Navigator.of(context).pop(true);
     } catch (error) {
       if (!mounted) return;
