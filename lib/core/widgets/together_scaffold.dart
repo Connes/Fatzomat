@@ -11,6 +11,7 @@ import '../app_design.dart';
 class TogetherAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
   final List<Widget>? actions;
+  final Widget? leading;
   final bool automaticallyImplyLeading;
   final Color? backgroundColor;
   final SystemUiOverlayStyle? systemOverlayStyle;
@@ -19,6 +20,7 @@ class TogetherAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.actions,
+    this.leading,
     this.automaticallyImplyLeading = true,
     this.backgroundColor,
     this.systemOverlayStyle,
@@ -28,6 +30,7 @@ class TogetherAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: title,
+      leading: leading,
       centerTitle: true,
       automaticallyImplyLeading: automaticallyImplyLeading,
       backgroundColor: backgroundColor ?? AppDesign.surface,
