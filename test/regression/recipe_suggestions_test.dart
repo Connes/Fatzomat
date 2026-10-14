@@ -19,7 +19,7 @@ void main() {
     expect(addRecipe, isNot(contains("title: 'Manuell erstellen'")));
     expect(addRecipe, contains("title: 'Mit ChatGPT erstellen'"));
     expect(addRecipe, contains("title: 'Rezept aus Foto erstellen'"));
-    expect(saved, contains("const Flexible(child: Text('Meine Rezepte'))"));
+    expect(saved, contains("title: const Text('Meine Rezepte')"));
     expect(saved, isNot(contains('receivedRecipeSuggestions')));
     expect(saved, isNot(contains('respondToRecipeSuggestion')));
     expect(saved, contains("PopupMenuItem(value: 'share', child: Text('Rezept teilen'))"));
