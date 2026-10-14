@@ -98,8 +98,13 @@ void main() {
 
       final choiceCard = find.byKey(ValueKey<String>('food_choice_dineOut_$choice'));
       expect(choiceCard, findsOneWidget, reason: 'Auswahl $choice fehlt');
-      await tester.ensureVisible(choiceCard);
-      await tester.tap(choiceCard);
+      final tapTarget = find.descendant(
+        of: choiceCard,
+        matching: find.byType(InkWell),
+      );
+      expect(tapTarget, findsOneWidget, reason: 'Klickziel für $choice fehlt');
+      await tester.ensureVisible(tapTarget);
+      await tester.tap(tapTarget);
       // The restaurant page starts device-location lookup asynchronously and
       // may show an indeterminate progress indicator, so don't use pumpAndSettle.
       await tester.pump(const Duration(milliseconds: 100));
