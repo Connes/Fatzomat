@@ -219,7 +219,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
               const Text('Wähle die Küche und gib einen Ort oder eine Adresse als Ausgangspunkt an.'),
               const SizedBox(height: 14),
               DropdownButtonFormField<String>(
-                value: _cuisine,
+                initialValue: _cuisine,
                 decoration: const InputDecoration(labelText: 'Küche'),
                 items: _cuisines.map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(),
                 onChanged: (value) => setState(() => _cuisine = value ?? _cuisine),
