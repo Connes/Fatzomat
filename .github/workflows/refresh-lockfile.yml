@@ -1,0 +1,35 @@
+name: Refresh Flutter lockfile
+
+on:
+  push:
+    branches: [fix/share-restaurant-prompt-to-chatgpt]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/share-restaurant-prompt-to-chatgpt
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.2"
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Commit lockfile if changed
+        run: |
+          if git diff --quiet -- pubspec.lock; then
+            echo "Lockfile already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.lock
+          git commit -m "Update Flutter lockfile for location dependencies [skip ci]"
+          git push
