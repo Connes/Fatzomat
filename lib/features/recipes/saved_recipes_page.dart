@@ -179,6 +179,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   bool loading = true;
   List<Recipe> recipes = [];
   String query = '';
+  String? mainIngredientFilter;
   TodayPlan? todayPlan;
   RealtimeChannel? realtimeChannel;
 
@@ -543,6 +544,13 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           !recipe.description.toLowerCase().contains(normalizedQuery)) {
         return false;
       }
+      if (mainIngredientFilter != null &&
+          !recipeModelMatchesSelection(
+            recipe,
+            mainChoice: mainIngredientFilter,
+          )) {
+        return false;
+      }
       return recipeModelMatchesSelection(
         recipe,
         mainChoice: widget.mainChoice,
@@ -734,7 +742,36 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(
-        title: const Text('Meine Rezepte'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PopupMenuButton<String>(
+              tooltip: 'Rezepte nach Hauptzutat filtern',
+              initialValue: mainIngredientFilter ?? 'Alle',
+              onSelected: (value) => setState(
+                () => mainIngredientFilter = value == 'Alle' ? null : value,
+              ),
+              icon: Icon(
+                Icons.filter_list_rounded,
+                size: 22,
+                color: mainIngredientFilter == null
+                    ? Theme.of(context).colorScheme.onSurfaceVariant
+                    : Theme.of(context).colorScheme.primary,
+              ),
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'Alle', child: Text('Alle Rezepte')),
+                PopupMenuDivider(),
+                PopupMenuItem(value: 'Schwein', child: Text('Schwein')),
+                PopupMenuItem(value: 'Rind', child: Text('Rind')),
+                PopupMenuItem(value: 'Huhn', child: Text('Huhn')),
+                PopupMenuItem(value: 'Vegetarisch', child: Text('Vegetarisch')),
+                PopupMenuItem(value: 'Fisch', child: Text('Fisch')),
+              ],
+            ),
+            const SizedBox(width: 2),
+            const Flexible(child: Text('Meine Rezepte')),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: 'Rezept hinzufügen',
