@@ -98,10 +98,7 @@ void main() {
 
       final choiceCard = find.byKey(ValueKey<String>('food_choice_dineOut_$choice'));
       expect(choiceCard, findsOneWidget, reason: 'Auswahl $choice fehlt');
-      final tapTarget = find.descendant(
-        of: choiceCard,
-        matching: find.byType(InkWell),
-      );
+      final tapTarget = find.byKey(ValueKey<String>('food_choice_tap_dineOut_$choice'));
       expect(tapTarget, findsOneWidget, reason: 'Klickziel für $choice fehlt');
       await tester.ensureVisible(tapTarget);
       await tester.tap(tapTarget);
