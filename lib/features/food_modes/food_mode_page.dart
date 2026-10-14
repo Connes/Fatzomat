@@ -353,6 +353,7 @@ class _OptionCard extends StatelessWidget {
     }
 
     return Semantics(
+      key: ValueKey<String>('food_choice_${mode.name}_${option.label}'),
       container: true,
       button: true,
       label: option.label,
