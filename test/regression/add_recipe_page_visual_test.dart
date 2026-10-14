@@ -146,8 +146,10 @@ test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutaten
     expect(source, isNot(contains('Der Prompt landet automatisch in der Zwischenablage.')));
     expect(source, contains("label: const Text('Erstellte JSON-Datei importieren')"));
     expect(source, contains('onPressed: _importRecipeFile'));
-    expect(source, contains('mainAxisSpacing: 16'));
-    expect(source, contains('crossAxisSpacing: 16'));
+    expect(source, contains('mainAxisSpacing: 10'));
+    expect(source, contains('crossAxisSpacing: 10'));
+    expect(source, contains('childAspectRatio: 1.82'));
+    expect(source, contains('padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7)'));
   });
 
 test('Import-Vorschau bietet Bearbeiten vor dem Speichern an', () {
