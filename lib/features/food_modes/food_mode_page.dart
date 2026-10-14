@@ -126,10 +126,9 @@ class _FoodModePageState extends State<FoodModePage> {
     _resolveAndOpen(context, choice);
   }
 
-  Future<void> _openChatGptForCuisine(BuildContext context, String cuisine) async {
-    final selected = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
+  void _openChatGptForCuisine(BuildContext context, String cuisine) {
+    Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
         builder: (_) => ChatGptRestaurantPage(
           planDate: widget.planDate,
           initialCuisine: cuisine,
@@ -137,9 +136,6 @@ class _FoodModePageState extends State<FoodModePage> {
         ),
       ),
     );
-    if (selected == true && context.mounted) {
-      Navigator.pop(context, true);
-    }
   }
 
   Widget _choiceGrid(List<_ModeOption> options) {
