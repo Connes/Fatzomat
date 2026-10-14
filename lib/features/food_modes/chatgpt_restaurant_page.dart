@@ -92,9 +92,9 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
         type: FileType.custom,
         allowedExtensions: const ['json'],
       );
-      if (result == null || result.isEmpty) return;
+      if (result.isEmpty) return;
       final file = result.first;
-      final bytes = await File(file.path).readAsBytes();
+      final bytes = await File(file.path!).readAsBytes();
       final decoded = jsonDecode(utf8.decode(bytes));
       if (decoded is! Map<String, dynamic>) {
         throw const FormatException('Die JSON-Datei muss ein Objekt enthalten.');
