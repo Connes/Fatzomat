@@ -645,6 +645,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
   final Set<String> initialSelectedFoodIds;
   final String? decisionRequestId;
   final bool selectForToday;
+  final bool autoOpenPrompt;
   final DateTime? planDate;
 
   const ChatGptRecipeSetupPage({
@@ -653,6 +654,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
     this.initialSelectedFoodIds = const <String>{},
     this.decisionRequestId,
     this.selectForToday = false,
+    this.autoOpenPrompt = false,
     this.planDate,
   });
 
@@ -688,6 +690,9 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
         loading = false;
         error = null;
       });
+      if (widget.autoOpenPrompt) {
+        await _copyPromptAndOpenChatGpt();
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -756,17 +761,15 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
 
     setState(() => opening = true);
     try {
-      const channel = MethodChannel('together/chatgpt');
-      final opened = await channel.invokeMethod<bool>('openApp') ?? false;
-      if (!opened) {
-        final uri = Uri.parse('https://chatgpt.com/');
-        if (!await launchUrl(uri, mode: LaunchMode.externalApplication) && mounted) {
-          throw StateError('ChatGPT konnte nicht geöffnet werden.');
-        }
+      // ChatGPT's q parameter opens a conversation with the generated prompt
+      // prefilled, instead of merely opening an empty chat.
+      final uri = Uri.https('chatgpt.com', '/', {'q': prompt});
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication) && mounted) {
+        throw StateError('ChatGPT konnte nicht geöffnet werden.');
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Prompt kopiert. In ChatGPT einfügen und das JSON anschließend in Schmackofatz importieren.')),
+        const SnackBar(content: Text('Rezept-Prompt an ChatGPT übergeben.')),
       );
     } on PlatformException catch (e) {
       if (mounted) showAppError(context, StateError(e.message ?? 'ChatGPT konnte nicht geöffnet werden.'));
