@@ -25,12 +25,10 @@ void main() {
       recipe.indexOf('Navigator.pop(context);'),
       lessThan(recipe.indexOf('navigateToToday();')),
     );
-    expect(recipe, contains('FilledButton.icon('));
-    expect(recipe, contains('onPressed: working ? null : selectPersonalToday'));
-    expect(recipe, contains("label: Text("));
-    expect(recipe, contains("'Plan wird gespeichert …'"));
-    expect(recipe, contains("'Für heute festlegen'"));
-    expect(recipe, contains('if (!personalTodaySelected)'));
+    expect(recipe, isNot(contains('onPressed: working ? null : selectPersonalToday')));
+    expect(recipe, isNot(contains("'Plan wird gespeichert …'")));
+    expect(recipe, isNot(contains("'Für heute festlegen'")));
+    expect(recipe, isNot(contains("'Für diesen Tag festlegen'")));
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
     expect(recipe, contains("label: const Text('Als gekocht markieren')"));
@@ -41,14 +39,11 @@ void main() {
     );
     final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
     expect(bottomNavigation, isNot(contains('widget.canMarkCooked')));
-    expect(recipe, contains("if (personalTodaySelected || widget.viewingTodaySelection) ...["));
+    expect(recipe, isNot(contains("if (personalTodaySelected || widget.viewingTodaySelection) ...[")));
     expect(recipe, contains("final bool viewingTodaySelection"));
     expect(recipe, contains("actions: widget.viewingTodaySelection ? null : ["));
-    expect(recipe, contains("'Für heute ausgewählt'"));
-    expect(
-      recipe.indexOf("'Für heute ausgewählt'"),
-      lessThan(recipe.lastIndexOf('recipe!.name')),
-    );
+    expect(recipe, isNot(contains("'Für heute ausgewählt'")));
+    expect(recipe, isNot(contains("'Für diesen Tag ausgewählt'")));
     expect(bottomNavigation, isNot(contains("'Für heute ausgewählt'")));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
     expect(today, contains('final VoidCallback? onOpenRecipe;'));
