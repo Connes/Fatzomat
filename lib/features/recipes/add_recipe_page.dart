@@ -954,6 +954,8 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                                             child: Image.asset(
                                               asset,
                                               fit: BoxFit.contain,
+                                              alignment: Alignment.center,
+                                              width: double.infinity,
                                               errorBuilder: (_, __, ___) => Icon(_icon(choice), size: 44),
                                             ),
                                           )
@@ -984,15 +986,6 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         minimumSize: const Size.fromHeight(54),
                       ),
                     ),
-                    if (selectedCount > 0) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        selectedFoodIds
-                            .map((id) => foods.where((food) => food.id == id).firstOrNull?.name)
-                            .whereType<String>()
-                            .join(', '),
-                      ),
-                    ],
                     const SizedBox(height: 10),
                     FilledButton.icon(
                       onPressed: _importRecipeFile,
