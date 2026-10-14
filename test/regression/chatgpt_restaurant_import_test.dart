@@ -25,8 +25,6 @@ void main() {
     expect(source, contains('if (widget.mode == FoodMode.dineOut)'));
     expect(source, contains('DiscoveryPage('));
   });
-}
-
 
   test('versioned ChatGPT payload is exposed as restaurant data in TodayPlan', () {
     final plan = TodayPlan(
@@ -74,3 +72,4 @@ void main() {
     expect(plan.restaurantAddress, 'Marktplatz 2');
     expect(plan.restaurantPhone, '01234');
   });
+}
