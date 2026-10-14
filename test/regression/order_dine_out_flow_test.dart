@@ -96,14 +96,10 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final choiceFinder = find.text(choice).last;
+      final choiceFinder = find.text(choice).first;
       expect(choiceFinder, findsOneWidget, reason: 'Auswahl $choice fehlt');
       await tester.ensureVisible(choiceFinder);
-      final choiceCard = find.ancestor(
-        of: choiceFinder,
-        matching: find.byType(InkWell),
-      ).first;
-      await tester.tap(choiceCard);
+      await tester.tap(choiceFinder);
       // The restaurant page starts device-location lookup asynchronously and
       // may show an indeterminate progress indicator, so don't use pumpAndSettle.
       await tester.pump(const Duration(milliseconds: 100));
