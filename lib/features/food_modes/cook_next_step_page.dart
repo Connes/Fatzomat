@@ -97,6 +97,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           initialSelectedFoodIds: Set<String>.from(selectedFoodIds),
           decisionRequestId: widget.decisionRequestId,
           selectForToday: true,
+          autoOpenPrompt: true,
           planDate: widget.planDate,
         ),
       ),
