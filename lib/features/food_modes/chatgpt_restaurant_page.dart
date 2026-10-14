@@ -332,55 +332,6 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
             padding: const EdgeInsets.all(18),
             color: AppDesign.surface.withValues(alpha: .97),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('Restaurant finden', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              const Text('Wähle die Küche und gib einen Ort oder eine Adresse als Ausgangspunkt an.'),
-              const SizedBox(height: 14),
-              DropdownButtonFormField<String>(
-                initialValue: _cuisine,
-                decoration: const InputDecoration(labelText: 'Küche'),
-                items: _cuisines.map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(),
-                onChanged: (value) => setState(() => _cuisine = value ?? _cuisine),
-              ),
-              const SizedBox(height: 12),
-              if (_locating) const LinearProgressIndicator(),
-              if (_locationStatus != null) ...[
-                Text(_locationStatus!, style: Theme.of(context).textTheme.bodySmall),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: _locating ? null : _determineCurrentLocation,
-                    icon: const Icon(Icons.my_location),
-                    label: const Text('Aktuellen Standort erneut ermitteln'),
-                  ),
-                ),
-              ],
-              TextField(
-                controller: _locationController,
-                decoration: const InputDecoration(
-                  labelText: 'Ermittelter Standort (änderbar)',
-                  hintText: 'Wird automatisch ermittelt',
-                  helperText: 'Dein aktueller Standort ist vorausgefüllt und kann angepasst werden.',
-                ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: _openChatGpt,
-                icon: const Icon(Icons.open_in_new_rounded),
-                label: const Text('Prompt an ChatGPT übergeben'),
-              ),
-              OutlinedButton.icon(
-                onPressed: _copyPrompt,
-                icon: const Icon(Icons.copy_rounded),
-                label: const Text('Nur Prompt kopieren'),
-              ),
-            ]),
-          ),
-          const SizedBox(height: 16),
-          AppSurface(
-            padding: const EdgeInsets.all(18),
-            color: AppDesign.surface.withValues(alpha: .97),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Text('Restaurant-JSON importieren', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               const Text('Wähle die von ChatGPT erstellte Fatzomat-JSON-Datei aus. Du siehst die Daten vor dem Speichern.'),
