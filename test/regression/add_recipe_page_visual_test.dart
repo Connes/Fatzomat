@@ -149,6 +149,9 @@ test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutaten
     expect(source, contains('mainAxisSpacing: 10'));
     expect(source, contains('crossAxisSpacing: 10'));
     expect(source, contains('childAspectRatio: 1.82'));
+    expect(source, isNot(contains("selectedFoodIds\n                            .map((id) => foods.where((food) => food.id == id).firstOrNull?.name)")));
+    expect(source, contains('width: double.infinity'));
+    expect(source, contains('fit: BoxFit.cover'));
     expect(source, contains('padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7)'));
     expect(source, contains('color: selected\n                              ? AppDesign.secondarySurface'));
     expect(source, isNot(contains('Icons.check_circle_rounded, size: 18')));
