@@ -71,10 +71,15 @@ Regeln:
   }
 
   static String buildPhotoImportPrompt() {
-    return '''Lies das angehängte Foto eines Rezepts vollständig aus und erstelle daraus eine gültige together_recipe.json für die App Schmackofatz.
+    return '''Lies alle angehängten Fotos desselben Rezepts vollständig aus und erstelle daraus eine einzige gültige together_recipe.json für die App Schmackofatz.
 
 WICHTIG:
-- Das angehängte Bild ist die einzige Quelle für die Rezeptdaten.
+- Verwende alle angehängten Bilder als zusammengehörige Seiten/Ausschnitte desselben Rezepts. Sie sind die einzige Quelle für die Rezeptdaten.
+- Prüfe die Fotos gemeinsam, nicht isoliert. Sie können überlappende Textbereiche zeigen oder mitten in einer Zutatenliste bzw. einem Zubereitungsschritt aneinander anschließen.
+- Erkenne Überlappungen anhand wiederholter Zeilen, Zutaten, Mengen, Abschnittsüberschriften oder Satzteile. Übernimm wiederholte Inhalte nur einmal. Erzeuge insbesondere keine doppelten Zutaten, wenn dieselbe Zeile auf zwei Fotos sichtbar ist.
+- Führe abgeschnittene Zeilen und Sätze über mehrere Fotos hinweg zusammen, wenn der Zusammenhang eindeutig ist. Bewahre die Reihenfolge des Rezepts.
+- Zähle eine Zutat nur einmal, sofern das Rezept sie nicht ausdrücklich an verschiedenen Stellen als getrennte Mengen aufführt. Wenn dieselbe Zutat tatsächlich in mehreren Abschnitten mit unterschiedlichen Mengen benötigt wird, erhalte diese getrennten Einträge und ihre Abschnittsnamen.
+- Wenn sich Fotos widersprechen oder ein Bereich trotz aller Bilder unleserlich bleibt, rate nicht. Verwende null bzw. leere Textfelder gemäß Schema.
 - Erfinde keine Zutaten, Mengen, Zeiten, Portionen oder Zubereitungsschritte.
 - Wenn eine Angabe auf dem Foto nicht eindeutig lesbar ist, verwende null für die Menge oder eine leere Zeichenkette für Textfelder, sofern das Schema dies erlaubt.
 - Erhalte die Reihenfolge der Zutaten und Zubereitungsschritte.

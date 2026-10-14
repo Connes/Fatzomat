@@ -10,7 +10,13 @@ void main() {
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
     expect(prompt, contains('buildPhotoImportPrompt'));
-    expect(prompt, contains('das angehängte Foto eines Rezepts'));
+    expect(prompt, contains('alle angehängten Fotos desselben Rezepts'));
+    expect(prompt, contains('Überlappungen anhand wiederholter Zeilen'));
+    expect(prompt, contains('keine doppelten Zutaten'));
+    expect(page, contains('pickMultiImage('));
+    expect(page, contains('List<XFile> selectedImages'));
+    expect(page, contains('List<XFile>.unmodifiable(selectedImages)'));
+    expect(page, contains('Fotos hinzufügen'));
     expect(prompt, contains('Erfinde keine Zutaten'));
     expect(prompt, contains('"format": "together_recipe"'));
     expect(prompt, contains('"version": 1'));
