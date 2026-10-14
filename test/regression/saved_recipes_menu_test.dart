@@ -5,10 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('saved recipes expose a subtle main ingredient filter with all five categories', () {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+    final appBar = File('lib/core/widgets/together_scaffold.dart').readAsStringSync();
 
     expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));
     expect(source, contains("title: const Text('Meine Rezepte')"));
-    expect(source, contains('centerTitle: true'));
+    expect(appBar, contains('centerTitle: true'));
     expect(source, contains('BorderRadius.circular(20)'));
     expect(source, contains('AppDesign.secondarySurface'));
     expect(source, contains("value == 'Alle' ? 'Alle Rezepte' : value"));
