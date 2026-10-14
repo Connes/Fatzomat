@@ -6,6 +6,7 @@ import '../../lib/core/services/location_service.dart';
 import '../../lib/data/models/restaurant_discovery.dart';
 import '../../lib/data/repositories/restaurant_discovery_repository.dart';
 import '../../lib/features/food_modes/food_mode_page.dart';
+import '../../lib/features/food_modes/chatgpt_restaurant_page.dart';
 import '../../lib/features/food_modes/restaurant_detail_page.dart';
 
 class _FakeLocationService implements LocationService {
@@ -153,8 +154,31 @@ void main() {
   }
 
   for (final choice in _dineOutChoices) {
-    testWidgets('Wir gehen essen: $choice durchläuft den Discovery- und Detailpfad', (tester) async {
-      await verifyChoiceFlow(tester, mode: FoodMode.dineOut, choice: choice);
+    testWidgets('Wir gehen essen: $choice öffnet ChatGPT mit der gewählten Küche', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: FoodModePage(
+          mode: FoodMode.dineOut,
+          locationService: _FakeLocationService(
+            const UserLocation(latitude: 48.89, longitude: 8.70),
+          ),
+          discoveryRepository: _FakeDiscoveryRepository([_restaurant(choice)]),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      final choiceFinder = find.text(choice).first;
+      expect(choiceFinder, findsOneWidget, reason: 'Auswahl $choice fehlt');
+      await tester.ensureVisible(choiceFinder);
+      await tester.tap(choiceFinder);
+      // The restaurant page starts device-location lookup asynchronously and
+      // may show an indeterminate progress indicator, so don't use pumpAndSettle.
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.byType(ChatGptRestaurantPage), findsOneWidget);
+      final cuisineField = tester.widget<DropdownButtonFormField<String>>(
+        find.byType(DropdownButtonFormField<String>),
+      );
+      expect(cuisineField.initialValue, choice);
     });
   }
 
