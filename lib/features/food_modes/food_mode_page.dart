@@ -226,7 +226,6 @@ class _FoodModePageState extends State<FoodModePage> {
                             MaterialPageRoute(
                               builder: (_) => ChatGptRestaurantPage(
                                 planDate: widget.planDate,
-                                onNavigateToToday: widget.onNavigateToToday,
                               ),
                             ),
                           );
