@@ -37,7 +37,15 @@ class TodayPlan {
     if (decisionType != 'dine_out' || decisionValue == null) return const <String, dynamic>{};
     try {
       final decoded = jsonDecode(decisionValue!);
-      return decoded is Map ? Map<String, dynamic>.from(decoded) : const <String, dynamic>{};
+      if (decoded is! Map) return const <String, dynamic>{};
+      final payload = Map<String, dynamic>.from(decoded);
+      // Imported ChatGPT suggestions use a versioned envelope. Older dine-out
+      // decisions store restaurant fields directly, so keep supporting both.
+      final nestedRestaurant = payload['restaurant'];
+      if (nestedRestaurant is Map) {
+        return Map<String, dynamic>.from(nestedRestaurant);
+      }
+      return payload;
     } catch (_) {
       return const <String, dynamic>{};
     }
