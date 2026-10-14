@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
@@ -76,9 +76,12 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
   }
 
   Future<void> _openChatGpt() async {
-    await _copyPrompt();
-    final uri = Uri.parse('https://chatgpt.com/');
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await SharePlus.instance.share(
+      ShareParams(
+        text: _prompt,
+        title: 'Restaurant-Suche mit ChatGPT',
+      ),
+    );
   }
 
   Future<void> _pickJson() async {
@@ -237,7 +240,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
               FilledButton.icon(
                 onPressed: _openChatGpt,
                 icon: const Icon(Icons.open_in_new_rounded),
-                label: const Text('Prompt kopieren & ChatGPT öffnen'),
+                label: const Text('Prompt an ChatGPT übergeben'),
               ),
               OutlinedButton.icon(
                 onPressed: _copyPrompt,
