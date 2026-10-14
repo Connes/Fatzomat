@@ -76,7 +76,10 @@ class RestaurantDetailPage extends StatelessWidget {
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14),
-      child: Row(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
@@ -109,6 +112,7 @@ class RestaurantDetailPage extends StatelessWidget {
               child: trailing,
             ),
         ],
+        ),
       ),
     );
   }
@@ -124,9 +128,12 @@ class RestaurantDetailPage extends StatelessWidget {
             .join(' '),
     ].where((part) => part.isNotEmpty).toList();
     final address = addressParts.isEmpty ? 'Nicht verfügbar' : addressParts.join('\n');
-    final addressWithDistance = result.formattedDistance.isEmpty
-        ? address
-        : '$address\n${result.formattedDistance}';
+    final addressUri = addressParts.isEmpty
+        ? null
+        : Uri.https('www.google.com', '/maps/dir/', {
+            'api': '1',
+            'destination': addressParts.join(', '),
+          });
     final phone = result.phone?.trim().isNotEmpty == true
         ? result.phone!.trim()
         : 'Nicht verfügbar';
@@ -150,7 +157,11 @@ class RestaurantDetailPage extends StatelessWidget {
                   _contactSection(
                     icon: Icons.location_on_rounded,
                     title: 'Anschrift',
-                    value: addressWithDistance,
+                    value: address,
+                    onTap: addressUri == null ? null : () => _open(context, addressUri),
+                    trailing: addressUri == null
+                        ? null
+                        : const Icon(Icons.directions_rounded, color: Colors.blueGrey),
                   ),
                   const Divider(height: 1),
                   _contactSection(
