@@ -94,9 +94,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       );
       if (result == null || result.isEmpty) return;
       final file = result.first;
-      final bytes = file.bytes ??
-          (file.path == null ? null : await File(file.path!).readAsBytes());
-      if (bytes == null) throw const FormatException('Datei konnte nicht gelesen werden.');
+      final bytes = await File(file.path).readAsBytes();
       final decoded = jsonDecode(utf8.decode(bytes));
       if (decoded is! Map<String, dynamic>) {
         throw const FormatException('Die JSON-Datei muss ein Objekt enthalten.');
