@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -90,10 +91,11 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['json'],
-        withData: true,
       );
-      if (result == null) return;
-      final bytes = result.files.single.bytes;
+      if (result == null || result.isEmpty) return;
+      final file = result.first;
+      final bytes = file.bytes ??
+          (file.path == null ? null : await File(file.path!).readAsBytes());
       if (bytes == null) throw const FormatException('Datei konnte nicht gelesen werden.');
       final decoded = jsonDecode(utf8.decode(bytes));
       if (decoded is! Map<String, dynamic>) {
