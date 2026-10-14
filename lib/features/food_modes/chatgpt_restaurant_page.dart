@@ -3,10 +3,8 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_design.dart';
@@ -30,20 +28,12 @@ class ChatGptRestaurantPage extends StatefulWidget {
 }
 
 class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
-  static const _cuisines = <String>[
-    'Griechisch', 'Italienisch', 'Türkisch', 'Japanisch', 'Chinesisch',
-    'Thailändisch', 'Vietnamesisch', 'Koreanisch', 'Indonesisch',
-    'Malaysisch', 'Sushi', 'Burger', 'Steak', 'Mexikanisch', 'Spanisch',
-    'Libanesisch', 'Portugiesisch', 'Vegetarisch', 'Vegan',
-  ];
-
   late String _cuisine;
   final _locationController = TextEditingController();
   String? _error;
   Map<String, dynamic>? _restaurant;
   bool _importing = false;
   bool _locating = false;
-  String? _locationStatus;
 
   @override
   void initState() {
@@ -56,7 +46,6 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
     if (!mounted) return;
     setState(() {
       _locating = true;
-      _locationStatus = 'Aktuellen Standort wird ermittelt …';
     });
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
@@ -88,10 +77,8 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
           : '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
       if (!mounted) return;
       _locationController.text = location;
-      setState(() => _locationStatus = 'Aktueller Standort wird als Suchmittelpunkt verwendet.');
     } catch (error) {
       if (!mounted) return;
-      setState(() => _locationStatus = error.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _locating = false);
       if (mounted && widget.autoOpenChatGpt) {
@@ -132,14 +119,6 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
 '''.trim();
   }
 
-  Future<void> _copyPrompt() async {
-    await Clipboard.setData(ClipboardData(text: _prompt));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Such-Prompt wurde kopiert.')),
-    );
-  }
-
   Future<bool> _tryLaunchChatGpt() async {
     try {
       final uri = Uri.https('chatgpt.com', '/', {'q': _prompt});
@@ -158,16 +137,6 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
         const SnackBar(content: Text('ChatGPT konnte nicht automatisch geöffnet werden. Du kannst den Prompt unten manuell öffnen.')),
       );
     }
-  }
-
-  Future<void> _openChatGpt() async {
-    if (await _tryLaunchChatGpt()) return;
-    await SharePlus.instance.share(
-      ShareParams(
-        text: _prompt,
-        title: 'Restaurant-Suche mit ChatGPT',
-      ),
-    );
   }
 
   Future<void> _pickJson() async {
