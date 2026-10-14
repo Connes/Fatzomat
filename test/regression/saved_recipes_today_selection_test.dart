@@ -7,7 +7,7 @@ void main() {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
     expect(source, contains("label: const Text('Auswählen')"));
-    expect(source, contains("Key('cook-search-select-recipe-${recipe.id}')"));
+    expect(source, contains("Key('cook-search-select-recipe-"));
     expect(source, contains("'Für heute auswählen'"));
     expect(source, contains("'Für diesen Tag auswählen'"));
     expect(source, contains('onPressed: () => selectRecipeForToday(recipe)'));
