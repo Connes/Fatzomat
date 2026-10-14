@@ -14,6 +14,7 @@ import '../../core/error_text.dart';
 import '../../core/services/location_service.dart';
 import '../../data/models/restaurant_discovery.dart';
 import 'restaurant_detail_page.dart';
+import 'chatgpt_restaurant_page.dart';
 import '../../data/repositories/restaurant_discovery_repository.dart';
 
 class FoodModePage extends StatefulWidget {
@@ -206,12 +207,39 @@ class _FoodModePageState extends State<FoodModePage> {
             final compactMode = widget.mode == FoodMode.cook || widget.mode == FoodMode.order;
             if (!compactMode) {
               return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: AppSurface(
-                  key: const ValueKey<String>('food_mode_choice_group'),
-                  padding: const EdgeInsets.all(10),
-                  color: AppDesign.surface.withValues(alpha: 0.96),
-                  child: _choiceGrid(options),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AppSurface(
+                      key: const ValueKey<String>('food_mode_choice_group'),
+                      padding: const EdgeInsets.all(10),
+                      color: AppDesign.surface.withValues(alpha: 0.96),
+                      child: _choiceGrid(options),
+                    ),
+                    if (widget.mode == FoodMode.dineOut) ...[
+                      const SizedBox(height: 14),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final selected = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChatGptRestaurantPage(
+                                planDate: widget.planDate,
+                                onNavigateToToday: widget.onNavigateToToday,
+                              ),
+                            ),
+                          );
+                          if (selected == true && context.mounted) {
+                            Navigator.pop(context, true);
+                          }
+                        },
+                        icon: const Icon(Icons.auto_awesome_rounded),
+                        label: const Text('Mit ChatGPT suchen'),
+                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
+                      ),
+                    ],
+                  ],
                 ),
               );
             }
