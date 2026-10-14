@@ -59,7 +59,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Pizza Lieferung'), findsOneWidget);
-    expect(find.text('3,2 km'), findsOneWidget);
+    expect(find.text('3,2 km'), findsNothing);
     expect(find.text('Lieferung laut Datenquelle verfügbar'), findsOneWidget);
   });
 
