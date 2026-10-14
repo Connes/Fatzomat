@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../lib/core/food_mode.dart';
 import '../../lib/core/services/location_service.dart';
@@ -85,6 +86,7 @@ const _dineOutChoices = [
 void main() {
   for (final choice in _dineOutChoices) {
     testWidgets('Wir gehen essen: $choice öffnet ChatGPT mit der gewählten Küche', (tester) async {
+      SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(MaterialApp(
         home: FoodModePage(
           mode: FoodMode.dineOut,
