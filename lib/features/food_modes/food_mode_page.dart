@@ -114,7 +114,10 @@ class _FoodModePageState extends State<FoodModePage> {
       ),
     );
     if (selected == true && context.mounted) {
-      Navigator.of(context).pop(true);
+      final navigator = Navigator.of(context);
+      if (navigator.canPop()) {
+        navigator.pop(true);
+      }
     }
   }
 
