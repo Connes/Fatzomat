@@ -12,6 +12,7 @@ import '../foods/food_preferences_page.dart';
 import '../shared/connection_page.dart';
 import 'notifications_page.dart';
 import 'personal_history_page.dart';
+import 'restaurant_favorites_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
