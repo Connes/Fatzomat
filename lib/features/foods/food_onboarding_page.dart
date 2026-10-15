@@ -363,10 +363,12 @@ class _FoodOnboardingIntro extends StatelessWidget {
                           key: ValueKey<String>('food_onboarding_brand_divider'),
                         ),
                       ),
-                      Text(
-                        'Willkommen',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineSmall,
+                      Center(
+                        child: Text(
+                          'Willkommen',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Text(
