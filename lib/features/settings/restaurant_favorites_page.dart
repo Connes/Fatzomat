@@ -46,34 +46,72 @@ class _RestaurantFavoritesPageState extends State<RestaurantFavoritesPage> {
   }
 
   Future<void> _addRestaurant() async {
-    final controller = TextEditingController();
-    final name = await showDialog<String>(
+    final nameController = TextEditingController();
+    final locationController = TextEditingController();
+    final input = await showDialog<Map<String, String>>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Lieblingsrestaurant hinzufügen'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(labelText: 'Restaurantname', hintText: 'z. B. Gasthaus zur Linde'),
-          onSubmitted: (_) => Navigator.pop(dialogContext, controller.text.trim()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              autofocus: true,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Restaurantname',
+                hintText: 'z. B. Gasthaus zur Linde',
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: locationController,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Ort oder Adresse',
+                hintText: 'z. B. Bad Herrenalb',
+              ),
+              onSubmitted: (_) {
+                final name = nameController.text.trim();
+                final location = locationController.text.trim();
+                if (name.isNotEmpty && location.isNotEmpty) {
+                  Navigator.pop(dialogContext, {'name': name, 'location': location});
+                }
+              },
+            ),
+          ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Abbrechen')),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Abbrechen'),
+          ),
           FilledButton.icon(
-            onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+            onPressed: () {
+              final name = nameController.text.trim();
+              final location = locationController.text.trim();
+              if (name.isNotEmpty && location.isNotEmpty) {
+                Navigator.pop(dialogContext, {'name': name, 'location': location});
+              }
+            },
             icon: const Icon(Icons.chat_rounded),
-            label: const Text('Mit ChatGPT ergänzen'),
+            label: const Text('Mit ChatGPT suchen'),
           ),
         ],
       ),
     );
-    controller.dispose();
-    if (name == null || name.trim().isEmpty || !mounted) return;
+    nameController.dispose();
+    locationController.dispose();
+    if (input == null || !mounted) return;
+
+    final name = input['name']!;
+    final location = input['location']!;
     final prompt = '''
-Ergänze mein Fatzomat-Lieblingsrestaurant anhand des Namens: "$name".
-Recherchiere aktuelle, verlässliche Quellen. Falls mehrere gleichnamige Restaurants existieren, frage nach dem Ort. Erfinde keine Daten; unbekannte optionale Angaben müssen null sein.
-Gib anschließend ausschließlich gültiges JSON ohne Markdown oder Erklärung in genau diesem Format aus:
+Ich möchte das Restaurant "$name" aus "$location" als Fatzomat-Lieblingsrestaurant speichern.
+Recherchiere mit aktuellen Webquellen und offiziellen Quellen, soweit verfügbar. Falls es mehrere passende Restaurants mit diesem Namen in oder nahe "$location" gibt, liste zuerst alle plausiblen Treffer nummeriert auf. Gib Name und vollständige Adresse sowie eine kurze Unterscheidung je Treffer an. Frage mich dann, welches Restaurant ich meine, und warte auf meine Auswahl. Erstelle vor meiner Auswahl KEINE JSON-Datei.
+Nach meiner Auswahl recherchiere die folgenden Felder: name, cuisine, address, phone, website, opening_hours. Pflichtfelder name, cuisine und address müssen nicht-leere Strings sein. Für nicht zuverlässig verifizierbare optionale Felder phone, website und opening_hours verwende null. Erfinde keine Angaben.
+Erstelle nach meiner Auswahl eine echte herunterladbare Datei namens "fatzomat_restaurant.json" als Datei-Anhang/Download, nicht nur einen Codeblock im Chat. Die Datei muss ausschließlich ein gültiges JSON-Objekt in genau diesem Format enthalten:
 {
   "schema_version": 1,
   "type": "fatzomat_restaurant_suggestion",
@@ -86,23 +124,31 @@ Gib anschließend ausschließlich gültiges JSON ohne Markdown oder Erklärung i
     "opening_hours": null
   }
 }
-name, cuisine und address sind Pflichtfelder als nicht-leere Strings. phone, website und opening_hours sind Strings oder null. website muss eine vollständige HTTP(S)-URL sein. opening_hours enthält, sofern verlässlich auffindbar, Wochentage und Zeiträume. Keine zusätzlichen Felder.
+Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. opening_hours soll, sofern verlässlich auffindbar, Wochentage und Zeiträume enthalten. Prüfe vor Bereitstellung, dass das JSON gültig ist und exakt dem Schema entspricht. Stelle den Download direkt bereit, damit ich die Datei speichern und anschließend in Fatzomat importieren kann.
 '''.trim();
-    final uri = Uri.https('chatgpt.com', '/', {'q': prompt});
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!mounted) return;
-    if (!launched) {
+
+    try {
+      final uri = Uri.https('chatgpt.com', '/', {'q': prompt});
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!mounted) return;
+      if (!launched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ChatGPT konnte nicht geöffnet werden. Bitte prüfe, ob ChatGPT installiert ist.')),
+        );
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ChatGPT konnte nicht geöffnet werden. Bitte prüfe, ob ChatGPT installiert ist.')),
+        const SnackBar(
+          content: Text('Wähle in ChatGPT bei mehreren Treffern das richtige Restaurant und lade danach die JSON-Datei herunter.'),
+          duration: Duration(seconds: 6),
+        ),
       );
-      return;
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ChatGPT konnte nicht geöffnet werden: $error')),
+      );
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('ChatGPT erstellt die Restaurantdaten. Importiere anschließend die JSON-Datei hier in Fatzomat.'),
-        duration: Duration(seconds: 5),
-      ),
-    );
   }
 
   Future<void> _remove(Map<String, dynamic> restaurant) async {
