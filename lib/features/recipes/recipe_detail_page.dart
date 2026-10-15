@@ -424,30 +424,31 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Text(recipe!.description, style: Theme.of(context).textTheme.bodyLarge),
           ),
           const SizedBox(height: 14),
-          AppSurface(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Personen', style: TextStyle(fontWeight: FontWeight.w800)),
-                const SizedBox(width: 12),
-                IconButton(
-                  tooltip: 'Eine Person weniger',
-                  onPressed: servings <= 1 || working ? null : () => setState(() => servings--),
-                  icon: const Icon(Icons.remove_rounded),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text('$servings', style: const TextStyle(fontWeight: FontWeight.w800)),
-                ),
-                IconButton(
-                  tooltip: 'Eine Person mehr',
-                  onPressed: servings >= 12 || working ? null : () => setState(() => servings++),
-                  icon: const Icon(Icons.add_rounded),
-                ),
-              ],
+          if (personalTodaySelected)
+            AppSurface(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Personen', style: TextStyle(fontWeight: FontWeight.w800)),
+                  const SizedBox(width: 12),
+                  IconButton(
+                    tooltip: 'Eine Person weniger',
+                    onPressed: servings <= 1 || working ? null : () => setState(() => servings--),
+                    icon: const Icon(Icons.remove_rounded),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('$servings', style: const TextStyle(fontWeight: FontWeight.w800)),
+                  ),
+                  IconButton(
+                    tooltip: 'Eine Person mehr',
+                    onPressed: servings >= 12 || working ? null : () => setState(() => servings++),
+                    icon: const Icon(Icons.add_rounded),
+                  ),
+                ],
+              ),
             ),
-          ),
           const SizedBox(height: 18),
           AppSurface(
             padding: EdgeInsets.zero,
