@@ -12,15 +12,13 @@ void main() {
     expect(migration, contains("source\n    )\n    values(\n      target_user"));
   });
 
-  test('restaurant selection is concrete and is resolved only after result selection', () {
+  test('restaurant choices route through ChatGPT import and keep the planning date', () {
     final page = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
     expect(page, contains('decisionRequestId: widget.decisionRequestId'));
-    expect(page, contains('persistPersonalDecision: widget.decisionRequestId == null'));
-    expect(page, contains("resultType: order ? 'order' : 'dine_out'"));
-    expect(page, contains('final decisionValue = order'));
-    expect(page, contains('jsonEncode({'));
-    expect(page, contains("'cuisine': widget.preference"));
-    expect(page, isNot(contains("resultType: 'preference'")));
+    expect(page, contains('initialCuisine: cuisine'));
+    expect(page, contains('planDate: widget.planDate'));
+    expect(page, contains('autoOpenChatGpt: true'));
+    expect(page, isNot(contains('DiscoveryPage(')));
   });
 
   test('connection creation does not depend on pgcrypto random bytes', () {
