@@ -105,7 +105,7 @@ class _RestaurantFavoritesPageState extends State<RestaurantFavoritesPage> {
                               Text(
                                 'Importiere ein Restaurant mit ChatGPT und speichere es beim Abschließen als Favorit.',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: AppDesign.primaryText,
+                                      color: AppDesign.text,
                                       height: 1.4,
                                     ),
                                 textAlign: TextAlign.center,
