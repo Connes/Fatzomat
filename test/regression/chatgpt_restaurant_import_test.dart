@@ -25,7 +25,9 @@ void main() {
     expect(source, contains("import 'chatgpt_restaurant_page.dart';"));
     expect(source, contains("const Text('Mit ChatGPT suchen')"));
     expect(source, contains('if (widget.mode == FoodMode.dineOut)'));
-    expect(source, contains('DiscoveryPage('));
+    expect(source, isNot(contains('DiscoveryPage(')));
+    expect(source, contains('initialCuisine: cuisine'));
+    expect(source, contains('autoOpenChatGpt: true'));
   });
 
   test('versioned ChatGPT payload is exposed as restaurant data in TodayPlan', () {
