@@ -28,8 +28,8 @@ void main() {
     expect(savedSource, contains('widget.onNavigateToTab!(0);'));
     expect(
       savedSource,
-      contains('Navigator.pop(context, true);'),
-      reason: 'Only a pushed SavedRecipesPage route returns success; the persistent tab navigates through its tab callback.',
+      contains('if (navigator.canPop())'),
+      reason: 'Only pop a successful recipe-selection route when the Navigator actually has a route to pop.',
     );
 
     expect(todaySource, contains('final repo = PersonalTodayRepository();'));
