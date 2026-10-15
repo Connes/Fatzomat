@@ -33,7 +33,9 @@ void main() {
     expect(today, contains("onTap: plan.status == 'cooked'"));
     expect(today, contains('? onOpenOrder'));
     expect(today, contains("plan.restaurantCuisine != null"));
-    expect(today, contains('RestaurantDetailPage'));
+    expect(today, isNot(contains('RestaurantDetailPage')));
+    expect(today, contains('Keine weiteren Restaurantdaten gespeichert.'));
+    expect(today, contains('Als erledigt markieren'));
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
     expect(foodMode, contains("'cuisine': widget.preference"));
     expect(foodMode, isNot(contains("'cuisine': result.cuisine?.trim().isNotEmpty == true ? result.cuisine : widget.preference")));
