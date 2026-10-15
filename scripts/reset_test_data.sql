@@ -7,6 +7,9 @@
 -- psql "$TEST_DATABASE_URL" -v TEST_RESET_CONFIRM=FATZOMAT_TEST_RESET -f scripts/reset_test_data.sql
 --
 -- The explicit confirmation is mandatory. The script does not create a backup.
+-- Supabase protects storage.objects from direct SQL deletion. Recipe image files
+-- are therefore NOT deleted here; the final query reports matching objects for
+-- cleanup through the Supabase Storage API/dashboard.
 
 \\if :{?TEST_RESET_CONFIRM}
 \\else
@@ -22,20 +25,12 @@
 
 BEGIN;
 
--- Remember recipe image paths before removing user-created recipes. Recipe
--- images live in Storage and are not removed automatically by deleting a row.
-CREATE TEMP TABLE reset_user_recipe_ids ON COMMIT DROP AS
+-- Keep the IDs in this psql session so the post-reset query can identify
+-- recipe image objects that need removal via the Storage API.
+CREATE TEMP TABLE reset_user_recipe_ids ON COMMIT PRESERVE ROWS AS
 SELECT id::text AS recipe_id
 FROM public.recipes
 WHERE created_by IS NOT NULL;
-
--- Remove private image files belonging to user-created recipes. The bucket
--- and object metadata are kept intact; only matching objects are deleted.
-DELETE FROM storage.objects o
-WHERE o.bucket_id = 'recipe-images'
-  AND split_part(o.name, '/', 1) IN (
-    SELECT recipe_id FROM reset_user_recipe_ids
-  );
 
 -- Remove all user-owned and connection-related application data. CASCADE is
 -- intentional for dependent rows (including recipe deletion requests).
@@ -56,8 +51,6 @@ TRUNCATE TABLE
   public.profiles
   RESTART IDENTITY CASCADE;
 
--- Recipe deletion requests are user-specific. This explicit delete also
--- covers deployments where the table is not reached through TRUNCATE CASCADE.
 DELETE FROM public.recipe_deletion_requests;
 
 -- Recipes are a global application library. Preserve seed/library entries
@@ -72,7 +65,7 @@ DELETE FROM auth.users;
 COMMIT;
 
 -- Verification: all user records and user-created recipe records must be gone.
--- Seed/global recipes and food catalog data are intentionally preserved.
+-- Global recipes and food catalog data are intentionally preserved.
 SELECT
   (SELECT count(*) FROM auth.users) AS auth_user_count,
   (SELECT count(*) FROM public.profiles) AS profile_count,
@@ -90,4 +83,8 @@ SELECT
   (SELECT count(*) FROM public.app_notifications) AS notification_count,
   (SELECT count(*) FROM public.recipe_deletion_requests) AS recipe_deletion_request_count,
   (SELECT count(*) FROM public.recipes WHERE created_by IS NOT NULL) AS user_created_recipe_count,
+  (SELECT count(*) FROM storage.objects
+   WHERE bucket_id = 'recipe-images'
+     AND split_part(name, '/', 1) IN (SELECT recipe_id FROM reset_user_recipe_ids)
+  ) AS user_recipe_image_objects_pending_storage_api_cleanup,
   (SELECT count(*) FROM storage.objects WHERE bucket_id = 'recipe-images') AS remaining_recipe_image_object_count;
