@@ -149,6 +149,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   const SizedBox(height: 14),
                   _SettingsTile(
+                    icon: Icons.favorite_rounded,
+                    title: 'Restaurant',
+                    subtitle: 'Deine gespeicherten Restaurantfavoriten',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RestaurantFavoritesPage()),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  _SettingsTile(
                     icon: Icons.people_alt_outlined,
                     title: connected ? 'Meine Connection' : 'Connection hinzufügen',
                     subtitle: connected
