@@ -13,13 +13,12 @@ Das Skript `scripts/reset_test_data.sql` entfernt alle Supabase-Auth-Nutzer und 
 - Food-Präferenzen, Rezept-Saves und Rezeptvorschläge.
 - Push-Geräte, Benachrichtigungen und Rezeptlöschanfragen.
 - Alle Rezepte mit `created_by IS NOT NULL` sowie die dazugehörigen Zutaten, die über Foreign Keys abhängen.
-- Dateien im privaten `recipe-images`-Bucket, wenn sie zu einem gelöschten nutzererstellten Rezept gehören.
 
 ## Was erhalten bleibt
 
 - Globale/Seed-Rezepte mit `created_by IS NULL`.
 - Der Food-Stammdatenbestand und sonstige globale App-Stammdaten.
-- Der Storage-Bucket selbst und Bilder, die nicht zu einem gelöschten nutzererstellten Rezept gehören.
+- Der Storage-Bucket und alle Storage-Objekte. Supabase blockiert direkte SQL-Löschungen aus `storage.objects`; das SQL-Skript löscht daher bewusst keine Bilddateien.
 
 ## Voraussetzungen und Ausführung
 
@@ -33,12 +32,13 @@ Das Skript `scripts/reset_test_data.sql` entfernt alle Supabase-Auth-Nutzer und 
      -f scripts/reset_test_data.sql
    ```
 
-4. Die abschließende Ergebniszeile prüfen. Alle Zähler für Nutzer- und nutzerbezogene Daten müssen `0` sein. `remaining_recipe_image_object_count` darf größer als null sein, wenn erhaltene globale oder anderweitig nicht nutzererstellten Rezeptbilder im Bucket liegen.
-5. Bei SQL-Fehlern nicht davon ausgehen, dass der Reset abgeschlossen ist. Da die Datenbankoperation in einer Transaktion läuft, werden Datenbankänderungen bei einem Fehler vor `COMMIT` zurückgerollt.
+4. Die abschließende Ergebniszeile prüfen. Alle Zähler für Nutzer- und nutzerbezogene Daten müssen `0` sein. `user_recipe_image_objects_pending_storage_api_cleanup` zählt noch vorhandene Bilder, deren Pfad zu einem vor dem Reset nutzererstellten Rezept gehört.
+5. Diese gezählten Bilder bei Bedarf anschließend über die Supabase Storage API oder das Supabase Dashboard löschen. **Nicht** direkt aus `storage.objects` löschen. Die Rezept-IDs für diese Zuordnung werden nur in einer temporären Tabelle der laufenden SQL-Sitzung gehalten; daher die Ergebnisprüfung in derselben `psql`-Sitzung durchführen.
+6. Bei SQL-Fehlern nicht davon ausgehen, dass der Reset abgeschlossen ist. Da die Datenbankoperation in einer Transaktion läuft, werden Datenbankänderungen bei einem Fehler vor `COMMIT` zurückgerollt.
 
 ## Sicherheitsgrenzen
 
-- Das Skript löscht **nicht** den gesamten Storage-Bucket, da dort Dateien liegen könnten, die nicht nutzerbezogen sind.
+- Das Skript löscht **nicht** den gesamten Storage-Bucket und entfernt keine Storage-Objekte per SQL.
 - Es löscht globale Food-/Seed-Daten nicht und setzt deren Sollbestand nicht neu auf.
 - Vor dem Einsatz auf einer abweichenden Schema-Version müssen neue Tabellen und Foreign Keys geprüft werden. Das Skript ist auf die derzeit im Repository dokumentierte Supabase-Struktur ausgelegt.
 - Die Bestätigung schützt vor versehentlichem Start, ersetzt aber nicht die Prüfung des Zielprojekts.
