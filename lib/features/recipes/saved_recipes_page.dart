@@ -392,9 +392,16 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     final planDate = selectedDate ?? DateTime.now();
     try {
       if (widget.decisionRequestId == null) {
+        final servings = await showDialog<int>(
+          context: context,
+          builder: (_) => _ServingsDialog(
+            initial: recipe.servings.clamp(1, 12).toInt(),
+          ),
+        );
+        if (servings == null || !mounted) return;
         await personalToday.selectRecipeForToday(
           recipe.id!,
-          servings: recipe.servings.clamp(1, 12).toInt(),
+          servings: servings,
           date: planDate,
         );
       } else {
