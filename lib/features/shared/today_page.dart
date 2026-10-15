@@ -620,13 +620,20 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         respectTopSafeArea: true,
         appBar: _todayAppBar(),
         body: const Center(
-          child: Text(
-            'Dein Tag wird vorbereitet …',
-            style: TextStyle(
-              color: AppDesign.mutedText,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'love',
+                style: TextStyle(
+                  color: AppDesign.mutedText,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text('❤️', style: TextStyle(fontSize: 18)),
+            ],
           ),
         ),
       );
@@ -1645,13 +1652,20 @@ class _ShoppingPageState extends State<ShoppingPage> {
       ),
       body: loading
           ? const Center(
-              child: Text(
-                'Einen Moment …',
-                style: TextStyle(
-                  color: AppDesign.mutedText,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'love',
+                    style: TextStyle(
+                      color: AppDesign.mutedText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text('❤️', style: TextStyle(fontSize: 18)),
+                ],
               ),
             )
           : RefreshIndicator(
