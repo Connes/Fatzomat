@@ -12,6 +12,7 @@ import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/personal_today_repository.dart';
+import '../../data/repositories/restaurant_favorites_repository.dart';
 
 class ChatGptRestaurantPage extends StatefulWidget {
   final DateTime? planDate;
@@ -209,6 +210,27 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     }
   }
 
+  Future<void> _saveAsFavorite() async {
+    final restaurant = _restaurant;
+    if (restaurant == null) return;
+    try {
+      final added = await RestaurantFavoritesRepository().add(restaurant);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(added
+              ? '${restaurant['name']} wurde in deinen Restaurantfavoriten gespeichert.'
+              : '${restaurant['name']} ist bereits in deinen Restaurantfavoriten.'),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Favorit konnte nicht gespeichert werden: $error')),
+      );
+    }
+  }
+
   Future<void> _useRestaurant() async {
     final restaurant = _restaurant;
     if (restaurant == null) return;
@@ -334,6 +356,12 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
                   onPressed: _useRestaurant,
                   icon: const Icon(Icons.check_circle_outline_rounded),
                   label: const Text('Als heutigen Vorschlag übernehmen'),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _saveAsFavorite,
+                  icon: const Icon(Icons.favorite_border_rounded),
+                  label: const Text('In Restaurantfavoriten speichern'),
                 ),
               ],
             ]),
