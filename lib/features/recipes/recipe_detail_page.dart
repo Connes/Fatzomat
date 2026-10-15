@@ -52,7 +52,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   Recipe? recipe;
   Object? loadError;
   bool loading = true, working = false, personalTodaySelected = false, cookedMarked = false;
-  String? selectedPlanId;
   int servings = 2;
   final Set<int> completedSteps = <int>{};
   bool ingredientsExpanded = false;
@@ -63,20 +62,20 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     try {
       final r = await repo.getRecipeModel(widget.recipeId);
       bool selectedForToday = false;
-      String? loadedPlanId;
+      int? loadedPlanServings;
       try {
         final today = await personalToday.todayPlan(date: widget.planDate);
         selectedForToday = today?.isRecipe == true &&
             today?.recipeId == widget.recipeId &&
             today?.status != 'cooked';
         if (selectedForToday) {
-          loadedPlanId = today!.id;
+          loadedPlanServings = today!.servings;
         }
       } catch (_) {
         // Personal Today state is optional metadata for recipe rendering.
       }
       if (!mounted) return;
-      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; selectedPlanId = loadedPlanId; loading = false; });
+      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
