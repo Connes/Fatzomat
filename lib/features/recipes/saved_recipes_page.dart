@@ -669,7 +669,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (_, i) {
             final recipe = visibleRecipes[i];
-            final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
             return Card(
               child: InkWell(
                 borderRadius: BorderRadius.circular(22),
@@ -874,7 +873,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 );
                         }
                         final recipe = visibleRecipes[i];
-                        final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
                         return Card(
                           child: InkWell(
                             borderRadius: BorderRadius.circular(22),
@@ -951,18 +949,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     );
   }
 
-  String _difficulty(String value) {
-    switch (value) {
-      case 'easy':
-        return 'Einfach';
-      case 'medium':
-        return 'Mittel';
-      case 'hard':
-        return 'Aufwendig';
-      default:
-        return value;
-    }
-  }
+
 }
 
 class _ServingsDialog extends StatefulWidget {
