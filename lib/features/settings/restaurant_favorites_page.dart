@@ -101,6 +101,7 @@ class _RestaurantFavoritesPageState extends State<RestaurantFavoritesPage> {
         ],
       ),
     );
+    await Future<void>.delayed(const Duration(milliseconds: 350));
     nameController.dispose();
     locationController.dispose();
     if (input == null || !mounted) return;
