@@ -619,7 +619,16 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         backgroundType: TogetherBackgroundType.home,
         respectTopSafeArea: true,
         appBar: _todayAppBar(),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const Center(
+          child: Text(
+            'Dein Tag wird vorbereitet …',
+            style: TextStyle(
+              color: AppDesign.mutedText,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
       );
     } else if (loadError != null) {
       page = TogetherScaffold(
@@ -1635,7 +1644,16 @@ class _ShoppingPageState extends State<ShoppingPage> {
         ],
       ),
       body: loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: Text(
+                'Einen Moment …',
+                style: TextStyle(
+                  color: AppDesign.mutedText,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            )
           : RefreshIndicator(
               onRefresh: load,
               child: ListView(
