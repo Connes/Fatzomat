@@ -917,12 +917,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${recipe.servings} Personen · $total Min. · ${_difficulty(recipe.difficulty)}',
-                                          style: Theme.of(context).textTheme.bodyMedium,
-                                        ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 12),
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: TextButton.icon(
