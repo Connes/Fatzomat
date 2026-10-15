@@ -15,7 +15,6 @@ import '../../core/app_design.dart';
 import '../../core/recipe_collection_events.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
-import '../../data/models/recipe.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import 'controllers/today_controller.dart';
 import '../recipes/recipe_detail_page.dart';
@@ -24,16 +23,12 @@ import '../../core/services/food_choice_asset_service.dart';
 import '../food_modes/food_mode_page.dart';
 import 'restaurant_details_dialog.dart';
 import '../food_modes/delivery_services_page.dart';
-import 'personalized_surprise_page.dart';
 import 'surprise_mode_roulette_page.dart';
 import 'connection_page.dart';
 import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
-import '../../data/repositories/food_repository.dart';
 import '../../data/repositories/restaurant_favorites_repository.dart';
-import '../../data/models/food.dart';
 import '../../data/models/decision_share.dart';
-import '../../core/services/surprise_recommendation_service.dart';
 
 class TodayPage extends StatefulWidget {
   final DateTime? initialDate;
