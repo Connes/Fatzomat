@@ -287,6 +287,10 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
         ],
       ),
     );
+    // Let the dialog route finish its reverse transition before disposing the
+    // controllers and its GlobalKey-backed Form. Otherwise Flutter can still
+    // have dependents attached while the dialog subtree is being unmounted.
+    await Future<void>.delayed(const Duration(milliseconds: 350));
     for (final controller in [nameController, cuisineController, addressController, phoneController, websiteController, hoursController]) {
       controller.dispose();
     }
