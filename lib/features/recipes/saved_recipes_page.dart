@@ -669,7 +669,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (_, i) {
             final recipe = visibleRecipes[i];
-            final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
             return Card(
               child: InkWell(
                 borderRadius: BorderRadius.circular(22),
@@ -707,12 +706,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
-                            const SizedBox(height: 6),
-                            Text(
-                              '${recipe.servings} Personen · $total Min. · ${_difficulty(recipe.difficulty)}',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             Align(
                               alignment: Alignment.centerLeft,
                               child: TextButton.icon(
@@ -879,7 +873,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 );
                         }
                         final recipe = visibleRecipes[i];
-                        final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
                         return Card(
                           child: InkWell(
                             borderRadius: BorderRadius.circular(22),
@@ -917,12 +910,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${recipe.servings} Personen · $total Min. · ${_difficulty(recipe.difficulty)}',
-                                          style: Theme.of(context).textTheme.bodyMedium,
-                                        ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 12),
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: TextButton.icon(
@@ -961,18 +949,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     );
   }
 
-  String _difficulty(String value) {
-    switch (value) {
-      case 'easy':
-        return 'Einfach';
-      case 'medium':
-        return 'Mittel';
-      case 'hard':
-        return 'Aufwendig';
-      default:
-        return value;
-    }
-  }
+
 }
 
 class _ServingsDialog extends StatefulWidget {
