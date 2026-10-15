@@ -37,8 +37,9 @@ void main() {
     expect(today, contains('Keine weiteren Restaurantdaten gespeichert.'));
     expect(today, contains('Als erledigt markieren'));
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
-    expect(foodMode, contains("'cuisine': widget.preference"));
-    expect(foodMode, isNot(contains("'cuisine': result.cuisine?.trim().isNotEmpty == true ? result.cuisine : widget.preference")));
+    expect(foodMode, contains("'fatzomat_pending_restaurant_import_cuisine', cuisine"));
+    expect(foodMode, contains('initialCuisine: cuisine'));
+    expect(foodMode, contains('autoOpenChatGpt: true'));
     expect(today, contains("assets/together/clean/icons/icon_cooking.png"));
     expect(today, contains("assets/together/clean/icons/icon_delivery.png"));
     expect(today, contains("assets/together/clean/icons/icon_restaurant.png"));
