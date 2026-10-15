@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -152,6 +155,84 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
     }
   }
 
+  Future<void> _importFavoriteJson() async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['json'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty || !mounted) return;
+      final file = result.files.single;
+      final bytes = file.bytes;
+      if (bytes == null) {
+        throw const FormatException('Die ausgewählte Datei konnte nicht gelesen werden.');
+      }
+      final decoded = jsonDecode(utf8.decode(bytes));
+      if (decoded is! Map<String, dynamic> ||
+          decoded['schema_version'] != 1 ||
+          decoded['type'] != 'fatzomat_restaurant_suggestion') {
+        throw const FormatException('Das ist keine gültige Fatzomat-Restaurantdatei.');
+      }
+      final rawRestaurant = decoded['restaurant'];
+      if (rawRestaurant is! Map) {
+        throw const FormatException('Die Restaurantdaten fehlen in der JSON-Datei.');
+      }
+      final restaurant = Map<String, dynamic>.from(rawRestaurant);
+      String requiredString(String key) {
+        final value = restaurant[key];
+        if (value is! String || value.trim().isEmpty) {
+          throw FormatException('Das Pflichtfeld „$key“ fehlt.');
+        }
+        return value.trim();
+      }
+      final name = requiredString('name');
+      final cuisine = requiredString('cuisine');
+      final address = requiredString('address');
+      for (final key in ['phone', 'website', 'opening_hours']) {
+        final value = restaurant[key];
+        if (value != null && value is! String) {
+          throw FormatException('Das Feld „$key“ muss Text oder null sein.');
+        }
+      }
+      final website = (restaurant['website'] as String?)?.trim();
+      if (website != null && website.isNotEmpty) {
+        final uri = Uri.tryParse(website);
+        if (uri == null || !uri.hasAuthority || !{'http', 'https'}.contains(uri.scheme)) {
+          throw const FormatException('Die Webseite muss eine gültige HTTP(S)-Adresse sein.');
+        }
+      }
+      final normalized = <String, dynamic>{
+        'name': name,
+        'cuisine': cuisine,
+        'address': address,
+        'phone': restaurant['phone'],
+        'website': website?.isEmpty == true ? null : website,
+        'opening_hours': restaurant['opening_hours'],
+      };
+      final added = await _repository.add(normalized);
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(added
+              ? '$name wurde zu deinen Favoriten hinzugefügt.'
+              : '$name ist mit dieser Adresse bereits in deinen Favoriten.'),
+        ),
+      );
+    } on FormatException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('JSON-Import fehlgeschlagen: ${error.message}')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Restaurant konnte nicht importiert werden: $error')),
+      );
+    }
+  }
+
   Future<void> _remove(Map<String, dynamic> restaurant) async {
     await _repository.remove(restaurant);
     await _load();
@@ -209,6 +290,12 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                                 color: AppDesign.text,
                                 height: 1.45,
                               ),
+                            ),
+                            const SizedBox(height: 12),
+                            OutlinedButton.icon(
+                              onPressed: _importFavoriteJson,
+                              icon: const Icon(Icons.file_upload_outlined),
+                              label: const Text('JSON-Datei importieren'),
                             ),
                             const SizedBox(height: 16),
                             FilledButton.icon(
