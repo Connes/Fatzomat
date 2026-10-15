@@ -296,45 +296,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _openSurprise() async {
-    try {
-      final results = await Future.wait([
-        FoodRepository().preferences(),
-        FoodRepository().foods(),
-        recipeRepo.savedRecipeModels(),
-      ]);
-      if (!mounted) return;
-      final preferences = results[0] as Map<String, String>;
-      final foods = results[1] as List<Food>;
-      final saved = results[2] as List<Recipe>;
-      final service = SurpriseRecommendationService();
-      final recommendation = await service.generate(
-        savedRecipes: saved,
-        preferences: preferences,
-        foods: foods,
-      );
-      if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PersonalizedSurprisePage(
-            recommendation: recommendation,
-            persistPersonalDecision: true,
-            planDate: _selectedDate,
-            service: service,
-            savedRecipes: saved,
-            preferences: preferences,
-            foods: foods,
-          ),
-        ),
-      );
-      if (mounted) await load();
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
-    }
-  }
-
   Future<void> _openMode(FoodMode mode) async {
     final selected = await Navigator.push<bool>(
       context,
