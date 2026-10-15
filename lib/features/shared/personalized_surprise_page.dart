@@ -146,7 +146,7 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
                       ),
                     )
                   else if (isCook)
-                    ..._recommendation.recipes.map(_recipeCard)
+                    ..._recommendation.recipes.map(_recipeCard),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: _loading || _saving ? null : _surpriseAgain,
