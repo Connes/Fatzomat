@@ -7,11 +7,9 @@ import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/models/recipe.dart';
 import '../../data/models/food.dart';
-import '../../data/models/restaurant_discovery.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../recipes/recipe_detail_page.dart';
-import '../food_modes/restaurant_detail_page.dart';
 
 class PersonalizedSurprisePage extends StatefulWidget {
   final SurpriseRecommendation recommendation;
@@ -81,13 +79,6 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
     await _saveDecision(type: 'recipe', value: recipe.name, recipeId: id);
   }
 
-  Future<void> _selectRestaurant(RestaurantDiscoveryResult result) async {
-    await _saveDecision(
-      type: _recommendation.decision.mode == FoodMode.order ? 'order' : 'dine_out',
-      value: result.name,
-    );
-  }
-
   Future<void> _saveDecision({required String type, required String value, String? recipeId}) async {
     if (_saving) return;
     setState(() => _saving = true);
@@ -123,19 +114,10 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
     Navigator.push(context, MaterialPageRoute(builder: (_) => RecipeDetailPage(recipeId: id)));
   }
 
-  void _openRestaurant(RestaurantDiscoveryResult result) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => RestaurantDetailPage(result: result, order: _recommendation.decision.mode == FoodMode.order),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isCook = _recommendation.isRecipe;
-    final resultsCount = isCook ? _recommendation.recipes.length : _recommendation.restaurants.length;
+    final resultsCount = _recommendation.recipes.length;
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.decisionResult,
@@ -159,14 +141,12 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
                         child: Text(
                           isCook
                               ? 'Es sind noch keine persönlichen Rezepte für eine Überraschung vorhanden.'
-                              : 'Gerade konnten keine passenden Ergebnisse gefunden werden.',
+                              : 'Für Restaurantsuche ist die alte Suche entfernt. Wähle eine Küche und nutze den ChatGPT-Import.',
                         ),
                       ),
                     )
                   else if (isCook)
                     ..._recommendation.recipes.map(_recipeCard)
-                  else
-                    ..._recommendation.restaurants.map(_restaurantCard),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: _loading || _saving ? null : _surpriseAgain,
@@ -195,20 +175,4 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
         ),
       );
 
-  Widget _restaurantCard(RestaurantDiscoveryResult result) => Card(
-        clipBehavior: Clip.antiAlias,
-        child: ListTile(
-          leading: Icon(_recommendation.decision.mode == FoodMode.order ? Icons.delivery_dining_rounded : Icons.restaurant_rounded),
-          title: Text(result.name),
-          subtitle: Text([
-            if (result.cuisine != null) result.cuisine!,
-            result.formattedDistance,
-          ].join(' · ')),
-          onTap: () => _openRestaurant(result),
-          trailing: FilledButton(
-            onPressed: _saving ? null : () => _selectRestaurant(result),
-            child: const Text('Auswählen'),
-          ),
-        ),
-      );
 }
