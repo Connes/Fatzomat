@@ -910,6 +910,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   _RecipeCardImage(
                                     imageUrl: recipe.imageUrl,
@@ -920,7 +921,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           recipe.name,
