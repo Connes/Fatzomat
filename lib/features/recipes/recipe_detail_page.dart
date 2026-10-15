@@ -53,7 +53,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   Object? loadError;
   bool loading = true, working = false, personalTodaySelected = false, cookedMarked = false;
   String? selectedPlanId;
-  int? selectedPlanServings;
   int servings = 2;
   final Set<int> completedSteps = <int>{};
   bool ingredientsExpanded = false;
@@ -65,7 +64,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       final r = await repo.getRecipeModel(widget.recipeId);
       bool selectedForToday = false;
       String? loadedPlanId;
-      int? loadedPlanServings;
       try {
         final today = await personalToday.todayPlan(date: widget.planDate);
         selectedForToday = today?.isRecipe == true &&
@@ -73,13 +71,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             today?.status != 'cooked';
         if (selectedForToday) {
           loadedPlanId = today!.id;
-          loadedPlanServings = today.servings;
         }
       } catch (_) {
         // Personal Today state is optional metadata for recipe rendering.
       }
       if (!mounted) return;
-      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; selectedPlanId = loadedPlanId; selectedPlanServings = loadedPlanServings; loading = false; });
+      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; selectedPlanId = loadedPlanId; loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
@@ -104,28 +101,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       MaterialPageRoute(builder: (_) => ManualRecipePage(initialRecipe: recipe)),
     );
     if (changed == true && mounted) await load();
-  }
-
-  Future<void> saveSelectedPlanServings() async {
-    final planId = selectedPlanId;
-    if (!personalTodaySelected || planId == null || working || servings == selectedPlanServings) return;
-    setState(() => working = true);
-    try {
-      final updated = await personalToday.updateServings(planId, servings);
-      if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
-      if (!mounted) return;
-      setState(() => selectedPlanServings = servings);
-      await widget.onTodayPlanChanged?.call();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Personenzahl und Einkaufsmengen wurden aktualisiert.')),
-        );
-      }
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
-    } finally {
-      if (mounted) setState(() => working = false);
-    }
   }
 
   Future<void> selectPersonalToday() async {
@@ -424,31 +399,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             child: Text(recipe!.description, style: Theme.of(context).textTheme.bodyLarge),
           ),
           const SizedBox(height: 14),
-          if (personalTodaySelected)
-            AppSurface(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Personen', style: TextStyle(fontWeight: FontWeight.w800)),
-                  const SizedBox(width: 12),
-                  IconButton(
-                    tooltip: 'Eine Person weniger',
-                    onPressed: servings <= 1 || working ? null : () => setState(() => servings--),
-                    icon: const Icon(Icons.remove_rounded),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('$servings', style: const TextStyle(fontWeight: FontWeight.w800)),
-                  ),
-                  IconButton(
-                    tooltip: 'Eine Person mehr',
-                    onPressed: servings >= 12 || working ? null : () => setState(() => servings++),
-                    icon: const Icon(Icons.add_rounded),
-                  ),
-                ],
-              ),
-            ),
           const SizedBox(height: 18),
           AppSurface(
             padding: EdgeInsets.zero,
@@ -608,33 +558,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
         ],
       ),
-      bottomNavigationBar: widget.viewingTodaySelection
-          ? null
-          : SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-          decoration: BoxDecoration(
-            color: AppDesign.surface,
-            border: const Border(top: BorderSide(color: AppDesign.divider)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (personalTodaySelected &&
-                  selectedPlanId != null &&
-                  servings != selectedPlanServings)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: working ? null : saveSelectedPlanServings,
-                    icon: const Icon(Icons.save_outlined),
-                    label: Text(working ? 'Personenzahl wird gespeichert …' : 'Personenzahl und Einkaufsliste aktualisieren'),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: null,
     );
   }
 }
