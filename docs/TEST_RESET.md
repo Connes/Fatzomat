@@ -1,13 +1,44 @@
 # Fatzomat Test Reset
 
-Dieser Reset ist ausschließlich für die Entwicklungs-/Testumgebung gedacht.
+**Destruktiver Reset ausschließlich für das dedizierte Entwicklungs-/Testprojekt. Niemals gegen Produktion ausführen.**
 
-## Ablauf
+Das Skript `scripts/reset_test_data.sql` entfernt alle Supabase-Auth-Nutzer und die zugehörigen Anwendungsdaten. Es ist ein manuell auszuführendes Wartungsskript, kein App-Feature und keine Migration.
 
-1. Alle Testnutzer löschen.
-2. Nutzerbezogene Testdaten bereinigen, einschließlich Today-Plänen, Einkaufslisten und Food-Präferenzen.
-3. Ausgewählte Test-Stammdaten auf den definierten Sollbestand bringen.
-4. Foreign-Key-Referenzen und verwaiste Daten prüfen.
-5. Am Ende automatisch verifizieren: Nutzer = 0, Testdaten = 0, gewünschte Foods vorhanden, unerwünschte Foods nicht vorhanden.
+## Was gelöscht wird
 
-Der Reset wird bewusst manuell und mit einer expliziten Bestätigung ausgeführt. Er ist kein App-Feature und keine normale Datenbankmigration.
+- Alle Konten aus `auth.users` (Supabase Auth entfernt zugehörige Identitäten und Sitzungen über Foreign Keys).
+- Profile und Verbindungen einschließlich Mitgliedschaften.
+- Persönliche Tagespläne, Verlauf und Einkaufslisteneinträge.
+- Geteilte Tages-/Rezeptpläne, Freigaben und Entscheidungsanfragen.
+- Food-Präferenzen, Rezept-Saves und Rezeptvorschläge.
+- Push-Geräte, Benachrichtigungen und Rezeptlöschanfragen.
+- Alle Rezepte mit `created_by IS NOT NULL` sowie die dazugehörigen Zutaten, die über Foreign Keys abhängen.
+- Dateien im privaten `recipe-images`-Bucket, wenn sie zu einem gelöschten nutzererstellten Rezept gehören.
+
+## Was erhalten bleibt
+
+- Globale/Seed-Rezepte mit `created_by IS NULL`.
+- Der Food-Stammdatenbestand und sonstige globale App-Stammdaten.
+- Der Storage-Bucket selbst und Bilder, die nicht zu einem gelöschten nutzererstellten Rezept gehören.
+
+## Voraussetzungen und Ausführung
+
+1. Vorher sicherstellen, dass die verwendete Datenbank-URL zum dedizierten Testprojekt gehört. Nicht aus einer produktiven Umgebung starten.
+2. Vorher einen Backup-/Snapshot erstellen, falls Daten wiederherstellbar bleiben müssen.
+3. Das Skript mit der expliziten Bestätigung ausführen:
+
+   ```sh
+   psql "$TEST_DATABASE_URL" \
+     -v TEST_RESET_CONFIRM=FATZOMAT_TEST_RESET \
+     -f scripts/reset_test_data.sql
+   ```
+
+4. Die abschließende Ergebniszeile prüfen. Alle Zähler für Nutzer- und nutzerbezogene Daten müssen `0` sein. `remaining_recipe_image_object_count` darf größer als null sein, wenn erhaltene globale oder anderweitig nicht nutzererstellten Rezeptbilder im Bucket liegen.
+5. Bei SQL-Fehlern nicht davon ausgehen, dass der Reset abgeschlossen ist. Da die Datenbankoperation in einer Transaktion läuft, werden Datenbankänderungen bei einem Fehler vor `COMMIT` zurückgerollt.
+
+## Sicherheitsgrenzen
+
+- Das Skript löscht **nicht** den gesamten Storage-Bucket, da dort Dateien liegen könnten, die nicht nutzerbezogen sind.
+- Es löscht globale Food-/Seed-Daten nicht und setzt deren Sollbestand nicht neu auf.
+- Vor dem Einsatz auf einer abweichenden Schema-Version müssen neue Tabellen und Foreign Keys geprüft werden. Das Skript ist auf die derzeit im Repository dokumentierte Supabase-Struktur ausgelegt.
+- Die Bestätigung schützt vor versehentlichem Start, ersetzt aber nicht die Prüfung des Zielprojekts.
