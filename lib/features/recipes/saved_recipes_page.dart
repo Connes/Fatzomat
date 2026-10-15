@@ -918,10 +918,15 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                   const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
-                                        const SizedBox(height: 12),
+                                        Text(
+                                          recipe.name,
+                                          style: Theme.of(context).textTheme.titleMedium,
+                                        ),
+                                        const SizedBox(height: 8),
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: TextButton.icon(
