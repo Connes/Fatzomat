@@ -423,9 +423,13 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         if (widget.onNavigateToTab != null) {
           widget.onNavigateToTab!(0);
         }
-        // Bubble success through SavedRecipesPage, CookNextStepPage and
-        // FoodModePage so the caller can refresh the exact date it opened.
-        Navigator.pop(context, true);
+        // Bubble success through a pushed recipe-selection flow when one
+        // exists. SavedRecipesPage can also be the root tab itself, where
+        // popping would empty the Navigator history and crash the app.
+        final navigator = Navigator.of(context);
+        if (navigator.canPop()) {
+          navigator.pop(true);
+        }
         return;
       }
 
