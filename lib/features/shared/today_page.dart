@@ -15,7 +15,6 @@ import '../../core/app_design.dart';
 import '../../core/recipe_collection_events.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
-import '../../data/models/restaurant_discovery.dart';
 import '../../data/models/recipe.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import 'controllers/today_controller.dart';
@@ -23,7 +22,6 @@ import '../recipes/recipe_detail_page.dart';
 import '../../core/food_mode.dart';
 import '../../core/services/food_choice_asset_service.dart';
 import '../food_modes/food_mode_page.dart';
-import '../food_modes/restaurant_detail_page.dart';
 import '../food_modes/delivery_services_page.dart';
 import 'personalized_surprise_page.dart';
 import 'connection_page.dart';
@@ -734,47 +732,38 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                       );
                                     }
                                   : plan!.decisionType == 'dine_out'
-                                      ? () {
-                                          final data = plan!.restaurantData;
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => RestaurantDetailPage(
-                                                result: RestaurantDiscoveryResult(
-                                                  id: data['id']?.toString() ?? '',
-                                                  name: plan!.restaurantName,
-                                                  address: data['address']?.toString(),
-                                                  city: data['city']?.toString(),
-                                                  distanceKm: (data['distance_km'] as num?)?.toDouble() ?? 0,
-                                                  latitude: (data['latitude'] as num?)?.toDouble() ?? 0,
-                                                  longitude: (data['longitude'] as num?)?.toDouble() ?? 0,
-                                                  phone: data['phone']?.toString(),
-                                                  website: data['website'] == null ? null : Uri.tryParse(data['website'].toString()),
-                                                  orderUri: data['order_url'] == null ? null : Uri.tryParse(data['order_url'].toString()),
-                                                  openingHours: data['opening_hours']?.toString(),
-                                                  deliveryAvailable: data['delivery_available'] == true,
-                                                  cuisine: data['cuisine']?.toString(),
-                                                ),
-                                                order: false,
-                                                onComplete: () async {
-                                                  try {
-                                                    await repo.removeTodayPlan(plan!.id);
-                                                    RecipeCollectionEvents.notifyChanged();
-                                                    if (!mounted) return;
-                                                    Navigator.of(context).pop();
-                                                    await load();
-                                                  } catch (error) {
-                                                    if (!mounted) return;
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text(friendlyError(error))),
-                                                    );
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      : null,
+                                       ? () async {
+                                           final data = plan!.restaurantData;
+                                           final details = <String>[
+                                             if ((data['address']?.toString() ?? '').trim().isNotEmpty) data['address'].toString(),
+                                             if ((data['phone']?.toString() ?? '').trim().isNotEmpty) 'Telefon: ${data['phone']}',
+                                             if ((data['website']?.toString() ?? '').trim().isNotEmpty) data['website'].toString(),
+                                             if ((data['opening_hours']?.toString() ?? '').trim().isNotEmpty) 'Öffnungszeiten: ${data['opening_hours']}',
+                                           ];
+                                           final done = await showDialog<bool>(
+                                             context: context,
+                                             builder: (dialogContext) => AlertDialog(
+                                               title: Text(plan!.restaurantName ?? 'Restaurant'),
+                                               content: Text(details.isEmpty
+                                                   ? 'Keine weiteren Restaurantdaten gespeichert.'
+                                                   : details.join('\\n\\n')),
+                                               actions: [
+                                                 TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Schließen')),
+                                                 FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Als erledigt markieren')),
+                                               ],
+                                             ),
+                                           );
+                                           if (done != true) return;
+                                           try {
+                                             await repo.removeTodayPlan(plan!.id);
+                                             RecipeCollectionEvents.notifyChanged();
+                                             if (mounted) await load();
+                                           } catch (error) {
+                                             if (!mounted) return;
+                                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+                                           }
+                                         }
+: null,
                               onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'
                                   ? () async {
                                       await Navigator.push(
