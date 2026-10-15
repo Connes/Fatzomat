@@ -75,23 +75,43 @@ class _RestaurantFavoritesPageState extends State<RestaurantFavoritesPage> {
               : _favorites.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(28),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.favorite_border_rounded, size: 48, color: AppDesign.primaryDark),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Noch keine Restaurantfavoriten',
-                              style: Theme.of(context).textTheme.titleMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Importiere ein Restaurant mit ChatGPT und speichere es beim Abschließen als Favorit.',
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                        padding: const EdgeInsets.all(24),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: AppDesign.softSurface,
+                            borderRadius: BorderRadius.circular(26),
+                            border: Border.all(color: AppDesign.divider),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 18,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.favorite_border_rounded, size: 48, color: AppDesign.primaryDark),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Noch keine Restaurantfavoriten',
+                                style: Theme.of(context).textTheme.titleMedium,
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Importiere ein Restaurant mit ChatGPT und speichere es beim Abschließen als Favorit.',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: AppDesign.primaryText,
+                                      height: 1.4,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     )
