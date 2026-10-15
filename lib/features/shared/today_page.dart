@@ -742,7 +742,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                              extraActionLabel: 'Als erledigt markieren',
                                            );
                                            if (done != true) return;
-                                           final restaurant = plan!.restaurantData;
                                            if ((restaurant['name']?.toString().trim() ?? '').isNotEmpty) {
                                              final saveAsFavorite = await showDialog<bool>(
                                                context: context,
