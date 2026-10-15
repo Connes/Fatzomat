@@ -59,7 +59,7 @@ void main() {
     expect(source, isNot(contains("'Willkommen!'")));
     expect(
       source,
-      contains("'Willkommen',\n                        textAlign: TextAlign.center,"),
+      contains("Center(\n                        child: Text(\n                          'Willkommen',\n                          textAlign: TextAlign.center,"),
     );
     expect(source, contains("ValueKey<String>('food_onboarding_welcome_box')"));
     expect(source, contains("onStart: () => setState(() => showSetup = true)"));
