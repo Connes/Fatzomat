@@ -130,8 +130,8 @@ class _RecipeCardImageState extends State<_RecipeCardImage> {
       child: resolvedUrl?.trim().isNotEmpty == true
           ? Image.network(
               resolvedUrl!,
-              width: 58,
-              height: 58,
+              width: 88,
+              height: 88,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => _fallback(),
             )
@@ -140,8 +140,8 @@ class _RecipeCardImageState extends State<_RecipeCardImage> {
   }
 
   Widget _fallback() => Container(
-        width: 58,
-        height: 58,
+        width: 88,
+        height: 88,
         color: AppDesign.softSurface,
         child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
       );
@@ -920,6 +920,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                   Expanded(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
