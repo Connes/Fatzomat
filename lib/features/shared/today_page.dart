@@ -22,6 +22,7 @@ import '../recipes/recipe_detail_page.dart';
 import '../../core/food_mode.dart';
 import '../../core/services/food_choice_asset_service.dart';
 import '../food_modes/food_mode_page.dart';
+import 'restaurant_details_dialog.dart';
 import '../food_modes/delivery_services_page.dart';
 import 'personalized_surprise_page.dart';
 import 'connection_page.dart';
@@ -734,25 +735,11 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                     }
                                   : plan!.decisionType == 'dine_out'
                                        ? () async {
-                                           final data = plan!.restaurantData;
-                                           final details = <String>[
-                                             if ((data['address']?.toString() ?? '').trim().isNotEmpty) data['address'].toString(),
-                                             if ((data['phone']?.toString() ?? '').trim().isNotEmpty) 'Telefon: ${data['phone']}',
-                                             if ((data['website']?.toString() ?? '').trim().isNotEmpty) data['website'].toString(),
-                                             if ((data['opening_hours']?.toString() ?? '').trim().isNotEmpty) 'Öffnungszeiten: ${data['opening_hours']}',
-                                           ];
-                                           final done = await showDialog<bool>(
-                                             context: context,
-                                             builder: (dialogContext) => AlertDialog(
-                                               title: Text(plan!.restaurantName),
-                                               content: Text(details.isEmpty
-                                                   ? 'Keine weiteren Restaurantdaten gespeichert.'
-                                                   : details.join('\\n\\n')),
-                                               actions: [
-                                                 TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Schließen')),
-                                                 FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Als erledigt markieren')),
-                                               ],
-                                             ),
+                                           final restaurant = plan!.restaurantData;
+                                           final done = await showRestaurantDetailsDialog(
+                                             context,
+                                             restaurant,
+                                             extraActionLabel: 'Als erledigt markieren',
                                            );
                                            if (done != true) return;
                                            final restaurant = plan!.restaurantData;
