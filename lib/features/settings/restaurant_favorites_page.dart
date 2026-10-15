@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
@@ -160,14 +161,14 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: const ['json'],
-        withData: true,
       );
-      if (result == null || result.files.isEmpty || !mounted) return;
-      final file = result.files.single;
-      final bytes = file.bytes;
-      if (bytes == null) {
+      if (result.isEmpty || !mounted) return;
+      final file = result.first;
+      final path = file.path;
+      if (path == null || path.isEmpty) {
         throw const FormatException('Die ausgewählte Datei konnte nicht gelesen werden.');
       }
+      final bytes = await File(path).readAsBytes();
       final decoded = jsonDecode(utf8.decode(bytes));
       if (decoded is! Map<String, dynamic> ||
           decoded['schema_version'] != 1 ||
