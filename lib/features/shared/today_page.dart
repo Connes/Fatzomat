@@ -743,7 +743,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                            final done = await showDialog<bool>(
                                              context: context,
                                              builder: (dialogContext) => AlertDialog(
-                                               title: Text(plan!.restaurantName ?? 'Restaurant'),
+                                               title: Text(plan!.restaurantName),
                                                content: Text(details.isEmpty
                                                    ? 'Keine weiteren Restaurantdaten gespeichert.'
                                                    : details.join('\\n\\n')),
