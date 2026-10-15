@@ -129,11 +129,19 @@ class _FoodModePageState extends State<FoodModePage> {
     try {
       await PersonalTodayRepository().selectDecision(
         type: 'dine_out',
-        value: jsonEncode({'type': 'fatzomat_restaurant_suggestion', 'schema_version': 1, 'restaurant': restaurant}),
+        value: jsonEncode({
+          'type': 'fatzomat_restaurant_suggestion',
+          'schema_version': 1,
+          'restaurant': restaurant,
+        }),
         date: widget.planDate,
       );
       if (!context.mounted) return;
-      Navigator.pop(context, true);
+
+      // Return the successful decision to the caller. The Today screen owns
+      // the next navigation step; popping again here can empty the Navigator
+      // history when this flow was opened as the root of a nested route.
+      Navigator.of(context).pop(true);
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
