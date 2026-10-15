@@ -298,11 +298,57 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     padding: const EdgeInsets.all(24),
                     children: [
                       const SizedBox(height: 70),
-                      Icon(Icons.notifications_none_rounded, size: 56, color: AppDesign.primaryDark),
-                      const SizedBox(height: 18),
-                      Text('Alles ruhig.', textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 8),
-                      Text('Hier erscheinen neue Rezepte und Entscheidungen.', textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge),
+                      Center(
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 440),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 28,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.94),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(
+                              color: AppDesign.primaryDark.withValues(alpha: 0.12),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.10),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.notifications_active_outlined,
+                                size: 56,
+                                color: AppDesign.primaryDark,
+                              ),
+                              const SizedBox(height: 18),
+                              Text(
+                                'Alles ruhig.',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Hier erscheinen neue Rezepte und Entscheidungen.',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   )
                 : ListView.separated(
