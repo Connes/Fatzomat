@@ -23,6 +23,7 @@ class _RestaurantFavoritesPageState extends State<RestaurantFavoritesPage> {
   final _repository = RestaurantFavoritesRepository();
   List<Map<String, dynamic>> _favorites = const [];
   bool _loading = true;
+  bool _showAddPanel = false;
   Object? _error;
 
   @override
@@ -370,6 +371,94 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
     );
   }
 
+  Future<void> _editRestaurant(Map<String, dynamic> restaurant) async {
+    final nameController = TextEditingController(text: restaurant['name']?.toString() ?? '');
+    final cuisineController = TextEditingController(text: restaurant['cuisine']?.toString() ?? '');
+    final addressController = TextEditingController(text: restaurant['address']?.toString() ?? '');
+    final phoneController = TextEditingController(text: restaurant['phone']?.toString() ?? '');
+    final websiteController = TextEditingController(text: restaurant['website']?.toString() ?? '');
+    final hoursController = TextEditingController(text: restaurant['opening_hours']?.toString() ?? '');
+    final formKey = GlobalKey<FormState>();
+    final edited = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Lieblingsrestaurant bearbeiten'),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _editField(nameController, 'Restaurantname', required: true),
+                _editField(cuisineController, 'Küche', required: true),
+                _editField(addressController, 'Adresse', required: true),
+                _editField(phoneController, 'Telefon'),
+                _editField(websiteController, 'Webseite'),
+                _editField(hoursController, 'Öffnungszeiten', maxLines: 3),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Abbrechen')),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState?.validate() != true) return;
+              Navigator.pop(dialogContext, <String, dynamic>{
+                'name': nameController.text.trim(),
+                'cuisine': cuisineController.text.trim(),
+                'address': addressController.text.trim(),
+                'phone': phoneController.text.trim().isEmpty ? null : phoneController.text.trim(),
+                'website': websiteController.text.trim().isEmpty ? null : websiteController.text.trim(),
+                'opening_hours': hoursController.text.trim().isEmpty ? null : hoursController.text.trim(),
+              });
+            },
+            child: const Text('Speichern'),
+          ),
+        ],
+      ),
+    );
+    for (final controller in [nameController, cuisineController, addressController, phoneController, websiteController, hoursController]) {
+      controller.dispose();
+    }
+    if (edited == null || !mounted) return;
+    await _repository.remove(restaurant);
+    await _repository.add(edited);
+    await _load();
+  }
+
+  Widget _editField(TextEditingController controller, String label, {bool required = false, int maxLines = 1}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(labelText: label),
+        validator: required
+            ? (value) => value == null || value.trim().isEmpty ? 'Bitte ausfüllen' : null
+            : null,
+      ),
+    );
+  }
+
+  Future<void> _confirmRemove(Map<String, dynamic> restaurant) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Lieblingsrestaurant löschen?'),
+        content: Text('${restaurant['name']} wird aus deinen Favoriten entfernt.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Abbrechen')),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) await _remove(restaurant);
+  }
+
   Future<void> _remove(Map<String, dynamic> restaurant) async {
     await _repository.remove(restaurant);
     await _load();
@@ -380,7 +469,16 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.settings,
       appBar: TogetherAppBar(
-        title: Text(widget.selectForToday ? 'Meine Restaurantfavoriten' : 'Restaurant'),
+        title: Text(widget.selectForToday ? 'Meine Restaurantfavoriten' : 'Lieblingsrestaurants'),
+        actions: widget.selectForToday
+            ? null
+            : [
+                IconButton(
+                  tooltip: _showAddPanel ? 'Hinzufügen schließen' : 'Lieblingsrestaurant hinzufügen',
+                  onPressed: () => setState(() => _showAddPanel = !_showAddPanel),
+                  icon: Icon(_showAddPanel ? Icons.close_rounded : Icons.add_rounded),
+                ),
+              ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -403,46 +501,47 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                     children: [
-                      AppSurface(
-                        padding: const EdgeInsets.all(20),
-                        color: AppDesign.surface,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Icon(Icons.favorite_rounded, size: 38, color: AppDesign.primaryDark),
-                            const SizedBox(height: 10),
-                            Text(
-                              'Lieblingsrestaurants',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: AppDesign.text,
-                                fontWeight: FontWeight.w700,
+                      if (_showAddPanel && !widget.selectForToday)
+                        AppSurface(
+                          padding: const EdgeInsets.all(20),
+                          color: AppDesign.surface,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'Lieblingsrestaurant hinzufügen',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: AppDesign.text,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Füge ein Restaurant über ChatGPT hinzu. ChatGPT recherchiert die fehlenden Angaben; anschließend importierst du die JSON-Daten in Fatzomat.',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppDesign.text,
-                                height: 1.45,
+                              const SizedBox(height: 8),
+                              Text(
+                                'Füge ein Restaurant über ChatGPT hinzu oder importiere eine JSON-Datei.',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppDesign.text,
+                                  height: 1.4,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            OutlinedButton.icon(
-                              onPressed: _importFavoriteJson,
-                              icon: const Icon(Icons.file_upload_outlined),
-                              label: const Text('JSON-Datei importieren'),
-                            ),
-                            const SizedBox(height: 16),
-                            FilledButton.icon(
-                              onPressed: _addRestaurant,
-                              icon: const Icon(Icons.add_rounded),
-                              label: const Text('Lieblingsrestaurant hinzufügen'),
-                            ),
-                          ],
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                onPressed: _importFavoriteJson,
+                                icon: const Icon(Icons.file_upload_outlined),
+                                label: const Text('JSON-Datei importieren'),
+                              ),
+                              const SizedBox(height: 8),
+                              FilledButton.icon(
+                                onPressed: _addRestaurant,
+                                icon: const Icon(Icons.add_rounded),
+                                label: const Text('Mit ChatGPT hinzufügen'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                      if (_showAddPanel && !widget.selectForToday)
+                        const SizedBox(height: 16),
                       const SizedBox(height: 16),
                       if (_favorites.isEmpty)
                         AppSurface(
@@ -488,16 +587,37 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                               child: ListTile(
                                 leading: const CircleAvatar(
                                   backgroundColor: AppDesign.softSurface,
-                                  child: Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+                                  child: Icon(Icons.favorite_rounded, color: AppDesign.primaryDark),
                                 ),
                                 title: Text(name, style: const TextStyle(color: AppDesign.text, fontWeight: FontWeight.w600)),
                                 subtitle: details.isEmpty ? null : Text(details, style: const TextStyle(color: AppDesign.text)),
                                 trailing: widget.selectForToday
                                     ? const Icon(Icons.chevron_right_rounded)
-                                    : IconButton(
-                                        tooltip: 'Favorit entfernen',
-                                        icon: const Icon(Icons.favorite, color: AppDesign.primaryDark),
-                                        onPressed: () => _remove(restaurant),
+                                    : PopupMenuButton<String>(
+                                        tooltip: 'Optionen für $name',
+                                        onSelected: (action) async {
+                                          if (action == 'edit') {
+                                            await _editRestaurant(restaurant);
+                                          } else if (action == 'delete') {
+                                            await _confirmRemove(restaurant);
+                                          }
+                                        },
+                                        itemBuilder: (context) => const [
+                                          PopupMenuItem(value: 'edit', child: ListTile(
+                                            leading: Icon(Icons.edit_outlined),
+                                            title: Text('Bearbeiten'),
+                                            contentPadding: EdgeInsets.zero,
+                                          )),
+                                          PopupMenuItem(value: 'delete', child: ListTile(
+                                            leading: Icon(Icons.delete_outline_rounded),
+                                            title: Text('Löschen'),
+                                            contentPadding: EdgeInsets.zero,
+                                          )),
+                                        ],
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: Icon(Icons.more_vert_rounded),
+                                        ),
                                       ),
                                 onTap: widget.selectForToday
                                     ? () => Navigator.pop(context, restaurant)
