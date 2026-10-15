@@ -46,11 +46,7 @@ void main() {
   });
 
   test('Überraschung Bestellen bleibt ohne alte Restaurant-Suche nutzbar', () async {
-    final repository = _Discovery();
-    final service = SurpriseRecommendationService(
-      locationService: _Location(),
-      restaurantRepository: repository,
-    );
+    final service = SurpriseRecommendationService();
     final result = await service.generate(
       savedRecipes: List.generate(4, (i) => _recipe('$i')),
       preferences: const {},
