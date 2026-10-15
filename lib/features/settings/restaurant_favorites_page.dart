@@ -253,11 +253,31 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
               if (cuisine != null && cuisine.trim().isNotEmpty)
                 _detailRow(Icons.restaurant_menu_rounded, 'Küche', cuisine),
               if (address != null && address.trim().isNotEmpty)
-                _detailRow(Icons.location_on_outlined, 'Adresse', address),
+                _detailRow(
+                  Icons.location_on_outlined,
+                  'Adresse',
+                  _formatAddress(address),
+                  onTap: () => _openAddress(address),
+                ),
               if (phone != null && phone.trim().isNotEmpty)
-                _detailRow(Icons.phone_outlined, 'Telefon', phone),
+                _detailRow(
+                  Icons.phone_outlined,
+                  'Telefon',
+                  phone,
+                  onTap: () => _launch(Uri(scheme: 'tel', path: phone.replaceAll(RegExp(r'[^0-9+*#,;]'), ''))),
+                ),
               if (website != null && website.trim().isNotEmpty)
-                _detailRow(Icons.language_rounded, 'Webseite', website),
+                _detailRow(
+                  Icons.language_rounded,
+                  'Webseite',
+                  website,
+                  onTap: () {
+                    final uri = Uri.tryParse(website);
+                    if (uri != null && uri.hasAuthority && {'http', 'https'}.contains(uri.scheme)) {
+                      _launch(uri);
+                    }
+                  },
+                ),
               if (hours != null && hours.trim().isNotEmpty)
                 _detailRow(Icons.schedule_rounded, 'Öffnungszeiten', hours),
               if ([cuisine, address, phone, website, hours]
@@ -267,17 +287,6 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
           ),
         ),
         actions: [
-          if (website != null && website.trim().isNotEmpty)
-            TextButton.icon(
-              onPressed: () async {
-                final uri = Uri.tryParse(website);
-                if (uri != null && await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                }
-              },
-              icon: const Icon(Icons.open_in_new_rounded),
-              label: const Text('Webseite öffnen'),
-            ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Schließen'),
@@ -287,25 +296,76 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
     );
   }
 
-  Widget _detailRow(IconData icon, String label, String value) {
+  String _formatAddress(String address) {
+    final parts = address.split(',').map((part) => part.trim()).where((part) => part.isNotEmpty).toList();
+    if (parts.length >= 2) return '${parts.first}\n${parts.skip(1).join(', ')}';
+    return address;
+  }
+
+  Future<void> _openAddress(String address) async {
+    final encoded = Uri.encodeComponent(address);
+    final googleMaps = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$encoded');
+    await _launch(googleMaps);
+  }
+
+  Future<void> _launch(Uri uri) async {
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Die Verknüpfung konnte nicht geöffnet werden.')),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Die Verknüpfung konnte nicht geöffnet werden.')),
+      );
+    }
+  }
+
+  Widget _detailRow(
+    IconData icon,
+    String label,
+    String value, {
+    VoidCallback? onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: AppDesign.primaryDark),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 2),
-                SelectableText(value),
-              ],
-            ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 20, color: AppDesign.primaryDark),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    Text(
+                      value,
+                      style: TextStyle(
+                        color: onTap == null ? AppDesign.text : AppDesign.primaryDark,
+                        decoration: onTap == null ? TextDecoration.none : TextDecoration.underline,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null)
+                const Padding(
+                  padding: EdgeInsets.only(left: 6, top: 2),
+                  child: Icon(Icons.open_in_new_rounded, size: 16, color: AppDesign.primaryDark),
+                ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
