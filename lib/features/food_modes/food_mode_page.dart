@@ -13,7 +13,6 @@ import '../../core/services/food_choice_asset_service.dart';
 import '../../core/food_mode.dart';
 import '../../core/error_text.dart';
 import 'chatgpt_restaurant_page.dart';
-import '../../data/repositories/restaurant_favorites_repository.dart';
 import '../settings/restaurant_favorites_page.dart';
 
 class FoodModePage extends StatefulWidget {
