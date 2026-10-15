@@ -92,7 +92,7 @@ void main() {
       expect(find.text(label), findsOneWidget, reason: 'Auswahl fehlt: $label');
     }
 
-    final expectedInteractiveCards = labels.length + (mode == FoodMode.dineOut ? 1 : 0);
+    final expectedInteractiveCards = labels.length + (mode == FoodMode.dineOut ? 2 : 0);
     expect(find.byType(InkWell), findsNWidgets(expectedInteractiveCards));
     expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
     if (compactMode) {
