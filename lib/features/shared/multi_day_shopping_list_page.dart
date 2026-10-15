@@ -171,6 +171,26 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     return categories;
   }
 
+  Future<void> _updatePlanServings(TodayPlan plan, int servings) async {
+    if (servings < 1 || servings > 12) return;
+    try {
+      final updated = await _repo.updateServings(plan.id, servings);
+      if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
+      await load(showLoading: false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Einkaufsmengen für ${plan.displayTitle} aktualisiert.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Personenzahl konnte nicht geändert werden: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _toggleItem(AggregatedShoppingItem item, bool checked) async {
     if (_updatingItems.contains(item.key) || !mounted) return;
     setState(() => _updatingItems.add(item.key));
@@ -453,8 +473,27 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                             style: const TextStyle(color: AppDesign.text),
                                           ),
                                           subtitle: Text(
-                                            '${plan.servings} Portionen',
+                                            '${plan.servings} Personen',
                                             style: const TextStyle(color: AppDesign.secondaryText),
+                                          ),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                tooltip: 'Eine Person weniger',
+                                                onPressed: plan.servings <= 1
+                                                    ? null
+                                                    : () => _updatePlanServings(plan, plan.servings - 1),
+                                                icon: const Icon(Icons.remove_circle_outline_rounded),
+                                              ),
+                                              IconButton(
+                                                tooltip: 'Eine Person mehr',
+                                                onPressed: plan.servings >= 12
+                                                    ? null
+                                                    : () => _updatePlanServings(plan, plan.servings + 1),
+                                                icon: const Icon(Icons.add_circle_outline_rounded),
+                                              ),
+                                            ],
                                           ),
                                         ))
                                     .toList(),
