@@ -50,17 +50,14 @@ void main() {
     expect(today, contains('Transform.translate('));
   });
 
-  test('restaurant discovery receives the selected date before saving a decision', () {
+  test('restaurant import receives the selected planning date', () {
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
-    final discoveryStart = foodMode.indexOf('builder: (_) => DiscoveryPage(');
-    final discoveryEnd = foodMode.indexOf('),\n      ),', discoveryStart);
-    expect(discoveryStart, isNonNegative);
-    expect(discoveryEnd, greaterThan(discoveryStart));
-    expect(
-      foodMode.substring(discoveryStart, discoveryEnd),
-      contains('planDate: widget.planDate,'),
-    );
-    expect(foodMode, contains('date: widget.planDate,'));
+    final chatGpt = File('lib/features/food_modes/chatgpt_restaurant_page.dart').readAsStringSync();
+    expect(foodMode, contains('planDate: widget.planDate'));
+    expect(foodMode, contains('initialCuisine: cuisine'));
+    expect(chatGpt, contains('final DateTime? planDate'));
+    expect(chatGpt, contains('date: widget.planDate'));
+    expect(foodMode, isNot(contains('DiscoveryPage(')));
   });
 
   test('saved recipe selection and recipe details keep the selected planning date', () {
