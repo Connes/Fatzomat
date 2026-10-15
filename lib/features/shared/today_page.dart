@@ -28,6 +28,7 @@ import 'connection_page.dart';
 import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../../data/repositories/food_repository.dart';
+import '../../data/repositories/restaurant_favorites_repository.dart';
 import '../../data/models/food.dart';
 import '../../data/models/decision_share.dart';
 import '../../core/services/surprise_recommendation_service.dart';
@@ -754,6 +755,44 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                              ),
                                            );
                                            if (done != true) return;
+                                           final restaurant = plan!.restaurantData;
+                                           if ((restaurant['name']?.toString().trim() ?? '').isNotEmpty) {
+                                             final saveAsFavorite = await showDialog<bool>(
+                                               context: context,
+                                               builder: (dialogContext) => AlertDialog(
+                                                 title: const Text('Restaurant als Favorit speichern?'),
+                                                 content: Text('${plan!.restaurantName} wird dauerhaft unter Einstellungen > Restaurant gespeichert.'),
+                                                 actions: [
+                                                   TextButton(
+                                                     onPressed: () => Navigator.pop(dialogContext, false),
+                                                     child: const Text('Nein, abschließen'),
+                                                   ),
+                                                   FilledButton.icon(
+                                                     onPressed: () => Navigator.pop(dialogContext, true),
+                                                     icon: const Icon(Icons.favorite_rounded),
+                                                     label: const Text('Als Favorit speichern'),
+                                                   ),
+                                                 ],
+                                               ),
+                                             );
+                                             if (saveAsFavorite == true) {
+                                               try {
+                                                 final added = await RestaurantFavoritesRepository().add(restaurant);
+                                                 if (!mounted) return;
+                                                 ScaffoldMessenger.of(context).showSnackBar(
+                                                   SnackBar(content: Text(added
+                                                       ? 'Restaurant als Favorit gespeichert.'
+                                                       : 'Dieses Restaurant ist bereits ein Favorit.')),
+                                                 );
+                                               } catch (error) {
+                                                 if (!mounted) return;
+                                                 ScaffoldMessenger.of(context).showSnackBar(
+                                                   SnackBar(content: Text(friendlyError(error))),
+                                                 );
+                                                 return;
+                                               }
+                                             }
+                                           }
                                            try {
                                              await repo.removeTodayPlan(plan!.id);
                                              RecipeCollectionEvents.notifyChanged();
