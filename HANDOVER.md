@@ -363,3 +363,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - PR #101 am 2026-10-13 gemergt: `a38d3326c3e20a5845ed7f5f06049250c1c168e3`. Beide PR-Quality-Gates waren erfolgreich (Analyze und Tests).
 - Supabase-Migration `date_aware_decide_for_me` auf Projekt `oidxezjdwqktpxuypbfb` angewendet. Live verifiziert: Die Funktion `send_decision_message(..., p_plan_date date)` ist vorhanden und ihre Definition nutzt das übergebene Datum für `decision_shares.plan_date` sowie den Benachrichtigungstext.
 - Keine Release-Builds.
+
+## Surprise-Roulette: CI-Regressions behoben (2026-10-15)
+
+- PR #148 („Fix CI after removing obsolete surprise flow“) wurde gemergt. Merge-Commit auf `main`: `4db0c894d3101bd185d1c3384a93f548a7d94540`.
+- `lib/features/shared/today_page.dart`: fünf ungenutzte Imports entfernt, die nach dem Entfernen des veralteten direkten Surprise-Flows übrig geblieben waren.
+- `test/regression/personal_today_decision_types_test.dart`: veraltete Erwartung an `_openSurprise()` auf den aktuellen `_handleSurprise()`-/`SurpriseModeRoulettePage`-Navigationspfad angepasst.
+- PR-CI erfolgreich. Nach dem Merge wurden Quality Gate Run `38798110581` und Flutter quality gate Run `38798110602` auf `main` ebenfalls mit `success` abgeschlossen.
+- Keine Supabase-Migration, kein Release-Build und keine Veröffentlichung erforderlich.
+- Aktueller nächster Schritt: bei der nächsten Änderung den tatsächlichen Stand von `main` und die dazugehörige CI prüfen; keine offenen Arbeiten aus dieser Fehlerbehebung.
