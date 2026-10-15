@@ -125,25 +125,30 @@ class _RecipeCardImageState extends State<_RecipeCardImage> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: resolvedUrl?.trim().isNotEmpty == true
-          ? Image.network(
-              resolvedUrl!,
-              width: 88,
-              height: 88,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _fallback(),
-            )
-          : _fallback(),
+    return SizedBox.square(
+      dimension: 88,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: resolvedUrl?.trim().isNotEmpty == true
+            ? Image.network(
+                resolvedUrl!,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _fallback(),
+              )
+            : _fallback(),
+      ),
     );
   }
 
-  Widget _fallback() => Container(
-        width: 88,
-        height: 88,
-        color: AppDesign.softSurface,
-        child: const Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+  Widget _fallback() => SizedBox.expand(
+        child: ColoredBox(
+          color: AppDesign.softSurface,
+          child: const Center(
+            child: Icon(Icons.restaurant_rounded, color: AppDesign.primaryDark),
+          ),
+        ),
       );
 }
 
