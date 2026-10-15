@@ -25,6 +25,7 @@ import '../food_modes/food_mode_page.dart';
 import 'restaurant_details_dialog.dart';
 import '../food_modes/delivery_services_page.dart';
 import 'personalized_surprise_page.dart';
+import 'surprise_mode_roulette_page.dart';
 import 'connection_page.dart';
 import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
@@ -286,7 +287,13 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
   Future<void> _handleSurprise() async {
-    await _openSurprise();
+    final mode = await Navigator.push<FoodMode>(
+      context,
+      MaterialPageRoute(builder: (_) => const SurpriseModeRoulettePage()),
+    );
+    if (mode != null && mounted) {
+      await _openMode(mode);
+    }
   }
 
   Future<void> _openSurprise() async {
