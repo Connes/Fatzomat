@@ -17,7 +17,9 @@ void main() {
     expect(repo, contains("'p_decision_type'"));
     expect(model, contains('decisionType'));
     expect(model, contains('decisionValue'));
-    expect(today, contains("await _openSurprise();"));
+    expect(today, contains('Future<void> _handleSurprise() async'));
+    expect(today, contains('const SurpriseModeRoulettePage()'));
+    expect(today, contains('await _openMode(mode);'));
   });
 
   test('collaboration recipe decision does not also write personal Today', () {
