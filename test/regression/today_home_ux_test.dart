@@ -34,7 +34,8 @@ void main() {
     expect(today, contains('? onOpenOrder'));
     expect(today, contains("plan.restaurantCuisine != null"));
     expect(today, isNot(contains('RestaurantDetailPage')));
-    expect(today, contains('Keine weiteren Restaurantdaten gespeichert.'));
+    final restaurantDetails = File('lib/features/shared/restaurant_details_dialog.dart').readAsStringSync();
+    expect(restaurantDetails, contains('Für dieses Restaurant sind keine weiteren Angaben gespeichert.'));
     expect(today, contains('Als erledigt markieren'));
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
     expect(foodMode, contains("'fatzomat_pending_restaurant_import_cuisine', cuisine"));
