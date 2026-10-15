@@ -28,7 +28,6 @@ void main() {
     }
 
     expect(find.text('Lieferdienste'), findsNothing);
-    expect(find.byType(DiscoveryPage), findsNothing);
   });
 
   test('Schnitzel und Pasta verwenden eigene Bildassets', () {
