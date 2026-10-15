@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/widgets/together_scaffold.dart';
@@ -11,6 +13,8 @@ import '../../core/services/food_choice_asset_service.dart';
 import '../../core/food_mode.dart';
 import '../../core/error_text.dart';
 import 'chatgpt_restaurant_page.dart';
+import '../../data/repositories/restaurant_favorites_repository.dart';
+import '../settings/restaurant_favorites_page.dart';
 
 class FoodModePage extends StatefulWidget {
   final FoodMode mode;
@@ -115,6 +119,30 @@ class _FoodModePageState extends State<FoodModePage> {
     }
   }
 
+  Future<void> _openRestaurantFavorites(BuildContext context) async {
+    final restaurant = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const RestaurantFavoritesPage(selectForToday: true),
+      ),
+    );
+    if (restaurant == null || !context.mounted) return;
+    try {
+      await PersonalTodayRepository().selectDecision(
+        type: 'dine_out',
+        value: jsonEncode({'type': 'fatzomat_restaurant_suggestion', 'schema_version': 1, 'restaurant': restaurant}),
+        date: widget.planDate,
+      );
+      if (!context.mounted) return;
+      Navigator.pop(context, true);
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(friendlyError(error))),
+      );
+    }
+  }
+
   Widget _choiceGrid(List<_ModeOption> options) {
     return GridView.builder(
       shrinkWrap: true,
@@ -202,6 +230,18 @@ class _FoodModePageState extends State<FoodModePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (widget.mode == FoodMode.dineOut) ...[
+                      Card(
+                        child: ListTile(
+                          leading: const CircleAvatar(child: Icon(Icons.favorite_rounded)),
+                          title: const Text('Meine Restaurantfavoriten'),
+                          subtitle: const Text('Ein gespeichertes Restaurant auswählen'),
+                          trailing: const Icon(Icons.chevron_right_rounded),
+                          onTap: () => _openRestaurantFavorites(context),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                     AppSurface(
                       key: const ValueKey<String>('food_mode_choice_group'),
                       padding: const EdgeInsets.all(10),
