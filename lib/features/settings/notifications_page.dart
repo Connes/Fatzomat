@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_feedback.dart';
+
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -140,7 +142,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             approve: approve,
           );
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppFeedback.showSnackBar(context, 
             SnackBar(
               content: Text(approve
                   ? 'Das Rezept wurde gelöscht.'
