@@ -233,40 +233,10 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   Widget _buildJackpotCelebration() {
     return AnimatedBuilder(
       animation: _celebration,
-      builder: (context, _) {
-        final progress = _celebration.value;
-        return Stack(
-          children: [
-            Positioned.fill(child: CustomPaint(painter: _JackpotParticlePainter(progress))),
-            if (progress < 0.72)
-              Align(
-                alignment: Alignment(0, -0.15 - progress * 0.2),
-                child: Transform.scale(
-                  scale: Curves.elasticOut.transform((progress / 0.28).clamp(0.0, 1.0)),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 24),
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: _deepRed.withValues(alpha: 0.96),
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: _gold, width: 3),
-                      boxShadow: [BoxShadow(color: _gold.withValues(alpha: 0.65 * (1 - progress)), blurRadius: 34, spreadRadius: 8)],
-                    ),
-                    child: const Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.auto_awesome, color: _gold, size: 42),
-                        SizedBox(height: 6),
-                        Text('JACKPOT!', textAlign: TextAlign.center, style: TextStyle(color: _gold, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: 3)),
-                        Text('DREI WALZEN. EIN GEWINNER!', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
+      builder: (context, _) => CustomPaint(
+        painter: _JackpotParticlePainter(_celebration.value),
+        size: Size.infinite,
+      ),
     );
   }
 
