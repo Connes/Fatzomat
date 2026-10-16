@@ -35,10 +35,11 @@ void main() {
 
     expect(page, contains('math.Random().nextInt(_modes.length)'));
     expect(page, contains('final alignment ='));
-    expect(page, contains('Future.wait(stops)'));
-    expect(page, contains('Duration(milliseconds: 850)'));
-    expect(page, contains('setState(() {'));
-    expect(page, contains('_stoppedReels = _reels.length'));
+    expect(page, contains('Stop reels in sequence'));
+    expect(page, contains('final startedAt = DateTime.now()'));
+    expect(page, contains('final remainingMs = 900 - elapsed.inMilliseconds'));
+    expect(page, contains('setState(() => _stoppedReels = index + 1)'));
+    expect(page, isNot(contains('Future.wait(stops)')));
     expect(page, contains('Navigator.pop(context, result)'));
   });
 }
