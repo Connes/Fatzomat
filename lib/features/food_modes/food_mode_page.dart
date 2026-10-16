@@ -409,7 +409,7 @@ class _OptionCard extends StatelessWidget {
                   // Let the image fill the complete card. Cropping to the
                   // card's portrait-ish ratio removes the blurred letterbox
                   // edges that were visible in the narrow image strip.
-                  image(),
+                  Positioned.fill(child: image()),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
