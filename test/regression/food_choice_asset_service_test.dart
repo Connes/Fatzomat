@@ -39,14 +39,14 @@ void main() {
 
   test('order mode maps every food choice to the new delivery artwork', () {
     const expected = <String, String>{
-      'Pizza': 'assets/food_choices/delivery/pizza.png',
-      'Burger': 'assets/food_choices/delivery/burger.png',
-      'Asiatisch': 'assets/food_choices/delivery/asiatisch.png',
-      'Döner': 'assets/food_choices/delivery/doener.png',
-      'Sushi': 'assets/food_choices/delivery/sushi.png',
-      'Indisch': 'assets/food_choices/delivery/indisch.png',
-      'Schnitzel': 'assets/food_choices/delivery/schnitzel.png',
-      'Pasta': 'assets/food_choices/delivery/pasta.png',
+      'Pizza': 'assets/food_choices/delivery/pizza.webp',
+      'Burger': 'assets/food_choices/delivery/burger.webp',
+      'Asiatisch': 'assets/food_choices/delivery/asiatisch.webp',
+      'Döner': 'assets/food_choices/delivery/doener.webp',
+      'Sushi': 'assets/food_choices/delivery/sushi.webp',
+      'Indisch': 'assets/food_choices/delivery/indisch.webp',
+      'Schnitzel': 'assets/food_choices/delivery/schnitzel.webp',
+      'Pasta': 'assets/food_choices/delivery/pasta.webp',
     };
 
     for (final entry in expected.entries) {

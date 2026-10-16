@@ -33,11 +33,11 @@ void main() {
   test('Schnitzel und Pasta verwenden eigene Bildassets', () {
     expect(
       FoodChoiceAssetService.assetFor(FoodMode.order, 'Schnitzel'),
-      'assets/food_choices/delivery/schnitzel.png',
+      'assets/food_choices/delivery/schnitzel.webp',
     );
     expect(
       FoodChoiceAssetService.assetFor(FoodMode.order, 'Pasta'),
-      'assets/food_choices/delivery/pasta.png',
+      'assets/food_choices/delivery/pasta.webp',
     );
   });
 }
