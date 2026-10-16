@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/app_design.dart';
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> {
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
     } finally {
       if (mounted) setState(() => _surprising = false);
     }
@@ -89,19 +91,19 @@ class _HomePageState extends State<HomePage> {
       final connection = await _collaborationRepository.connectionInfo();
       if (!mounted) return;
       if (connection?.isConnected != true) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('Es ist noch keine zweite Person verbunden.')),
         );
         return;
       }
       await _collaborationRepository.sendDecisionMessage(type: 'ask');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Nachricht „Entscheide Du“ gesendet.')),
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
     } finally {
       if (mounted) setState(() => _loadingDecisionMessage = false);
     }
