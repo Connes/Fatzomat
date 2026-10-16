@@ -442,3 +442,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Beim Ergebnis startet eine rund 2,4 Sekunden lange Jackpot-Sequenz mit großer goldener „JACKPOT!“-Einblendung, pulsierendem Glanz und animiertem Gold-/Konfetti-Regen über der Seite. Die Effekte fangen keine Eingaben ab.
 - Inspiration: typische Slot-Gewinnsequenzen kombinieren einen klaren Gewinnmoment mit Münz-/Konfetti-Bursts und einer kurzen, gestuften Animation. Referenz: Twin Win Games, [Mythology Slot Game Art & Animation](https://twinwingames.com/mythology-slot-game-art-animation/).
 - Umsetzung in PR aus Branch `fix/roulette-win-celebration-label`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Roulette: Jackpot-Banner entfernt, Goldregen beibehalten (2026-10-16)
+
+- Die große „JACKPOT!“-Anzeige und die dazugehörige Box wurden entfernt.
+- Der animierte Gold-/Konfetti-Regen bleibt als dezente Gewinnfeier nach dem Stoppen der Walzen erhalten.
+- Umsetzung in PR aus Branch `fix/remove-jackpot-banner-keep-gold-rain`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
