@@ -1219,7 +1219,7 @@ class _TodayResultCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            Divider(height: 1, thickness: 1, color: AppDesign.border),
+            Divider(height: 1, thickness: 1, color: AppDesign.divider),
             if (plan.status == 'cooked')
               Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 8),
@@ -1257,7 +1257,7 @@ class _TodayResultCard extends StatelessWidget {
                     Container(
                       width: 1,
                       height: 30,
-                      color: AppDesign.border,
+                      color: AppDesign.divider,
                     ),
                     Expanded(
                       child: TextButton.icon(
