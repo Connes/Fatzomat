@@ -25,6 +25,11 @@ void main() {
       'Portugiesisch',
       'Vegetarisch',
       'Vegan',
+      'Deutsch',
+      'Französisch',
+      'Indisch',
+      'Amerikanisch',
+      'Afrikanisch',
       'Überrasch mich',
     ];
 
@@ -58,8 +63,9 @@ void main() {
     }
   });
 
-  test('new restaurant categories use dedicated artwork instead of icon fallbacks', () {
-    const newCategories = <String>[
+  test('restaurant categories use dedicated WebP artwork instead of icon fallbacks', () {
+    const categories = <String>[
+      'Italienisch',
       'Griechisch',
       'Türkisch',
       'Japanisch',
@@ -69,13 +75,23 @@ void main() {
       'Koreanisch',
       'Indonesisch',
       'Malaysisch',
+      'Sushi',
+      'Burger',
+      'Steak',
+      'Mexikanisch',
       'Spanisch',
       'Libanesisch',
       'Portugiesisch',
+      'Vegetarisch',
       'Vegan',
+      'Deutsch',
+      'Französisch',
+      'Indisch',
+      'Amerikanisch',
+      'Afrikanisch',
     ];
 
-    for (final choice in newCategories) {
+    for (final choice in categories) {
       expect(
         FoodChoiceAssetService.iconFor(FoodMode.dineOut, choice),
         isNull,
@@ -83,8 +99,8 @@ void main() {
       );
       expect(
         FoodChoiceAssetService.assetFor(FoodMode.dineOut, choice),
-        endsWith('.png'),
-        reason: '$choice soll ein eigenes Restaurant-Food-Asset verwenden',
+        endsWith('.webp'),
+        reason: '$choice soll ein eigenes Restaurant-WebP-Asset verwenden',
       );
     }
   });
