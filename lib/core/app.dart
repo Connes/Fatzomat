@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_design.dart';
+import 'app_feedback.dart';
 import 'launch_page.dart';
 import 'push_notification_service.dart';
 
@@ -14,6 +15,13 @@ class FoodApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppDesign.theme(),
       navigatorKey: appNavigatorKey,
+      builder: (context, child) => ValueListenableBuilder<bool>(
+        valueListenable: AppFeedback.inputBlocked,
+        builder: (context, blocked, _) => AbsorbPointer(
+          absorbing: blocked,
+          child: child ?? const SizedBox.shrink(),
+        ),
+      ),
       home: const LaunchPage(),
     );
   }
