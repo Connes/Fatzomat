@@ -25,7 +25,7 @@ class FoodChoiceAssetService {
 
   static const _dineOut = <String, String>{
     'Italienisch': 'assets/food_choices/restaurant/italienisch.png',
-    'Griechisch': 'assets/food_choices/restaurant/griechisch_test.png',
+    'Griechisch': 'assets/food_choices/restaurant/griechisch.png',
     'Türkisch': 'assets/food_choices/restaurant/tuerkisch.png',
     'Japanisch': 'assets/food_choices/restaurant/japanisch.png',
     'Chinesisch': 'assets/food_choices/restaurant/chinesisch.png',
