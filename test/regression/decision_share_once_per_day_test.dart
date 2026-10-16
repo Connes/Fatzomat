@@ -18,7 +18,7 @@ void main() {
     expect(model, contains('final bool isShared;'));
     expect(model, contains('final bool isSharedAccepted;'));
     expect(today, contains("onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision"));
-    expect(today, contains('Entscheidung bereits geteilt'));
+    expect(today, contains("Text('Teilen')"));
     expect(today, contains('Entscheidung übernommen'));
     expect(shareModel, contains('acceptedAt'));
   });
