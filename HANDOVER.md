@@ -379,5 +379,8 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Neue Umsetzung auf Branch `feature/casino-image-roulette`: drei unabhängig laufende Walzen mit den vorhandenen Kategorie-Assets `icon_cooking.png`, `icon_delivery.png` und `icon_restaurant.png`. Die Bilder bewegen sich frame-synchron per `AnimationController`/Ticker; beim Stoppen bremsen die Walzen nacheinander mit `Curves.easeOutQuart` ab und landen alle auf derselben zufällig gewählten Kategorie.
 - Optik: dunkelrote Casino-Maschine, goldener Rahmen/Payline, drei Reel-Fenster, Stopptaste und hervorgehobenes Gewinnerbild. Keine neue Dependency und keine neuen Bilddateien nötig.
 - Animationstechnik an offizieller Flutter-Dokumentation ausgerichtet: explizite Controller für koordinierte, wiederholte Bewegung; Animationen auf kleine Widget-Teilbäume begrenzt. Quellen: https://api.flutter.dev/flutter/animation/AnimationController-class.html und https://docs.flutter.dev/perf/best-practices
-- Regressionstest ergänzt: `test/regression/surprise_roulette_animation_test.dart`. PR und CI stehen noch aus; vor Merge Analyze, Tests, UI-/Animationslogik und Post-Merge-CI prüfen.
+- Regressionstest ergänzt: `test/regression/surprise_roulette_animation_test.dart`.
+- PR #149 wurde per Squash-Merge integriert; Merge-Commit auf `main`: `834c4d43ef05e43535e7593b83a9ba733adb86e5`.
+- Beide PR-Qualitätsprüfungen auf Head `207e75f7b25563301f31651957c11ab35c57f225` erfolgreich: Quality Gate Run `38852756446` und Flutter quality gate Run `38852756469` (Hygiene, Dependencies, Icon-Generierung, Analyze und Tests).
+- Post-Merge-Workflows auf dem Merge-Commit sind gestartet und müssen abschließend geprüft werden.
 - Keine Supabase-Migration und keine Release-Builds.
