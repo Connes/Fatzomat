@@ -22,7 +22,7 @@ void main() {
     expect(today, contains('decisionType: plan!.decisionType'));
     expect(today, contains('decisionValue: plan!.decisionValue'));
     expect(today, contains('decisionName: plan!.displayTitle'));
-    expect(today, contains("'Entscheidung teilen'"));
+    expect(today, contains("Text('Teilen')"));
     expect(repo, contains('Future<void> sendDecisionMessage'));
     expect(repo, contains('PGRST202'));
     expect(repo, contains("'p_message_type': type"));

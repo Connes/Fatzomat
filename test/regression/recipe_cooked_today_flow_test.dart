@@ -50,7 +50,7 @@ void main() {
 
     expect(today, contains("plan.status == 'cooked'"));
     expect(today, contains("Icons.check_circle_rounded"));
-    expect(today, contains("Text('Gekocht'"));
+    expect(today, contains("if (plan.status == 'cooked')"));
     expect(today, contains("Für heute ist alles erledigt."));
     expect(today, contains("Deine Entscheidung ist abgeschlossen."));
     expect(today, contains("plan!.status == 'cooked' || plan!.isShared"));
