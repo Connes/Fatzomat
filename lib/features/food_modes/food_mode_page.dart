@@ -403,40 +403,37 @@ class _OptionCard extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(17),
-              child: Column(
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(17),
+                  // Let the image fill the complete card. Cropping to the
+                  // card's portrait-ish ratio removes the blurred letterbox
+                  // edges that were visible in the narrow image strip.
+                  image(),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      width: double.infinity,
+                      constraints: const BoxConstraints(minHeight: 48),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
                       ),
-                      child: ColoredBox(
-                        color: AppDesign.softSurface,
-                        child: image(),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF8F5EF),
                       ),
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 48),
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 8,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFF8F5EF),
-                    ),
-                    child: Text(
-                      option.label,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppDesign.text,
-                        fontSize: 14,
-                        height: 1.1,
-                        fontWeight: FontWeight.w700,
+                      child: Text(
+                        option.label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppDesign.text,
+                          fontSize: 14,
+                          height: 1.1,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
