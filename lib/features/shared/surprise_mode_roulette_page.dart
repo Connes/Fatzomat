@@ -161,29 +161,6 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
           children: [
             const SizedBox(height: 4),
-            const Icon(Icons.auto_awesome, color: _gold, size: 26),
-            const SizedBox(height: 8),
-            Text(
-              _finished ? 'DER ZUFALL HAT ENTSCHIEDEN' : 'FATZOMAT ROYALE',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: _deepRed,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.7,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _finished
-                  ? 'Euer Abend steht fest.'
-                  : 'Drei Walzen. Drei Möglichkeiten. Ein Treffer.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppDesign.text,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: 24),
             _buildSlotMachine(context),
             const SizedBox(height: 22),
             if (_finished && result != null)
@@ -231,14 +208,23 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               ),
             if (_finished) ...[
               const SizedBox(height: 10),
-              OutlinedButton(
+              FilledButton.icon(
                 onPressed: _spinAgain,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: _deepRed,
-                  side: const BorderSide(color: _deepRed, width: 1.2),
-                  minimumSize: const Size.fromHeight(48),
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('NOCHMAL DREHEN'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: _deepRed,
+                  foregroundColor: _gold,
+                  minimumSize: const Size.fromHeight(54),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: _gold, width: 1.5),
+                  ),
                 ),
-                child: const Text('NOCHMAL DREHEN'),
               ),
             ],
           ],
@@ -284,7 +270,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               const Icon(Icons.star_rounded, color: _gold, size: 17),
               const SizedBox(width: 8),
               Text(
-                'ROYAL JACKPOT',
+                'FATZOMA',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: _gold,
                       fontWeight: FontWeight.w900,

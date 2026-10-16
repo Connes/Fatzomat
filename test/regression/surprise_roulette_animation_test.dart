@@ -16,7 +16,13 @@ void main() {
     expect(page, contains('icon_delivery.png'));
     expect(page, contains('icon_restaurant.png'));
     expect(page, contains('class _CasinoReel'));
-    expect(page, contains('ROYAL JACKPOT'));
+    expect(page, contains("'FATZOMA'"));
+    expect(page, isNot(contains('ROYAL JACKPOT')));
+    expect(page, isNot(contains('DER ZUFALL HAT ENTSCHIEDEN')));
+    expect(page, isNot(contains('Euer Abend steht fest.')));
+    expect(page, contains("'NOCHMAL DREHEN'"));
+    expect(page, contains('backgroundColor: _deepRed'));
+    expect(page, contains('foregroundColor: _gold'));
     expect(page, isNot(contains('AnimatedSwitcher')));
     expect(page, isNot(contains('Timer(')));
   });
