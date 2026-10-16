@@ -26,7 +26,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   static const _labels = <FoodMode, String>{
     FoodMode.cook: 'Wir kochen',
     FoodMode.order: 'Wir bestellen',
-    FoodMode.dineOut: 'Wir essen',
+    FoodMode.dineOut: 'Wir gehen essen',
   };
 
   static const _categoryAssets = <String>[
@@ -41,6 +41,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   static const _reelHeight = 200.0;
 
   late final List<AnimationController> _reels;
+  late final AnimationController _celebration;
   bool _spinning = true;
   bool _stopping = false;
   bool _finished = false;
@@ -53,6 +54,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   @override
   void initState() {
     super.initState();
+    _celebration = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400));
     _reels = List<AnimationController>.generate(
       3,
       (index) => AnimationController.unbounded(
@@ -125,9 +127,12 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       _stopping = false;
       _finished = true;
     });
+    _celebration.forward(from: 0);
   }
 
   void _spinAgain() {
+    _celebration.stop();
+    _celebration.reset();
     setState(() {
       _spinning = true;
       _stopping = false;
@@ -140,6 +145,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
 
   @override
   void dispose() {
+    _celebration.dispose();
     for (final reel in _reels) {
       reel.dispose();
     }
@@ -152,7 +158,9 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.decisionResult,
       appBar: TogetherAppBar(title: const Text('Überrasch mich')),
-      body: SafeArea(
+      body: Stack(
+        children: [
+          SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
           children: [
@@ -212,7 +220,53 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               ),
           ],
         ),
+          ),
+          if (_finished)
+            Positioned.fill(
+              child: IgnorePointer(child: _buildJackpotCelebration()),
+            ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildJackpotCelebration() {
+    return AnimatedBuilder(
+      animation: _celebration,
+      builder: (context, _) {
+        final progress = _celebration.value;
+        return Stack(
+          children: [
+            Positioned.fill(child: CustomPaint(painter: _JackpotParticlePainter(progress))),
+            if (progress < 0.72)
+              Align(
+                alignment: Alignment(0, -0.15 - progress * 0.2),
+                child: Transform.scale(
+                  scale: Curves.elasticOut.transform((progress / 0.28).clamp(0.0, 1.0)),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: _deepRed.withValues(alpha: 0.96),
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: _gold, width: 3),
+                      boxShadow: [BoxShadow(color: _gold.withValues(alpha: 0.65 * (1 - progress)), blurRadius: 34, spreadRadius: 8)],
+                    ),
+                    child: const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.auto_awesome, color: _gold, size: 42),
+                        SizedBox(height: 6),
+                        Text('JACKPOT!', textAlign: TextAlign.center, style: TextStyle(color: _gold, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: 3)),
+                        Text('DREI WALZEN. EIN GEWINNER!', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -565,6 +619,41 @@ class _ReelSymbol extends StatelessWidget {
       ),
     );
   }
+}
+
+class _JackpotParticlePainter extends CustomPainter {
+  _JackpotParticlePainter(this.progress);
+  final double progress;
+  static const _gold = Color(0xFFFFD779);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = math.Random(23);
+    final paint = Paint()..style = PaintingStyle.fill;
+    for (var i = 0; i < 100; i++) {
+      final startX = random.nextDouble() * size.width;
+      final drift = (random.nextDouble() - 0.5) * 110;
+      final startY = -random.nextDouble() * size.height * 0.45;
+      final y = startY + progress * (size.height * 1.65);
+      final x = startX + drift * progress;
+      if (y < -12 || y > size.height + 12) continue;
+      final fade = (1 - progress * 0.72).clamp(0.0, 1.0);
+      paint.color = i.isEven ? _gold.withValues(alpha: fade) : Colors.white.withValues(alpha: fade * 0.9);
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(progress * 8 + i);
+      if (i % 3 == 0) {
+        final path = Path()..moveTo(0, -7)..lineTo(3, 0)..lineTo(0, 7)..lineTo(-3, 0)..close();
+        canvas.drawPath(path, paint);
+      } else {
+        canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset.zero, width: i.isEven ? 5 : 3, height: i.isEven ? 10 : 6), const Radius.circular(2)), paint);
+      }
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _JackpotParticlePainter oldDelegate) => oldDelegate.progress != progress;
 }
 
 class _ConstantVelocitySimulation extends Simulation {
