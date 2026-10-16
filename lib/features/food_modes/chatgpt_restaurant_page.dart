@@ -266,10 +266,13 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Restaurant wurde als Tagesvorschlag übernommen.')),
       );
-      // Let FoodModePage handle returning to Today after this route returns.
-      // Navigating to Today here clears the stack before the parent resumes,
-      // so the parent's subsequent pop can hit an empty Navigator history.
-      Navigator.of(context).pop(true);
+      // This page can be opened from a nested flow or as a root route.
+      // Persisting the decision must succeed even when there is no route to pop.
+      // When pushed by FoodModePage, return true so the parent can finish its flow.
+      final navigator = Navigator.of(context);
+      if (navigator.canPop()) {
+        navigator.pop(true);
+      }
     } catch (error) {
       if (!mounted) return;
       AppFeedback.showSnackBar(context, 
