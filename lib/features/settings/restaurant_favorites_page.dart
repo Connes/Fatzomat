@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_design.dart';
@@ -139,12 +141,12 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!mounted) return;
       if (!launched) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('ChatGPT konnte nicht geöffnet werden. Bitte prüfe, ob ChatGPT installiert ist.')),
         );
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(
           content: Text('Wähle in ChatGPT bei mehreren Treffern das richtige Restaurant und lade danach die JSON-Datei herunter.'),
           duration: Duration(seconds: 6),
@@ -152,7 +154,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('ChatGPT konnte nicht geöffnet werden: $error')),
       );
     }
@@ -216,7 +218,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       final added = await _repository.add(normalized);
       await _load();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(
           content: Text(added
               ? '$name wurde zu deinen Favoriten hinzugefügt.'
@@ -225,12 +227,12 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       );
     } on FormatException catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('JSON-Import fehlgeschlagen: ${error.message}')),
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('Restaurant konnte nicht importiert werden: $error')),
       );
     }

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_design.dart';
@@ -178,13 +180,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
       await load(showLoading: false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text('Einkaufsmengen für ${plan.displayTitle} aktualisiert.')),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text('Personenzahl konnte nicht geändert werden: $e')),
         );
       }
@@ -205,7 +207,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       // of leaving a misleading checkbox state on screen.
       await load(showLoading: false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        AppFeedback.showSnackBar(context, SnackBar(
           content: Text('Einkaufsartikel konnte nicht vollständig aktualisiert werden: $e'),
         ));
       }
@@ -234,14 +236,14 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       });
       await load(showLoading: false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('Einkaufsliste erledigt. Die Zutaten bleiben gespeichert.')),
         );
       }
     } catch (e) {
       await load(showLoading: false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text('Einkaufsliste konnte nicht als erledigt gespeichert werden: $e')),
         );
       }
@@ -269,7 +271,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       // state so the visible aggregate never pretends the whole batch succeeded.
       await load(showLoading: false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        AppFeedback.showSnackBar(context, SnackBar(
           content: Text(
             checked
                 ? 'Zutaten konnten nicht vollständig abgehakt werden: $e'

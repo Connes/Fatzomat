@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -131,7 +133,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         );
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+      if (mounted) AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(e))));
     } finally {
       if (mounted) setState(() => working = false);
     }
@@ -143,7 +145,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     // accident when the same recipe happens to be selected for both dates.
     if (!_isPlanDateToday) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(
             content: Text('Zukünftige Entscheidungen können nicht als gekocht markiert werden.'),
           ),
@@ -155,7 +157,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       final today = await personalToday.todayPlan(date: widget.planDate);
       if (today == null || !today.isRecipe || today.recipeId != widget.recipeId) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppFeedback.showSnackBar(context, 
             const SnackBar(content: Text('Dieses Rezept ist nicht mehr für heute eingeplant.')),
           );
         }
@@ -188,7 +190,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         );
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+      if (mounted) AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(e))));
     } finally {
       if (mounted) setState(() => working = false);
     }
@@ -247,7 +249,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       final updated = await repo.setRecipeImage(widget.recipeId, upload);
       if (mounted) setState(() => recipe = updated);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+      if (mounted) AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(e))));
     } finally {
       if (mounted) setState(() => working = false);
     }
@@ -259,7 +261,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     try {
       final saved = await const TogetherRecipeFileService().saveRecipe(recipe!, servings: servings);
       if (!mounted || !saved) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Rezeptdatei gespeichert.')),
       );
     } catch (e) {
@@ -288,7 +290,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       if (!removed) {
         if (mounted) {
           setState(() => working = false);
-          ScaffoldMessenger.of(context).showSnackBar(
+          AppFeedback.showSnackBar(context, 
             const SnackBar(
               content: Text('Die Löschanfrage wurde gesendet. Das Rezept bleibt bis zur ausdrücklichen Zustimmung erhalten.'),
             ),
@@ -298,7 +300,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       }
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      if (mounted) { setState(() => working = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e)))); }
+      if (mounted) { setState(() => working = false); AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(e)))); }
     }
   }
 

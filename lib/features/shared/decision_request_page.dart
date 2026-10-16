@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/widgets/together_scaffold.dart';
@@ -114,7 +116,7 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
       }
       return true;
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(e))));
+      if (mounted) AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(e))));
       return false;
     } finally {
       if (mounted) setState(() => working = false);
@@ -169,7 +171,7 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
     }
   }
 

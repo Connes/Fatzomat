@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/widgets/together_scaffold.dart';
@@ -143,7 +145,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       );
       if (!mounted) return;
       if (target == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('Keine weitere offene Entscheidung gefunden.')),
         );
         return;
@@ -157,7 +159,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       await load();
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(friendlyError(error))),
       );
     }
@@ -249,13 +251,13 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     try {
       await _collaborationRepository.acceptDecisionShare(share.id);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Geteilte Entscheidung übernommen.')),
       );
       await load();
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(friendlyError(error))),
       );
     } finally {
@@ -273,7 +275,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       await load();
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(friendlyError(error))),
       );
     } finally {
@@ -322,7 +324,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         planDate: _selectedDate,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Nachricht „Entscheide Du“ gesendet.')),
       );
     } catch (error) {
@@ -332,7 +334,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
           errorText.contains('keine verbindung zu einer zweiten person')) {
         await _showNoConnectionDialog();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text(friendlyError(error))),
         );
       }
@@ -363,12 +365,12 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
         sourcePlanId: plan!.id,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Deine Entscheidung wurde geteilt.')),
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
     } finally {
       if (mounted) setState(() => _loadingDecisionMessage = false);
     }
@@ -406,7 +408,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   Future<void> removeTodayPlan() async {
     if (plan == null) return;
     if (plan!.status == 'cooked') {
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(_isSelectedDateToday
             ? 'Für heute ist schon alles erledigt. Deine Entscheidung ist abgeschlossen.'
             : 'Für ${_todayDateLabel()} ist diese Entscheidung bereits abgeschlossen.')),
@@ -449,7 +451,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       RecipeCollectionEvents.notifyChanged();
       await load();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text(_isSelectedDateToday
               ? 'Heutige Entscheidung entfernt.'
               : 'Entscheidung für ${_todayDateLabel()} entfernt.')),
@@ -744,14 +746,14 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                                try {
                                                  final added = await RestaurantFavoritesRepository().add(restaurant);
                                                  if (!mounted) return;
-                                                 ScaffoldMessenger.of(context).showSnackBar(
+                                                 AppFeedback.showSnackBar(context, 
                                                    SnackBar(content: Text(added
                                                        ? 'Restaurant als Favorit gespeichert.'
                                                        : 'Dieses Restaurant ist bereits ein Favorit.')),
                                                  );
                                                } catch (error) {
                                                  if (!mounted) return;
-                                                 ScaffoldMessenger.of(context).showSnackBar(
+                                                 AppFeedback.showSnackBar(context, 
                                                    SnackBar(content: Text(friendlyError(error))),
                                                  );
                                                  return;
@@ -764,7 +766,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                              if (mounted) await load();
                                            } catch (error) {
                                              if (!mounted) return;
-                                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+                                             AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
                                            }
                                          }
 : null,

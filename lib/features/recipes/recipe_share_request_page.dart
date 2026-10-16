@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_feedback.dart';
+
 import '../../core/app_design.dart';
 import '../../core/async_error.dart';
 import '../../core/widgets/together_background.dart';
@@ -83,7 +85,7 @@ class _RecipeShareRequestPageState extends State<RecipeShareRequestPage> {
         suggestion = result;
         working = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(accept ? 'Rezept ist jetzt in der gemeinsamen Bibliothek bestätigt.' : 'Rezept wurde abgelehnt.')),
       );
       if (accept) {

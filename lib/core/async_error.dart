@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'app_exception.dart';
+import 'app_feedback.dart';
 import 'error_text.dart';
 
 void showAppError(BuildContext context, Object error) {
   debugPrint('[Schmackofatz] $error');
   if (!context.mounted) return;
   final appError = normalizeAppException(error);
-  ScaffoldMessenger.of(context).showSnackBar(
+  AppFeedback.showSnackBar(context, 
     SnackBar(content: Text(friendlyError(appError))),
   );
 }

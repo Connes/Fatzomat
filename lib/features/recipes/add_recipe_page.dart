@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
@@ -194,7 +196,7 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(
           content: Text(
             '${selectedImages.length} Fotos und der Prompt wurden zum Teilen vorbereitet. '
@@ -455,7 +457,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       }
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('„${_recipe.name}“ wurde gespeichert.')),
       );
       Navigator.pop(context, true);
@@ -872,7 +874,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
         throw StateError('ChatGPT konnte nicht geöffnet werden.');
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Rezept-Prompt an ChatGPT übergeben.')),
       );
     } on PlatformException catch (e) {
@@ -885,7 +887,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
   }
 
   void _show(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    AppFeedback.showSnackBar(context, SnackBar(content: Text(message)));
   }
 
   IconData _icon(String choice) => switch (choice) {
@@ -1205,7 +1207,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
         await RecipeRepository().saveRecipeModel(recipe);
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rezept gespeichert.')));
+      AppFeedback.showSnackBar(context, const SnackBar(content: Text('Rezept gespeichert.')));
       Navigator.pop(context, true);
     } catch (e) {
       if (mounted) showAppError(context, e);
@@ -1215,7 +1217,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   }
 
   void _show(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    AppFeedback.showSnackBar(context, SnackBar(content: Text(message)));
   }
 
   int _int(String value, {required int fallback, required int min, required int max}) {

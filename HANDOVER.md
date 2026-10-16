@@ -419,3 +419,11 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Nach dem Ergebnis steht „NOCHMAL DREHEN“ jetzt oberhalb des grünen Weiter-Buttons.
 - Regressionstest für Feieranimation, entfernte Texte und Reihenfolge der Ergebnisaktionen erweitert.
 - Erster CI-Lauf fand einen Fehler im Regressionstest (unbeabsichtigte Dart-Interpolation von `_labels[result]` im Testtext); korrigiert in Commit `81d7a7f325ac46ac37a8ad2b791f75ea16145a27`. Neue PR-CI läuft noch. Keine Supabase-Änderungen und kein Release-Build.
+
+
+## Zentrale Kurz-Hinweise und Eingabesperre (2026-10-16)
+
+- Neue zentrale Komponente `AppFeedback`: transiente SnackBars werden auf maximal zwei Sekunden begrenzt und zählen gemeinsam, sodass überlappende/queued Hinweise die Eingabesperre nicht vorzeitig lösen.
+- `FoodApp` absorbiert Eingaben global, solange mindestens ein zentral ausgegebener Hinweis aktiv ist.
+- Bekannte SnackBar-Aufrufe in Today, Verbindung, Entscheidungsanfragen, Rezeptdetails, Startseite, Einstellungen, Restaurantdetails, Einkaufslisten und ausgewählten Food-/Recipe-Seiten auf die zentrale Komponente umgestellt.
+- Noch ausstehend: vollständiger Repository-Audit auf alle SnackBar-Ausgaben, Tests/Analyse, PR-CI und Post-Merge-CI. Keine Supabase-Änderung und kein Release-Build.

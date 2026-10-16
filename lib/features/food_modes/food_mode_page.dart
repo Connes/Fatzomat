@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
@@ -86,7 +88,7 @@ class _FoodModePageState extends State<FoodModePage> {
         Navigator.pop(context, true);
       } catch (error) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text(friendlyError(error))),
         );
       }
@@ -147,7 +149,7 @@ class _FoodModePageState extends State<FoodModePage> {
       Navigator.of(context).pop(true);
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(friendlyError(error))),
       );
     }

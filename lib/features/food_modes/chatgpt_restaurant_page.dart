@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -135,7 +137,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
   Future<void> _launchChatGptWithPrompt() async {
     final launched = await _tryLaunchChatGpt();
     if (!launched && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('ChatGPT konnte nicht automatisch geöffnet werden. Du kannst den Prompt unten manuell öffnen.')),
       );
     }
@@ -216,7 +218,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     try {
       final added = await RestaurantFavoritesRepository().add(restaurant);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(
           content: Text(added
               ? '${restaurant['name']} wurde in deinen Restaurantfavoriten gespeichert.'
@@ -225,7 +227,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('Favorit konnte nicht gespeichert werden: $error')),
       );
     }
@@ -261,7 +263,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       final preferences = await SharedPreferences.getInstance();
       await preferences.remove('fatzomat_pending_restaurant_import_cuisine');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Restaurant wurde als Tagesvorschlag übernommen.')),
       );
       // Let FoodModePage handle returning to Today after this route returns.
@@ -270,7 +272,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       Navigator.of(context).pop(true);
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('Restaurant konnte nicht gespeichert werden: $error')),
       );
     }

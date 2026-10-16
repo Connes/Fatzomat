@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -55,7 +57,7 @@ class DeliveryServicesPage extends StatelessWidget {
     }
     final webOpened = await launchUrl(Uri.parse(service.url), mode: LaunchMode.externalApplication);
     if (webOpened || !context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    AppFeedback.showSnackBar(context, 
       SnackBar(content: Text('${service.name} konnte nicht geöffnet werden.')),
     );
   }
@@ -91,7 +93,7 @@ class DeliveryServicesPage extends StatelessWidget {
       Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('Bestellung konnte nicht abgeschlossen werden: $error')),
       );
     }

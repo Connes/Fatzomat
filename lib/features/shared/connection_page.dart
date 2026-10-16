@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_feedback.dart';
+
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -159,7 +161,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
           );
         });
         await load();
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('Ihr seid jetzt verbunden.')),
         );
       }
@@ -188,7 +190,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
       await repo.disconnectConnection();
       if (!mounted) return;
       setState(() { myCode = null; memberCount = 0; info = null; });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verbindung getrennt.')));
+      AppFeedback.showSnackBar(context, const SnackBar(content: Text('Verbindung getrennt.')));
     } catch (e) {
       if (mounted) showAppError(context, e);
     } finally {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/app_feedback.dart';
+
 import '../../core/error_text.dart';
 import '../../core/food_mode.dart';
 import '../../core/services/surprise_recommendation_service.dart';
@@ -67,7 +69,7 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
       setState(() => _recommendation = next);
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -102,7 +104,7 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
       Navigator.pop(context, true);
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(friendlyError(error))));
+      AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
