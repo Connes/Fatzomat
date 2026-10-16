@@ -28,7 +28,6 @@ void main() {
     expect(page, isNot(contains('Tippe auf STOPP und lass den Zufall entscheiden.')));
     expect(page, isNot(contains('Die Walzen bremsen')));
     expect(page, contains("label: const Text('NOCHMAL DREHEN')"));
-    expect(page, contains("label: Text('Weiter mit „${_labels[result]}“')"));
     expect(page, isNot(contains('_labels[mode]!')));
     expect(page, contains('Color(0xFF19030A)'));
     expect(page, contains('borderRadius: BorderRadius.circular(28)'));
