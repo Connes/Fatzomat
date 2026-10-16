@@ -504,8 +504,8 @@ Arbeitsbranch: `feat/unified-food-category-images`
 - Regressionstest-Erwartungen wurden auf das gemeinsame Layout aktualisiert.
 
 ### Noch offen / nicht als abgeschlossen ausgeben
-- Die Beispielgrafik im Format 1200 × 900 muss als tatsächliche Asset-Datei in das Repository eingebunden und in der laufenden App visuell geprüft werden.
+- Eine lokale Beispielgrafik für „Griechisch“ wurde aus dem generierten Motiv auf exakt 1200 × 900 Pixel zugeschnitten/skaliert und als WebP mit ca. 232,7 KB optimiert. Sie liegt derzeit nur als Gesprächsdatei vor, nicht im Repository: `greek_food_sample_1200x900.webp`. Sie muss als tatsächliche Asset-Datei eingebunden und in der laufenden App visuell geprüft werden.
 - Die vollständige neue Bildsammlung für alle vorhandenen Kategorien wurde noch nicht in das Repository geschrieben. Die verfügbaren GitHub-Dateischreibwerkzeuge akzeptieren Textdateien direkt, bieten hier aber keinen direkten Pfad zum Hochladen der lokal generierten Binärdateien. Die lokal generierte Beispielgrafik ist daher noch kein Bestandteil dieses Branches.
 - Pixelmaße, Bilddateigrößen und einheitlicher Bildstil aller endgültigen Grafiken sind noch nicht verifiziert.
-- `flutter analyze`, `flutter test`, CI und visuelle Prüfung wurden für diesen Branch noch nicht ausgeführt.
+- Der erste CI-Lauf auf Commit `118477895a3110d4a3a72daf6fb5951993034624` schlug wegen einer veralteten `AppSurface`-Assertion im aktualisierten Regressionstest fehl. Die Assertion wurde im aktuellen Head `946f91489838ab8470ee4ecd56cc3040fd098a3e` entfernt. Für diesen korrigierten Head liegt noch kein neuer CI-Lauf vor; Analyse und Tests sind deshalb noch nicht als bestanden bestätigt. Eine visuelle App-Prüfung fand nicht statt.
 - Vor Merge müssen die offenen Asset-Arbeiten und Prüfungen erledigt sein. Keine Behauptung über erfolgreiche Bilddarstellung, vollständige Bildproduktion oder bestandene Tests machen, bevor diese Schritte tatsächlich erfolgt sind.
