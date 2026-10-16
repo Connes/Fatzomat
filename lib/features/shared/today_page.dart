@@ -1106,11 +1106,15 @@ class _TodayResultCard extends StatelessWidget {
       'dine_out' => 'HEUTE ESSEN GEHEN',
       _ => 'HEUTE KOCHEN',
     };
-    final title = plan.decisionType == 'dine_out'
-        ? (plan.restaurantName.trim().isNotEmpty
-            ? plan.restaurantName
-            : (plan.restaurantCuisine ?? plan.displayTitle))
-        : plan.displayTitle;
+    final title = switch (plan.decisionType) {
+      'order' => plan.decisionValue?.trim().isNotEmpty == true
+          ? plan.decisionValue!.trim()
+          : 'Auswahl',
+      'dine_out' => plan.restaurantName.trim().isNotEmpty
+          ? plan.restaurantName
+          : (plan.restaurantCuisine ?? plan.displayTitle),
+      _ => plan.displayTitle,
+    };
 
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.97),
@@ -1200,7 +1204,7 @@ class _TodayResultCard extends StatelessWidget {
                               letterSpacing: 1.3,
                             ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 22),
                       Text(
                         title,
                         textAlign: TextAlign.center,
