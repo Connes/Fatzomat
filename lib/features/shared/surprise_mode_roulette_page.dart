@@ -247,10 +247,10 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                     margin: const EdgeInsets.symmetric(horizontal: 24),
                     padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
                     decoration: BoxDecoration(
-                      color: _deepRed.withOpacity(0.96),
+                      color: _deepRed.withValues(alpha: 0.96),
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(color: _gold, width: 3),
-                      boxShadow: [BoxShadow(color: _gold.withOpacity(0.65 * (1 - progress)), blurRadius: 34, spreadRadius: 8)],
+                      boxShadow: [BoxShadow(color: _gold.withValues(alpha: 0.65 * (1 - progress)), blurRadius: 34, spreadRadius: 8)],
                     ),
                     child: const Column(
                       mainAxisSize: MainAxisSize.min,
@@ -638,7 +638,7 @@ class _JackpotParticlePainter extends CustomPainter {
       final x = startX + drift * progress;
       if (y < -12 || y > size.height + 12) continue;
       final fade = (1 - progress * 0.72).clamp(0.0, 1.0);
-      paint.color = i.isEven ? _gold.withOpacity(fade) : Colors.white.withOpacity(fade * 0.9);
+      paint.color = i.isEven ? _gold.withValues(alpha: fade) : Colors.white.withValues(alpha: fade * 0.9);
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate(progress * 8 + i);
