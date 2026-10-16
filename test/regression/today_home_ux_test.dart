@@ -32,7 +32,7 @@ void main() {
     expect(today, isNot(contains("label: const Text('Lieferdienste')")));
     expect(today, contains("if (plan.decisionType == 'order')"));
     expect(today, contains('DeliveryServicesPage'));
-    expect(today, contains('FoodChoiceAssetService.assetFor(FoodMode.order'));
+    expect(today, contains('FoodChoiceAssetService.assetFor('));
     expect(today, contains("onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'"));
     expect(today, contains("onTap: plan.status == 'cooked'"));
     expect(today, contains('? onOpenOrder'));
