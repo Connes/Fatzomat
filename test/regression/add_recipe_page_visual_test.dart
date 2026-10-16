@@ -134,11 +134,11 @@ test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutaten
 
     expect(source, contains('extendBody: true'));
     expect(source, contains('FoodChoiceAssetService.assetFor(FoodMode.cook, choice)'));
-    expect(assetSource, contains("'Rind': 'assets/food_choices/cooking/rind.webp'"));
-    expect(assetSource, contains("'Schwein': 'assets/food_choices/cooking/schwein.webp'"));
-    expect(assetSource, contains("'Huhn': 'assets/food_choices/cooking/huhn.webp'"));
-    expect(assetSource, contains("'Fisch': 'assets/food_choices/cooking/fisch.webp'"));
-    expect(assetSource, contains("'Vegetarisch': 'assets/food_choices/cooking/vegetarisch.webp'"));
+    expect(assetSource, contains("'Rind': 'assets/food_choices/cooking/rind.png'"));
+    expect(assetSource, contains("'Schwein': 'assets/food_choices/cooking/schwein.png'"));
+    expect(assetSource, contains("'Huhn': 'assets/food_choices/cooking/huhn.png'"));
+    expect(assetSource, contains("'Fisch': 'assets/food_choices/cooking/fisch.png'"));
+    expect(assetSource, contains("'Vegetarisch': 'assets/food_choices/cooking/vegetarisch.png'"));
     expect(source, isNot(contains("Text('1. Hauptauswahl'")));
     expect(source, isNot(contains("Text('2. Zutaten auswählen'")));
     expect(source, isNot(contains("Text('3. Prompt kopieren und ChatGPT öffnen'")));
