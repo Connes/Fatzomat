@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_design.dart';
@@ -97,13 +99,13 @@ class _SettingsPageState extends State<SettingsPage> {
       final uri = await BackupService().exportPersonalBackup();
       if (!mounted) return;
       if (uri != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('Sicherung gespeichert.')),
         );
       }
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text(friendlyError(error))),
       );
     }
