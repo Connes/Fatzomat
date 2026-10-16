@@ -366,12 +366,13 @@ class _OptionCard extends StatelessWidget {
 
       final image = Image.asset(
         assetPath,
+        // Positioned.fill supplies finite constraints for the card area.
+        // Let Image adapt to those constraints instead of passing infinity
+        // as an explicit image size.
         fit: BoxFit.cover,
         alignment: Alignment.center,
         filterQuality: FilterQuality.high,
         excludeFromSemantics: true,
-        width: double.infinity,
-        height: double.infinity,
       );
 
       return image;
