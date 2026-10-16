@@ -449,3 +449,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die große „JACKPOT!“-Anzeige und die dazugehörige Box wurden entfernt.
 - Der animierte Gold-/Konfetti-Regen bleibt als dezente Gewinnfeier nach dem Stoppen der Walzen erhalten.
 - Umsetzung in PR aus Branch `fix/remove-jackpot-banner-keep-gold-rain`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Roulette: Stopp-Button bleibt während des Anhaltens unverändert (2026-10-16)
+
+- Beim Antippen von „STOPP“ bleiben Beschriftung, Icon und Button-Styling unverändert, statt auf „WALZEN STOPPEN …“ umzuschalten und optisch zu verblassen.
+- Mehrfaches Antippen bleibt durch den bestehenden `_stopping`-Guard wirkungslos.
+- Umsetzung in PR aus Branch `fix/roulette-stop-button-stays-unchanged`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
