@@ -418,4 +418,4 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Den erklärenden Status-/Hinweistext oberhalb des Stopp-Buttons entfernt.
 - Nach dem Ergebnis steht „NOCHMAL DREHEN“ jetzt oberhalb des grünen Weiter-Buttons.
 - Regressionstest für Feieranimation, entfernte Texte und Reihenfolge der Ergebnisaktionen erweitert.
-- PR-CI und Post-Merge-CI stehen aus. Keine Supabase-Änderungen und kein Release-Build.
+- Erster CI-Lauf fand einen Fehler im Regressionstest (unbeabsichtigte Dart-Interpolation von `_labels[result]` im Testtext); korrigiert in Commit `81d7a7f325ac46ac37a8ad2b791f75ea16145a27`. Neue PR-CI läuft noch. Keine Supabase-Änderungen und kein Release-Build.
