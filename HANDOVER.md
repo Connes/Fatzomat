@@ -484,3 +484,28 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Vorherige Stack-/Overlay-Lösungen entfernt; die Karte nutzt wieder ein klares `Column`-Layout mit `Expanded(flex: 4)` für das Bild und `Expanded(flex: 1)` für die Beschriftung.
 - Das Bild wird mit `BoxFit.cover` im oberen 80%-Bereich zugeschnitten und füllt diesen Bereich; die untere Beschriftung ist ein eigener, deckender 20%-Bereich.
 - Umsetzung in PR aus Branch `fix/food-choice-card-4-5-image-layout`. Vor Merge: Tests, Analyse und Quality Gate prüfen. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Offene Umsetzung: Einheitliches Fatzomat-Kategorie-Bildsystem (2026-10-16)
+
+Arbeitsbranch: `feat/unified-food-category-images`
+
+### Bestätigte Ausgangslage
+- `FoodChoiceAssetService` ist die zentrale Zuordnung für Koch-, Bestell- und Restaurantkategorien.
+- `TodayPage` verwendet bereits `FoodChoiceAssetService.assetFor` für Restaurant- und Bestellkategorien. Diese zentrale Zuordnung soll beibehalten werden.
+- Die drei Auswahlseiten hatten unterschiedliche Layoutpfade: Kochen/Bestellen berechneten die Kartenhöhe anhand der verfügbaren Bildschirmhöhe, während Essen gehen ein scrollbares Grid mit festem `childAspectRatio: 0.78` verwendete.
+- Die vorhandenen Bilddateien haben uneinheitliche Pixelmaße und Seitenverhältnisse. Eine lokale Prüfung des Nutzers ergab 33 PNGs; insbesondere die Bestellbilder sind breitformatig und groß.
+- Das vorhandene Kartenwidget verwendet bereits eine 4:1-Aufteilung für Bild und Beschriftung. Die Asset-Bilder hatten zusätzlich explizite unendliche Breiten- und Höhenwerte, die entfernt werden.
+
+### In diesem Branch umgesetzt
+- Alle drei Auswahlmodi verwenden jetzt dasselbe scrollbare Layout und denselben Grid-Helper mit festem Karten-Seitenverhältnis.
+- Der bisherige separate, anhand der Bildschirmhöhe berechnete Grid-Pfad für Kochen/Bestellen wurde entfernt.
+- Explizite `width: double.infinity`- und `height: double.infinity`-Vorgaben an `Image.asset` wurden entfernt, damit das Bild die durch `Expanded` und den Kartencontainer vorgegebenen Constraints nutzen kann.
+- Regressionstest-Erwartungen wurden auf das gemeinsame Layout aktualisiert.
+
+### Noch offen / nicht als abgeschlossen ausgeben
+- Eine lokale Beispielgrafik für „Griechisch“ wurde aus dem generierten Motiv auf exakt 1200 × 900 Pixel zugeschnitten/skaliert und als WebP mit ca. 232,7 KB optimiert. Sie liegt derzeit nur als Gesprächsdatei vor, nicht im Repository: `greek_food_sample_1200x900.webp`. Sie muss als tatsächliche Asset-Datei eingebunden und in der laufenden App visuell geprüft werden.
+- Die vollständige neue Bildsammlung für alle vorhandenen Kategorien wurde noch nicht in das Repository geschrieben. Die verfügbaren GitHub-Dateischreibwerkzeuge akzeptieren Textdateien direkt, bieten hier aber keinen direkten Pfad zum Hochladen der lokal generierten Binärdateien. Die lokal generierte Beispielgrafik ist daher noch kein Bestandteil dieses Branches.
+- Pixelmaße, Bilddateigrößen und einheitlicher Bildstil aller endgültigen Grafiken sind noch nicht verifiziert.
+- Der erste CI-Lauf auf Commit `118477895a3110d4a3a72daf6fb5951993034624` schlug wegen einer veralteten `AppSurface`-Assertion im aktualisierten Regressionstest fehl. Die Assertion wurde im aktuellen Head `946f91489838ab8470ee4ecd56cc3040fd098a3e` entfernt. Für diesen korrigierten Head liegt noch kein neuer CI-Lauf vor; Analyse und Tests sind deshalb noch nicht als bestanden bestätigt. Eine visuelle App-Prüfung fand nicht statt.
+- Vor Merge müssen die offenen Asset-Arbeiten und Prüfungen erledigt sein. Keine Behauptung über erfolgreiche Bilddarstellung, vollständige Bildproduktion oder bestandene Tests machen, bevor diese Schritte tatsächlich erfolgt sind.

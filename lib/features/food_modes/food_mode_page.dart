@@ -233,98 +233,51 @@ class _FoodModePageState extends State<FoodModePage> {
         }),
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final compactMode = widget.mode == FoodMode.cook || widget.mode == FoodMode.order;
-            if (!compactMode) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (widget.mode == FoodMode.dineOut) ...[
-                      Card(
-                        child: ListTile(
-                          leading: const CircleAvatar(child: Icon(Icons.favorite_rounded)),
-                          title: const Text('Meine Restaurantfavoriten'),
-                          subtitle: const Text('Ein gespeichertes Restaurant auswählen'),
-                          trailing: const Icon(Icons.chevron_right_rounded),
-                          onTap: () => _openRestaurantFavorites(context),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (widget.mode == FoodMode.dineOut) ...[
+                Card(
+                  child: ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.favorite_rounded),
+                    ),
+                    title: const Text('Meine Restaurantfavoriten'),
+                    subtitle: const Text('Ein gespeichertes Restaurant auswählen'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => _openRestaurantFavorites(context),
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+              _choiceGrid(options),
+              if (widget.mode == FoodMode.dineOut) ...[
+                const SizedBox(height: 14),
+                FilledButton.icon(
+                  onPressed: () async {
+                    final selected = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatGptRestaurantPage(
+                          planDate: widget.planDate,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                    ],
-                    AppSurface(
-                      key: const ValueKey<String>('food_mode_choice_group'),
-                      padding: const EdgeInsets.all(10),
-                      color: AppDesign.surface.withValues(alpha: 0.96),
-                      child: _choiceGrid(options),
-                    ),
-                    if (widget.mode == FoodMode.dineOut) ...[
-                      const SizedBox(height: 14),
-                      FilledButton.icon(
-                        onPressed: () async {
-                          final selected = await Navigator.push<bool>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ChatGptRestaurantPage(
-                                planDate: widget.planDate,
-                              ),
-                            ),
-                          );
-                          if (selected == true && context.mounted) {
-                            Navigator.pop(context, true);
-                          }
-                        },
-                        icon: const Icon(Icons.auto_awesome_rounded),
-                        label: const Text('Mit ChatGPT suchen'),
-                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            }
-
-            final rows = (options.length + 1) ~/ 2;
-            const gap = 10.0;
-            const verticalPadding = 16.0;
-            final gridGaps = (rows - 1) * gap;
-            final reserved = verticalPadding + gridGaps;
-            final cardHeight = (constraints.maxHeight - reserved) / rows;
-            final cardWidth = (constraints.maxWidth - gap) / 2;
-            final aspectRatio = cardWidth / cardHeight;
-
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: cardHeight * rows + gridGaps,
-                    child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: gap,
-                        crossAxisSpacing: gap,
-                        childAspectRatio: aspectRatio,
-                      ),
-                      itemCount: options.length,
-                      itemBuilder: (context, index) {
-                        final option = options[index];
-                        return _OptionCard(
-                          mode: widget.mode,
-                          option: option,
-                          onTap: () => _select(context, option.label),
-                        );
-                      },
-                    ),
+                    );
+                    if (selected == true && context.mounted) {
+                      Navigator.pop(context, true);
+                    }
+                  },
+                  icon: const Icon(Icons.auto_awesome_rounded),
+                  label: const Text('Mit ChatGPT suchen'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(54),
                   ),
-                ],
-              ),
-            );
-          },
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -370,8 +323,6 @@ class _OptionCard extends StatelessWidget {
         alignment: Alignment.center,
         filterQuality: FilterQuality.high,
         excludeFromSemantics: true,
-        width: double.infinity,
-        height: double.infinity,
       );
     }
 

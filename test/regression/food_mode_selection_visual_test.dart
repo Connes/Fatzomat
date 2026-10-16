@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:food_app_mvp/core/app_design.dart';
 import 'package:food_app_mvp/core/food_mode.dart';
 import 'package:food_app_mvp/core/services/food_choice_asset_service.dart';
 import 'package:food_app_mvp/features/food_modes/food_mode_page.dart';
@@ -79,13 +78,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final compactMode = mode == FoodMode.cook || mode == FoodMode.order;
-    expect(
-      find.byKey(const ValueKey<String>('food_mode_choice_group')),
-      compactMode ? findsNothing : findsOneWidget,
-    );
-    expect(find.byType(AppSurface), compactMode ? findsNothing : findsOneWidget);
-    expect(find.byType(SingleChildScrollView), compactMode ? findsNothing : findsOneWidget);
+    expect(find.byKey(const ValueKey<String>('food_mode_choice_group')), findsNothing);
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.byType(GridView), findsOneWidget);
 
     for (final label in labels) {
@@ -95,9 +89,7 @@ void main() {
     final expectedInteractiveCards = labels.length + (mode == FoodMode.dineOut ? 2 : 0);
     expect(find.byType(InkWell), findsNWidgets(expectedInteractiveCards));
     expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
-    if (compactMode) {
-      expect(find.byType(Scrollable), findsOneWidget);
-    }
+    expect(find.byType(Scrollable), findsNWidgets(2));
 
     for (final label in imageLabels) {
       final asset = FoodChoiceAssetService.assetFor(mode, label)!;
