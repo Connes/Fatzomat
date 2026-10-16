@@ -43,6 +43,22 @@ Der Nutzer beschreibt fachlich, was geändert werden soll. Danach wird die techn
 - Vor destruktiven Live-Datenbankänderungen oder risikoreichen Aktionen sorgfältig prüfen und bei wesentlichem Risiko vorher Rücksprache halten.
 - Änderungen an Live-Systemen und Deployments separat verifizieren; ein GitHub-Merge beweist nicht automatisch, dass ein Live-System aktualisiert wurde.
 
+## Verifizierter aktueller Status (2026-10-16)
+
+Dieser Abschnitt ist maßgeblich gegenüber älteren, chronologisch dokumentierten Notizen weiter unten. Einige ältere Einträge enthalten zum Zeitpunkt ihrer Erstellung korrekte, inzwischen aber überholte Angaben wie „CI steht aus“ oder „vor Merge prüfen“.
+
+- Aktueller `main`: `2c49d0acd01c17a50ac89e4e6bb27056f11b3e5e` (`docs: record completed snackbar audit`).
+- Keine offenen Pull Requests.
+- PRs #149 bis #163 wurden gemergt, soweit für diese Serie vorhanden; die Food-Auswahlkarten-Änderungen #159–#163 sowie Roulette-Änderungen #149–#158 sind in `main`.
+- Beide Workflows für den aktuellen `main`-Commit sind erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/38915751149) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/38915751343).
+- Der SnackBar-Audit über alle 85 Dart-Dateien in `lib/` ist abgeschlossen. Direkte Aufrufe von `ScaffoldMessenger.of(...).showSnackBar` außerhalb von `lib/core/app_feedback.dart` wurden nicht gefunden.
+- PR #163: vereinheitlichtes Layout für alle drei Food-Auswahlmodi; beide Post-Merge-Workflows erfolgreich. Die visuelle Prüfung der drei Modi wurde vom Nutzer bestätigt.
+- Keine Release-Builds erstellen und keine App-Veröffentlichung einrichten.
+
+### Nächster sinnvoller Schritt
+
+Die verbleibenden, fachlich relevanten Punkte aus alten Notizen anhand des aktuellen Codes und der Live-Systeme einzeln verifizieren. Besonders die Rezeptbild-Upload-Diagnose ist historisch als noch nicht auf dem Gerät bestätigt dokumentiert. Nicht erneut an bereits gemergten Roulette- oder Food-Karten-Fixes arbeiten, sofern kein neuer Fehler beobachtet wird.
+
 ## Projekt
 
 - Repository: `Connes/Fatzomat`
