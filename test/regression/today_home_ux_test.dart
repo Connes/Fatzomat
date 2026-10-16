@@ -24,7 +24,11 @@ void main() {
     expect(today, contains("'Überrasch mich'"));
     expect(today, contains("'Entscheide Du'"));
     expect(today, isNot(contains("'Entscheidung ändern'")));
-    expect(today, contains("'Entscheidung entfernen'"));
+    expect(today, contains("Text('Entfernen')"));
+    expect(today, contains("Text('Teilen')"));
+    expect(today, contains("'HEUTE BESTELLEN'"));
+    expect(today, contains("'HEUTE KOCHEN'"));
+    expect(today, contains("'HEUTE ESSEN GEHEN'"));
     expect(today, isNot(contains("label: const Text('Lieferdienste')")));
     expect(today, contains("if (plan.decisionType == 'order')"));
     expect(today, contains('DeliveryServicesPage'));
