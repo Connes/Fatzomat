@@ -1100,14 +1100,30 @@ class _TodayResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final titleSize = width >= 700 ? 40.0 : 32.0;
+    final titleSize = width >= 700 ? 38.0 : 32.0;
+    final modeLabel = switch (plan.decisionType) {
+      'order' => 'HEUTE BESTELLEN',
+      'dine_out' => 'HEUTE ESSEN GEHEN',
+      _ => 'HEUTE KOCHEN',
+    };
+    final title = plan.decisionType == 'dine_out'
+        ? (plan.restaurantName.trim().isNotEmpty
+            ? plan.restaurantName
+            : (plan.restaurantCuisine ?? plan.displayTitle))
+        : plan.displayTitle;
 
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.97),
       clipBehavior: Clip.antiAlias,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(width >= 700 ? 28 : 18, 20, width >= 700 ? 28 : 18, 22),
+        padding: EdgeInsets.fromLTRB(
+          width >= 700 ? 28 : 18,
+          18,
+          width >= 700 ? 28 : 18,
+          10,
+        ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Material(
               color: Colors.transparent,
@@ -1124,32 +1140,36 @@ class _TodayResultCard extends StatelessWidget {
                     children: [
                       if (plan.isRecipe) ...[
                         ClipRRect(
-                        borderRadius: BorderRadius.circular(22),
-                        child: plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
-                            ? Image.network(
-                                plan.imageUrl!,
-                                height: 150,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Image.asset(
+                          borderRadius: BorderRadius.circular(22),
+                          child: plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
+                              ? Image.network(
+                                  plan.imageUrl!,
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Image.asset(
+                                    'assets/together/clean/background/recipe_detail_background.png',
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : Image.asset(
                                   'assets/together/clean/background/recipe_detail_background.png',
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
-                              )
-                            : Image.asset(
-                                'assets/together/clean/background/recipe_detail_background.png',
-                                height: 150,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
                         ),
                       ] else if (plan.decisionType == 'order') ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(22),
                           child: Image.asset(
-                            FoodChoiceAssetService.assetFor(FoodMode.order, plan.decisionValue ?? '') ?? 'assets/together/clean/icons/icon_delivery.png',
+                            FoodChoiceAssetService.assetFor(
+                                  FoodMode.order,
+                                  plan.decisionValue ?? '',
+                                ) ??
+                                'assets/together/clean/icons/icon_delivery.png',
                             height: 150,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -1170,145 +1190,95 @@ class _TodayResultCard extends StatelessWidget {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 20),
-                      if (plan.status == 'cooked') ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                          decoration: BoxDecoration(
-                            color: AppDesign.secondarySurface,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check_circle_rounded, size: 20),
-                              SizedBox(width: 8),
-                              Text('Gekocht', style: TextStyle(fontWeight: FontWeight.w800)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      if (plan.decisionType == 'dine_out' && plan.restaurantCuisine != null) ...[
-                        Text(
-                          plan.restaurantCuisine!,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: AppDesign.primaryDark.withValues(alpha: 0.72),
-                              ),
-                        ),
-                        const SizedBox(height: 6),
-                      ],
-                      if (plan.decisionType == 'dine_out') ...[
-                        Text(
-                          'Wir gehen essen',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                fontSize: titleSize,
-                                height: 1.05,
-                                fontWeight: FontWeight.w800,
-                                color: AppDesign.primaryDark,
-                              ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          plan.restaurantName,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                fontSize: titleSize,
-                                height: 1.05,
-                                fontWeight: FontWeight.w800,
-                                color: AppDesign.primaryDark,
-                              ),
-                        ),
-                      ] else
-                        Text(
-                          plan.displayTitle,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                fontSize: titleSize,
-                                height: 1.05,
-                                fontWeight: FontWeight.w800,
-                                color: AppDesign.primaryDark,
-                              ),
-                        ),
+                      const SizedBox(height: 18),
+                      Text(
+                        modeLabel,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: AppDesign.secondaryText,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.3,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              fontSize: titleSize,
+                              height: 1.05,
+                              fontWeight: FontWeight.w800,
+                              color: AppDesign.primaryDark,
+                            ),
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
+            Divider(height: 1, thickness: 1, color: AppDesign.border),
             if (plan.status == 'cooked')
-              AppSurface(
-                color: AppDesign.secondarySurface,
-                child: Column(
+              Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 8),
+                child: Text(
+                  'Für heute ist alles erledigt.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppDesign.secondaryText,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              )
+            else
+              SizedBox(
+                height: 58,
+                child: Row(
                   children: [
-                    const Icon(Icons.check_circle_rounded, size: 32),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Für heute ist alles erledigt.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                    Expanded(
+                      child: TextButton.icon(
+                        onPressed: onShare,
+                        icon: const Icon(Icons.ios_share_rounded, size: 20),
+                        label: const Text('Teilen'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppDesign.primaryDark,
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Deine Entscheidung ist abgeschlossen.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    Container(
+                      width: 1,
+                      height: 30,
+                      color: AppDesign.border,
+                    ),
+                    Expanded(
+                      child: TextButton.icon(
+                        onPressed: onCancel,
+                        icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                        label: const Text('Entfernen'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppDesign.secondaryText,
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              )
-            else ...[
-              if (plan.isSharedAccepted)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: onShare,
-                    icon: const Icon(Icons.people_alt_rounded),
-                    label: const Text('Gemeinsame Tagesentscheidung'),
-                  ),
-                )
-              else if (plan.isShared)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: onShare,
-                    icon: const Icon(Icons.ios_share_rounded),
-                    label: const Text('Entscheidung bereits geteilt'),
-                  ),
-                )
-              else
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: onShare,
-                    icon: const Icon(Icons.ios_share_rounded),
-                    label: const Text('Entscheidung teilen'),
-                  ),
-                ),
-              if (plan.isSharedAccepted) ...[
-                const SizedBox(height: 8),
-                Text(
-                  'Entscheidung übernommen',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppDesign.primaryDark,
-                      ),
-                ),
-              ],
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: onCancel,
-                  icon: const Icon(Icons.delete_outline_rounded),
-                  label: const Text('Entscheidung entfernen'),
-                ),
               ),
-            ],
           ],
         ),
       ),
