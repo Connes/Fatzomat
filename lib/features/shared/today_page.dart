@@ -724,39 +724,41 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                            );
                                            if (done != true) return;
                                            if ((restaurant['name']?.toString().trim() ?? '').isNotEmpty) {
-                                             final saveAsFavorite = await showDialog<bool>(
-                                               context: context,
-                                               builder: (dialogContext) => AlertDialog(
-                                                 title: const Text('Restaurant als Favorit speichern?'),
-                                                 content: Text('${plan!.restaurantName} wird dauerhaft unter Einstellungen > Restaurant gespeichert.'),
-                                                 actions: [
-                                                   TextButton(
-                                                     onPressed: () => Navigator.pop(dialogContext, false),
-                                                     child: const Text('Nein, abschließen'),
-                                                   ),
-                                                   FilledButton.icon(
-                                                     onPressed: () => Navigator.pop(dialogContext, true),
-                                                     icon: const Icon(Icons.favorite_rounded),
-                                                     label: const Text('Als Favorit speichern'),
-                                                   ),
-                                                 ],
-                                               ),
-                                             );
-                                             if (saveAsFavorite == true) {
-                                               try {
-                                                 final added = await RestaurantFavoritesRepository().add(restaurant);
-                                                 if (!mounted) return;
-                                                 AppFeedback.showSnackBar(context, 
-                                                   SnackBar(content: Text(added
-                                                       ? 'Restaurant als Favorit gespeichert.'
-                                                       : 'Dieses Restaurant ist bereits ein Favorit.')),
-                                                 );
-                                               } catch (error) {
-                                                 if (!mounted) return;
-                                                 AppFeedback.showSnackBar(context, 
-                                                   SnackBar(content: Text(friendlyError(error))),
-                                                 );
-                                                 return;
+                                             final favoritesRepository = RestaurantFavoritesRepository();
+                                             final alreadyFavorite = await favoritesRepository.contains(restaurant);
+                                             if (!alreadyFavorite) {
+                                               final saveAsFavorite = await showDialog<bool>(
+                                                 context: context,
+                                                 builder: (dialogContext) => AlertDialog(
+                                                   title: const Text('Restaurant als Favorit speichern?'),
+                                                   content: Text('${plan!.restaurantName} wird dauerhaft unter Einstellungen > Restaurant gespeichert.'),
+                                                   actions: [
+                                                     TextButton(
+                                                       onPressed: () => Navigator.pop(dialogContext, false),
+                                                       child: const Text('Nein, abschließen'),
+                                                     ),
+                                                     FilledButton.icon(
+                                                       onPressed: () => Navigator.pop(dialogContext, true),
+                                                       icon: const Icon(Icons.favorite_rounded),
+                                                       label: const Text('Als Favorit speichern'),
+                                                     ),
+                                                   ],
+                                                 ),
+                                               );
+                                               if (saveAsFavorite == true) {
+                                                 try {
+                                                   await favoritesRepository.add(restaurant);
+                                                   if (!mounted) return;
+                                                   AppFeedback.showSnackBar(context,
+                                                     const SnackBar(content: Text('Restaurant als Favorit gespeichert.')),
+                                                   );
+                                                 } catch (error) {
+                                                   if (!mounted) return;
+                                                   AppFeedback.showSnackBar(context,
+                                                     SnackBar(content: Text(friendlyError(error))),
+                                                   );
+                                                   return;
+                                                 }
                                                }
                                              }
                                            }
