@@ -425,8 +425,9 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 
 - Neue zentrale Komponente `AppFeedback`: transiente SnackBars werden auf maximal zwei Sekunden begrenzt und zählen gemeinsam, sodass überlappende/queued Hinweise die Eingabesperre nicht vorzeitig lösen.
 - `FoodApp` absorbiert Eingaben global, solange mindestens ein zentral ausgegebener Hinweis aktiv ist.
-- Bekannte SnackBar-Aufrufe in Today, Verbindung, Entscheidungsanfragen, Rezeptdetails, Startseite, Einstellungen, Restaurantdetails, Einkaufslisten und ausgewählten Food-/Recipe-Seiten auf die zentrale Komponente umgestellt.
-- Noch ausstehend: vollständiger Repository-Audit auf alle SnackBar-Ausgaben, Tests/Analyse, PR-CI und Post-Merge-CI. Keine Supabase-Änderung und kein Release-Build.
+- Der vollständige Audit aller 85 Dart-Dateien unter `lib/` wurde gegen `main` durchgeführt. Alle gefundenen produktiven SnackBar-Ausgaben verwenden `AppFeedback.showSnackBar`; direkte Aufrufe von `ScaffoldMessenger.of(...).showSnackBar` existieren nur in der zentralen Implementierung `lib/core/app_feedback.dart`. Keine verbliebenen direkten Aufrufe in den übrigen Produktionsdateien gefunden.
+- PR #154 wurde am 2026-10-16 gemergt; die aktuellen Quality-Gate- und Flutter-quality-gate-Workflows auf `main` sind erfolgreich. Keine Supabase-Änderung und kein Release-Build.
+- Ergebnis: kein weiterer Code-Fix für die SnackBar-Zentralisierung erforderlich. Als nächstes die übrigen historischen Handover-Notizen systematisch mit dem tatsächlichen PR-/CI-Stand abgleichen, bevor neue Feature-Arbeit begonnen wird.
 
 
 ## Bereits gespeicherte Restaurantfavoriten beim Abschließen (2026-10-16)
