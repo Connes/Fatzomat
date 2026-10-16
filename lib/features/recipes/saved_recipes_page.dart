@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/widgets/together_scaffold.dart';
@@ -445,7 +447,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         return;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('„${recipe.name}“ ist für die gemeinsame Entscheidung ausgewählt.')),
       );
     } catch (error) {
@@ -491,7 +493,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
         final planId = await collaboration.shareRecipeForToday(recipe.id!, servings: servings);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(content: Text('Gemeinsames Rezept hinzugefügt. Eure Einkaufsliste ist jetzt vorbereitet.')),
         );
         await Navigator.push(
@@ -540,7 +542,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
       await personalToday.selectRecipeForToday(recipe.id!, servings: servings, date: widget.planDate);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('Rezept hinzugefügt. Deine persönliche Einkaufsliste ist jetzt vorbereitet.')),
       );
       await load();
@@ -630,7 +632,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     try {
       final removed = await repo.removeRecipeFromCollection(recipe.id!);
       if (!removed && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           const SnackBar(
             content: Text('Die Löschanfrage wurde an die verbundene Person gesendet. Das Rezept bleibt bis zur ausdrücklichen Zustimmung erhalten.'),
           ),
