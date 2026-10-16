@@ -16,7 +16,7 @@ void main() {
     expect(page, contains('icon_delivery.png'));
     expect(page, contains('icon_restaurant.png'));
     expect(page, contains('class _CasinoReel'));
-    expect(page, contains("'FATZOMA'"));
+    expect(page, contains("'FATZOMAT'"));
     expect(page, isNot(contains('ROYAL JACKPOT')));
     expect(page, isNot(contains('DER ZUFALL HAT ENTSCHIEDEN')));
     expect(page, isNot(contains('Euer Abend steht fest.')));

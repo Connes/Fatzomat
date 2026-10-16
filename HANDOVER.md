@@ -394,3 +394,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Regressionstest für Branding, entfernte Texte und Button-Kontrast ergänzt.
 - PR-CI erfolgreich: Quality Gate Run `38853957458` und Flutter quality gate Run `38853957448`, beide mit Analyze und Tests erfolgreich.
 - Post-Merge-CI und Handover-Commit-CI nach der Dokumentation noch prüfen. Keine Supabase-Migration und kein Release-Build.
+
+
+## Surprise-Roulette: Markenname korrigiert (2026-10-16)
+
+- Nutzerkorrektur: Die Beschriftung zwischen den Sternen lautet `FATZOMAT`, nicht `FATZOMA`.
+- Roulette-Label und Regressionstest entsprechend angepasst. Keine weitere UI-Änderung, keine Supabase-Migration und kein Release-Build.
+- CI-Prüfungen für PR und nach dem Merge stehen noch aus.

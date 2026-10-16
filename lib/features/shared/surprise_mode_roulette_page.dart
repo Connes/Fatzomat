@@ -270,7 +270,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               const Icon(Icons.star_rounded, color: _gold, size: 17),
               const SizedBox(width: 8),
               Text(
-                'FATZOMA',
+                'FATZOMAT',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: _gold,
                       fontWeight: FontWeight.w900,
