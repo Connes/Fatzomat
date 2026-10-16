@@ -95,29 +95,33 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       _resultIndex = winner;
     });
 
-    // All reels brake in parallel and settle within one shared second.
-    final stops = <Future<void>>[];
+    // Stop reels in sequence, with the entire sequence capped at 900 ms.
+    final startedAt = DateTime.now();
     for (var index = 0; index < _reels.length; index++) {
+      if (!mounted) return;
       final controller = _reels[index];
       final current = controller.value;
-      final firstLanding = current.ceil() + 3;
+      final firstLanding = current.ceil() + 2;
       final alignment =
           (winner - (firstLanding % _modes.length) + _modes.length) %
               _modes.length;
       final target = (firstLanding + alignment).toDouble();
-      stops.add(
-        controller.animateTo(
-          target,
-          duration: const Duration(milliseconds: 850),
-          curve: Curves.easeOutQuart,
-        ),
+      final elapsed = DateTime.now().difference(startedAt);
+      final remainingMs = 900 - elapsed.inMilliseconds;
+      final reelsRemaining = _reels.length - index;
+      final durationMs = (remainingMs / reelsRemaining).floor().clamp(80, 320);
+
+      await controller.animateTo(
+        target,
+        duration: Duration(milliseconds: durationMs),
+        curve: Curves.easeOutQuart,
       );
+      if (!mounted) return;
+      setState(() => _stoppedReels = index + 1);
     }
 
-    await Future.wait(stops);
     if (!mounted) return;
     setState(() {
-      _stoppedReels = _reels.length;
       _spinning = false;
       _stopping = false;
       _finished = true;
