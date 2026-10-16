@@ -456,3 +456,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Beim Antippen von „STOPP“ bleiben Beschriftung, Icon und Button-Styling unverändert, statt auf „WALZEN STOPPEN …“ umzuschalten und optisch zu verblassen.
 - Mehrfaches Antippen bleibt durch den bestehenden `_stopping`-Guard wirkungslos.
 - Umsetzung in PR aus Branch `fix/roulette-stop-button-stays-unchanged`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Auswahlkarten: Food-Grafiken ohne breite Bildstreifen (2026-10-16)
+
+- Food-Choice-Bilder füllen nun die gesamte Auswahlkarte mit `BoxFit.cover`; der beige Textbereich liegt als sauberer, deckender Streifen am unteren Rand darüber.
+- Der engere Bildausschnitt reduziert sichtbare unscharfe Rand-/Letterbox-Bereiche und vermeidet den Eindruck, dass das Motiv in einem flachen Bildfenster verzerrt wirkt.
+- Umsetzung in PR aus Branch `fix/food-choice-images-fill-cards`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
