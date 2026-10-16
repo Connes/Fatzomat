@@ -197,13 +197,11 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               ),
             ] else
               FilledButton.icon(
-                onPressed: _stopping || !_spinning ? null : _stopRoulette,
-                icon: Icon(
-                  _stopping
-                      ? Icons.hourglass_bottom_rounded
-                      : Icons.stop_circle_rounded,
-                ),
-                label: Text(_stopping ? 'WALZEN STOPPEN …' : 'STOPP'),
+                // Keep the button's appearance unchanged while the reels stop.
+                // _stopRoulette ignores additional taps while _stopping is true.
+                onPressed: _spinning ? _stopRoulette : null,
+                icon: const Icon(Icons.stop_circle_rounded),
+                label: const Text('STOPP'),
                 style: FilledButton.styleFrom(
                   backgroundColor: _deepRed,
                   foregroundColor: _gold,
