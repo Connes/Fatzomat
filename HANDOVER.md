@@ -405,8 +405,8 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 
 ## Surprise-Roulette: gemeinsamer Stopp und passende Gewinnerkarte (2026-10-16)
 
-- Alle drei Walzen bremsen nach „STOPP“ parallel ab; jede Animation nutzt dieselbe Dauer von 850 ms, sodass alle innerhalb einer Sekunde stehen.
+- Die drei Walzen stoppen weiterhin sichtbar nacheinander, aber mit stark verkürzten Bremsphasen. Die gesamte Stoppreihenfolge ist auf maximal rund 900 ms ausgelegt.
 - Unter „EURE GEWINNER-KATEGORIE“ bleibt nur das Kategorie-Bild sichtbar; der zusätzliche Text „Wir essen“/„Wir bestellen“/„Wir kochen“ darunter wurde entfernt.
 - Die Gewinnerkarte verwendet jetzt denselben dunkelroten Verlauf, goldenen Rahmen und abgerundeten Casino-Stil wie die Slotmaschine.
-- Regressionstest auf paralleles Stoppen, Zeitlimit und Gewinnerkarten-Layout angepasst.
+- Regressionstest auf sequenzielles Stoppen innerhalb einer Sekunde und das Gewinnerkarten-Layout angepasst.
 - PR-CI und Post-Merge-CI stehen aus. Keine Supabase-Änderung und kein Release-Build.
