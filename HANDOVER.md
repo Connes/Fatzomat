@@ -372,3 +372,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - PR-CI erfolgreich. Nach dem Merge wurden Quality Gate Run `38798110581` und Flutter quality gate Run `38798110602` auf `main` ebenfalls mit `success` abgeschlossen.
 - Keine Supabase-Migration, kein Release-Build und keine Veröffentlichung erforderlich.
 - Aktueller nächster Schritt: bei der nächsten Änderung den tatsächlichen Stand von `main` und die dazugehörige CI prüfen; keine offenen Arbeiten aus dieser Fehlerbehebung.
+
+## Surprise-Roulette: Casino-Walzen mit Kategorie-Bildern (2026-10-16)
+
+- Ausgangspunkt: `SurpriseModeRoulettePage` nutzte Timer-getaktete Indexsprünge und `AnimatedSwitcher`; das wirkte wie Gezuckel statt einer echten, gleichmäßigen Walzenbewegung.
+- Neue Umsetzung auf Branch `feature/casino-image-roulette`: drei unabhängig laufende Walzen mit den vorhandenen Kategorie-Assets `icon_cooking.png`, `icon_delivery.png` und `icon_restaurant.png`. Die Bilder bewegen sich frame-synchron per `AnimationController`/Ticker; beim Stoppen bremsen die Walzen nacheinander mit `Curves.easeOutQuart` ab und landen alle auf derselben zufällig gewählten Kategorie.
+- Optik: dunkelrote Casino-Maschine, goldener Rahmen/Payline, drei Reel-Fenster, Stopptaste und hervorgehobenes Gewinnerbild. Keine neue Dependency und keine neuen Bilddateien nötig.
+- Animationstechnik an offizieller Flutter-Dokumentation ausgerichtet: explizite Controller für koordinierte, wiederholte Bewegung; Animationen auf kleine Widget-Teilbäume begrenzt. Quellen: https://api.flutter.dev/flutter/animation/AnimationController-class.html und https://docs.flutter.dev/perf/best-practices
+- Regressionstest ergänzt: `test/regression/surprise_roulette_animation_test.dart`. PR und CI stehen noch aus; vor Merge Analyze, Tests, UI-/Animationslogik und Post-Merge-CI prüfen.
+- Keine Supabase-Migration und keine Release-Builds.
