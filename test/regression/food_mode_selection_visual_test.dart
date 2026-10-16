@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:food_app_mvp/core/app_design.dart';
 import 'package:food_app_mvp/core/food_mode.dart';
 import 'package:food_app_mvp/core/services/food_choice_asset_service.dart';
 import 'package:food_app_mvp/features/food_modes/food_mode_page.dart';
