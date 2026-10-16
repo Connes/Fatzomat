@@ -486,26 +486,27 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Umsetzung in PR aus Branch `fix/food-choice-card-4-5-image-layout`. Vor Merge: Tests, Analyse und Quality Gate prüfen. Keine Supabase-Änderung und kein Release-Build.
 
 
-## Offene Umsetzung: Einheitliches Fatzomat-Kategorie-Bildsystem (2026-10-16)
+## Einheitliches Fatzomat-Kategorie-Bildsystem (2026-10-16)
 
 Arbeitsbranch: `feat/unified-food-category-images`
+PR #163 wurde am 2026-10-16 per Squash-Merge abgeschlossen. Merge-Commit auf `main`: `649b05db73915fb5ef6fed3ddf3243b1ce8acc29`.
 
-### Bestätigte Ausgangslage
-- `FoodChoiceAssetService` ist die zentrale Zuordnung für Koch-, Bestell- und Restaurantkategorien.
-- `TodayPage` verwendet bereits `FoodChoiceAssetService.assetFor` für Restaurant- und Bestellkategorien. Diese zentrale Zuordnung soll beibehalten werden.
-- Die drei Auswahlseiten hatten unterschiedliche Layoutpfade: Kochen/Bestellen berechneten die Kartenhöhe anhand der verfügbaren Bildschirmhöhe, während Essen gehen ein scrollbares Grid mit festem `childAspectRatio: 0.78` verwendete.
-- Die vorhandenen Bilddateien haben uneinheitliche Pixelmaße und Seitenverhältnisse. Eine lokale Prüfung des Nutzers ergab 33 PNGs; insbesondere die Bestellbilder sind breitformatig und groß.
-- Das vorhandene Kartenwidget verwendet bereits eine 4:1-Aufteilung für Bild und Beschriftung. Die Asset-Bilder hatten zusätzlich explizite unendliche Breiten- und Höhenwerte, die entfernt werden.
+### Umgesetzt
+- Alle drei Auswahlmodi („Wir kochen“, „Wir bestellen“ und „Wir gehen essen“) verwenden dasselbe scrollbare Layout und denselben Grid-Helper mit festem Karten-Seitenverhältnis.
+- Die separate, anhand der Bildschirmhöhe berechnete Grid-Variante für Kochen/Bestellen wurde entfernt.
+- Explizite `width: double.infinity`- und `height: double.infinity`-Vorgaben an `Image.asset` wurden entfernt.
+- Regressionstests wurden an das gemeinsame Layout angepasst.
+- Die zentrale Zuordnung der fünf Kochkategorien verwendet optimierte WebP-Assets: Rind, Schwein, Huhn, Fisch und Vegetarisch.
+- Die Restaurant-Zuordnung für „Griechisch“ verweist auf das vorhandene `griechisch.png`; das temporäre Testbild wurde nicht übernommen.
 
-### In diesem Branch umgesetzt
-- Alle drei Auswahlmodi verwenden jetzt dasselbe scrollbare Layout und denselben Grid-Helper mit festem Karten-Seitenverhältnis.
-- Der bisherige separate, anhand der Bildschirmhöhe berechnete Grid-Pfad für Kochen/Bestellen wurde entfernt.
-- Explizite `width: double.infinity`- und `height: double.infinity`-Vorgaben an `Image.asset` wurden entfernt, damit das Bild die durch `Expanded` und den Kartencontainer vorgegebenen Constraints nutzen kann.
-- Regressionstest-Erwartungen wurden auf das gemeinsame Layout aktualisiert.
+### Verifikation
+- Lokale Prüfung laut Arbeitsstand: `flutter analyze` erfolgreich und 298 Tests erfolgreich.
+- PR-CI auf Head `67c8100fb69c3e98a74a98b8b308a675525fedbc`: Quality Gate und Flutter quality gate erfolgreich.
+- Nutzer hat die Darstellung der drei Auswahlmodi in der App bestätigt.
+- Post-Merge-CI auf `main`, Merge-Commit `649b05db73915fb5ef6fed3ddf3243b1ce8acc29`, war beim Aktualisieren dieser Notiz noch in Bearbeitung:
+  - Quality Gate: https://github.com/Connes/Fatzomat/actions/runs/38914242366
+  - Flutter quality gate: https://github.com/Connes/Fatzomat/actions/runs/38914242367
 
-### Noch offen / nicht als abgeschlossen ausgeben
-- Eine lokale Beispielgrafik für „Griechisch“ wurde aus dem generierten Motiv auf exakt 1200 × 900 Pixel zugeschnitten/skaliert und als WebP mit ca. 232,7 KB optimiert. Sie liegt derzeit nur als Gesprächsdatei vor, nicht im Repository: `greek_food_sample_1200x900.webp`. Sie muss als tatsächliche Asset-Datei eingebunden und in der laufenden App visuell geprüft werden.
-- Die vollständige neue Bildsammlung für alle vorhandenen Kategorien wurde noch nicht in das Repository geschrieben. Die verfügbaren GitHub-Dateischreibwerkzeuge akzeptieren Textdateien direkt, bieten hier aber keinen direkten Pfad zum Hochladen der lokal generierten Binärdateien. Die lokal generierte Beispielgrafik ist daher noch kein Bestandteil dieses Branches.
-- Pixelmaße, Bilddateigrößen und einheitlicher Bildstil aller endgültigen Grafiken sind noch nicht verifiziert.
-- Der erste CI-Lauf auf Commit `118477895a3110d4a3a72daf6fb5951993034624` schlug wegen einer veralteten `AppSurface`-Assertion im aktualisierten Regressionstest fehl. Die Assertion wurde im aktuellen Head `946f91489838ab8470ee4ecd56cc3040fd098a3e` entfernt. Für diesen korrigierten Head liegt noch kein neuer CI-Lauf vor; Analyse und Tests sind deshalb noch nicht als bestanden bestätigt. Eine visuelle App-Prüfung fand nicht statt.
-- Vor Merge müssen die offenen Asset-Arbeiten und Prüfungen erledigt sein. Keine Behauptung über erfolgreiche Bilddarstellung, vollständige Bildproduktion oder bestandene Tests machen, bevor diese Schritte tatsächlich erfolgt sind.
+### Umfang / nächste Prüfung
+- Die vorhandenen Restaurantgrafiken bleiben PNGs. Eine vollständige Neugenerierung oder Konvertierung sämtlicher Restaurantbilder war nicht Teil dieses PRs.
+- Nach Abschluss der Post-Merge-CI deren Ergebnis kontrollieren. Keine Release-Builds erstellen.
