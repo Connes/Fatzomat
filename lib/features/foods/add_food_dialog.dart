@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_feedback.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/constants.dart';
@@ -47,7 +49,7 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
       if (mounted) Navigator.pop(context, food);
     } on PostgrestException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text(e.code == '23505'
               ? 'Dieses Lebensmittel gibt es bereits.'
               : 'Speichern fehlgeschlagen.')),
@@ -55,7 +57,7 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        AppFeedback.showSnackBar(context, 
           SnackBar(content: Text(friendlyError(e))),
         );
       }
