@@ -161,26 +161,34 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
             _buildSlotMachine(context),
             const SizedBox(height: 22),
             if (_finished && result != null)
-              _buildWinner(context, result)
-            else
-              Text(
-                _stopping
-                    ? 'Die Walzen bremsen …'
-                    : 'Tippe auf STOPP und lass den Zufall entscheiden.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppDesign.secondaryText,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
+              _buildWinner(context, result),
             const SizedBox(height: 18),
-            if (_finished && result != null)
+            if (_finished && result != null) ...[
+              FilledButton.icon(
+                onPressed: _spinAgain,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('NOCHMAL DREHEN'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: _deepRed,
+                  foregroundColor: _gold,
+                  minimumSize: const Size.fromHeight(54),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: _gold, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               FilledButton.icon(
                 onPressed: () => Navigator.pop(context, result),
                 icon: const Icon(Icons.arrow_forward_rounded),
                 label: Text('Weiter mit „${_labels[result]}“'),
-              )
-            else
+              ),
+            ] else
               FilledButton.icon(
                 onPressed: _stopping || !_spinning ? null : _stopRoulette,
                 icon: Icon(
@@ -203,27 +211,6 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   ),
                 ),
               ),
-            if (_finished) ...[
-              const SizedBox(height: 10),
-              FilledButton.icon(
-                onPressed: _spinAgain,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('NOCHMAL DREHEN'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: _deepRed,
-                  foregroundColor: _gold,
-                  minimumSize: const Size.fromHeight(54),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
       ),
@@ -345,54 +332,97 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
 
   Widget _buildWinner(BuildContext context, FoodMode mode) {
     final index = _modes.indexOf(mode);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF7A1528),
-            Color(0xFF310512),
-            Color(0xFF19030A),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: _gold, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: _deepRed.withValues(alpha: .28),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: .72, end: 1),
+      duration: const Duration(milliseconds: 750),
+      curve: Curves.elasticOut,
+      builder: (context, scale, child) => Transform.scale(
+        scale: scale,
+        child: child,
       ),
-      child: Column(
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
-          const Text(
-            'EURE GEWINNER-KATEGORIE',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _gold,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.2,
-              fontSize: 13,
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF7A1528),
+                  Color(0xFF310512),
+                  Color(0xFF19030A),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: _gold, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: _gold.withValues(alpha: .34),
+                  blurRadius: 28,
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: _deepRed.withValues(alpha: .32),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'EURE GEWINNER-KATEGORIE',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _gold,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10070A),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: const Color(0xFFB98736),
+                      width: 2,
+                    ),
+                  ),
+                  child: Image.asset(
+                    _categoryAssets[index],
+                    height: 112,
+                    width: 150,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF10070A),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFB98736), width: 2),
-            ),
-            child: Image.asset(
-              _categoryAssets[index],
-              height: 112,
-              width: 150,
-              fit: BoxFit.contain,
-            ),
+          const Positioned(
+            top: -12,
+            left: 12,
+            child: Icon(Icons.auto_awesome, color: _gold, size: 28),
+          ),
+          const Positioned(
+            top: 4,
+            right: 8,
+            child: Icon(Icons.star_rounded, color: _gold, size: 26),
+          ),
+          const Positioned(
+            bottom: -8,
+            left: 28,
+            child: Icon(Icons.star_rounded, color: _gold, size: 22),
+          ),
+          const Positioned(
+            bottom: 0,
+            right: 20,
+            child: Icon(Icons.auto_awesome, color: _gold, size: 24),
           ),
         ],
       ),
