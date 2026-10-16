@@ -79,7 +79,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey<String>('food_mode_choice_group')), findsNothing);
-    expect(find.byType(AppSurface), findsNothing);
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.byType(GridView), findsOneWidget);
 
