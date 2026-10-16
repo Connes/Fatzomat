@@ -37,7 +37,7 @@ void main() {
     expect(today, contains('onTodayPlanChanged: load'));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
     expect(today, contains('final VoidCallback? onOpenRecipe;'));
-    expect(today, contains("label: const Text('Entscheidung entfernen')"));
+    expect(today, contains("Text('Entfernen')"));
     expect(today, contains('plan!.isRecipe\n              ?'));
     expect(today, contains('Zugehörige persönliche Rezeptartikel verschwinden ebenfalls aus der Einkaufsliste.'));
     expect(today, contains("'„\${plan!.displayTitle}“ wird aus deinem \${_isSelectedDateToday ? 'heutigen Plan' : 'Plan für \${_todayDateLabel()}'} entfernt.'"));
