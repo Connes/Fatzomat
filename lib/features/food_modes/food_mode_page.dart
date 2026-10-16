@@ -364,18 +364,15 @@ class _OptionCard extends StatelessWidget {
         );
       }
 
-      final image = Image.asset(
+      return Image.asset(
         assetPath,
-        // Positioned.fill supplies finite constraints for the card area.
-        // Let Image adapt to those constraints instead of passing infinity
-        // as an explicit image size.
         fit: BoxFit.cover,
         alignment: Alignment.center,
         filterQuality: FilterQuality.high,
         excludeFromSemantics: true,
+        width: double.infinity,
+        height: double.infinity,
       );
-
-      return image;
     }
 
     return Semantics(
@@ -404,26 +401,30 @@ class _OptionCard extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(17),
-              child: Stack(
-                fit: StackFit.expand,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Let the image fill the complete card. Cropping to the
-                  // card's portrait-ish ratio removes the blurred letterbox
-                  // edges that were visible in the narrow image strip.
-                  Positioned.fill(child: image()),
-                  Align(
-                    alignment: Alignment.bottomCenter,
+                  // The image deliberately occupies 4/5 of the card.
+                  Expanded(
+                    flex: 4,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(17),
+                      ),
+                      child: image(),
+                    ),
+                  ),
+                  // The remaining 1/5 is a separate, opaque caption area.
+                  Expanded(
+                    flex: 1,
                     child: Container(
                       width: double.infinity,
-                      constraints: const BoxConstraints(minHeight: 48),
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
-                        vertical: 8,
+                        vertical: 6,
                       ),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF8F5EF),
-                      ),
+                      color: const Color(0xFFF8F5EF),
                       child: Text(
                         option.label,
                         maxLines: 2,
