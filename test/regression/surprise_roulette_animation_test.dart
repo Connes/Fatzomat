@@ -21,6 +21,9 @@ void main() {
     expect(page, isNot(contains('DER ZUFALL HAT ENTSCHIEDEN')));
     expect(page, isNot(contains('Euer Abend steht fest.')));
     expect(page, contains("'NOCHMAL DREHEN'"));
+    expect(page, isNot(contains('_labels[mode]!')));
+    expect(page, contains('Color(0xFF19030A)'));
+    expect(page, contains('borderRadius: BorderRadius.circular(28)'));
     expect(page, contains('backgroundColor: _deepRed'));
     expect(page, contains('foregroundColor: _gold'));
     expect(page, isNot(contains('AnimatedSwitcher')));
@@ -32,8 +35,11 @@ void main() {
 
     expect(page, contains('math.Random().nextInt(_modes.length)'));
     expect(page, contains('final alignment ='));
-    expect(page, contains('await controller.animateTo('));
+    expect(page, contains('Stop reels in sequence'));
+    expect(page, contains('final startedAt = DateTime.now()'));
+    expect(page, contains('final remainingMs = 900 - elapsed.inMilliseconds'));
     expect(page, contains('setState(() => _stoppedReels = index + 1)'));
+    expect(page, isNot(contains('Future.wait(stops)')));
     expect(page, contains('Navigator.pop(context, result)'));
   });
 }

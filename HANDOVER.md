@@ -401,3 +401,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Nutzerkorrektur: Die Beschriftung zwischen den Sternen lautet `FATZOMAT`, nicht `FATZOMA`.
 - Roulette-Label und Regressionstest entsprechend angepasst. Keine weitere UI-Änderung, keine Supabase-Migration und kein Release-Build.
 - CI-Prüfungen für PR und nach dem Merge stehen noch aus.
+
+
+## Surprise-Roulette: gemeinsamer Stopp und passende Gewinnerkarte (2026-10-16)
+
+- Die drei Walzen stoppen weiterhin sichtbar nacheinander, aber mit stark verkürzten Bremsphasen. Die gesamte Stoppreihenfolge ist auf maximal rund 900 ms ausgelegt.
+- Unter „EURE GEWINNER-KATEGORIE“ bleibt nur das Kategorie-Bild sichtbar; der zusätzliche Text „Wir essen“/„Wir bestellen“/„Wir kochen“ darunter wurde entfernt.
+- Die Gewinnerkarte verwendet jetzt denselben dunkelroten Verlauf, goldenen Rahmen und abgerundeten Casino-Stil wie die Slotmaschine.
+- Regressionstest auf sequenzielles Stoppen innerhalb einer Sekunde und das Gewinnerkarten-Layout angepasst.
+- PR-CI und Post-Merge-CI stehen aus. Keine Supabase-Änderung und kein Release-Build.

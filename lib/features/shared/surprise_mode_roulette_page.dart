@@ -95,32 +95,29 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       _resultIndex = winner;
     });
 
-    // Stop the reels one after another. Each one keeps moving while the
-    // previous reel decelerates, like a physical slot machine.
+    // Stop reels in sequence, with the entire sequence capped at 900 ms.
+    final startedAt = DateTime.now();
     for (var index = 0; index < _reels.length; index++) {
       if (!mounted) return;
       final controller = _reels[index];
       final current = controller.value;
-      final firstLanding = current.ceil() + 6;
+      final firstLanding = current.ceil() + 2;
       final alignment =
           (winner - (firstLanding % _modes.length) + _modes.length) %
               _modes.length;
       final target = (firstLanding + alignment).toDouble();
-      final distance = target - current;
-      final duration = Duration(
-        milliseconds: (distance * 1000 / (11.5 + index * 1.1) * 4).round(),
-      );
+      final elapsed = DateTime.now().difference(startedAt);
+      final remainingMs = 900 - elapsed.inMilliseconds;
+      final reelsRemaining = _reels.length - index;
+      final durationMs = (remainingMs / reelsRemaining).floor().clamp(80, 320);
 
       await controller.animateTo(
         target,
-        duration: duration,
+        duration: Duration(milliseconds: durationMs),
         curve: Curves.easeOutQuart,
       );
       if (!mounted) return;
       setState(() => _stoppedReels = index + 1);
-      if (index < _reels.length - 1) {
-        await Future<void>.delayed(const Duration(milliseconds: 150));
-      }
     }
 
     if (!mounted) return;
@@ -349,16 +346,24 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   Widget _buildWinner(BuildContext context, FoodMode mode) {
     final index = _modes.indexOf(mode);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: .94),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: _gold, width: 2),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF7A1528),
+            Color(0xFF310512),
+            Color(0xFF19030A),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: _gold, width: 3),
         boxShadow: [
           BoxShadow(
-            color: _deepRed.withValues(alpha: .12),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
+            color: _deepRed.withValues(alpha: .28),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -368,27 +373,26 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
             'EURE GEWINNER-KATEGORIE',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: _deepRed,
+              color: _gold,
               fontWeight: FontWeight.w900,
-              letterSpacing: 1.1,
-              fontSize: 12,
+              letterSpacing: 1.2,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 8),
-          Image.asset(
-            _categoryAssets[index],
-            height: 94,
-            width: 120,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _labels[mode]!,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: _deepRed,
-                  fontWeight: FontWeight.w900,
-                ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF10070A),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFB98736), width: 2),
+            ),
+            child: Image.asset(
+              _categoryAssets[index],
+              height: 112,
+              width: 150,
+              fit: BoxFit.contain,
+            ),
           ),
         ],
       ),
