@@ -15,7 +15,7 @@ class FoodApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppDesign.theme(),
       navigatorKey: appNavigatorKey,
-      builder: (context, child) => ValueListenableBuilder<bool>(
+      builder: (context, child) => ValueListenableBuilder<int>(
         valueListenable: AppFeedback.activeNotices,
         builder: (context, activeNotices, _) => AbsorbPointer(
           absorbing: activeNotices > 0,
