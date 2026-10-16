@@ -16,9 +16,9 @@ class FoodApp extends StatelessWidget {
       theme: AppDesign.theme(),
       navigatorKey: appNavigatorKey,
       builder: (context, child) => ValueListenableBuilder<bool>(
-        valueListenable: AppFeedback.inputBlocked,
-        builder: (context, blocked, _) => AbsorbPointer(
-          absorbing: blocked,
+        valueListenable: AppFeedback.activeNotices,
+        builder: (context, activeNotices, _) => AbsorbPointer(
+          absorbing: activeNotices > 0,
           child: child ?? const SizedBox.shrink(),
         ),
       ),
