@@ -5,11 +5,11 @@ import '../food_mode.dart';
 /// Central mapping from the semantic food choice to its dedicated UI asset.
 class FoodChoiceAssetService {
   static const _cook = <String, String>{
-    'Rind': 'assets/food_choices/cooking/rind.png',
-    'Schwein': 'assets/food_choices/cooking/schwein.png',
-    'Huhn': 'assets/food_choices/cooking/huhn.png',
-    'Fisch': 'assets/food_choices/cooking/fisch.png',
-    'Vegetarisch': 'assets/food_choices/cooking/vegetarisch.png',
+    'Rind': 'assets/food_choices/cooking/rind.webp',
+    'Schwein': 'assets/food_choices/cooking/schwein.webp',
+    'Huhn': 'assets/food_choices/cooking/huhn.webp',
+    'Fisch': 'assets/food_choices/cooking/fisch.webp',
+    'Vegetarisch': 'assets/food_choices/cooking/vegetarisch.webp',
   };
 
   static const _order = <String, String>{
@@ -25,7 +25,7 @@ class FoodChoiceAssetService {
 
   static const _dineOut = <String, String>{
     'Italienisch': 'assets/food_choices/restaurant/italienisch.png',
-    'Griechisch': 'assets/food_choices/restaurant/griechisch.png',
+    'Griechisch': 'assets/food_choices/restaurant/griechisch_test.png',
     'Türkisch': 'assets/food_choices/restaurant/tuerkisch.png',
     'Japanisch': 'assets/food_choices/restaurant/japanisch.png',
     'Chinesisch': 'assets/food_choices/restaurant/chinesisch.png',
