@@ -14,7 +14,7 @@ void main() {
     expect(shell, contains('TodayPage('));
     expect(shell, contains('resetToTodaySignal: _todayResetSignal'));
     expect(today, isNot(contains("'Entscheidung ändern'")));
-    expect(today, contains("'Entscheidung entfernen'"));
+    expect(today, isNot(contains("'Entscheidung entfernen'")));
     expect(today, contains("'Wir kochen'"));
     expect(today, contains("'Wir bestellen'"));
     expect(today, contains("'Wir gehen essen'"));
