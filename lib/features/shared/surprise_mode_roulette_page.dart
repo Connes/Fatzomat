@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../core/app_design.dart';
 import '../../core/food_mode.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
