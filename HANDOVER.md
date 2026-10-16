@@ -463,3 +463,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Food-Choice-Bilder füllen nun die gesamte Auswahlkarte mit `BoxFit.cover`; der beige Textbereich liegt als sauberer, deckender Streifen am unteren Rand darüber.
 - Der engere Bildausschnitt reduziert sichtbare unscharfe Rand-/Letterbox-Bereiche und vermeidet den Eindruck, dass das Motiv in einem flachen Bildfenster verzerrt wirkt.
 - Umsetzung in PR aus Branch `fix/food-choice-images-fill-cards`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Auswahlkarten: Food-Bilder nach Full-bleed-Layout wieder sichtbar machen (2026-10-16)
+
+- Ursache: Das Bild wurde als nicht-positioniertes Stack-Kind mit expliziter unendlicher Breite/Höhe eingesetzt; in dieser Stack-Konstellation konnte es ohne gültige endliche Layoutgrenzen ausfallen.
+- Fix: Bild wird über `Positioned.fill` exakt auf die Kartenfläche begrenzt. Der Bildausschnitt bleibt vollflächig, die Beschriftung bleibt als deckender Streifen unten.
+- Umsetzung in PR aus Branch `fix/restore-food-choice-images`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
