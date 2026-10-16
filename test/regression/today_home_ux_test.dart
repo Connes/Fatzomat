@@ -36,7 +36,7 @@ void main() {
     expect(today, contains("onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'"));
     expect(today, contains("onTap: plan.status == 'cooked'"));
     expect(today, contains('? onOpenOrder'));
-    expect(today, contains("plan.restaurantCuisine != null"));
+    expect(today, contains("plan.restaurantCuisine"));
     expect(today, isNot(contains('RestaurantDetailPage')));
     final restaurantDetails = File('lib/features/shared/restaurant_details_dialog.dart').readAsStringSync();
     expect(restaurantDetails, contains('Für dieses Restaurant sind keine weiteren Angaben gespeichert.'));
