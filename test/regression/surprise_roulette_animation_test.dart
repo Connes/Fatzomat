@@ -21,6 +21,13 @@ void main() {
     expect(page, isNot(contains('DER ZUFALL HAT ENTSCHIEDEN')));
     expect(page, isNot(contains('Euer Abend steht fest.')));
     expect(page, contains("'NOCHMAL DREHEN'"));
+    expect(page, contains('TweenAnimationBuilder<double>'));
+    expect(page, contains('Curves.elasticOut'));
+    expect(page, contains('Icons.auto_awesome'));
+    expect(page, contains('color: _gold.withValues(alpha: .34)'));
+    expect(page, isNot(contains('Tippe auf STOPP und lass den Zufall entscheiden.')));
+    expect(page, isNot(contains('Die Walzen bremsen')));
+    expect(page, contains("label: const Text('NOCHMAL DREHEN')"));
     expect(page, isNot(contains('_labels[mode]!')));
     expect(page, contains('Color(0xFF19030A)'));
     expect(page, contains('borderRadius: BorderRadius.circular(28)'));

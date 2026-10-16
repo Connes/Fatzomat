@@ -410,3 +410,12 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Die Gewinnerkarte verwendet jetzt denselben dunkelroten Verlauf, goldenen Rahmen und abgerundeten Casino-Stil wie die Slotmaschine.
 - Regressionstest auf sequenzielles Stoppen innerhalb einer Sekunde und das Gewinnerkarten-Layout angepasst.
 - PR-CI und Post-Merge-CI stehen aus. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Surprise-Roulette: Gewinner-Inszenierung und Button-Reihenfolge (2026-10-16)
+
+- Gewinnerkarte beim Anhalten mit elastischem Einblenden, goldener Leucht-Aura und Stern-/Funkensymbolen dramatischer hervorgehoben.
+- Den erklärenden Status-/Hinweistext oberhalb des Stopp-Buttons entfernt.
+- Nach dem Ergebnis steht „NOCHMAL DREHEN“ jetzt oberhalb des grünen Weiter-Buttons.
+- Regressionstest für Feieranimation, entfernte Texte und Reihenfolge der Ergebnisaktionen erweitert.
+- Erster CI-Lauf fand einen Fehler im Regressionstest (unbeabsichtigte Dart-Interpolation von `_labels[result]` im Testtext); korrigiert in Commit `81d7a7f325ac46ac37a8ad2b791f75ea16145a27`. Neue PR-CI läuft noch. Keine Supabase-Änderungen und kein Release-Build.
