@@ -427,3 +427,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - `FoodApp` absorbiert Eingaben global, solange mindestens ein zentral ausgegebener Hinweis aktiv ist.
 - Bekannte SnackBar-Aufrufe in Today, Verbindung, Entscheidungsanfragen, Rezeptdetails, Startseite, Einstellungen, Restaurantdetails, Einkaufslisten und ausgewählten Food-/Recipe-Seiten auf die zentrale Komponente umgestellt.
 - Noch ausstehend: vollständiger Repository-Audit auf alle SnackBar-Ausgaben, Tests/Analyse, PR-CI und Post-Merge-CI. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Bereits gespeicherte Restaurantfavoriten beim Abschließen (2026-10-16)
+
+- Beim Abschließen einer Restaurant-Entscheidung wird zuerst geprüft, ob Name und Adresse bereits als Favorit gespeichert sind.
+- Bereits gespeicherte Restaurants überspringen die Nachfrage zum Speichern; die Entscheidung wird direkt abgeschlossen. Bei noch nicht gespeicherten Restaurants bleibt die bisherige Abfrage erhalten.
+- Umsetzung in PR aus Branch `fix/skip-favorite-prompt-if-saved`. CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
