@@ -470,3 +470,10 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Ursache: Das Bild wurde als nicht-positioniertes Stack-Kind mit expliziter unendlicher Breite/Höhe eingesetzt; in dieser Stack-Konstellation konnte es ohne gültige endliche Layoutgrenzen ausfallen.
 - Fix: Bild wird über `Positioned.fill` exakt auf die Kartenfläche begrenzt. Der Bildausschnitt bleibt vollflächig, die Beschriftung bleibt als deckender Streifen unten.
 - Umsetzung in PR aus Branch `fix/restore-food-choice-images`; CI und Merge stehen noch aus. Keine Supabase-Änderung und kein Release-Build.
+
+
+## Food-Choice-Bilder: Bildgröße an Karten-Constraints anpassen (2026-10-16)
+
+- Folgefehler nach der Full-bleed-Umstellung: `Image.asset` bekam weiterhin explizit `width/height: double.infinity`, obwohl `Positioned.fill` bereits die Kartenfläche begrenzt. Diese widersprüchliche Größenangabe konnte die Bilder im Layout unsichtbar machen.
+- Die expliziten unendlichen Bildmaße entfernt; `Positioned.fill` liefert jetzt die endlichen Constraints und `BoxFit.cover` füllt den verfügbaren Raum. Die Textbeschriftung bleibt unten im Kartenbereich.
+- PR `fix/food-choice-images-finite-layout`; drei unabhängige CI-Gates (Tests, Analyse, Quality) vor Merge prüfen. Keine Supabase-Änderung und kein Release-Build.
