@@ -384,3 +384,13 @@ Der Radius ist fest auf 10 km. Der aktuelle App-Pfad ruft `search_restaurants` a
 - Beide PR-Qualitätsprüfungen auf Head `207e75f7b25563301f31651957c11ab35c57f225` erfolgreich: Quality Gate Run `38852756446` und Flutter quality gate Run `38852756469` (Hygiene, Dependencies, Icon-Generierung, Analyze und Tests).
 - Post-Merge-Workflows auf dem Merge-Commit sind gestartet und müssen abschließend geprüft werden.
 - Keine Supabase-Migration und keine Release-Builds.
+
+## Surprise-Roulette: Feinschliff nach Nutzerfeedback (2026-10-16)
+
+- PR #150 („Polish surprise roulette header and repeat button“) wurde gemergt. Merge-Commit: `7f5bf71528271da0ae69026944d874cd7256166a`.
+- Den oberen Introblock inklusive „DER ZUFALL HAT ENTSCHIEDEN“ und „Euer Abend steht fest.“ entfernt; dadurch steht die Casino-Walzenbox weiter oben.
+- Laufband-Überschrift zwischen den Sternen auf `FATZOMA` geändert.
+- „NOCHMAL DREHEN“ ist jetzt ein ausgefüllter dunkelroter Button mit goldener Schrift, Icon und Goldrahmen für klaren Kontrast auf dem Hintergrund.
+- Regressionstest für Branding, entfernte Texte und Button-Kontrast ergänzt.
+- PR-CI erfolgreich: Quality Gate Run `38853957458` und Flutter quality gate Run `38853957448`, beide mit Analyze und Tests erfolgreich.
+- Post-Merge-CI und Handover-Commit-CI nach der Dokumentation noch prüfen. Keine Supabase-Migration und kein Release-Build.
