@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 
 import '../../core/app_design.dart';
 import '../../core/food_mode.dart';
@@ -553,7 +552,7 @@ class _ConstantVelocitySimulation extends Simulation {
   final double start;
   final double velocity;
 
-  const _ConstantVelocitySimulation(this.start, this.velocity);
+  _ConstantVelocitySimulation(this.start, this.velocity);
 
   @override
   double x(double time) => start + velocity * time;
