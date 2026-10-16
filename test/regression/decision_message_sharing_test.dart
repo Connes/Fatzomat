@@ -21,7 +21,7 @@ void main() {
     expect(today, contains('decisionType: plan!.decisionType'));
     expect(today, contains('decisionValue: plan!.decisionValue'));
     expect(today, contains('decisionName: plan!.displayTitle'));
-    expect(today, contains("label: const Text('Entscheidung teilen')"));
+    expect(today, contains("Text('Teilen')"));
     expect(today, contains('pendingDecisionShareForDate'));
     expect(today, contains('onPressed: onDecide'));
     expect(today, isNot(contains('onPressed: hasConnection ? onDecide : null')));
