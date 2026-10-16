@@ -26,6 +26,15 @@ void main() {
     expect(today, isNot(contains('class _TodayDateLabel')));
     expect(today, contains('class _TodayDecisionCard'));
     expect(today, contains('class _TodayResultCard'));
+    expect(today, contains("'HEUTE BESTELLEN'"));
+    expect(today, contains("'HEUTE KOCHEN'"));
+    expect(today, contains("'HEUTE ESSEN GEHEN'"));
+    expect(today, contains("Text('Teilen')"));
+    expect(today, contains("Text('Entfernen')"));
+    expect(today, contains('Divider(height: 1, thickness: 1'));
+    expect(today, contains('width: 1,'));
+    expect(today, isNot(contains("label: const Text('Entscheidung teilen')")));
+    expect(today, isNot(contains("label: const Text('Entscheidung entfernen')")));
 
     expect(today, isNot(contains("'Was essen wir heute?'")));
     expect(today, isNot(contains("'HEUTE GIBT’S'")));
