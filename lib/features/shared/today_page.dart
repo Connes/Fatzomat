@@ -1230,7 +1230,7 @@ class _TodayResultCard extends StatelessWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Material(
               color: Colors.transparent,
@@ -1312,7 +1312,7 @@ class _TodayResultCard extends StatelessWidget {
                         (plan.decisionType == 'dine_out'
                                 ? plan.restaurantCuisine
                                 : plan.decisionType == 'order'
-                                    ? 'BESTELLUNG'
+                                    ? plan.decisionValue
                                     : plan.isRecipe
                                         ? 'REZEPT'
                                         : 'ÜBERRASCHUNG')
