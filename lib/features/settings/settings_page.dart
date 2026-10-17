@@ -112,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.settings,
-      appBar: const TogetherAppBar(title: Text('Einstellungen')),
+      appBar: const TogetherAppBar(title: Text('Profil')),
       body: loadError != null
           ? AppErrorView(error: loadError!, onRetry: load)
           : RefreshIndicator(
@@ -133,8 +133,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 14),
                   _SettingsTile(
                     icon: Icons.favorite_rounded,
-                    title: 'Restaurant',
-                    subtitle: 'Deine gespeicherten Restaurantfavoriten',
+                    title: 'Lieblingsrestaurants',
+                    subtitle: 'Deine gespeicherten Favoriten',
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const RestaurantFavoritesPage()),
@@ -143,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 14),
                   _SettingsTile(
                     icon: Icons.people_alt_outlined,
-                    title: connected ? 'Meine Connection' : 'Connection hinzufügen',
+                    title: 'Connection',
                     subtitle: connected
                         ? 'Gemeinsam Rezepte und Mahlzeiten nutzen'
                         : 'Optional gemeinsam mit einer Person nutzen',
