@@ -258,29 +258,6 @@ class _FoodModePageState extends State<FoodModePage> {
                 const SizedBox(height: 10),
               ],
               _choiceGrid(options),
-              if (widget.mode == FoodMode.dineOut) ...[
-                const SizedBox(height: 14),
-                FilledButton.icon(
-                  onPressed: () async {
-                    final selected = await Navigator.push<bool>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatGptRestaurantPage(
-                          planDate: widget.planDate,
-                        ),
-                      ),
-                    );
-                    if (selected == true && context.mounted) {
-                      Navigator.pop(context, true);
-                    }
-                  },
-                  icon: const Icon(Icons.auto_awesome_rounded),
-                  label: const Text('Mit ChatGPT suchen'),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(54),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
