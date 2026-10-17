@@ -132,33 +132,41 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
       backgroundType: TogetherBackgroundType.recipes,
       appBar: const TogetherAppBar(title: Text('Wir kochen')),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
-          children: [
-            _MyChoiceCard(
-              mainChoice: widget.mainChoice,
-              mainChoiceAsset: FoodChoiceAssetService.assetFor(FoodMode.cook, widget.mainChoice),
-              selectedFoods: selectedFoods,
-              loadingFoods: loadingFoods,
-              loadError: foodLoadError,
-              onAddIngredients: _openAdditionalIngredients,
-            ),
-            const SizedBox(height: 20),
-            _RecipeActionButton(
-              key: const Key('cook-summary-new-recipes'),
-              icon: Icons.auto_awesome_rounded,
-              label: 'Neue Rezepte suchen',
-              onPressed: _findNewRecipes,
-            ),
-            const SizedBox(height: 12),
-            _RecipeActionButton(
-              key: const Key('cook-summary-saved-recipes'),
-              icon: Icons.menu_book_rounded,
-              label: 'Aus meinen Rezepten suchen',
-              onPressed: _findSavedRecipes,
-              secondary: true,
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(top: 8, bottom: 20),
+                  child: _MyChoiceCard(
+                    mainChoice: widget.mainChoice,
+                    mainChoiceAsset: FoodChoiceAssetService.assetFor(FoodMode.cook, widget.mainChoice),
+                    selectedFoods: selectedFoods,
+                    loadingFoods: loadingFoods,
+                    loadError: foodLoadError,
+                    onAddIngredients: _openAdditionalIngredients,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _RecipeActionButton(
+                key: const Key('cook-summary-new-recipes'),
+                icon: Icons.auto_awesome_rounded,
+                label: 'Neue Rezepte suchen',
+                onPressed: _findNewRecipes,
+              ),
+              const SizedBox(height: 12),
+              _RecipeActionButton(
+                key: const Key('cook-summary-saved-recipes'),
+                icon: Icons.menu_book_rounded,
+                label: 'Aus meinen Rezepten suchen',
+                onPressed: _findSavedRecipes,
+                secondary: true,
+              ),
+            ],
+          ),
         ),
       ),
     );
