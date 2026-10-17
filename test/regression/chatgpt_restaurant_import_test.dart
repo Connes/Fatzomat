@@ -23,7 +23,8 @@ void main() {
   test('ChatGPT restaurant search is an additional option on dine-out page', () {
     final source = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
     expect(source, contains("import 'chatgpt_restaurant_page.dart';"));
-    expect(source, contains("const Text('Mit ChatGPT suchen')"));
+    expect(source, isNot(contains("const Text('Mit ChatGPT suchen')")));
+    expect(source, contains('_openChatGptForCuisine(context, option.label)'));
     expect(source, contains('if (widget.mode == FoodMode.dineOut)'));
     expect(source, isNot(contains('DiscoveryPage(')));
     expect(source, contains('initialCuisine: cuisine'));

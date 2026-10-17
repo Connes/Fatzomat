@@ -193,7 +193,20 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               FilledButton.icon(
                 onPressed: () => Navigator.pop(context, result),
                 icon: const Icon(Icons.arrow_forward_rounded),
-                label: Text('Weiter mit „${_labels[result]}“'),
+                label: Text('WEITER MIT „${_labels[result]}“'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: _deepRed,
+                  foregroundColor: _gold,
+                  minimumSize: const Size.fromHeight(54),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: _gold, width: 1.5),
+                  ),
+                ),
               ),
             ] else
               FilledButton.icon(
