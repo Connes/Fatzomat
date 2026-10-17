@@ -180,6 +180,7 @@ void main() {
         'Vegan',
       ],
     );
+    expect(find.text('Mit ChatGPT suchen'), findsNothing);
   });
 
   testWidgets('Die drei Auswahlseiten zeigen keinen Überraschungsweg', (tester) async {
