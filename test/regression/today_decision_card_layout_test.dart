@@ -9,5 +9,7 @@ void main() {
     expect(card.indexOf('modeLabel'), lessThan(card.indexOf('if (plan.isRecipe)')));
     expect(card, contains("if (plan.decisionType != 'order')"));
     expect(card, contains('MainAxisAlignment.spaceBetween'));
+    expect(card, contains('padding: const EdgeInsets.only(top: 8)'));
+    expect(card, contains('const SizedBox(height: 20),'));
   });
 }
