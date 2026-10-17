@@ -23,6 +23,6 @@ void main() {
     final resultCard = today.substring(resultCardStart, choiceCardStart);
     expect(decisionCard, contains('height: _todayDecisionCardHeight(context)'));
     expect(resultCard, contains('height: _todayDecisionCardHeight(context)'));
-    expect(resultCard, contains('mainAxisAlignment: MainAxisAlignment.center'));
+    expect(resultCard, contains('mainAxisAlignment: MainAxisAlignment.spaceBetween'));
   });
 }
