@@ -1262,19 +1262,19 @@ class _TodayResultCard extends StatelessWidget {
                           child: plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
                               ? Image.network(
                                   plan.imageUrl!,
-                                  height: 150,
+                                  height: 180,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Image.asset(
                                     'assets/together/clean/background/recipe_detail_background.png',
-                                    height: 150,
+                                    height: 180,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
                                   ),
                                 )
                               : Image.asset(
                                   'assets/together/clean/background/recipe_detail_background.png',
-                                  height: 150,
+                                  height: 180,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 ),
@@ -1288,7 +1288,7 @@ class _TodayResultCard extends StatelessWidget {
                                   plan.decisionValue ?? '',
                                 ) ??
                                 'assets/together/clean/icons/icon_delivery.png',
-                            height: 150,
+                            height: 180,
                             width: double.infinity,
                             fit: BoxFit.cover,
                           ),
@@ -1302,7 +1302,7 @@ class _TodayResultCard extends StatelessWidget {
                                   plan.restaurantCuisine ?? '',
                                 ) ??
                                 'assets/together/clean/icons/icon_restaurant.png',
-                            height: 150,
+                            height: 180,
                             width: double.infinity,
                             fit: BoxFit.cover,
                           ),
