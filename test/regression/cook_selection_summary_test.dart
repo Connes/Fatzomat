@@ -159,7 +159,7 @@ void main() {
     await tester.tap(find.text('Auswahl übernehmen (1)'));
     await tester.pumpAndSettle();
     expect(find.text('Rezepte finden'), findsNothing);
-    final summaryList = find.byType(ListView);
+    final summaryList = find.byType(SingleChildScrollView);
     expect(summaryList, findsOneWidget);
     await tester.drag(summaryList, const Offset(0, -500));
     await tester.pumpAndSettle();
