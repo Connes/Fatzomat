@@ -55,13 +55,10 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       if (!await Geolocator.isLocationServiceEnabled()) {
         throw Exception('Standortdienste sind deaktiviert. Bitte aktiviere sie in den Geräteeinstellungen.');
       }
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
+      final permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        throw Exception('Standortzugriff wurde nicht erlaubt. Bitte erteile Fatzomat die Standortberechtigung in den Einstellungen.');
+        throw Exception('Standortzugriff ist nicht freigegeben. Bitte erteile Fatzomat die Standortberechtigung in den Systemeinstellungen. Es wird nicht bei jeder ChatGPT-Übergabe erneut gefragt.');
       }
       final position = await Geolocator.getCurrentPosition();
       final placemarks = await placemarkFromCoordinates(
@@ -83,6 +80,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       _locationController.text = location;
     } catch (error) {
       if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _locating = false);
       if (mounted && widget.autoOpenChatGpt) {
