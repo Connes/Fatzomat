@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/app_shell.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -269,7 +270,19 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       // When pushed by FoodModePage, return true so the parent can finish its flow.
       final navigator = Navigator.of(context);
       if (navigator.canPop()) {
+        // In the regular flow, return the result to FoodModePage and let the
+        // Today page refresh after its route has been popped.
         navigator.pop(true);
+      } else {
+        // An external file import can make this page the root route, with no
+        // Today page or global navigation underneath it. Rebuild the normal
+        // app shell after saving so the user is not stranded on the import UI.
+        navigator.pushAndRemoveUntil<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => AppShell(initialDate: widget.planDate),
+          ),
+          (route) => false,
+        );
       }
     } catch (error) {
       if (!mounted) return;
