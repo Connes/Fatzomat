@@ -43,6 +43,11 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Nach jedem Merge den tatsächlichen neuen `main`-Commit und dessen CI prüfen. Anschließend offene PRs erneut auf Aktualität, Konflikte, Basis und CI kontrollieren; Änderungen an `main` können frühere Prüfungen entwerten.
 - Keine grünen Ergebnisse von einem älteren Commit auf einen neueren Commit oder den Merge-Commit übertragen. Nur den exakt geprüften Commit als erfolgreich bezeichnen.
 - App-PRs erst als abgeschlossen melden, wenn sie gemergt und der resultierende `main`-Stand geprüft wurde. Lokale Geräteprüfung bleibt Aufgabe des Nutzers und darf nicht behauptet werden, solange sie nicht stattgefunden hat.
+- **Abschluss-Checkliste ist Pflicht, nicht optional:** Vor einer Abschlussmeldung alle offenen PRs live abfragen und einzeln als offen, gemergt oder geschlossen ohne Merge klassifizieren. CI-Status und Merge-Status nicht aus dem Gesprächsverlauf ableiten.
+- Für jeden PR, der zu einer Nutzeranforderung gehört: aktuellen Head prüfen, erforderliche Checks für exakt diesen Head abwarten, Merge durchführen, Merge-Ergebnis verifizieren und kontrollieren, dass die Änderung im aktuellen `main` enthalten ist. Anschließend Post-Merge-CI abwarten und offene PRs erneut abfragen.
+- Ein erfolgreicher PR-CI-Lauf bedeutet **nicht**, dass der PR gemergt ist. Ein erfolgreicher Merge bedeutet **nicht**, dass die Änderung schon in der installierten Live-App sichtbar ist. Repository-Stand, CI-Stand und Live-/Gerätestand getrennt berichten.
+- Wenn ein PR absichtlich nicht gemergt wird, muss der konkrete Grund genannt werden. Keine offene PR stillschweigend als erledigt behandeln. Vor der Abschlussmeldung muss die offene PR-Liste leer sein oder jeder verbleibende PR ausdrücklich mit Grund aufgeführt werden.
+- Abschlussmeldung nur mit verifizierten Fakten: PR-Nummer/Link, Merge-Commit, Ergebnis der CI auf dem aktuellen `main` und gegebenenfalls klar benannter noch laufender Post-Merge-Prüfung. Nie „fertig“ sagen, wenn einer dieser erforderlichen Schritte noch offen ist.
 - Bei mehreren offenen PRs eine klare Reihenfolge verfolgen: ältere unabhängige PRs mit grüner CI zuerst; danach abhängige PRs in Reihenfolge ihrer Voraussetzungen; nach jedem Merge neu validieren.
 ## Kommunikationsregel: nur konkrete Schritte
 
