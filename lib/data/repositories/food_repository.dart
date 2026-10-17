@@ -75,7 +75,7 @@ class FoodRepository {
       'user_id': _userId,
       'food_id': foodId,
       'preference': preference,
-    });
+    }, onConflict: 'user_id,food_id');
   }
 
   Future<void> clearPreference(String foodId) async {
