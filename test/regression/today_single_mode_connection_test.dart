@@ -10,7 +10,7 @@ void main() {
     expect(today, contains("title: const Text('Keine Verbindung vorhanden')"));
     expect(today, contains("label: const Text('Jetzt Connection aufbauen')"));
     expect(today, contains("MaterialPageRoute(builder: (_) => const ConnectionPage())"));
-    expect(today, contains('onPressed: onDecide'));
+    expect(today, contains('onTap: onDecide'));
     expect(today, contains('Noch keine Connection vorhanden.'));
   });
 }
