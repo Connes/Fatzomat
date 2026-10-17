@@ -7,7 +7,7 @@ void main() {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final card = source.substring(source.indexOf('class _TodayResultCard'), source.indexOf('class _TodayChoiceImage'));
     expect(card.indexOf('modeLabel'), lessThan(card.indexOf('if (plan.isRecipe)')));
-    expect(card.indexOf('plan.restaurantCuisine'), greaterThan(card.indexOf('if (plan.isRecipe)')));
+    expect(card.indexOf("? plan.decisionValue\n                                    : plan.isRecipe"), greaterThan(card.indexOf('if (plan.isRecipe)')));
     expect(card, contains('MainAxisAlignment.spaceBetween'));
   });
 }
