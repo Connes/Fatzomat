@@ -1245,6 +1245,16 @@ class _TodayResultCard extends StatelessWidget {
                   padding: const EdgeInsets.all(4),
                   child: Column(
                     children: [
+                      Text(
+                        modeLabel,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: AppDesign.secondaryText,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.3,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
                       if (plan.isRecipe) ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(22),
@@ -1297,9 +1307,17 @@ class _TodayResultCard extends StatelessWidget {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 14),
                       Text(
-                        modeLabel,
+                        (plan.decisionType == 'dine_out'
+                                ? plan.restaurantCuisine
+                                : plan.decisionType == 'order'
+                                    ? 'BESTELLUNG'
+                                    : plan.isRecipe
+                                        ? 'REZEPT'
+                                        : 'ÜBERRASCHUNG')
+                            ?.trim()
+                            .toUpperCase() ?? '',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                               color: AppDesign.secondaryText,
@@ -1307,7 +1325,7 @@ class _TodayResultCard extends StatelessWidget {
                               letterSpacing: 1.3,
                             ),
                       ),
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 12),
                       Text(
                         title,
                         textAlign: TextAlign.center,
