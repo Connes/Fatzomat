@@ -25,6 +25,16 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Nach Merge tatsächlichen `main`-Commit und Post-Merge-CI prüfen. Nicht aus einem erfolgreichen PR-Lauf auf den Zustand des Merge-Commits schließen.
 - Der Nutzer führt lokal `git pull` aus und prüft die App auf seinem Gerät. Keine Geräteprüfung behaupten, solange sie nicht stattgefunden hat.
 
+## Kommunikationsregel: nur konkrete Schritte
+
+- Bei Fehlerbehebungen und gemeinsamer Entwicklungsarbeit kurz und handlungsorientiert antworten.
+- Wenn der Nutzer lokal etwas ausführen muss, **nur die konkret auszuführenden Befehle bzw. Schritte nennen**, in der richtigen Reihenfolge.
+- Keine langen Erklärungen, keine unnötigen Hintergrundinformationen und insbesondere keine Listen mit Dingen, die der Nutzer nicht tun soll.
+- Wenn ein Schritt eine Prüfung erfordert, den passenden Prüf-Befehl direkt angeben.
+- Nur dann zusätzliche Erklärung geben, wenn sie nötig ist, um Datenverlust, Sicherheitsrisiken oder einen irreversiblen Fehler zu verhindern.
+- Aufgaben, die autonom über Repository-/GitHub-Werkzeuge erledigt werden können, selbst ausführen, statt den Nutzer unnötig mit manuellen Schritten zu belasten.
+- Nach Abschluss knapp das Ergebnis und den nächsten erforderlichen Befehl nennen. Keine überflüssigen Abschlussfragen.
+
 ## Projektgrenzen und Sicherheit
 
 - Fatzomat ist für den privaten Gebrauch des Nutzers bestimmt. Öffentliches GitHub-Repository bedeutet keine öffentliche App-Verteilung.
@@ -37,10 +47,12 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 
 ## Zuletzt verifizierter Repository-Stand
 
-- `main` war beim Prüfen auf Commit `871f518db3a5a44337aa3d7c2062baca820c39d9` (`Show only selected order on Today decision card`), gemergt am 2026-10-16.
+- `main` war beim Prüfen auf Commit `871f518db5a3a44337aa3d7c2062baca820c39d9` (`Show only selected order on Today decision card`), gemergt am 2026-10-16.
 - PR #169 ist gemergt: Bestellentscheidungen zeigen auf der Heute-Karte nur die gewählte Option, z. B. „Sushi“, und die vertikalen Abstände wurden angeglichen.
 - PR #168 ist gemergt: Nach Restaurantimport wird `Navigator.pop(true)` nur aufgerufen, wenn der Navigator tatsächlich eine Route zurückgehen kann.
 - PR #167 ist gemergt: gemeinsames Layout der Heute-Entscheidungskarte für Kochen, Bestellen und Restaurantbesuch.
+- PR #170 aktualisiert diese Übergabedatei; beim letzten Abruf war er offen. Aktuellen Status vor dem Merge prüfen.
+- PR #171 entfernt historische Markdown-Changelogs und einmalige Berichte; beim letzten Abruf war er offen und beide CI-Workflows liefen. Aktuellen Status vor dem Merge prüfen.
 - Für den genannten aktuellen `main`-Commit lieferte die verfügbare GitHub-Schnittstelle bei dieser Aktualisierung keine Workflow-Runs und keine Statuschecks. Daher wird der CI-Status hier ausdrücklich **nicht als verifiziert grün** angegeben. Beim nächsten Arbeitsbeginn erneut prüfen.
 - Supabase-Live-Status wurde im Rahmen dieser Handover-Aktualisierung nicht geprüft. Keine Annahmen über aktive Migrationen oder Deployment-Versionen treffen.
 
