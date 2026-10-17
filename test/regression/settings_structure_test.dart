@@ -11,17 +11,19 @@ void main() {
     expect(shell, contains('const SettingsPage()'));
     expect(shell, contains('Icons.settings_outlined'));
     expect(shell, contains('Icons.settings_rounded'));
-    expect(shell, contains("label: ''"));
-    expect(shell, isNot(contains("label: 'Profil'")));
+    expect(shell, contains("label: 'Profil'"));
+    expect(shell, contains("label: 'Profil'"));
     expect(shell, isNot(contains('Icons.person_outline_rounded')));
   });
 
   test('Einstellungsseite verwendet die neue Struktur ohne Account-UI', () {
     final settings = source('lib/features/settings/settings_page.dart');
 
-    expect(settings, contains("title: Text('Einstellungen')"));
+    expect(settings, contains("title: Text('Profil')"));
     expect(settings, contains('Meine Ernährung'));
-    expect(settings, contains("title: connected ? 'Meine Connection' : 'Connection hinzufügen'"));
+    expect(settings, contains("title: 'Lieblingsrestaurants'"));
+    expect(settings, contains("subtitle: 'Deine gespeicherten Favoriten'"));
+    expect(settings, contains("title: 'Connection'"));
     expect(settings, contains("title: 'Backup'"));
     expect(settings, contains('BackupPage()'));
     expect(settings, isNot(contains("title: 'Backup erstellen'")));
