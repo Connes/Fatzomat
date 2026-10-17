@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                   final cardHeight = (cardWidth * (480 / 540)).clamp(158.0, 390.0).toDouble();
                   final gridHeight = cardHeight * 2 + gap;
                   const ctaGap = 16.0;
-                  const ctaHeight = 92.0;
+                  const ctaHeight = 72.0;
                   final welcomeHeight = 24.0 + 14.0;
                   final groupHeight = welcomeHeight + gridHeight + ctaGap + ctaHeight;
                   final verticalRoom = constraints.maxHeight - groupHeight;
@@ -212,29 +212,40 @@ class _HomePageState extends State<HomePage> {
                               child: Semantics(
                                 button: true,
                                 label: 'Person zur Entscheidung für heute auffordern.',
-                                child: FilledButton.icon(
+                                child: FilledButton(
                                   onPressed: _askPartnerToDecide,
-                                icon: const Icon(Icons.people_alt_rounded, size: 25),
-                                label: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    'Entscheide Du',
-                                  ),
-                                ),
                                   style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFF8A3D),
-                                  foregroundColor: Colors.white,
-                                  elevation: 3,
-                                  shadowColor: const Color(0x45FF8A3D),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
+                                    minimumSize: const Size(0, 0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    backgroundColor: const Color(0xFFFF8A3D),
+                                    foregroundColor: Colors.white,
+                                    elevation: 3,
+                                    shadowColor: const Color(0x45FF8A3D),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                                  textStyle: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  child: Center(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.people_alt_rounded, size: 25),
+                                          const SizedBox(width: 8),
+                                          const Text(
+                                            'Entscheide Du',
+                                            maxLines: 1,
+                                            softWrap: false,
+                                            style: TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
