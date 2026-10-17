@@ -25,6 +25,16 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Nach Merge tatsächlichen `main`-Commit und Post-Merge-CI prüfen. Nicht aus einem erfolgreichen PR-Lauf auf den Zustand des Merge-Commits schließen.
 - Der Nutzer führt lokal `git pull` aus und prüft die App auf seinem Gerät. Keine Geräteprüfung behaupten, solange sie nicht stattgefunden hat.
 
+## PR-Reihenfolge und Merge-Gates
+
+- Vor jeder Änderung den aktuellen `main`-Commit, alle offenen PRs, ihre Basis-/Head-Commits, Merge-Konflikte und die neuesten CI-Läufe direkt bei GitHub prüfen. Statusangaben aus älteren Chats oder dieser Datei sind kein Live-Nachweis.
+- Ältere PRs zuerst prüfen und nach Möglichkeit zuerst abschließen. Die Nummer bzw. das Alter allein entscheidet nicht: Abhängigkeiten, überlappende Dateien und die Basis-Commits sind ausschlaggebend.
+- PRs, die auf Änderungen eines anderen offenen PRs aufbauen, erst nach dessen Merge integrieren oder die Abhängigkeit ausdrücklich sauber abbilden. Keine abhängigen PRs so behandeln, als wären sie unabhängig.
+- Vor jedem Merge müssen alle für den aktuellen Head-Commit erforderlichen CI-Checks erfolgreich sein und der PR mergebar sein. Bei roten Checks Logs lesen, Ursache beheben und die neuen Läufe abwarten. Nicht wegen Zeitdruck überspringen.
+- Nach jedem Merge den tatsächlichen neuen `main`-Commit und dessen CI prüfen. Anschließend offene PRs erneut auf Aktualität, Konflikte, Basis und CI kontrollieren; Änderungen an `main` können frühere Prüfungen entwerten.
+- Keine grünen Ergebnisse von einem älteren Commit auf einen neueren Commit oder den Merge-Commit übertragen. Nur den exakt geprüften Commit als erfolgreich bezeichnen.
+- App-PRs erst als abgeschlossen melden, wenn sie gemergt und der resultierende `main`-Stand geprüft wurde. Lokale Geräteprüfung bleibt Aufgabe des Nutzers und darf nicht behauptet werden, solange sie nicht stattgefunden hat.
+- Bei mehreren offenen PRs eine klare Reihenfolge verfolgen: ältere unabhängige PRs mit grüner CI zuerst; danach abhängige PRs in Reihenfolge ihrer Voraussetzungen; nach jedem Merge neu validieren.
 ## Kommunikationsregel: nur konkrete Schritte
 
 - Bei Fehlerbehebungen und gemeinsamer Entwicklungsarbeit kurz und handlungsorientiert antworten.
@@ -51,8 +61,10 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - PR #169 ist gemergt: Bestellentscheidungen zeigen auf der Heute-Karte nur die gewählte Option, z. B. „Sushi“, und die vertikalen Abstände wurden angeglichen.
 - PR #168 ist gemergt: Nach Restaurantimport wird `Navigator.pop(true)` nur aufgerufen, wenn der Navigator tatsächlich eine Route zurückgehen kann.
 - PR #167 ist gemergt: gemeinsames Layout der Heute-Entscheidungskarte für Kochen, Bestellen und Restaurantbesuch.
-- PR #170 aktualisiert diese Übergabedatei; beim letzten Abruf war er offen. Aktuellen Status vor dem Merge prüfen.
-- PR #171 entfernt historische Markdown-Changelogs und einmalige Berichte; beim letzten Abruf war er offen und beide CI-Workflows liefen. Aktuellen Status vor dem Merge prüfen.
+- PR #170 aktualisiert diese Übergabedatei und wurde am 2026-10-17 gemergt. Der Merge-Commit war `b57f9de5c324d451cd6469f2b44aa0e0102a02f8`; nachfolgende `main`-CI und aktueller `main`-Stand müssen live erneut geprüft werden.
+- PR #171 entfernt historische Markdown-Changelogs und einmalige Berichte. Nach dem Merge von #170 war er nicht mehr mergebar; zuerst Basis/Änderungen und Konflikte prüfen, aktualisieren und CI erneut ausführen, bevor er gemergt wird.
+- PR #172 ergänzt Restaurantkategorien und entfernt den unteren ChatGPT-Suchbutton. Nach einer Regressionstest-Anpassung laufen die CI-Checks erneut; erst bei grünen Checks und mergebarem Status fortfahren.
+- PR #173 gestaltet den Button „Entscheide Du“ auf der Heute-Seite neu. Zwei Regressionstest-Erwartungen wurden an das neue `onTap` angepasst; die letzten bekannten Läufe für den aktuellen Head waren erfolgreich. Vor Merge erneut aktuellen Head und alle Checks bestätigen.
 - Für den genannten aktuellen `main`-Commit lieferte die verfügbare GitHub-Schnittstelle bei dieser Aktualisierung keine Workflow-Runs und keine Statuschecks. Daher wird der CI-Status hier ausdrücklich **nicht als verifiziert grün** angegeben. Beim nächsten Arbeitsbeginn erneut prüfen.
 - Supabase-Live-Status wurde im Rahmen dieser Handover-Aktualisierung nicht geprüft. Keine Annahmen über aktive Migrationen oder Deployment-Versionen treffen.
 
