@@ -1,26 +1,33 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Stores personal restaurant favorites independently from daily decisions.
+/// Stores each user's restaurant favorites in Supabase so they follow the
+/// account across devices. SharedPreferences is used only for one-time
+/// migration of favorites created by older app versions.
 class RestaurantFavoritesRepository {
-  static const _storageKey = 'fatzomat_restaurant_favorites_v1';
+  static const _legacyStorageKey = 'fatzomat_restaurant_favorites_v1';
+
+  final SupabaseClient? _client;
+  SupabaseClient get client => _client ?? Supabase.instance.client;
+
+  RestaurantFavoritesRepository({SupabaseClient? client}) : _client = client;
+
+  String get _userId => client.auth.currentUser?.id ??
+      (throw StateError('Bitte melde dich an, um Restaurantfavoriten zu verwenden.'));
 
   Future<List<Map<String, dynamic>>> all() async {
-    final preferences = await SharedPreferences.getInstance();
-    final raw = preferences.getString(_storageKey);
-    if (raw == null || raw.trim().isEmpty) return const [];
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! List) return const [];
-      return decoded
-          .whereType<Map>()
-          .map((item) => Map<String, dynamic>.from(item))
-          .where((item) => (item['name']?.toString().trim() ?? '').isNotEmpty)
-          .toList(growable: false);
-    } catch (_) {
-      return const [];
-    }
+    await _migrateLegacyFavorites();
+    final rows = await client
+        .from('restaurant_favorites')
+        .select('id,name,cuisine,address,phone,website,opening_hours')
+        .eq('user_id', _userId)
+        .order('name');
+    return (rows as List)
+        .whereType<Map>()
+        .map((row) => Map<String, dynamic>.from(row))
+        .toList(growable: false);
   }
 
   Future<bool> contains(Map<String, dynamic> restaurant) async {
@@ -33,11 +40,12 @@ class RestaurantFavoritesRepository {
   Future<bool> add(Map<String, dynamic> restaurant) async {
     final name = restaurant['name']?.toString().trim() ?? '';
     if (name.isEmpty) throw ArgumentError('Ein Restaurantname ist erforderlich.');
-    final preferences = await SharedPreferences.getInstance();
-    final favorites = (await all()).toList();
+    await _migrateLegacyFavorites();
     final key = _identity(restaurant);
+    final favorites = await all();
     if (favorites.any((item) => _identity(item) == key)) return false;
-    favorites.add({
+    await client.from('restaurant_favorites').insert({
+      'user_id': _userId,
       'name': name,
       'cuisine': _nullable(restaurant['cuisine']),
       'address': _nullable(restaurant['address']),
@@ -45,15 +53,60 @@ class RestaurantFavoritesRepository {
       'website': _nullable(restaurant['website']),
       'opening_hours': _nullable(restaurant['opening_hours']),
     });
-    await preferences.setString(_storageKey, jsonEncode(favorites));
     return true;
   }
 
   Future<void> remove(Map<String, dynamic> restaurant) async {
-    final preferences = await SharedPreferences.getInstance();
     final key = _identity(restaurant);
-    final favorites = (await all()).where((item) => _identity(item) != key).toList();
-    await preferences.setString(_storageKey, jsonEncode(favorites));
+    if (key.isEmpty) return;
+    final favorites = await all();
+    final match = favorites.where((item) => _identity(item) == key);
+    if (match.isEmpty) return;
+    await client
+        .from('restaurant_favorites')
+        .delete()
+        .eq('user_id', _userId)
+        .eq('id', match.first['id'].toString());
+  }
+
+  Future<void> _migrateLegacyFavorites() async {
+    final userId = _userId;
+    final preferences = await SharedPreferences.getInstance();
+    final raw = preferences.getString(_legacyStorageKey);
+    if (raw == null || raw.trim().isEmpty) return;
+
+    // Keep the legacy value until every row has been safely uploaded. This
+    // makes an interrupted migration retryable without silently losing data.
+    final decoded = jsonDecode(raw);
+    if (decoded is! List) {
+      await preferences.remove(_legacyStorageKey);
+      return;
+    }
+
+    final rows = await client
+        .from('restaurant_favorites')
+        .select('name,address')
+        .eq('user_id', userId);
+    final existing = (rows as List)
+        .whereType<Map>()
+        .map((row) => _identity(Map<String, dynamic>.from(row)))
+        .toSet();
+
+    for (final item in decoded.whereType<Map>()) {
+      final restaurant = Map<String, dynamic>.from(item);
+      final name = restaurant['name']?.toString().trim() ?? '';
+      if (name.isEmpty || !existing.add(_identity(restaurant))) continue;
+      await client.from('restaurant_favorites').insert({
+        'user_id': userId,
+        'name': name,
+        'cuisine': _nullable(restaurant['cuisine']),
+        'address': _nullable(restaurant['address']),
+        'phone': _nullable(restaurant['phone']),
+        'website': _nullable(restaurant['website']),
+        'opening_hours': _nullable(restaurant['opening_hours']),
+      });
+    }
+    await preferences.remove(_legacyStorageKey);
   }
 
   String _identity(Map<String, dynamic> restaurant) {
