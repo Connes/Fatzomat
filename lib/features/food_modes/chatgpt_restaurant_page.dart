@@ -235,18 +235,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
   Future<void> _useRestaurant() async {
     final restaurant = _restaurant;
     if (restaurant == null) return;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Als heutigen Vorschlag übernehmen?'),
-        content: Text('${restaurant['name']} wird als Restaurantvorschlag für den ausgewählten Tag gespeichert.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Abbrechen')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Übernehmen')),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
+    if (!mounted) return;
     try {
       // Existing personal-day decisions store a type and value. Persist the
       // validated restaurant payload in that value to avoid a second datastore.
