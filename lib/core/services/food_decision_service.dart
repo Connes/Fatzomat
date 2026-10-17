@@ -3,7 +3,7 @@ import '../food_mode.dart';
 class FoodDecisionService {
   static const cookChoices = ['Rind', 'Schwein', 'Huhn', 'Fisch', 'Vegetarisch'];
   static const orderChoices = ['Pizza', 'Burger', 'Asiatisch', 'Döner', 'Sushi', 'Indisch'];
-  static const dineOutChoices = ['Italienisch', 'Steak', 'Asiatisch', 'Sushi', 'Burger', 'Mexikanisch', 'Vegetarisch'];
+  static const dineOutChoices = ['Italienisch', 'Steak', 'Asiatisch', 'Sushi', 'Burger', 'Mexikanisch', 'Vegetarisch', 'Griechisch', 'Türkisch', 'Japanisch', 'Chinesisch', 'Thailändisch', 'Vietnamesisch', 'Koreanisch', 'Indonesisch', 'Malaysisch', 'Spanisch', 'Libanesisch', 'Portugiesisch', 'Deutsch', 'Französisch', 'Amerikanisch', 'Afrikanisch', 'Indisch', 'Vegan'];
 
   static String surprise(FoodMode mode, {int? seed}) {
     final values = switch (mode) {
