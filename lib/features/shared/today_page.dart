@@ -1008,6 +1008,21 @@ class _IncomingDecisionShareCard extends StatelessWidget {
   }
 }
 
+double _todayDecisionCardHeight(BuildContext context) {
+  final screenWidth = MediaQuery.sizeOf(context).width;
+  final cardWidth = (screenWidth - 32).clamp(0.0, 560.0).toDouble();
+  final gap = screenWidth >= 700 ? 14.0 : 10.0;
+  final horizontalPadding = screenWidth >= 700 ? 24.0 : 16.0;
+  final gridWidth = (cardWidth - 8 - horizontalPadding * 2)
+      .clamp(0.0, double.infinity)
+      .toDouble();
+  final tileWidth = (gridWidth - gap) / 2;
+  final gridHeight = 2 * (tileWidth / 1.06) + gap;
+
+  // Card padding, grid spacing, "Entscheide Du" button and Card margin.
+  return 18 + 14 + gridHeight + 16 + 76 + 20 + 8;
+}
+
 class _TodayDecisionCard extends StatelessWidget {
   final VoidCallback onCook;
   final VoidCallback onOrder;
@@ -1028,7 +1043,9 @@ class _TodayDecisionCard extends StatelessWidget {
     final gap = width >= 700 ? 14.0 : 10.0;
     final padding = width >= 700 ? 24.0 : 16.0;
 
-    return Card(
+    return SizedBox(
+      height: _todayDecisionCardHeight(context),
+      child: Card(
       color: AppDesign.surface.withValues(alpha: 0.97),
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -1160,6 +1177,7 @@ class _TodayDecisionCard extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -1198,7 +1216,9 @@ class _TodayResultCard extends StatelessWidget {
       _ => plan.displayTitle,
     };
 
-    return Card(
+    return SizedBox(
+      height: _todayDecisionCardHeight(context),
+      child: Card(
       color: AppDesign.surface.withValues(alpha: 0.97),
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -1209,7 +1229,8 @@ class _TodayResultCard extends StatelessWidget {
           10,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Material(
               color: Colors.transparent,
@@ -1367,6 +1388,7 @@ class _TodayResultCard extends StatelessWidget {
               ),
           ],
         ),
+      ),
       ),
     );
   }
