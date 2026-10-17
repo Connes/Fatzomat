@@ -13,7 +13,6 @@ import 'notifications_page.dart';
 import 'personal_history_page.dart';
 import 'restaurant_favorites_page.dart';
 import 'backup_page.dart';
-import 'backup_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
