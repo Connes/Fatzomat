@@ -268,10 +268,10 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
       // This page can be opened from a nested flow or as a root route.
       // Persisting the decision must succeed even when there is no route to pop.
       // When pushed by FoodModePage, return true so the parent can finish its flow.
+      // In the regular flow, return the result to FoodModePage and let the
+      // Today page refresh after its route has been popped.
       final navigator = Navigator.of(context);
       if (navigator.canPop()) {
-        // In the regular flow, return the result to FoodModePage and let the
-        // Today page refresh after its route has been popped.
         navigator.pop(true);
       } else {
         // An external file import can make this page the root route, with no
