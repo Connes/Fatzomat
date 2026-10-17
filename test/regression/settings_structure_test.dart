@@ -22,7 +22,9 @@ void main() {
     expect(settings, contains("title: Text('Einstellungen')"));
     expect(settings, contains('Meine Ernährung'));
     expect(settings, contains("title: connected ? 'Meine Connection' : 'Connection hinzufügen'"));
-    expect(settings, contains("title: 'Backup erstellen'"));
+    expect(settings, contains("title: 'Backup'"));
+    expect(settings, contains('BackupPage()'));
+    expect(settings, isNot(contains("title: 'Backup erstellen'")));
     expect(settings, isNot(contains('_SettingsIntro')));
     expect(settings, isNot(contains("SectionHeader(title: 'Meine Ernährung')")));
     expect(settings, isNot(contains("SectionHeader(title: 'Connections')")));
@@ -48,7 +50,8 @@ void main() {
   test('Backup exportiert keine Profil-/Namensdaten', () {
     final backup = source('lib/data/services/backup_service.dart');
 
-    expect(backup, contains('profile: null'));
-    expect(backup, isNot(contains('select(\'display_name,onboarding_completed\')')));
+    expect(backup, isNot(contains('display_name')));
+    expect(backup, isNot(contains('access_token')));
+    expect(backup, isNot(contains('recipes')));
   });
 }
