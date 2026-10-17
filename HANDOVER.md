@@ -57,22 +57,21 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 
 ## Zuletzt verifizierter Repository-Stand
 
-- `main` war beim Prüfen auf Commit `871f518db5a3a44337aa3d7c2062baca820c39d9` (`Show only selected order on Today decision card`), gemergt am 2026-10-16.
-- PR #169 ist gemergt: Bestellentscheidungen zeigen auf der Heute-Karte nur die gewählte Option, z. B. „Sushi“, und die vertikalen Abstände wurden angeglichen.
-- PR #168 ist gemergt: Nach Restaurantimport wird `Navigator.pop(true)` nur aufgerufen, wenn der Navigator tatsächlich eine Route zurückgehen kann.
-- PR #167 ist gemergt: gemeinsames Layout der Heute-Entscheidungskarte für Kochen, Bestellen und Restaurantbesuch.
-- PR #170 wurde am 2026-10-17 gemergt. Der Merge-Commit war `b57f9de5c324d451cd6469f2b44aa0e0102a02f8`; beide Post-Merge-CI-Workflows waren erfolgreich.
-- PR #171 entfernt historische Markdown-Changelogs und einmalige Berichte. Aktueller Status vor dem Merge prüfen.
-- PR #172 ergänzt Restaurantkategorien und entfernt den unteren ChatGPT-Suchbutton. Beide CI-Workflows waren am Head `04879fc8b27f029096bc41277ddb987050790365` erfolgreich; vor Merge aktuellen Head, Basis und Mergebarkeit erneut prüfen.
-- PR #173 gestaltet den Button „Entscheide Du“ auf der Heute-Seite neu. Beide CI-Workflows waren am Head `9a4780f3ec2073dd487a9b1149bbd93306bd93fe` erfolgreich; vor Merge aktuellen Head, Basis und Mergebarkeit erneut prüfen.
-- Für den genannten aktuellen `main`-Commit lieferte die verfügbare GitHub-Schnittstelle bei dieser Aktualisierung keine Workflow-Runs und keine Statuschecks. Daher wird der CI-Status hier ausdrücklich **nicht als verifiziert grün** angegeben. Beim nächsten Arbeitsbeginn erneut prüfen.
-- Supabase-Live-Status wurde im Rahmen dieser Handover-Aktualisierung nicht geprüft. Keine Annahmen über aktive Migrationen oder Deployment-Versionen treffen.
+- `main` steht beim Prüfen auf Merge-Commit `6948ac1de7d2a8836d480c048440f347361d2681` (`style: polish Today decide-you action (#177)`), gemergt am 2026-10-17.
+- PR #170 aktualisierte diese Übergabe; PR #171 entfernte historische Markdown-Changelogs und einmalige Berichte.
+- PR #175 ergänzte verbindliche Merge-Gates und Statuspflege.
+- PR #176 ist gemergt: Restaurantkategorien wurden ergänzt; der separate untere ChatGPT-Suchbutton wurde entfernt, die direkte Suche über die Kategorie bleibt Bestandteil des Flows.
+- PR #177 ist gemergt: Der CTA „Entscheide Du“ auf der Heute-Seite wurde visuell überarbeitet; Regressionserwartungen wurden an die tappbare Fläche angepasst.
+- Die vorherigen PRs #172 und #173 wurden nicht gemergt; ihre überarbeiteten Nachfolger #176 und #177 wurden auf aktualisierter Basis gemergt.
+- Die GitHub-Schnittstelle liefert für `6948ac1de7d2a8836d480c048440f347361d2681` aktuell weder Combined-Statuschecks noch Workflow-Runs. CI ist deshalb **nicht verifiziert grün**. Vor weiteren Merges erneut direkt prüfen.
+- Die GitHub-Suche lieferte keine offenen Issues oder Pull Requests; wegen der bekannten Einschränkungen der Suchschnittstelle sollte dies vor der nächsten Änderung erneut geprüft werden.
+- Supabase-Live-Status wurde nicht geprüft. Keine Annahmen über aktive Migrationen oder Deployment-Versionen treffen.
 
 ## Nächster Schritt
 
-1. Beim nächsten Arbeitsbeginn den aktuellen `main`-Commit, offene PRs und CI direkt bei GitHub erneut prüfen.
-2. Frühere Handover-Notizen enthielten eine Diagnose zum Rezeptbild-Upload und zur Erstellung signierter Storage-URLs. Den aktuellen Code und, falls diese Funktion weiterhin relevant ist, das tatsächliche Verhalten separat prüfen, bevor daraus eine offene Aufgabe oder ein erledigter Fix abgeleitet wird.
-3. Danach die nächste vom Nutzer gewünschte Änderung priorisieren. Keine bereits gemergten Roulette- oder Auswahlkarten-Fixes erneut bearbeiten, sofern kein neuer Fehler beobachtet wird.
+1. Bei der nächsten Sitzung `main`, offene PRs und CI erneut live prüfen.
+2. Vor einer neuen Funktion einen aktuellen Code-/Testbefund als nächsten Arbeitspunkt festlegen; alte Feature-Branches sind stark hinter `main` und dürfen nicht ungeprüft wiederverwendet werden.
+3. Rezeptbild-Upload und signierte Storage-URLs nur dann weiter untersuchen, wenn die Funktion im aktuellen Code noch relevant ist oder ein reproduzierbarer Fehler vorliegt.
 
 ## Technische Orientierung
 
