@@ -333,8 +333,6 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Text('Restaurant-JSON importieren', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
-              const Text('Wähle die von ChatGPT erstellte Fatzomat-JSON-Datei aus. Du siehst die Daten vor dem Speichern.'),
-              const SizedBox(height: 12),
               FilledButton.icon(
                 onPressed: _importing ? null : _pickJson,
                 icon: _importing
