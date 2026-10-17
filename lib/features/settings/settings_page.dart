@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/app_feedback.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_design.dart';
 import '../../core/async_error.dart';
-import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/collaboration_repository.dart';
@@ -14,6 +12,7 @@ import '../shared/connection_page.dart';
 import 'notifications_page.dart';
 import 'personal_history_page.dart';
 import 'restaurant_favorites_page.dart';
+import 'backup_page.dart';
 import 'backup_page.dart';
 
 class SettingsPage extends StatefulWidget {
