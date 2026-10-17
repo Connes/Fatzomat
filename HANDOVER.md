@@ -15,6 +15,15 @@ Wenn der Nutzer „Fatzomat weiterentwickeln“ schreibt:
 
 GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis, kein Beweis für den Live-Zustand.
 
+## Autonomer Arbeitsmodus
+
+- „Fatzomat weiterentwickeln“ startet einen fortlaufenden Arbeitszyklus, nicht nur eine Bestandsaufnahme oder einen Vorschlag.
+- Nach einem abgeschlossenen Schritt den nächsten sinnvollen, risikoarmen Schritt selbst bestimmen und im selben Arbeitsauftrag fortsetzen, ohne für jedes „Mach weiter“ eine neue Freigabe anzufordern.
+- Fehlerursachen untersuchen, Fixes und Regressionstests implementieren, relevante CI-Läufe abwarten, rote Checks beheben und nach erfolgreicher Prüfung den PR-Workflow bis zum Merge und zur Post-Merge-Verifikation fortführen.
+- Nur anhalten und den Nutzer einbeziehen, wenn eine fachliche Entscheidung tatsächlich nicht ableitbar ist, Zugang/Berechtigungen fehlen oder ein destruktiver Live-/Produktionsschritt ein wesentliches Risiko birgt.
+- Keine Erfolge, Tests, Geräteprüfungen oder Live-Zustände behaupten, die nicht konkret verifiziert wurden.
+- Autonom bedeutet nicht unbegrenzte Hintergrundarbeit nach Ende einer Sitzung: Beim nächsten Aufruf den tatsächlichen Zustand prüfen und den Arbeitszyklus nahtlos fortsetzen.
+
 ## Verbindlicher Entwicklungsworkflow
 
 - Repository: `Connes/Fatzomat`; Hauptbranch: `main`.
