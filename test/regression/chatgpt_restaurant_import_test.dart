@@ -15,6 +15,9 @@ void main() {
     expect(source, contains('in der Nähe des folgenden Ausgangspunkts'));
     expect(source, contains('FilePicker.pickFiles'));
     expect(source, contains('Unbekanntes JSON-Format'));
+    expect(source, contains('Future<void> _useRestaurant() async {'));
+    final useRestaurant = source.substring(source.indexOf('Future<void> _useRestaurant() async {'), source.indexOf('Widget _detail('));
+    expect(useRestaurant, isNot(contains('showDialog')));
     expect(source, contains('Als heutigen Vorschlag übernehmen'));
     expect(source, contains('if (navigator.canPop()) {\n        navigator.pop(true);\n      }'));
     expect(source, isNot(contains('widget.onNavigateToToday?.call();')));
