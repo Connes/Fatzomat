@@ -9,12 +9,12 @@ import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/collaboration_repository.dart';
-import '../../data/services/backup_service.dart';
 import '../foods/food_preferences_page.dart';
 import '../shared/connection_page.dart';
 import 'notifications_page.dart';
 import 'personal_history_page.dart';
 import 'restaurant_favorites_page.dart';
+import 'backup_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -94,23 +94,6 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<void> exportBackup() async {
-    try {
-      final uri = await BackupService().exportPersonalBackup();
-      if (!mounted) return;
-      if (uri != null) {
-        AppFeedback.showSnackBar(context, 
-          const SnackBar(content: Text('Sicherung gespeichert.')),
-        );
-      }
-    } catch (error) {
-      if (!mounted) return;
-      AppFeedback.showSnackBar(context, 
-        SnackBar(content: Text(friendlyError(error))),
-      );
-    }
-  }
-
   Future<void> openConnection() async {
     await Navigator.push(
       context,
@@ -174,9 +157,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   const SizedBox(height: 14),
                   _SettingsTile(
                     icon: Icons.backup_outlined,
-                    title: 'Backup erstellen',
-                    subtitle: 'Deine persönlichen Daten als private Sicherung speichern',
-                    onTap: exportBackup,
+                    title: 'Backup',
+                    subtitle: 'Persönliche Daten sichern oder wiederherstellen',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const BackupPage()),
+                    ),
                   ),
                   const SizedBox(height: 14),
                   _SettingsTile(
