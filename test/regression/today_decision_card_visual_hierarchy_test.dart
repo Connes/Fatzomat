@@ -9,6 +9,7 @@ void main() {
     expect(card, contains('fontSize: 18,'));
     expect(card, contains('height: 180,'));
     expect(card, contains("if (plan.decisionType != 'order')"));
-    expect(card, contains('const SizedBox(height: 28),'));
+    expect(card, contains('padding: const EdgeInsets.only(top: 8)'));
+    expect(card, contains('const SizedBox(height: 20),'));
   });
 }

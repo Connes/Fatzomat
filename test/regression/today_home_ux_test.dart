@@ -31,7 +31,7 @@ void main() {
     expect(today, contains("'HEUTE ESSEN GEHEN'"));
     expect(today, contains("'order' => plan.decisionValue?.trim().isNotEmpty == true"));
     expect(today, contains("if (plan.decisionType != 'order') ...["));
-    expect(today, contains('Text(\n                        title,'));
+    expect(today, contains('child: Text(\n                          title,'));
     expect(today, isNot(contains("label: const Text('Lieferdienste')")));
     expect(today, contains("if (plan.decisionType == 'order')"));
     expect(today, contains('DeliveryServicesPage'));

@@ -1327,8 +1327,10 @@ class _TodayResultCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                       ],
-                      Text(
-                        title,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          title,
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -1338,13 +1340,14 @@ class _TodayResultCard extends StatelessWidget {
                               fontWeight: FontWeight.w800,
                               color: AppDesign.primaryDark,
                             ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 20),
             Divider(height: 1, thickness: 1, color: AppDesign.divider),
             if (plan.status == 'cooked')
               Padding(
