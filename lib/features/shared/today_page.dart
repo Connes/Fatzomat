@@ -926,7 +926,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 child: Image.asset(
                   FoodChoiceAssetService.assetFor(FoodMode.dineOut, cuisine ?? '') ??
                       'assets/together/clean/icons/icon_restaurant.png',
-                  height: 150,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -1250,7 +1250,8 @@ class _TodayResultCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                               color: AppDesign.secondaryText,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
                               letterSpacing: 1.3,
                             ),
                       ),
@@ -1308,24 +1309,24 @@ class _TodayResultCard extends StatelessWidget {
                         ),
                       ],
                       const SizedBox(height: 14),
-                      Text(
-                        (plan.decisionType == 'dine_out'
-                                ? plan.restaurantCuisine
-                                : plan.decisionType == 'order'
-                                    ? plan.decisionValue
-                                    : plan.isRecipe
-                                        ? 'REZEPT'
-                                        : 'ÜBERRASCHUNG')
-                            ?.trim()
-                            .toUpperCase() ?? '',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: AppDesign.secondaryText,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.3,
-                            ),
-                      ),
-                      const SizedBox(height: 12),
+                      if (plan.decisionType != 'order') ...[
+                        Text(
+                          (plan.decisionType == 'dine_out'
+                                  ? plan.restaurantCuisine
+                                  : plan.isRecipe
+                                      ? 'REZEPT'
+                                      : 'ÜBERRASCHUNG')
+                              ?.trim()
+                              .toUpperCase() ?? '',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                color: AppDesign.secondaryText,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.3,
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       Text(
                         title,
                         textAlign: TextAlign.center,
@@ -1343,7 +1344,7 @@ class _TodayResultCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 28),
             Divider(height: 1, thickness: 1, color: AppDesign.divider),
             if (plan.status == 'cooked')
               Padding(
