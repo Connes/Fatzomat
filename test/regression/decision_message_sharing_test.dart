@@ -23,7 +23,7 @@ void main() {
     expect(today, contains('decisionName: plan!.displayTitle'));
     expect(today, contains("Text('Teilen')"));
     expect(today, contains('pendingDecisionShareForDate'));
-    expect(today, contains('onPressed: onDecide'));
+    expect(today, contains('onTap: onDecide'));
     expect(today, isNot(contains('onPressed: hasConnection ? onDecide : null')));
     expect(today, contains('Noch keine Connection vorhanden.'));
     expect(today, contains('rejectDecisionShare'));
