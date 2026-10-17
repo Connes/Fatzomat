@@ -86,7 +86,7 @@ void main() {
       expect(find.text(label), findsOneWidget, reason: 'Auswahl fehlt: $label');
     }
 
-    final expectedInteractiveCards = labels.length + (mode == FoodMode.dineOut ? 2 : 0);
+    final expectedInteractiveCards = labels.length + (mode == FoodMode.dineOut ? 1 : 0);
     expect(find.byType(InkWell), findsNWidgets(expectedInteractiveCards));
     expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
     expect(find.byType(Scrollable), findsNWidgets(2));
@@ -122,7 +122,7 @@ void main() {
     ]);
   });
 
-  testWidgets('Wir gehen essen hat eine gemeinsame Box und alle Auswahltexte',
+  testWidgets('Wir gehen essen zeigt Kategorien ohne ChatGPT-Suchbutton',
       (tester) async {
     await pumpMode(
       tester,
