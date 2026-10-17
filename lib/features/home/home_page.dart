@@ -143,8 +143,9 @@ class _HomePageState extends State<HomePage> {
                   final cardHeight = (cardWidth * (480 / 540)).clamp(158.0, 390.0).toDouble();
                   final gridHeight = cardHeight * 2 + gap;
                   const ctaGap = 16.0;
-                  const ctaHeight = 60.0;
-                  final groupHeight = gridHeight + ctaGap + ctaHeight;
+                  const ctaHeight = 76.0;
+                  final welcomeHeight = 24.0 + 14.0;
+                  final groupHeight = welcomeHeight + gridHeight + ctaGap + ctaHeight;
                   final verticalRoom = constraints.maxHeight - groupHeight;
                   final topSpace = verticalRoom > 0 ? verticalRoom / 2 : 12.0;
 
