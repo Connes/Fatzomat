@@ -72,13 +72,6 @@ class _BackupPageState extends State<BackupPage> {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(4, 4, 4, 18),
-              child: Text(
-                'Gesichert werden deine Lebensmittelentscheidungen und die persönliche Historie. '
-                'Rezepte und Restaurantfavoriten werden nicht in die Datei kopiert.',
-              ),
-            ),
             _BackupActionTile(
               icon: Icons.backup_outlined,
               title: 'Erstellen',
