@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_design.dart';
@@ -64,6 +65,7 @@ class _LaunchPageState extends State<LaunchPage>
     // be rendered. Startup data and the minimum duration run in parallel.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      _requestLocationPermissionOnce();
       waitForLaunchReadiness(
         startup: (widget.startupLoader ?? loadStartupData)(),
         minimumDuration: widget.minimumDuration,
@@ -74,6 +76,24 @@ class _LaunchPageState extends State<LaunchPage>
         ));
       });
     });
+  }
+
+  /// Ask for location access once during the first app launch, rather than
+  /// interrupting every later restaurant-to-ChatGPT handoff.
+  Future<void> _requestLocationPermissionOnce() async {
+    const requestedKey = 'fatzomat_location_permission_requested';
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      if (preferences.getBool(requestedKey) == true) return;
+      // Persist before showing the OS dialog so a denial cannot cause a loop.
+      await preferences.setBool(requestedKey, true);
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        await Geolocator.requestPermission();
+      }
+    } catch (_) {
+      // Location is optional. A startup permission failure must not block the app.
+    }
   }
 
   Future<void> _continue(StartupLoadResult result) async {
