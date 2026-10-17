@@ -50,11 +50,9 @@ class BackupService {
       dialogTitle: 'Fatzomat-Backup auswählen',
       type: FileType.custom,
       allowedExtensions: const ['json'],
-      withData: true,
-      allowMultiple: false,
     );
-    if (picked == null || picked.files.isEmpty) return null;
-    final bytes = picked.files.single.bytes;
+    if (picked.isEmpty) return null;
+    final bytes = picked.first.bytes;
     if (bytes == null) {
       throw const FormatException('Die ausgewählte Datei konnte nicht gelesen werden.');
     }
