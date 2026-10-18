@@ -540,11 +540,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                           color: AppDesign.surface,
                           bordered: false,
                           padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Zusammengefasste Zutaten',
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Zusammengefasste Zutaten',
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                       color: AppDesign.text,
                                       fontWeight: FontWeight.w700,
@@ -706,8 +708,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                     style: const TextStyle(color: AppDesign.secondaryText),
                                                   ),
                                           )),
-                                ],
-                            ],
+                                  ],
+                              ],
+                            ),
                           ),
                           ),
                         ],
