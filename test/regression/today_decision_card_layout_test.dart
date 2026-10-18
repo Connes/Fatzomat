@@ -28,7 +28,7 @@ void main() {
     expect(header, contains('modeLabel'));
     expect(header, contains('child: image'));
     expect(content, contains('categoryLabel'));
-    expect(content, isNot(contains('onTap:')));
+    expect(content, contains('onTap: onTitleTap'));
     expect(header, isNot(contains('onTap:')));
     expect(content, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
     expect(content, contains('Expanded('));
