@@ -1023,7 +1023,7 @@ double _todayDecisionCardHeight(BuildContext context) {
   final gridHeight = 2 * (tileWidth / 1.06) + gap;
 
   // Card padding, grid spacing, "Entscheide Du" button and Card margin.
-  return 18 + 14 + gridHeight + 16 + 76 + 20 + 8;
+  return 18 + 14 + gridHeight + 16 + 76 + 20 + 8 + 28;
 }
 
 class _TodayDecisionCard extends StatelessWidget {
@@ -1032,6 +1032,7 @@ class _TodayDecisionCard extends StatelessWidget {
   final VoidCallback onDineOut;
   final VoidCallback onSurprise;
   final VoidCallback onDecide;
+
   const _TodayDecisionCard({
     required this.onCook,
     required this.onOrder,
@@ -1049,137 +1050,159 @@ class _TodayDecisionCard extends StatelessWidget {
     return SizedBox(
       height: _todayDecisionCardHeight(context),
       child: Card(
-      color: AppDesign.surface.withValues(alpha: 0.97),
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(padding, 18, padding, 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 14),
-            GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: gap,
-              mainAxisSpacing: gap,
-              childAspectRatio: 1.06,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _TodayChoiceImage(
-                  asset: 'assets/together/clean/icons/icon_cooking.png',
-                  label: 'Wir kochen',
-                  onTap: onCook,
+        color: AppDesign.surface.withValues(alpha: 0.97),
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(padding, 18, padding, 20),
+          child: Column(
+            children: [
+              // The four decision modes live together in their own surface.
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppDesign.surfaceSoft.withValues(alpha: 0.72),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(
+                      color: AppDesign.divider.withValues(alpha: 0.55),
+                    ),
+                  ),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: gap,
+                    mainAxisSpacing: gap,
+                    childAspectRatio: 1.06,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      _TodayChoiceImage(
+                        asset: 'assets/together/clean/icons/icon_cooking.png',
+                        label: 'Wir kochen',
+                        onTap: onCook,
+                      ),
+                      _TodayChoiceImage(
+                        asset: 'assets/together/clean/icons/icon_delivery.png',
+                        label: 'Wir bestellen',
+                        onTap: onOrder,
+                      ),
+                      _TodayChoiceImage(
+                        asset: 'assets/together/clean/icons/icon_restaurant.png',
+                        label: 'Wir gehen essen',
+                        onTap: onDineOut,
+                      ),
+                      _TodayChoiceImage(
+                        asset: 'assets/together/clean/icons/icon_surprise.png',
+                        label: 'Überrasch mich',
+                        onTap: onSurprise,
+                      ),
+                    ],
+                  ),
                 ),
-                _TodayChoiceImage(
-                  asset: 'assets/together/clean/icons/icon_delivery.png',
-                  label: 'Wir bestellen',
-                  onTap: onOrder,
+              ),
+              const SizedBox(height: 12),
+              // The partner-decision action is visually separated from the grid.
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppDesign.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: AppDesign.divider.withValues(alpha: 0.75),
+                  ),
                 ),
-                _TodayChoiceImage(
-                  asset: 'assets/together/clean/icons/icon_restaurant.png',
-                  label: 'Wir gehen essen',
-                  onTap: onDineOut,
-                ),
-                _TodayChoiceImage(
-                  asset: 'assets/together/clean/icons/icon_surprise.png',
-                  label: 'Überrasch mich',
-                  onTap: onSurprise,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(22),
-                child: InkWell(
-                  onTap: onDecide,
+                child: Material(
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(22),
-                  child: Ink(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          Color(0xFFFFA24A),
-                          Color(0xFFFF783E),
+                  child: InkWell(
+                    onTap: onDecide,
+                    borderRadius: BorderRadius.circular(22),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFFFFA24A),
+                            Color(0xFFFF783E),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x30FF783E),
+                            blurRadius: 14,
+                            offset: Offset(0, 6),
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(22),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x30FF783E),
-                          blurRadius: 14,
-                          offset: Offset(0, 6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 15,
                         ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 15,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 46,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.22),
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.35),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 46,
+                              height: 46,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.22),
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.35),
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.people_alt_rounded,
+                                color: Colors.white,
+                                size: 25,
                               ),
                             ),
-                            child: const Icon(
-                              Icons.people_alt_rounded,
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Entscheide Du',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.1,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    'Deine Connection um eine Wahl bitten',
+                                    style: TextStyle(
+                                      color: Color(0xFFFFF5EC),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
                               color: Colors.white,
-                              size: 25,
+                              size: 22,
                             ),
-                          ),
-                          const SizedBox(width: 14),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Entscheide Du',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.1,
-                                  ),
-                                ),
-                                SizedBox(height: 3),
-                                Text(
-                                  'Deine Connection um eine Wahl bitten',
-                                  style: TextStyle(
-                                    color: Color(0xFFFFF5EC),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
