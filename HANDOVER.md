@@ -51,6 +51,9 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Bei mehreren offenen PRs eine klare Reihenfolge verfolgen: ältere unabhängige PRs mit grüner CI zuerst; danach abhängige PRs in Reihenfolge ihrer Voraussetzungen; nach jedem Merge neu validieren.
 ## Kommunikationsregel: nur konkrete Schritte
 
+- **Rückmeldung erst nach vollständigem Abschluss:** Während eines autonomen Arbeitszyklus keine Zwischenstands- oder Fortschrittsmeldungen senden. Erst berichten, wenn der PR gemergt ist, die Änderung im aktuellen `main` verifiziert wurde und die Post-Merge-CI geprüft ist.
+- Vor dieser Abschlussmeldung offene PRs und deren Status live prüfen. Die Meldung knapp halten und PR-Link, Merge-Commit sowie den konkret verifizierten CI-Status nennen. Wenn ein externer Blocker oder eine notwendige Nutzerentscheidung den Abschluss verhindert, nur dann melden und den konkreten Blocker nennen.
+- Einen fehlenden oder nicht abrufbaren CI-Status nicht als Erfolg werten. Den Arbeitszyklus weiterführen und Prüfungen erneut abfragen, soweit dies mit den verfügbaren Werkzeugen möglich ist.
 - Bei Fehlerbehebungen und gemeinsamer Entwicklungsarbeit kurz und handlungsorientiert antworten.
 - Wenn der Nutzer lokal etwas ausführen muss, **nur die konkret auszuführenden Befehle bzw. Schritte nennen**, in der richtigen Reihenfolge.
 - Keine langen Erklärungen, keine unnötigen Hintergrundinformationen und insbesondere keine Listen mit Dingen, die der Nutzer nicht tun soll.
