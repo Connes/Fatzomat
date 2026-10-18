@@ -557,7 +557,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       label: const Text('Rezept und Tagesaufgabe abschließen'),
                     ),
             )
-          : null;
+          : null,
     );
   }
 }
