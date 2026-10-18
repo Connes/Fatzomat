@@ -1276,11 +1276,6 @@ class _TodayResultCard extends StatelessWidget {
                 fit: BoxFit.cover,
               );
 
-    final openDetails = plan.status == 'cooked'
-        ? null
-        : plan.decisionType == 'order' || plan.decisionType == 'dine_out'
-            ? onOpenOrder
-            : onOpenRecipe;
 
     return SizedBox(
       height: _todayDecisionCardHeight(context),
@@ -1299,14 +1294,12 @@ class _TodayResultCard extends StatelessWidget {
               _TodayDecisionCardHeader(
                 modeLabel: modeLabel,
                 image: image,
-                onTap: openDetails,
               ),
               Expanded(
                 child: _TodayDecisionCardContent(
                   categoryLabel: categoryLabel,
                   title: title,
                   titleSize: titleSize,
-                  onTap: openDetails,
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1326,26 +1319,19 @@ class _TodayResultCard extends StatelessWidget {
 class _TodayDecisionCardHeader extends StatelessWidget {
   final String modeLabel;
   final Widget image;
-  final VoidCallback? onTap;
 
   const _TodayDecisionCardHeader({
     required this.modeLabel,
     required this.image,
-    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
               Text(
                 modeLabel,
                 textAlign: TextAlign.center,
@@ -1361,9 +1347,7 @@ class _TodayDecisionCardHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(22),
                 child: image,
               ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
@@ -1373,27 +1357,20 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String? categoryLabel;
   final String title;
   final double titleSize;
-  final VoidCallback? onTap;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
     required this.title,
     required this.titleSize,
-    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
               if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
@@ -1425,9 +1402,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
