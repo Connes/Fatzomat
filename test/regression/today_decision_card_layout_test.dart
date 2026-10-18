@@ -28,6 +28,8 @@ void main() {
     expect(header, contains('modeLabel'));
     expect(header, contains('child: image'));
     expect(content, contains('categoryLabel'));
+    expect(content, contains('final VoidCallback? onTap;'));
+    expect(content, contains('onTap: onTap'));
     expect(content, contains('maxLines: 2'));
     expect(content, contains('TextOverflow.ellipsis'));
     expect(actions, contains('height: 58'));
