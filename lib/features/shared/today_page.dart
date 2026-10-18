@@ -1369,70 +1369,83 @@ class _TodayResultCard extends StatelessWidget {
                 ),
               ),
             ),
-            Divider(height: 1, thickness: 1, color: AppDesign.divider),
-            if (plan.status == 'cooked')
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 8),
-                child: Text(
-                  'Für heute ist alles erledigt.',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppDesign.secondaryText,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              )
-            else
-              SizedBox(
-                height: 58,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextButton.icon(
-                        onPressed: onShare,
-                        icon: const Icon(Icons.ios_share_rounded, size: 20),
-                        label: const Text('Teilen'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppDesign.primaryDark,
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 58,
-                      color: AppDesign.divider,
-                    ),
-                    Expanded(
-                      child: TextButton.icon(
-                        onPressed: onCancel,
-                        icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                        label: const Text('Entfernen'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppDesign.secondaryText,
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            _TodayDecisionCardActions(
+              isCompleted: plan.status == 'cooked',
+              onShare: onShare,
+              onCancel: onCancel,
+            ),
           ],
         ),
       ),
       ),
+    );
+  }
+}
+
+
+class _TodayDecisionCardActions extends StatelessWidget {
+  final bool isCompleted;
+  final VoidCallback? onShare;
+  final VoidCallback onCancel;
+
+  const _TodayDecisionCardActions({
+    required this.isCompleted,
+    required this.onShare,
+    required this.onCancel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Divider(height: 1, thickness: 1, color: AppDesign.divider),
+        if (isCompleted)
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 8),
+            child: Text(
+              'Für heute ist alles erledigt.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppDesign.secondaryText,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 58,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: onShare,
+                    icon: const Icon(Icons.ios_share_rounded, size: 20),
+                    label: const Text('Teilen'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppDesign.primaryDark,
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+                Container(width: 1, height: 58, color: AppDesign.divider),
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: onCancel,
+                    icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                    label: const Text('Entfernen'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppDesign.secondaryText,
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
