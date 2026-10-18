@@ -541,34 +541,33 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               ),
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: widget.viewingTodaySelection && widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length
-          ? SafeArea(
-              minimum: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+          if (widget.viewingTodaySelection &&
+              widget.canMarkCooked &&
+              steps.isNotEmpty &&
+              completedSteps.length == steps.length) ...[
+            const SizedBox(height: 8),
+            Center(
               child: cookedMarked
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppDesign.secondarySurface,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Row(
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.check_circle_rounded, size: 20),
                           SizedBox(width: 8),
-                          Text('Rezept und Tagesaufgabe abgeschlossen', style: TextStyle(fontWeight: FontWeight.w800)),
+                          Text('Als gekocht abgeschlossen', style: TextStyle(fontWeight: FontWeight.w800)),
                         ],
                       ),
                     )
-                  : FilledButton.icon(
+                  : TextButton.icon(
                       onPressed: working ? null : markCooked,
                       icon: const Icon(Icons.check_circle_outline_rounded),
-                      label: const Text('Rezept und Tagesaufgabe abschließen'),
+                      label: const Text('Als gekocht abschließen'),
                     ),
-            )
-          : null,
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

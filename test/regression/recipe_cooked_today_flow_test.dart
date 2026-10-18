@@ -31,18 +31,18 @@ void main() {
     expect(recipe, isNot(contains("'Für diesen Tag festlegen'")));
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
-    expect(recipe, contains("label: const Text('Rezept und Tagesaufgabe abschließen')"));
-    expect(recipe, contains("widget.viewingTodaySelection && widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length"));
+    expect(recipe, contains("label: const Text('Als gekocht abschließen')"));
+    expect(recipe, contains("widget.viewingTodaySelection &&\n              widget.canMarkCooked &&\n              steps.isNotEmpty &&\n              completedSteps.length == steps.length"));
     expect(recipe, contains("completedSteps.length == steps.length"));
-    expect(recipe, contains("bottomNavigationBar: widget.viewingTodaySelection && widget.canMarkCooked"));
-    final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
-    expect(bottomNavigation, contains('widget.canMarkCooked'));
+    expect(recipe, contains("if (widget.viewingTodaySelection &&\n              widget.canMarkCooked"));
+    expect(recipe, contains('TextButton.icon('));
+    expect(recipe, isNot(contains('bottomNavigationBar: widget.viewingTodaySelection')));
     expect(recipe, isNot(contains("if (personalTodaySelected || widget.viewingTodaySelection) ...[")));
     expect(recipe, contains("final bool viewingTodaySelection"));
     expect(recipe, contains("actions: widget.viewingTodaySelection ? null : ["));
     expect(recipe, isNot(contains("'Für heute ausgewählt'")));
     expect(recipe, isNot(contains("'Für diesen Tag ausgewählt'")));
-    expect(bottomNavigation, isNot(contains("'Für heute ausgewählt'")));
+    expect(recipe, isNot(contains("'Für heute ausgewählt'")));
     expect(today, contains("onOpenRecipe: plan!.isRecipe && plan!.status != 'cooked'"));
     expect(today, contains('final VoidCallback? onOpenRecipe;'));
 
