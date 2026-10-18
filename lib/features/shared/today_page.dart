@@ -499,7 +499,8 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       title: SizedBox(
         height: 48,
         child: Stack(
-          alignment: Alignment.center,          children: [
+          alignment: Alignment.center,
+          children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 80),
               child: Text(
@@ -1000,7 +1001,8 @@ class _IncomingDecisionShareCard extends StatelessWidget {
 
 double _todayDecisionCardHeight(BuildContext context) {
   final screenWidth = MediaQuery.sizeOf(context).width;
-  final cardWidth = (screenWidth - 32).clamp(0.0, 560.0).toDouble();  final gap = screenWidth >= 700 ? 14.0 : 10.0;
+  final cardWidth = (screenWidth - 32).clamp(0.0, 560.0).toDouble();
+  final gap = screenWidth >= 700 ? 14.0 : 10.0;
   final horizontalPadding = screenWidth >= 700 ? 24.0 : 16.0;
   final gridWidth = (cardWidth - 8 - horizontalPadding * 2)
       .clamp(0.0, double.infinity)
@@ -1502,6 +1504,7 @@ class _TodayChoiceImage extends StatelessWidget {
   final String asset;
   final String label;
   final VoidCallback onTap;
+
   const _TodayChoiceImage({
     required this.asset,
     required this.label,
