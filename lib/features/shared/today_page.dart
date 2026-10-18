@@ -489,7 +489,9 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       'November',
       'Dezember',
     ];
-    return '${weekdays[date.weekday - 1]}, ${date.day}. ${months[date.month - 1]}';  }
+    return '${weekdays[date.weekday - 1]}, ${date.day}. ${months[date.month - 1]}';
+  }
+
   PreferredSizeWidget _todayAppBar() {
     final showBackwardControls = !_isSelectedDateToday;
     return TogetherAppBar(
@@ -497,8 +499,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       title: SizedBox(
         height: 48,
         child: Stack(
-          alignment: Alignment.center,
-          children: [
+          alignment: Alignment.center,          children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 80),
               child: Text(
@@ -983,12 +984,14 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: FilledButton(                    onPressed: busy ? null : onAccept,
+                  child: FilledButton(
+                    onPressed: busy ? null : onAccept,
                     child: const Text('Übernehmen'),
                   ),
                 ),
               ],
-            ),          ],
+            ),
+          ],
         ),
       ),
     );
@@ -997,8 +1000,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
 
 double _todayDecisionCardHeight(BuildContext context) {
   final screenWidth = MediaQuery.sizeOf(context).width;
-  final cardWidth = (screenWidth - 32).clamp(0.0, 560.0).toDouble();
-  final gap = screenWidth >= 700 ? 14.0 : 10.0;
+  final cardWidth = (screenWidth - 32).clamp(0.0, 560.0).toDouble();  final gap = screenWidth >= 700 ? 14.0 : 10.0;
   final horizontalPadding = screenWidth >= 700 ? 24.0 : 16.0;
   final gridWidth = (cardWidth - 8 - horizontalPadding * 2)
       .clamp(0.0, double.infinity)
@@ -1481,13 +1483,15 @@ class _TodayDecisionCardActions extends StatelessWidget {
                     onPressed: onCancel,
                     icon: const Icon(Icons.delete_outline_rounded, size: 20),
                     label: const Text('Entfernen'),
-                    style: TextButton.styleFrom(                      foregroundColor: AppDesign.secondaryText,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppDesign.secondaryText,
                       textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
-              ],            ),
+              ],
+            ),
           ),
       ],
     );
@@ -1498,7 +1502,6 @@ class _TodayChoiceImage extends StatelessWidget {
   final String asset;
   final String label;
   final VoidCallback onTap;
-
   const _TodayChoiceImage({
     required this.asset,
     required this.label,
@@ -1979,14 +1982,16 @@ class _ShoppingPageState extends State<ShoppingPage> {
                   ],
                 ],
               ),
-            ),    );
+            ),
+    );
   }
 }
 
 
 class _ShoppingGroup extends StatelessWidget {
   final String category;
-  final List<ShoppingItem> items;  final String Function(ShoppingItem) itemLabel;
+  final List<ShoppingItem> items;
+  final String Function(ShoppingItem) itemLabel;
   final Future<void> Function(ShoppingItem, bool) onToggle;
   final Future<void> Function(ShoppingItem) onEdit;
   final Future<void> Function(ShoppingItem) onDelete;
@@ -1997,8 +2002,7 @@ class _ShoppingGroup extends StatelessWidget {
     required this.itemLabel,
     required this.onToggle,
     required this.onEdit,
-    required this.onDelete,
-  });
+    required this.onDelete,  });
 
   @override
   Widget build(BuildContext context) => Padding(
