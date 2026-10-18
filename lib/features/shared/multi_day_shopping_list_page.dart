@@ -35,6 +35,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   bool _loading = true;
   bool _showOnlyOpen = false;
   bool _completingList = false;
+  bool _hasInitializedExpansion = false;
   Object? _error;
   int _generation = 0;
   RealtimeChannel? _channel;
@@ -67,6 +68,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       _days = _makeDays(today);
       _plans = const [];
       _items = const [];
+      _hasInitializedExpansion = false;
       // Carry the default selection forward with the calendar. Preserve any
       // explicitly selected future day that remains in the new three-day view.
       final hadOnlyTodaySelected = _selected.length == 1 && _selected.contains(oldTodayKey);
@@ -92,7 +94,6 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     _days = _makeDays(_observedToday);
     _dayBoundaryTimer = Timer.periodic(const Duration(minutes: 1), (_) => _checkDayBoundary());
     _selected.add(_key(_observedToday));
-    _expanded.add(_key(_observedToday));
     _subscribe();
     load();
   }
@@ -146,6 +147,16 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           _selected.add(activeKeys.first);
         }
         _expanded.removeWhere((key) => !activeKeys.contains(key));
+        // Initially open the first day that still needs shopping. Completed
+        // days stay collapsed after reload and can be opened manually by
+        // tapping their day header.
+        if (!_hasInitializedExpansion) {
+          final firstIncompleteDay = _activeDays.where((day) => !_isDayCompleted(day));
+          if (firstIncompleteDay.isNotEmpty) {
+            _expanded.add(_key(firstIncompleteDay.first));
+          }
+          _hasInitializedExpansion = true;
+        }
         _loading = false;
         _error = null;
       });
