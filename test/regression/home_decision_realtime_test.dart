@@ -11,6 +11,7 @@ void main() {
     expect(pubspec, contains('version: 1.13.46+262'));
     expect(home, contains("sendDecisionMessage(type: 'ask')"));
     expect(home, contains("child: FittedBox"));
+    expect(home, isNot(contains('Icons.people_alt_rounded')));
     expect(home, contains("maxLines: 1"));
     expect(home, contains("'Entscheide Du'"));
     expect(home, isNot(contains("table: 'decision_requests'")));
