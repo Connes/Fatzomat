@@ -497,8 +497,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       'November',
       'Dezember',
     ];
-    return '${weekdays[date.weekday - 1]}, ${date.day}. ${months[date.month - 1]}';
-  }
+    return '${weekdays[date.weekday - 1]}, ${date.day}. ${months[date.month - 1]}';  }
 
   PreferredSizeWidget _todayAppBar() {
     final showBackwardControls = !_isSelectedDateToday;
@@ -794,10 +793,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                   : null,
                             ),
                     ),
-                    if (_pendingDecisionShare == null && completedPlans.isNotEmpty) ...[
-                      const SizedBox(height: 22),
-                      _CompletedTodayDecisions(plans: completedPlans),
-                    ],
                   ],
                     ),
                   ),
@@ -997,8 +992,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: FilledButton(
-                    onPressed: busy ? null : onAccept,
+                  child: FilledButton(                    onPressed: busy ? null : onAccept,
                     child: const Text('Übernehmen'),
                   ),
                 ),
@@ -1497,8 +1491,7 @@ class _TodayDecisionCardActions extends StatelessWidget {
                     onPressed: onCancel,
                     icon: const Icon(Icons.delete_outline_rounded, size: 20),
                     label: const Text('Entfernen'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppDesign.secondaryText,
+                    style: TextButton.styleFrom(                      foregroundColor: AppDesign.secondaryText,
                       textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -1997,8 +1990,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                   ],
                 ],
               ),
-            ),
-    );
+            ),    );
   }
 }
 
