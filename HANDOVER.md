@@ -92,3 +92,9 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Für Tests und Regressionen die bestehenden Testmuster unter `test/` verwenden.
 - Supabase-Migrationen liegen im Repository unter `supabase/migrations/`; Live-Anwendung und Funktionsdefinitionen müssen separat geprüft werden.
 - Relevante dauerhafte Setup-, Sicherheits-, Test- und Release-Dokumentation liegt unter `docs/`. Diese Dokumente nicht durch historische Einzelberichte ersetzen.
+
+
+## Änderung in Arbeit (2026-10-18)
+
+- Feature-Branch `refactor/shared-decision-card-actions`: Aktionsbereich der Heute-Entscheidungskarte in `_TodayDecisionCardActions` extrahiert. Horizontale Trennlinie und Aktionen „Teilen“/„Entfernen“ sind damit zentral wiederverwendbar; der Erledigt-Zustand bleibt erhalten.
+- Regressionstests werden auf die extrahierte Komponente angepasst. CI und Merge-Status nach PR-Erstellung live prüfen.
