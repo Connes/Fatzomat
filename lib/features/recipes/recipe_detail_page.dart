@@ -472,9 +472,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                 ...List.generate(steps.length, (i) {
                   final done = completedSteps.contains(i);
                   final nextStep = i == completedSteps.length;
-                  final canToggle = personalTodaySelected &&
-                      (done && i == completedSteps.length - 1) ||
-                      (personalTodaySelected && !done && nextStep);
+                  final canToggle = widget.viewingTodaySelection &&
+                      personalTodaySelected &&
+                      ((done && i == completedSteps.length - 1) ||
+                          (!done && nextStep));
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Material(
@@ -542,7 +543,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
         ],
       ),
-      bottomNavigationBar: widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length
+      bottomNavigationBar: widget.viewingTodaySelection && widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length
           ? SafeArea(
               minimum: const EdgeInsets.fromLTRB(20, 10, 20, 12),
               child: cookedMarked
