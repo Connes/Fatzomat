@@ -2005,7 +2005,8 @@ class _ShoppingGroup extends StatelessWidget {
     required this.itemLabel,
     required this.onToggle,
     required this.onEdit,
-    required this.onDelete,  });
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) => Padding(
