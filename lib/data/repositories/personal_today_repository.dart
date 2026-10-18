@@ -439,6 +439,15 @@ class PersonalTodayRepository {
     await client.from('shopping_items').delete().eq('id', itemId);
   }
 
+  Future<void> deleteShoppingItemsForPlans(Iterable<String> planIds) async {
+    final ids = planIds.toSet().where((id) => id.trim().isNotEmpty).toList();
+    if (ids.isEmpty) return;
+    await client
+        .from('shopping_items')
+        .delete()
+        .inFilter('personal_today_plan_id', ids);
+  }
+
 
   Future<void> _resolveNestedRecipeImage(Map<String, dynamic> map) async {
     final recipe = map['recipes'];

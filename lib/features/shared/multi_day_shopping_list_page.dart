@@ -55,7 +55,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           if (i < _plans.length &&
               _plans[i].where((plan) => plan.isRecipe).any(
                     (plan) => _items.any((item) => item.planId == plan.id),
-                  ))
+                  ) &&
+              !_isDayCompleted(_days[i]))
             _days[i],
       ];
 
