@@ -404,13 +404,39 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('Restaurantfavoriten konnten nicht geladen werden.'),
-                        const SizedBox(height: 12),
-                        FilledButton(onPressed: _load, child: const Text('Erneut versuchen')),
-                      ],
+                    child: AppSurface(
+                      padding: const EdgeInsets.all(24),
+                      color: AppDesign.surface,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.cloud_off_rounded,
+                            size: 36,
+                            color: AppDesign.primaryDark,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Lieblingsrestaurants konnten nicht geladen werden.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppDesign.text,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Bitte prüfe deine Verbindung und versuche es erneut.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppDesign.text,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(onPressed: _load, child: const Text('Erneut versuchen')),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -423,14 +449,14 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                       const SizedBox(height: 16),
                       if (_favorites.isEmpty)
                         AppSurface(
-                          padding: const EdgeInsets.all(22),
+                          padding: const EdgeInsets.all(24),
                           color: AppDesign.surface,
                           child: Column(
                             children: [
-                              const Icon(Icons.restaurant_menu_rounded, size: 34, color: AppDesign.primaryDark),
+                              const Icon(Icons.restaurant_menu_rounded, size: 38, color: AppDesign.primaryDark),
                               const SizedBox(height: 8),
                               Text(
-                                'Noch keine Favoriten gespeichert',
+                                'Noch keine Lieblingsrestaurants vorhanden',
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: AppDesign.text,
@@ -439,7 +465,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Deine gespeicherten Restaurants erscheinen hier.',
+                                'Füge über das Plus oben rechts dein erstes Lieblingsrestaurant hinzu. Es erscheint dann hier.',
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: AppDesign.text,
