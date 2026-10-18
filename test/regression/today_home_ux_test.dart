@@ -39,8 +39,8 @@ void main() {
     expect(today, contains('DeliveryServicesPage'));
     expect(today, contains('FoodChoiceAssetService.assetFor('));
     expect(today, contains("onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'"));
-    expect(today, contains('final openDetails = plan.status == \'cooked\''));
-    expect(today, contains('onTap: openDetails'));
+    expect(today, isNot(contains('final openDetails = plan.status == \'cooked\'')));
+    expect(today, isNot(contains('onTap: openDetails')));
     expect(today, contains('? onOpenOrder'));
     expect(today, contains("plan.restaurantCuisine"));
     expect(today, isNot(contains('RestaurantDetailPage')));
