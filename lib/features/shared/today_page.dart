@@ -2174,9 +2174,13 @@ class _CompletedTodayDecisions extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 560),
       child: AppSurface(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Theme(
-          data: theme.copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+          clipBehavior: Clip.antiAlias,
+          child: Theme(
+            data: theme.copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
             initiallyExpanded: false,
             tilePadding: const EdgeInsets.symmetric(horizontal: 4),
             childrenPadding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
@@ -2197,23 +2201,24 @@ class _CompletedTodayDecisions extends StatelessWidget {
                 const Icon(Icons.expand_more_rounded),
               ],
             ),
-            children: plans.map((item) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              leading: const Icon(Icons.done_rounded, color: AppDesign.secondaryText),
-              title: Text(
-                item.displayTitle,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  decoration: TextDecoration.lineThrough,
+              children: plans.map((item) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                leading: const Icon(Icons.done_rounded, color: AppDesign.secondaryText),
+                title: Text(
+                  item.displayTitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    decoration: TextDecoration.lineThrough,
+                    color: AppDesign.secondaryText,
+                  ),
+                ),
+                trailing: const Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 18,
                   color: AppDesign.secondaryText,
                 ),
-              ),
-              trailing: const Icon(
-                Icons.check_circle_outline_rounded,
-                size: 18,
-                color: AppDesign.secondaryText,
-              ),
-            )).toList(),
+              )).toList(),
+            ),
           ),
         ),
       ),
