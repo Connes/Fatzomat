@@ -1293,7 +1293,6 @@ class _TodayResultCard extends StatelessWidget {
                   categoryLabel: categoryLabel,
                   title: title,
                   titleSize: titleSize,
-                  isOrder: plan.decisionType == 'order',
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1360,13 +1359,11 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String? categoryLabel;
   final String title;
   final double titleSize;
-  final bool isOrder;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
     required this.title,
     required this.titleSize,
-    required this.isOrder,
   });
 
   @override
