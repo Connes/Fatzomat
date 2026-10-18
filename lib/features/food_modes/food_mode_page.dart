@@ -257,19 +257,6 @@ class _FoodModePageState extends State<FoodModePage> {
                 ),
                 const SizedBox(height: 10),
               ],
-              if (widget.mode == FoodMode.order) ...[
-                Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 16),
-                  child: Text(
-                    'Wähle dein Lieferdienst',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppDesign.primaryDark,
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                ),
-              ],
               _choiceGrid(options),
             ],
           ),
