@@ -403,6 +403,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           context: context,
           builder: (_) => _ServingsDialog(
             initial: recipe.servings.clamp(1, 12).toInt(),
+            confirmLabel: 'Bestätigen',
           ),
         );
         if (servings == null || !mounted) return;
@@ -978,7 +979,11 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 class _ServingsDialog extends StatefulWidget {
   final int initial;
-  const _ServingsDialog({required this.initial});
+  final String confirmLabel;
+  const _ServingsDialog({
+    required this.initial,
+    this.confirmLabel = 'Zur Einkaufsliste',
+  });
 
   @override
   State<_ServingsDialog> createState() => _ServingsDialogState();
@@ -1011,7 +1016,10 @@ class _ServingsDialogState extends State<_ServingsDialog> {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
-          FilledButton(onPressed: () => Navigator.pop(context, servings), child: const Text('Zur Einkaufsliste')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, servings),
+            child: Text(widget.confirmLabel),
+          ),
         ],
       );
 }

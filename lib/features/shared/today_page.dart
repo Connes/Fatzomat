@@ -1288,6 +1288,12 @@ class _TodayResultCard extends StatelessWidget {
                 fit: BoxFit.cover,
               );
 
+    final openDetails = plan.status == 'cooked'
+        ? null
+        : plan.decisionType == 'order' || plan.decisionType == 'dine_out'
+            ? onOpenOrder
+            : onOpenRecipe;
+
     return SizedBox(
       height: _todayDecisionCardHeight(context),
       child: Card(
@@ -1305,17 +1311,14 @@ class _TodayResultCard extends StatelessWidget {
               _TodayDecisionCardHeader(
                 modeLabel: modeLabel,
                 image: image,
-                onTap: plan.status == 'cooked'
-                    ? null
-                    : plan.decisionType == 'order' || plan.decisionType == 'dine_out'
-                        ? onOpenOrder
-                        : onOpenRecipe,
+                onTap: openDetails,
               ),
               Expanded(
                 child: _TodayDecisionCardContent(
                   categoryLabel: categoryLabel,
                   title: title,
                   titleSize: titleSize,
+                  onTap: openDetails,
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1382,49 +1385,58 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String? categoryLabel;
   final String title;
   final double titleSize;
+  final VoidCallback? onTap;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
     required this.title,
     required this.titleSize,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
-              Text(
-                categoryLabel!.trim().toUpperCase(),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppDesign.secondaryText,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.3,
-                    ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontSize: titleSize,
-                    height: 1.05,
-                    fontWeight: FontWeight.w800,
-                    color: AppDesign.primaryDark,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
+                  Text(
+                    categoryLabel!.trim().toUpperCase(),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppDesign.secondaryText,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.3,
+                        ),
                   ),
+                  const SizedBox(height: 8),
+                ],
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontSize: titleSize,
+                        height: 1.05,
+                        fontWeight: FontWeight.w800,
+                        color: AppDesign.primaryDark,
+                      ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
