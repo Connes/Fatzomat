@@ -31,14 +31,12 @@ void main() {
     expect(recipe, isNot(contains("'Für diesen Tag festlegen'")));
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
-    expect(recipe, contains("label: const Text('Als gekocht markieren')"));
-    expect(recipe, contains("if (widget.canMarkCooked && steps.isNotEmpty && completedSteps.contains(steps.length - 1))"));
-    expect(
-      recipe.indexOf("completedSteps.contains(steps.length - 1)"),
-      lessThan(recipe.indexOf("label: const Text('Als gekocht markieren')")),
-    );
+    expect(recipe, contains("label: const Text('Rezept und Tagesaufgabe abschließen')"));
+    expect(recipe, contains("widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length"));
+    expect(recipe, contains("completedSteps.length == steps.length"));
+    expect(recipe, contains("bottomNavigationBar: widget.canMarkCooked"));
     final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
-    expect(bottomNavigation, isNot(contains('widget.canMarkCooked')));
+    expect(bottomNavigation, contains('widget.canMarkCooked'));
     expect(recipe, isNot(contains("if (personalTodaySelected || widget.viewingTodaySelection) ...[")));
     expect(recipe, contains("final bool viewingTodaySelection"));
     expect(recipe, contains("actions: widget.viewingTodaySelection ? null : ["));
