@@ -12,9 +12,9 @@ void main() {
     expect(source, contains("title: const Text('Zutaten'"));
     expect(source, contains("title: const Text('Zubereitung'"));
     expect(source, contains('final nextStep = i == completedSteps.length;'));
-    expect(source, contains('final canToggle = personalTodaySelected &&'));
+    expect(source, contains('final canToggle = widget.viewingTodaySelection &&'));
     expect(source, contains('(done && i == completedSteps.length - 1)'));
-    expect(source, contains('&& !done && nextStep'));
+    expect(source, contains('(!done && nextStep)'));
     expect(source, isNot(contains('Icons.soup_kitchen_rounded')));
     expect(source, isNot(contains("Schritten erledigt")));
     expect(source, isNot(contains("Für heute festlegen")));
