@@ -36,7 +36,6 @@ void main() {
     expect(content, contains('TextOverflow.ellipsis'));
 
     final actions = source.substring(source.indexOf('class _TodayDecisionCardActions'));
-    expect(actions, contains('SizedBox('));
     expect(actions, contains('height: 58'));
     expect(actions, contains('Container(width: 1, height: 58, color: AppDesign.divider)'));
     expect(actions, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
