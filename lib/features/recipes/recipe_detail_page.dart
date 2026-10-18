@@ -559,7 +559,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         ],
                       ),
                     )
-                  : TextButton.icon(
+                  : FilledButton.icon(
                       onPressed: working ? null : markCooked,
                       icon: const Icon(Icons.check_circle_outline_rounded),
                       label: const Text('Als gekocht abschließen'),
