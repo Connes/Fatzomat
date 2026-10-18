@@ -43,7 +43,9 @@ void main() {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(page, contains('_items.any((item) => item.planId == plan.id)'));
-    expect(page, contains('_selected.removeWhere((key) => !activeKeys.contains(key))'));
+    expect(page, contains('_selected.removeWhere((key) =>'));
+    expect(page, contains('!_isDayCompleted(day)'));
+    expect(page, contains('onChanged: _isDayCompleted(day)'));
     expect(page, contains("'\${selectedDays.length} von \${activeDays.length} Tagen ausgewählt'"));
     expect(page, contains('await load(showLoading: false);'));
     expect(page, contains('_isDayCompleted(day)'));
