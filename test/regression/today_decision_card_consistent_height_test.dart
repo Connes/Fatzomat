@@ -8,10 +8,6 @@ void main() {
 
     expect(today, contains('double _todayDecisionCardHeight(BuildContext context)'));
     expect(today, contains('height: _todayDecisionCardHeight(context)'));
-    expect(
-      'height: _todayDecisionCardHeight(context)',
-      isNotEmpty,
-    );
     final decisionCardStart = today.indexOf('class _TodayDecisionCard extends StatelessWidget');
     final resultCardStart = today.indexOf('class _TodayResultCard extends StatelessWidget');
     final choiceCardStart = today.indexOf('class _TodayChoiceImage extends StatelessWidget');
@@ -23,6 +19,8 @@ void main() {
     final resultCard = today.substring(resultCardStart, choiceCardStart);
     expect(decisionCard, contains('height: _todayDecisionCardHeight(context)'));
     expect(resultCard, contains('height: _todayDecisionCardHeight(context)'));
-    expect(resultCard, contains('mainAxisAlignment: MainAxisAlignment.spaceBetween'));
+    expect(resultCard, contains('_TodayDecisionCardHeader('));
+    expect(resultCard, contains('Expanded('));
+    expect(resultCard, contains('_TodayDecisionCardActions('));
   });
 }

@@ -30,11 +30,12 @@ void main() {
     expect(today, contains("'HEUTE KOCHEN'"));
     expect(today, contains("'HEUTE ESSEN GEHEN'"));
     expect(today, contains("'order' => plan.decisionValue?.trim().isNotEmpty == true"));
-    expect(today, contains("if (plan.decisionType != 'order') ...["));
-    expect(today, contains('height: 190,\n                          child: Center('));
-    expect(today, contains('Text(\n                              title,'));
+    expect(today, contains('_TodayDecisionCardHeader('));
+    expect(today, contains('_TodayDecisionCardContent('));
+    expect(today, contains('_TodayDecisionCardActions('));
+    expect(today, contains('height: _todayDecisionCardHeight(context)'));
     expect(today, isNot(contains("label: const Text('Lieferdienste')")));
-    expect(today, contains("if (plan.decisionType == 'order')"));
+    expect(today, contains("plan.decisionType == 'order'"));
     expect(today, contains('DeliveryServicesPage'));
     expect(today, contains('FoodChoiceAssetService.assetFor('));
     expect(today, contains("onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'"));

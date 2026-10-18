@@ -12,13 +12,33 @@ void main() {
     expect(action, contains('await load()'));
   });
 
-  test('order title is centered and lower dividers meet', () {
+  test('decision card has fixed header and action sections with flexible content', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final card = source.substring(source.indexOf('class _TodayResultCard'));
-    expect(card, contains('height: 190,\n                          child: Center('));
+    expect(card, contains('height: _todayDecisionCardHeight(context)'));
+    expect(card, contains('_TodayDecisionCardHeader('));
+    expect(card, contains('Expanded('));
+    expect(card, contains('_TodayDecisionCardContent('));
     expect(card, contains('_TodayDecisionCardActions('));
-    expect(source, contains('height: 58,\n            child: Row('));
-    expect(source, contains('Container(width: 1, height: 58, color: AppDesign.divider)'));
-    expect(card, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
+    expect(card, contains('height: 180'));
+
+    final header = source.substring(
+      source.indexOf('class _TodayDecisionCardHeader'),
+      source.indexOf('class _TodayDecisionCardContent'),
+    );
+    expect(header, contains('modeLabel'));
+    expect(header, contains('child: image'));
+
+    final content = source.substring(
+      source.indexOf('class _TodayDecisionCardContent'),
+      source.indexOf('class _TodayDecisionCardActions'),
+    );
+    expect(content, contains('maxLines: 2'));
+    expect(content, contains('TextOverflow.ellipsis'));
+
+    final actions = source.substring(source.indexOf('class _TodayDecisionCardActions'));
+    expect(actions, contains('height: 58'));
+    expect(actions, contains('Container(width: 1, height: 58, color: AppDesign.divider)'));
+    expect(actions, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
   });
 }
