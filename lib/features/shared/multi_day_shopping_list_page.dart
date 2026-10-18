@@ -141,10 +141,14 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       setState(() {
         _plans = plans;
         _items = items;
-        final activeKeys = _activeDays.map(_key).toSet();
-        _selected.removeWhere((key) => !activeKeys.contains(key));
-        if (!_selected.any(activeKeys.contains) && activeKeys.isNotEmpty) {
-          _selected.add(activeKeys.first);
+        final activeDays = _activeDays;
+        final activeKeys = activeDays.map(_key).toSet();
+        _selected.removeWhere((key) =>
+            !activeKeys.contains(key) ||
+            activeDays.any((day) => _key(day) == key && _isDayCompleted(day)));
+        if (_selected.isEmpty && activeDays.isNotEmpty) {
+          final firstIncompleteDay = activeDays.where((day) => !_isDayCompleted(day));
+          _selected.add(_key(firstIncompleteDay.isNotEmpty ? firstIncompleteDay.first : activeDays.first));
         }
         _expanded.removeWhere((key) => !activeKeys.contains(key));
         // Completed days must collapse immediately, including when the user
