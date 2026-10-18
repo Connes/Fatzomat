@@ -1209,6 +1209,11 @@ class _TodayResultCard extends StatelessWidget {
       'dine_out' => 'HEUTE ESSEN GEHEN',
       _ => 'HEUTE KOCHEN',
     };
+    final categoryLabel = switch (plan.decisionType) {
+      'order' => null,
+      'dine_out' => plan.restaurantCuisine,
+      _ => plan.isRecipe ? 'REZEPT' : 'ÜBERRASCHUNG',
+    };
     final title = switch (plan.decisionType) {
       'order' => plan.decisionValue?.trim().isNotEmpty == true
           ? plan.decisionValue!.trim()
@@ -1218,170 +1223,193 @@ class _TodayResultCard extends StatelessWidget {
           : (plan.restaurantCuisine ?? plan.displayTitle),
       _ => plan.displayTitle,
     };
+    final image = plan.isRecipe
+        ? (plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
+            ? Image.network(
+                plan.imageUrl!,
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Image.asset(
+                  'assets/together/clean/background/recipe_detail_background.png',
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              )
+            : Image.asset(
+                'assets/together/clean/background/recipe_detail_background.png',
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ))
+        : plan.decisionType == 'order'
+            ? Image.asset(
+                FoodChoiceAssetService.assetFor(
+                      FoodMode.order,
+                      plan.decisionValue ?? '',
+                    ) ??
+                    'assets/together/clean/icons/icon_delivery.png',
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              )
+            : Image.asset(
+                FoodChoiceAssetService.assetFor(
+                      FoodMode.dineOut,
+                      plan.restaurantCuisine ?? '',
+                    ) ??
+                    'assets/together/clean/icons/icon_restaurant.png',
+                height: 180,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              );
 
     return SizedBox(
       height: _todayDecisionCardHeight(context),
       child: Card(
-      color: AppDesign.surface.withValues(alpha: 0.97),
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          width >= 700 ? 28 : 18,
-          18,
-          width >= 700 ? 28 : 18,
-          10,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
+        color: AppDesign.surface.withValues(alpha: 0.97),
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            width >= 700 ? 28 : 18,
+            18,
+            width >= 700 ? 28 : 18,
+            10,
+          ),
+          child: Column(
+            children: [
+              _TodayDecisionCardHeader(
+                modeLabel: modeLabel,
+                image: image,
                 onTap: plan.status == 'cooked'
                     ? null
                     : plan.decisionType == 'order' || plan.decisionType == 'dine_out'
                         ? onOpenOrder
                         : onOpenRecipe,
-                borderRadius: BorderRadius.circular(22),
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Column(
-                    children: [
-                      Text(
-                        modeLabel,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: AppDesign.secondaryText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.3,
-                            ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (plan.isRecipe) ...[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(22),
-                          child: plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
-                              ? Image.network(
-                                  plan.imageUrl!,
-                                  height: 180,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Image.asset(
-                                    'assets/together/clean/background/recipe_detail_background.png',
-                                    height: 180,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : Image.asset(
-                                  'assets/together/clean/background/recipe_detail_background.png',
-                                  height: 180,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
-                      ] else if (plan.decisionType == 'order') ...[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(22),
-                          child: Image.asset(
-                            FoodChoiceAssetService.assetFor(
-                                  FoodMode.order,
-                                  plan.decisionValue ?? '',
-                                ) ??
-                                'assets/together/clean/icons/icon_delivery.png',
-                            height: 180,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ] else if (plan.decisionType == 'dine_out') ...[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(22),
-                          child: Image.asset(
-                            FoodChoiceAssetService.assetFor(
-                                  FoodMode.dineOut,
-                                  plan.restaurantCuisine ?? '',
-                                ) ??
-                                'assets/together/clean/icons/icon_restaurant.png',
-                            height: 180,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 14),
-                      if (plan.decisionType != 'order') ...[
-                        Text(
-                          (plan.decisionType == 'dine_out'
-                                  ? plan.restaurantCuisine
-                                  : plan.isRecipe
-                                      ? 'REZEPT'
-                                      : 'ÜBERRASCHUNG')
-                              ?.trim()
-                              .toUpperCase() ?? '',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                color: AppDesign.secondaryText,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.3,
-                              ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      if (plan.decisionType == 'order')
-                        SizedBox(
-                          height: 190,
-                          child: Center(
-                            child: Text(
-                              title,
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                fontSize: titleSize,
-                                height: 1.05,
-                                fontWeight: FontWeight.w800,
-                                color: AppDesign.primaryDark,
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            title,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              fontSize: titleSize,
-                              height: 1.05,
-                              fontWeight: FontWeight.w800,
-                              color: AppDesign.primaryDark,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+              ),
+              Expanded(
+                child: _TodayDecisionCardContent(
+                  categoryLabel: categoryLabel,
+                  title: title,
+                  titleSize: titleSize,
+                  isOrder: plan.decisionType == 'order',
                 ),
               ),
-            ),
-            _TodayDecisionCardActions(
-              isCompleted: plan.status == 'cooked',
-              onShare: onShare,
-              onCancel: onCancel,
-            ),
-          ],
+              _TodayDecisionCardActions(
+                isCompleted: plan.status == 'cooked',
+                onShare: onShare,
+                onCancel: onCancel,
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
 }
 
+
+class _TodayDecisionCardHeader extends StatelessWidget {
+  final String modeLabel;
+  final Widget image;
+  final VoidCallback? onTap;
+
+  const _TodayDecisionCardHeader({
+    required this.modeLabel,
+    required this.image,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                modeLabel,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: AppDesign.secondaryText,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.3,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: image,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TodayDecisionCardContent extends StatelessWidget {
+  final String? categoryLabel;
+  final String title;
+  final double titleSize;
+  final bool isOrder;
+
+  const _TodayDecisionCardContent({
+    required this.categoryLabel,
+    required this.title,
+    required this.titleSize,
+    required this.isOrder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
+              Text(
+                categoryLabel!.trim().toUpperCase(),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: AppDesign.secondaryText,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.3,
+                    ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    fontSize: titleSize,
+                    height: 1.05,
+                    fontWeight: FontWeight.w800,
+                    color: AppDesign.primaryDark,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _TodayDecisionCardActions extends StatelessWidget {
   final bool isCompleted;
