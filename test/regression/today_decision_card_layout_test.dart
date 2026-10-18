@@ -28,8 +28,8 @@ void main() {
     expect(header, contains('modeLabel'));
     expect(header, contains('child: image'));
     expect(content, contains('categoryLabel'));
-    expect(content, contains('final VoidCallback? onTap;'));
-    expect(content, contains('onTap: onTap'));
+    expect(content, isNot(contains('onTap:')));
+    expect(header, isNot(contains('onTap:')));
     expect(content, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
     expect(content, contains('Expanded('));
     expect(content, contains('child: Center('));
