@@ -403,7 +403,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           const SizedBox(height: 18),
           AppSurface(
             padding: EdgeInsets.zero,
-            child: ExpansionTile(
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+              clipBehavior: Clip.antiAlias,
+              child: ExpansionTile(
               initiallyExpanded: false,
               onExpansionChanged: (expanded) => setState(() => ingredientsExpanded = expanded),
               title: const Text('Zutaten', style: TextStyle(fontWeight: FontWeight.w800)),
@@ -437,12 +441,17 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   )),
                 ]),
               ],
+              ),
             ),
           ),
           const SizedBox(height: 18),
           AppSurface(
             padding: EdgeInsets.zero,
-            child: ExpansionTile(
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+              clipBehavior: Clip.antiAlias,
+              child: ExpansionTile(
               initiallyExpanded: false,
               onExpansionChanged: (expanded) => setState(() => preparationExpanded = expanded),
               title: const Text('Zubereitung', style: TextStyle(fontWeight: FontWeight.w800)),
@@ -528,6 +537,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   );
                 }),
               ],
+              ),
             ),
           ),
         ],
