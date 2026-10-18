@@ -23,6 +23,9 @@ void main() {
     expect(savedSource, contains("label: const Text('Auswählen')"));
     expect(savedSource, contains('PersonalTodayRepository'));
     expect(savedSource, contains('personalToday.selectRecipeForToday'));
+    expect(savedSource, contains("confirmLabel: 'Bestätigen'"));
+    expect(savedSource, contains("this.confirmLabel = 'Zur Einkaufsliste'"));
+    expect(savedSource, contains('child: Text(widget.confirmLabel)'));
     expect(savedSource, isNot(contains('_ensureConnectionForToday')));
     expect(savedSource, contains('if (widget.onNavigateToTab != null)'));
     expect(savedSource, contains('widget.onNavigateToTab!(0);'));
