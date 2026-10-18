@@ -1407,6 +1407,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
+                const SizedBox(height: 16),
                 Text(
                   categoryLabel!.trim().toUpperCase(),
                   textAlign: TextAlign.center,
