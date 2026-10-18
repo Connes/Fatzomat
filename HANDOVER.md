@@ -72,44 +72,22 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Vor destruktiven Live-Datenbankänderungen oder risikoreichen Aktionen sorgfältig prüfen und bei wesentlichem Risiko vorher Rücksprache halten.
 - Migrationen versioniert und nachvollziehbar halten.
 
-## Zuletzt verifizierter Repository-Stand
+## Aktueller Repository-Stand (geprüft 2026-10-18)
 
-- `main` steht beim Prüfen auf Merge-Commit `6948ac1de7d2a8836d480c048440f347361d2681` (`style: polish Today decide-you action (#177)`), gemergt am 2026-10-17.
-- PR #170 aktualisierte diese Übergabe; PR #171 entfernte historische Markdown-Changelogs und einmalige Berichte.
-- PR #175 ergänzte verbindliche Merge-Gates und Statuspflege.
-- PR #176 ist gemergt: Restaurantkategorien wurden ergänzt; der separate untere ChatGPT-Suchbutton wurde entfernt, die direkte Suche über die Kategorie bleibt Bestandteil des Flows.
-- PR #177 ist gemergt: Der CTA „Entscheide Du“ auf der Heute-Seite wurde visuell überarbeitet; Regressionserwartungen wurden an die tappbare Fläche angepasst.
-- Die vorherigen PRs #172 und #173 wurden nicht gemergt; ihre überarbeiteten Nachfolger #176 und #177 wurden auf aktualisierter Basis gemergt.
-- Die GitHub-Schnittstelle liefert für `6948ac1de7d2a8836d480c048440f347361d2681` aktuell weder Combined-Statuschecks noch Workflow-Runs. CI ist deshalb **nicht verifiziert grün**. Vor weiteren Merges erneut direkt prüfen.
-- Die GitHub-Suche lieferte keine offenen Issues oder Pull Requests; wegen der bekannten Einschränkungen der Suchschnittstelle sollte dies vor der nächsten Änderung erneut geprüft werden.
-- Supabase-Live-Status wurde nicht geprüft. Keine Annahmen über aktive Migrationen oder Deployment-Versionen treffen.
+- `main` steht auf `6a1ba4dbe6c31284ff5d8229bb50b111912ca469`: [Fix shopping list checkbox ink rendering (#221)](https://github.com/Connes/Fatzomat/pull/221).
+- Letzte Änderung: Die zusammengefasste Einkaufsliste erhält eine transparente `Material`-Ebene, damit Checkbox-Taps und Ink-Effekte korrekt dargestellt werden.
+- Bei der Live-Prüfung wurden keine offenen Pull Requests gefunden.
+- Für den aktuellen Main-Commit lieferte GitHub keine Statuschecks und keine Workflow-Runs. Post-Merge-CI ist daher **nicht als erfolgreich verifiziert**.
+- Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
 
 ## Nächster Schritt
 
-1. Bei der nächsten Sitzung `main`, offene PRs und CI erneut live prüfen.
-2. Vor einer neuen Funktion einen aktuellen Code-/Testbefund als nächsten Arbeitspunkt festlegen; alte Feature-Branches sind stark hinter `main` und dürfen nicht ungeprüft wiederverwendet werden.
-3. Rezeptbild-Upload und signierte Storage-URLs nur dann weiter untersuchen, wenn die Funktion im aktuellen Code noch relevant ist oder ein reproduzierbarer Fehler vorliegt.
+1. Zu Beginn jeder Sitzung `main`, offene PRs und CI live erneut prüfen.
+2. Nur die letzte aktuelle Änderung in diesem Dokument zusammenfassen. Historische PR-Listen und alte Sitzungsberichte gehören nicht hierher.
+3. Den nächsten Arbeitspunkt aus einem aktuellen Code-/Testbefund ableiten; alte Feature-Branches nicht ungeprüft wiederverwenden.
 
 ## Technische Orientierung
 
 - Für Tests und Regressionen die bestehenden Testmuster unter `test/` verwenden.
 - Supabase-Migrationen liegen im Repository unter `supabase/migrations/`; Live-Anwendung und Funktionsdefinitionen müssen separat geprüft werden.
 - Relevante dauerhafte Setup-, Sicherheits-, Test- und Release-Dokumentation liegt unter `docs/`. Diese Dokumente nicht durch historische Einzelberichte ersetzen.
-
-
-## Abgeschlossen (2026-10-18)
-
-- PR [#199](https://github.com/Connes/Fatzomat/pull/199) wurde nach erfolgreichen Checks auf dem aktuellen PR-Head gemergt. Der Aktionsbereich der Heute-Entscheidungskarte ist in `_TodayDecisionCardActions` extrahiert; Teilen/Entfernen und der Erledigt-Zustand bleiben erhalten.
-- Merge-Commit: `eef7709d4543c5ba3e119da4cc01681662528538`.
-- PR-CI für den geprüften Head `899f691cb8ef5e228283d2585b88244ab6cc2020`: Test, Analyze und Repository-Quality-Job erfolgreich. Post-Merge-CI auf dem Merge-Commit ist noch separat zu prüfen; keine Geräteprüfung durchgeführt.
-
-- PR [#200](https://github.com/Connes/Fatzomat/pull/200) wurde gemergt: Die Heute-Entscheidungskarte hat jetzt einen festen Kopf- und Aktionsbereich sowie flexiblen Inhalt; lange Titel werden auf zwei Zeilen begrenzt. Merge-Commit: `71f3b1608455c3b45d70d700da778def3745c7cd`. Die PR-CI für Head `61a500838b62682f546173f455d6c6d06cc42513` war erfolgreich (Repository-Quality, Tests und Analyze). Für den Merge-Commit lieferte die verfügbare GitHub-Schnittstelle keine Workflow-Runs und keine Statuschecks; Post-Merge-CI ist daher nicht als grün verifiziert. Keine Geräteprüfung durchgeführt.
-
-- PR [#201](https://github.com/Connes/Fatzomat/pull/201) wurde nach erfolgreichen PR-Checks gemergt. Die vier Heute-Entscheidungsmöglichkeiten sind in einer eigenen Fläche gruppiert; „Entscheide Du“ hat eine separate Fläche darunter. Die Kartenhöhe wurde entsprechend erweitert und ein Regressionstest ergänzt. Merge-Commit: `7788c6b98bcdbcba56f98026299a0551e258951b`. PR-CI für Head `592a52776a3b2d4d1ef64d765944daac1967b388`: Test, Analyze und Repository-Quality erfolgreich. Für den Merge-Commit meldet die verfügbare GitHub-Schnittstelle keine Workflow-Runs oder Statuschecks; Post-Merge-CI ist damit nicht bestätigt. Keine Geräteprüfung durchgeführt.
-
-
-- PR [#202](https://github.com/Connes/Fatzomat/pull/202) wurde nach erfolgreichen CI-Prüfungen auf dem exakten PR-Head gemergt. Der Titel der Heute-Entscheidung öffnet jetzt wie das Bild dasselbe Ziel; im Ablauf „Für heute auswählen“ heißt der Button „Bestätigen“, während der Einkaufslisten-Ablauf „Zur Einkaufsliste“ beibehält. Regressionstests ergänzt.
-- Merge-Commit und aktueller main: 6eb873943255c013a40bc3fe2fcea77a5431dc29. PR-CI auf Head f420a55b99a9d5b00386e3e6ab1f38d47a5cb2ac: Flutter quality gate, Analyze und Test erfolgreich. Die GitHub-Schnittstelle meldet für den Merge-Commit derzeit noch keine Post-Merge-Workflow-Runs oder Statuschecks; deshalb ist Post-Merge-CI noch nicht als grün verifiziert. Keine Geräteprüfung durchgeführt.
-
-
-- PR für die Ausrichtung des Heute-Karteninhalts vorbereitet: Kategorie bleibt am oberen Rand des mittleren Bereichs; der Titel wird im verbleibenden Platz vertikal zentriert, sodass ein- und zweizeilige Titel ausgeglichen wirken. Regressionstest ergänzt. Geräteprüfung bleibt ausstehend.
