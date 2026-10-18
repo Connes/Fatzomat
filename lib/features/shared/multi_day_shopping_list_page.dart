@@ -325,6 +325,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       for (final day in selectedDays)
         ..._plansFor(day).where((plan) => plan.isRecipe).map((plan) => plan.id),
     };
+    // The aggregate list is independent of the day ExpansionTiles. Hide it
+    // when every selected day is completed and collapsed; reopening a completed
+    // day header makes the saved ingredients visible again.
+    final shouldShowAggregatedList = selectedDays.isEmpty || selectedDays.any(
+      (day) => !_isDayCompleted(day) || _expanded.contains(_key(day)),
+    );
     final visibleItems = _items
         .where((item) => selectedPlanIds.contains(item.planId))
         .toList(growable: false);
@@ -518,8 +524,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                               ),
                             ),
                           ),
-                        const SizedBox(height: 6),
-                        AppSurface(
+                        if (shouldShowAggregatedList) ...[
+                          const SizedBox(height: 6),
+                          AppSurface(
                           color: AppDesign.surface,
                           bordered: false,
                           padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
@@ -692,7 +699,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 ],
                             ],
                           ),
-                        ),
+                          ),
+                        ],
                       ],
                     ],
                   ),
