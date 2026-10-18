@@ -32,4 +32,20 @@ void main() {
     expect(content, contains('TextOverflow.ellipsis'));
     expect(actions, contains('height: 58'));
   });
+
+  test('Today decision choices and partner action have separate surfaces', () {
+    final source = File('lib/features/shared/today_page.dart').readAsStringSync();
+    final start = source.indexOf('class _TodayDecisionCard extends StatelessWidget');
+    final end = source.indexOf('class _TodayResultCard extends StatelessWidget', start);
+    expect(start, isNonNegative);
+    expect(end, greaterThan(start));
+    final card = source.substring(start, end);
+
+    expect(card, contains('The four decision modes live together in their own surface.'));
+    expect(card, contains('GridView.count('));
+    expect(card, contains('The partner-decision action is visually separated from the grid.'));
+    expect(card, contains("'Entscheide Du'"));
+    expect(card, contains('const SizedBox(height: 12)'));
+    expect(source, contains('gridHeight + 16 + 76 + 20 + 8 + 28'));
+  });
 }
