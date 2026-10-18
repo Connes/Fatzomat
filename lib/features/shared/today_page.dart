@@ -1233,7 +1233,7 @@ class _TodayResultCard extends StatelessWidget {
       _ => 'HEUTE KOCHEN',
     };
     final categoryLabel = switch (plan.decisionType) {
-      'order' => null,
+      'order' => 'WÄHLE DEIN LIEFERDIENST',
       'dine_out' => plan.restaurantCuisine,
       _ => plan.isRecipe ? 'REZEPT' : 'ÜBERRASCHUNG',
     };
