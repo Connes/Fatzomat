@@ -16,7 +16,9 @@ void main() {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final card = source.substring(source.indexOf('class _TodayResultCard'));
     expect(card, contains('height: 190,\n                          child: Center('));
-    expect(card, contains('height: 58,\n                      color: AppDesign.divider,'));
+    expect(card, contains('_TodayDecisionCardActions('));
+    expect(source, contains('height: 58,\n            child: Row('));
+    expect(source, contains('Container(width: 1, height: 58, color: AppDesign.divider)'));
     expect(card, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
   });
 }
