@@ -147,6 +147,11 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           _selected.add(activeKeys.first);
         }
         _expanded.removeWhere((key) => !activeKeys.contains(key));
+        // Completed days must collapse immediately, including when the user
+        // checks the final item while that day's list is currently open.
+        _expanded.removeWhere((key) => _activeDays.any(
+              (day) => _key(day) == key && _isDayCompleted(day),
+            ));
         // Initially open the first day that still needs shopping. Completed
         // days stay collapsed after reload and can be opened manually by
         // tapping their day header.
