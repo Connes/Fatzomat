@@ -32,7 +32,7 @@ void main() {
     expect(recipe, contains('final bool canMarkCooked'));
     expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
     expect(recipe, contains("label: const Text('Rezept und Tagesaufgabe abschließen')"));
-    expect(recipe, contains("if (widget.canMarkCooked && steps.isNotEmpty && completedSteps.contains(steps.length - 1))"));
+    expect(recipe, contains("widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length"));
     expect(recipe, contains("completedSteps.length == steps.length"));
     expect(recipe, contains("bottomNavigationBar: widget.canMarkCooked"));
     final bottomNavigation = recipe.substring(recipe.indexOf('bottomNavigationBar:'));
