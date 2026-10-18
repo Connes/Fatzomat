@@ -14,8 +14,10 @@ void main() {
 
     final header = source.substring(headerStart, contentStart);
     final content = source.substring(contentStart, actionsStart);
+    final card = source.substring(source.indexOf('class _TodayResultCard'), headerStart);
     expect(header, contains('fontSize: 18,'));
-    expect(header, contains('height: 180'));
+    expect(header, contains('child: image'));
+    expect(card, contains('height: 180'));
     expect(content, contains('maxLines: 2'));
     expect(content, contains('TextOverflow.ellipsis'));
   });
