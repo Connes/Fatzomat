@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('home decision button has extra height to avoid compact-screen overflow', () {
+  test('home decision button uses compact height to avoid compact-screen overflow', () {
     final home = File('lib/features/home/home_page.dart').readAsStringSync();
-    expect(home, contains('const ctaHeight = 72.0;'));
+    expect(home, contains('const ctaHeight = 56.0;'));
     expect(home, contains('final groupHeight = welcomeHeight + gridHeight + ctaGap + ctaHeight;'));
   });
 
