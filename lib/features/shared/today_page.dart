@@ -763,7 +763,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                              }
                                            }
                                            try {
-                                             await repo.removeTodayPlan(plan!.id);
+                                             final completed = await repo.updateStatus(plan!.id, 'cooked');
+                                             if (!completed) {
+                                               throw StateError('Die Tagesentscheidung konnte nicht abgeschlossen werden.');
+                                             }
                                              RecipeCollectionEvents.notifyChanged();
                                              if (mounted) await load();
                                            } catch (error) {
@@ -1327,27 +1330,45 @@ class _TodayResultCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                       ],
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          title,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      if (plan.decisionType == 'order')
+                        SizedBox(
+                          height: 190,
+                          child: Center(
+                            child: Text(
+                              title,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                fontSize: titleSize,
+                                height: 1.05,
+                                fontWeight: FontWeight.w800,
+                                color: AppDesign.primaryDark,
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
                               fontSize: titleSize,
                               height: 1.05,
                               fontWeight: FontWeight.w800,
                               color: AppDesign.primaryDark,
                             ),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
             Divider(height: 1, thickness: 1, color: AppDesign.divider),
             if (plan.status == 'cooked')
               Padding(
@@ -1385,7 +1406,7 @@ class _TodayResultCard extends StatelessWidget {
                     ),
                     Container(
                       width: 1,
-                      height: 30,
+                      height: 58,
                       color: AppDesign.divider,
                     ),
                     Expanded(

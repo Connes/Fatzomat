@@ -10,6 +10,7 @@ void main() {
     expect(card, contains('height: 180,'));
     expect(card, contains("if (plan.decisionType != 'order')"));
     expect(card, contains('padding: const EdgeInsets.only(top: 8)'));
-    expect(card, contains('const SizedBox(height: 8),'));
+    expect(card, contains('height: 190,\n                          child: Center('));
+    expect(card, contains('height: 58,\n                      color: AppDesign.divider,'));
   });
 }
