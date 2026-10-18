@@ -91,6 +91,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
+  // The detail page can be opened from Today or from the saved-recipe list.
+  // In either case, the currently selected recipe for today may be completed.
+  // Never expose completion for a future-dated plan.
+  bool get _canMarkCooked =>
+      (widget.canMarkCooked || personalTodaySelected) && _isPlanDateToday;
+
   double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 12).toDouble();
   String formatQuantity(double value) => value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(value < 10 ? 1 : 0);
   String difficulty(String value) => switch (value) { 'easy' => 'Einfach', 'medium' => 'Mittel', 'hard' => 'Aufwendig', _ => value };
@@ -140,7 +146,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   }
 
   Future<void> markCooked() async {
-    if (!widget.canMarkCooked || working) return;
+    if (!_canMarkCooked || working) return;
     // Never allow a future-dated detail route to complete today's plan by
     // accident when the same recipe happens to be selected for both dates.
     if (!_isPlanDateToday) {
@@ -542,7 +548,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           ),
         ],
       ),
-      bottomNavigationBar: widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length
+      bottomNavigationBar: _canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length
           ? SafeArea(
               minimum: const EdgeInsets.fromLTRB(20, 10, 20, 12),
               child: cookedMarked
