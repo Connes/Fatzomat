@@ -318,8 +318,11 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   Widget build(BuildContext context) {
     final activeDays = _activeDays;
     final activeKeys = activeDays.map(_key).toSet();
+    // Completed shopping lists are no longer selectable for the open aggregate.
+    // Their saved recipes remain visible in the day section, but their items
+    // must not be counted or shown among ingredients still to buy.
     final selectedDays = activeDays
-        .where((day) => _selected.contains(_key(day)))
+        .where((day) => _selected.contains(_key(day)) && !_isDayCompleted(day))
         .toList(growable: false);
     final selectedPlanIds = <String>{
       for (final day in selectedDays)
@@ -465,15 +468,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                   }
                                 }),
                                 leading: Checkbox(
-                                  value: _selected.contains(_key(day)),
+                                  value: !_isDayCompleted(day) && _selected.contains(_key(day)),
                                   activeColor: AppDesign.primaryDark,
-                                  onChanged: (value) => setState(() {
-                                    if (value == true) {
-                                      _selected.add(_key(day));
-                                    } else {
-                                      _selected.remove(_key(day));
-                                    }
-                                  }),
+                                  onChanged: _isDayCompleted(day)
+                                      ? null
+                                      : (value) => setState(() {
+                                            if (value == true) {
+                                              _selected.add(_key(day));
+                                            } else {
+                                              _selected.remove(_key(day));
+                                            }
+                                          }),
                                 ),
                                 title: Text(
                                   _dayTitle(day),
