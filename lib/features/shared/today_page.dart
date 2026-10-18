@@ -61,7 +61,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   double _dragOffset = 0;
   DateTime _lastObservedDay = DateTime.now();
   Timer? _dayBoundaryTimer;
-  List<TodayPlan> completedPlans = const [];
   bool loading = true;
   int _loadGeneration = 0;
   Object? loadError;
@@ -213,12 +212,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     try {
       final selectedPlan = await repo.todayPlan(date: requestedDate);
       DecisionShare? pendingShare;
-      List<TodayPlan> completed = const [];
-      try {
-        if (_isSelectedDateToday) completed = await repo.completedTodayPlans();
-      } catch (_) {
-        // Completed history must not block the current decision card.
-      }
       try {
         pendingShare = await _collaborationRepository.pendingDecisionShareForDate(requestedDate);
         final connection = await _collaborationRepository.connectionInfo();
@@ -230,7 +223,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
       setState(() {
         _displayedDate = requestedDate;
         plan = selectedPlan;
-        completedPlans = completed;
         loading = false;
         loadError = null;
         _pendingDecisionShare = pendingShare;
@@ -794,10 +786,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                   : null,
                             ),
                     ),
-                    if (_pendingDecisionShare == null && completedPlans.isNotEmpty) ...[
-                      const SizedBox(height: 22),
-                      _CompletedTodayDecisions(plans: completedPlans),
-                    ],
                   ],
                     ),
                   ),
@@ -2160,68 +2148,6 @@ class _ShoppingItemDialogState extends State<_ShoppingItemDialog> {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
         FilledButton(onPressed: submit, child: Text(editing ? 'Speichern' : 'Hinzufügen')),
       ],
-    );
-  }
-}
-class _CompletedTodayDecisions extends StatelessWidget {
-  final List<TodayPlan> plans;
-  const _CompletedTodayDecisions({required this.plans});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 560),
-      child: AppSurface(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(AppDesign.radiusXl),
-          clipBehavior: Clip.antiAlias,
-          child: Theme(
-            data: theme.copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-            initiallyExpanded: false,
-            tilePadding: const EdgeInsets.symmetric(horizontal: 4),
-            childrenPadding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
-            leading: const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
-            title: Text(
-              'Heute bereits erledigt',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: AppDesign.primaryDark,
-                fontWeight: FontWeight.w800,
-                letterSpacing: .3,
-              ),
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('${plans.length}', style: theme.textTheme.labelLarge),
-                const SizedBox(width: 8),
-                const Icon(Icons.expand_more_rounded),
-              ],
-            ),
-              children: plans.map((item) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-                leading: const Icon(Icons.done_rounded, color: AppDesign.secondaryText),
-                title: Text(
-                  item.displayTitle,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    decoration: TextDecoration.lineThrough,
-                    color: AppDesign.secondaryText,
-                  ),
-                ),
-                trailing: const Icon(
-                  Icons.check_circle_outline_rounded,
-                  size: 18,
-                  color: AppDesign.secondaryText,
-                ),
-              )).toList(),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
