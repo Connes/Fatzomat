@@ -20,13 +20,14 @@ void main() {
     expect(card, contains('Expanded('));
     expect(card, contains('_TodayDecisionCardContent('));
     expect(card, contains('_TodayDecisionCardActions('));
+    expect(card, contains('height: 180'));
 
     final header = source.substring(
       source.indexOf('class _TodayDecisionCardHeader'),
       source.indexOf('class _TodayDecisionCardContent'),
     );
-    expect(header, contains('height: 180'));
     expect(header, contains('modeLabel'));
+    expect(header, contains('child: image'));
 
     final content = source.substring(
       source.indexOf('class _TodayDecisionCardContent'),
