@@ -527,39 +527,37 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     ),
                   );
                 }),
-                if (widget.canMarkCooked && steps.isNotEmpty && completedSteps.contains(steps.length - 1)) ...[
-                  const SizedBox(height: 2),
-                  SizedBox(
-                    width: double.infinity,
-                    child: cookedMarked
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: AppDesign.secondarySurface,
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.check_circle_rounded, size: 20),
-                                SizedBox(width: 8),
-                                Text('Als gekocht markiert', style: TextStyle(fontWeight: FontWeight.w800)),
-                              ],
-                            ),
-                          )
-                        : OutlinedButton.icon(
-                            onPressed: working ? null : markCooked,
-                            icon: const Icon(Icons.check_circle_outline_rounded),
-                            label: const Text('Als gekocht markieren'),
-                          ),
-                  ),
-                ],
               ],
             ),
           ),
         ],
       ),
-      bottomNavigationBar: null,
+      bottomNavigationBar: widget.canMarkCooked && steps.isNotEmpty && completedSteps.length == steps.length
+          ? SafeArea(
+              minimum: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+              child: cookedMarked
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppDesign.secondarySurface,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text('Rezept und Tagesaufgabe abgeschlossen', style: TextStyle(fontWeight: FontWeight.w800)),
+                        ],
+                      ),
+                    )
+                  : FilledButton.icon(
+                      onPressed: working ? null : markCooked,
+                      icon: const Icon(Icons.check_circle_outline_rounded),
+                      label: const Text('Rezept und Tagesaufgabe abschließen'),
+                    ),
+            )
+          : null;
     );
   }
 }
