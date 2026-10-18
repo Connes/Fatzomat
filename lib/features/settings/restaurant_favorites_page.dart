@@ -26,7 +26,6 @@ class _RestaurantFavoritesPageState extends State<RestaurantFavoritesPage> {
   final _repository = RestaurantFavoritesRepository();
   List<Map<String, dynamic>> _favorites = const [];
   bool _loading = true;
-  bool _showAddPanel = false;
   Object? _error;
 
   @override
@@ -157,6 +156,50 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       AppFeedback.showSnackBar(context, 
         SnackBar(content: Text('ChatGPT konnte nicht geöffnet werden: $error')),
       );
+    }
+  }
+
+  Future<void> _showAddOptions() async {
+    if (widget.selectForToday) return;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Lieblingsrestaurant hinzufügen',
+                style: Theme.of(sheetContext).textTheme.titleLarge?.copyWith(
+                  color: AppDesign.text,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.pop(sheetContext, 'json'),
+                icon: const Icon(Icons.file_upload_outlined),
+                label: const Text('JSON-Datei importieren'),
+              ),
+              const SizedBox(height: 8),
+              FilledButton.icon(
+                onPressed: () => Navigator.pop(sheetContext, 'chatgpt'),
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Mit ChatGPT hinzufügen'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    if (choice == 'json') {
+      await _importFavoriteJson();
+    } else if (choice == 'chatgpt') {
+      await _addRestaurant();
     }
   }
 
@@ -349,9 +392,9 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
             ? null
             : [
                 IconButton(
-                  tooltip: _showAddPanel ? 'Hinzufügen schließen' : 'Lieblingsrestaurant hinzufügen',
-                  onPressed: () => setState(() => _showAddPanel = !_showAddPanel),
-                  icon: Icon(_showAddPanel ? Icons.close_rounded : Icons.add_rounded),
+                  tooltip: 'Lieblingsrestaurant hinzufügen oder importieren',
+                  onPressed: _showAddOptions,
+                  icon: const Icon(Icons.add_rounded),
                 ),
               ],
       ),
@@ -376,47 +419,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                     children: [
-                      if (_showAddPanel && !widget.selectForToday)
-                        AppSurface(
-                          padding: const EdgeInsets.all(20),
-                          color: AppDesign.surface,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                'Lieblingsrestaurant hinzufügen',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: AppDesign.text,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Füge ein Restaurant über ChatGPT hinzu oder importiere eine JSON-Datei.',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppDesign.text,
-                                  height: 1.4,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              OutlinedButton.icon(
-                                onPressed: _importFavoriteJson,
-                                icon: const Icon(Icons.file_upload_outlined),
-                                label: const Text('JSON-Datei importieren'),
-                              ),
-                              const SizedBox(height: 8),
-                              FilledButton.icon(
-                                onPressed: _addRestaurant,
-                                icon: const Icon(Icons.add_rounded),
-                                label: const Text('Mit ChatGPT hinzufügen'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (_showAddPanel && !widget.selectForToday)
-                        const SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       const SizedBox(height: 16),
                       if (_favorites.isEmpty)
                         AppSurface(
