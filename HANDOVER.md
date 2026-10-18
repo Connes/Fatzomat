@@ -110,3 +110,6 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 
 - PR [#202](https://github.com/Connes/Fatzomat/pull/202) wurde nach erfolgreichen CI-Prüfungen auf dem exakten PR-Head gemergt. Der Titel der Heute-Entscheidung öffnet jetzt wie das Bild dasselbe Ziel; im Ablauf „Für heute auswählen“ heißt der Button „Bestätigen“, während der Einkaufslisten-Ablauf „Zur Einkaufsliste“ beibehält. Regressionstests ergänzt.
 - Merge-Commit und aktueller main: 6eb873943255c013a40bc3fe2fcea77a5431dc29. PR-CI auf Head f420a55b99a9d5b00386e3e6ab1f38d47a5cb2ac: Flutter quality gate, Analyze und Test erfolgreich. Die GitHub-Schnittstelle meldet für den Merge-Commit derzeit noch keine Post-Merge-Workflow-Runs oder Statuschecks; deshalb ist Post-Merge-CI noch nicht als grün verifiziert. Keine Geräteprüfung durchgeführt.
+
+
+- PR für die Ausrichtung des Heute-Karteninhalts vorbereitet: Kategorie bleibt am oberen Rand des mittleren Bereichs; der Titel wird im verbleibenden Platz vertikal zentriert, sodass ein- und zweizeilige Titel ausgeglichen wirken. Regressionstest ergänzt. Geräteprüfung bleibt ausstehend.
