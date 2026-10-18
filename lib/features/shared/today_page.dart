@@ -784,6 +784,33 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                       if (mounted) await load();
                                     }
                                   : null,
+                              onOpenDecisionTitle: () {
+                                if (plan!.isRecipe && plan!.recipeId != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => RecipeDetailPage(
+                                        recipeId: plan!.recipeId!,
+                                        canMarkCooked: _isSelectedDateToday && plan!.status != 'cooked',
+                                        viewingTodaySelection: true,
+                                        planDate: _selectedDate,
+                                        onTodayPlanChanged: load,
+                                      ),
+                                    ),
+                                  ).then((_) {
+                                    if (mounted) load();
+                                  });
+                                } else if (plan!.decisionType == 'dine_out') {
+                                  _openMode(FoodMode.dineOut);
+                                } else if (plan!.decisionType == 'order') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => DeliveryServicesPage(planId: plan!.id),
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                     ),
                   ],
@@ -1200,6 +1227,7 @@ class _TodayResultCard extends StatelessWidget {
   final TodayPlan plan;
   final VoidCallback? onOpenRecipe;
   final VoidCallback? onOpenOrder;
+  final VoidCallback onOpenDecisionTitle;
   final VoidCallback onCancel;
   final VoidCallback? onShare;
 
@@ -1207,6 +1235,7 @@ class _TodayResultCard extends StatelessWidget {
     required this.plan,
     required this.onOpenRecipe,
     required this.onOpenOrder,
+    required this.onOpenDecisionTitle,
     required this.onCancel,
     required this.onShare,
   });
@@ -1300,6 +1329,7 @@ class _TodayResultCard extends StatelessWidget {
                   categoryLabel: categoryLabel,
                   title: title,
                   titleSize: titleSize,
+                  onTitleTap: onOpenDecisionTitle,
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1357,11 +1387,13 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String? categoryLabel;
   final String title;
   final double titleSize;
+  final VoidCallback onTitleTap;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
     required this.title,
     required this.titleSize,
+    required this.onTitleTap,
   });
 
   @override
@@ -1388,17 +1420,24 @@ class _TodayDecisionCardContent extends StatelessWidget {
               ],
               Expanded(
                 child: Center(
-                  child: Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          fontSize: titleSize,
-                          height: 1.05,
-                          fontWeight: FontWeight.w800,
-                          color: AppDesign.primaryDark,
-                        ),
+                  child: InkWell(
+                    onTap: onTitleTap,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      child: Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              fontSize: titleSize,
+                              height: 1.05,
+                              fontWeight: FontWeight.w800,
+                              color: AppDesign.primaryDark,
+                            ),
+                      ),
+                    ),
                   ),
                 ),
               ),
