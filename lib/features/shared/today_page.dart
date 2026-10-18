@@ -1403,42 +1403,41 @@ class _TodayDecisionCardContent extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Center(
           child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
-              Text(
-                categoryLabel!.trim().toUpperCase(),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppDesign.secondaryText,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.3,
-                    ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontSize: titleSize,
-                    height: 1.05,
-                    fontWeight: FontWeight.w800,
-                    color: AppDesign.primaryDark,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
+                  Text(
+                    categoryLabel!.trim().toUpperCase(),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppDesign.secondaryText,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.3,
+                        ),
                   ),
+                  const SizedBox(height: 8),
+                ],
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontSize: titleSize,
+                        height: 1.05,
+                        fontWeight: FontWeight.w800,
+                        color: AppDesign.primaryDark,
+                      ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }        ),
       ),
     );
   }
