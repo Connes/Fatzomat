@@ -94,7 +94,8 @@ GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis
 - Relevante dauerhafte Setup-, Sicherheits-, Test- und Release-Dokumentation liegt unter `docs/`. Diese Dokumente nicht durch historische Einzelberichte ersetzen.
 
 
-## Änderung in Arbeit (2026-10-18)
+## Abgeschlossen (2026-10-18)
 
-- Feature-Branch `refactor/shared-decision-card-actions`: Aktionsbereich der Heute-Entscheidungskarte in `_TodayDecisionCardActions` extrahiert. Horizontale Trennlinie und Aktionen „Teilen“/„Entfernen“ sind damit zentral wiederverwendbar; der Erledigt-Zustand bleibt erhalten.
-- Regressionstests werden auf die extrahierte Komponente angepasst. CI und Merge-Status nach PR-Erstellung live prüfen.
+- PR [#199](https://github.com/Connes/Fatzomat/pull/199) wurde nach erfolgreichen Checks auf dem aktuellen PR-Head gemergt. Der Aktionsbereich der Heute-Entscheidungskarte ist in `_TodayDecisionCardActions` extrahiert; Teilen/Entfernen und der Erledigt-Zustand bleiben erhalten.
+- Merge-Commit: `eef7709d4543c5ba3e119da4cc01681662528538`.
+- PR-CI für den geprüften Head `899f691cb8ef5e228283d2585b88244ab6cc2020`: Test, Analyze und Repository-Quality-Job erfolgreich. Post-Merge-CI auf dem Merge-Commit ist noch separat zu prüfen; keine Geräteprüfung durchgeführt.
