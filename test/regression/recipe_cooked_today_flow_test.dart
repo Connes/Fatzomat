@@ -35,7 +35,7 @@ void main() {
     expect(recipe, contains("widget.viewingTodaySelection &&\n              widget.canMarkCooked &&\n              steps.isNotEmpty &&\n              completedSteps.length == steps.length"));
     expect(recipe, contains("completedSteps.length == steps.length"));
     expect(recipe, contains("if (widget.viewingTodaySelection &&\n              widget.canMarkCooked"));
-    expect(recipe, contains('TextButton.icon('));
+    expect(recipe, contains('FilledButton.icon('));
     expect(recipe, isNot(contains('bottomNavigationBar: widget.viewingTodaySelection')));
     expect(recipe, isNot(contains("if (personalTodaySelected || widget.viewingTodaySelection) ...[")));
     expect(recipe, contains("final bool viewingTodaySelection"));
