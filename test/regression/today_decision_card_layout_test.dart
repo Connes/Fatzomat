@@ -30,6 +30,9 @@ void main() {
     expect(content, contains('categoryLabel'));
     expect(content, contains('final VoidCallback? onTap;'));
     expect(content, contains('onTap: onTap'));
+    expect(content, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
+    expect(content, contains('Expanded('));
+    expect(content, contains('child: Center('));
     expect(content, contains('maxLines: 2'));
     expect(content, contains('TextOverflow.ellipsis'));
     expect(actions, contains('height: 58'));
