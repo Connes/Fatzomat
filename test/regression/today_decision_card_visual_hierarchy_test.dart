@@ -3,14 +3,20 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('today decision card uses larger headings and taller images', () {
+  test('today decision card uses a clear fixed header and flexible title hierarchy', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
-    final card = source.substring(source.indexOf('class _TodayResultCard'), source.indexOf('class _TodayChoiceImage'));
-    expect(card, contains('fontSize: 18,'));
-    expect(card, contains('height: 180,'));
-    expect(card, contains("if (plan.decisionType != 'order')"));
-    expect(card, contains('padding: const EdgeInsets.only(top: 8)'));
-    expect(card, contains('height: 190,\n                          child: Center('));
-    expect(card, contains('_TodayDecisionCardActions('));
+    final headerStart = source.indexOf('class _TodayDecisionCardHeader');
+    final contentStart = source.indexOf('class _TodayDecisionCardContent');
+    final actionsStart = source.indexOf('class _TodayDecisionCardActions');
+    expect(headerStart, isNonNegative);
+    expect(contentStart, greaterThan(headerStart));
+    expect(actionsStart, greaterThan(contentStart));
+
+    final header = source.substring(headerStart, contentStart);
+    final content = source.substring(contentStart, actionsStart);
+    expect(header, contains('fontSize: 18,'));
+    expect(header, contains('height: 180'));
+    expect(content, contains('maxLines: 2'));
+    expect(content, contains('TextOverflow.ellipsis'));
   });
 }
