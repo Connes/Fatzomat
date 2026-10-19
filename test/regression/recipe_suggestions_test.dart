@@ -22,7 +22,8 @@ void main() {
     expect(saved, contains("title: const Text('Meine Rezepte')"));
     expect(saved, isNot(contains('receivedRecipeSuggestions')));
     expect(saved, isNot(contains('respondToRecipeSuggestion')));
-    expect(saved, contains("PopupMenuItem(value: 'share', child: Text('Rezept teilen'))"));
+    expect(saved, contains("value: 'share'"));
+    expect(saved, contains("title: Text('Rezept teilen')"));
     expect(detail, isNot(contains("'Rezept teilen'")));
     expect(detail, contains("'Rezept bearbeiten'"));
     expect(notifications, contains("item.type == 'recipe_created'"));

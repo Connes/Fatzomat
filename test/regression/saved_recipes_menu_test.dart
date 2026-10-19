@@ -28,9 +28,12 @@ void main() {
     expect(source, contains("if (value == 'edit') editRecipe(recipe);"));
     expect(source, contains("if (value == 'delete') deleteRecipe(recipe);"));
     expect(source, contains("if (value == 'share') shareRecipe(recipe);"));
-    expect(source, contains("PopupMenuItem(value: 'edit', child: Text('Rezept bearbeiten'))"));
-    expect(source, contains("PopupMenuItem(value: 'delete', child: Text('Rezept löschen'))"));
-    expect(source, contains("PopupMenuItem(value: 'share', child: Text('Rezept teilen'))"));
+    expect(source, contains("value: 'edit'"));
+    expect(source, contains("title: Text('Rezept bearbeiten')"));
+    expect(source, contains("value: 'delete'"));
+    expect(source, contains("title: Text('Rezept löschen'"));
+    expect(source, contains("value: 'share'"));
+    expect(source, contains("title: Text('Rezept teilen')"));
 
     expect(source, isNot(contains("PopupMenuItem(value: 'today'")));
     expect(source, isNot(contains("PopupMenuItem(value: 'shopping'")));

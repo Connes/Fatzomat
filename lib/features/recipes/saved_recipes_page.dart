@@ -949,15 +949,52 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                     ),
                                   ),
                                   PopupMenuButton<String>(
+                                    tooltip: 'Rezeptoptionen',
                                     onSelected: (value) {
                                       if (value == 'edit') editRecipe(recipe);
                                       if (value == 'delete') deleteRecipe(recipe);
                                       if (value == 'share') shareRecipe(recipe);
                                     },
-                                    itemBuilder: (_) => const [
-                                      PopupMenuItem(value: 'edit', child: Text('Rezept bearbeiten')),
-                                      PopupMenuItem(value: 'delete', child: Text('Rezept löschen')),
-                                      PopupMenuItem(value: 'share', child: Text('Rezept teilen')),
+                                    color: AppDesign.surfaceSoft,
+                                    surfaceTintColor: Colors.transparent,
+                                    elevation: 10,
+                                    shadowColor: Colors.black.withValues(alpha: .14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+                                      side: const BorderSide(color: AppDesign.divider),
+                                    ),
+                                    constraints: const BoxConstraints(minWidth: 232, maxWidth: 280),
+                                    menuPadding: const EdgeInsets.symmetric(vertical: 6),
+                                    itemBuilder: (_) => [
+                                      const PopupMenuItem(
+                                        value: 'edit',
+                                        height: 48,
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                          leading: Icon(Icons.edit_outlined, color: AppDesign.secondaryText),
+                                          title: Text('Rezept bearbeiten'),
+                                        ),
+                                      ),
+                                      const PopupMenuDivider(height: 1),
+                                      const PopupMenuItem(
+                                        value: 'delete',
+                                        height: 48,
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                          leading: Icon(Icons.delete_outline_rounded, color: AppDesign.error),
+                                          title: Text('Rezept löschen', style: TextStyle(color: AppDesign.error)),
+                                        ),
+                                      ),
+                                      const PopupMenuDivider(height: 1),
+                                      const PopupMenuItem(
+                                        value: 'share',
+                                        height: 48,
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                          leading: Icon(Icons.share_outlined, color: AppDesign.secondaryText),
+                                          title: Text('Rezept teilen'),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
