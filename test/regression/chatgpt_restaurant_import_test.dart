@@ -13,6 +13,11 @@ void main() {
       expect(source, contains("'$field'"));
     }
     expect(source, contains('in der Nähe des folgenden Ausgangspunkts'));
+    expect(source, contains('AUTOMATISCH in derselben Antwort'));
+    expect(source, contains('herunterladbare Datei als ChatGPT-Dateianhang'));
+    expect(source, contains('Warte nicht darauf, dass ich die Datei zusätzlich anfordere'));
+    expect(source, contains('direkten Download-Link bereit'));
+    expect(source, contains('steakhouse_tango_import.json'));
     expect(source, contains('FilePicker.pickFiles'));
     expect(source, contains('Unbekanntes JSON-Format'));
     expect(source, contains('Future<void> _useRestaurant() async {'));
