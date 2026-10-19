@@ -372,6 +372,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   children: [
                     MetaPill(icon: Icons.timer_outlined, label: '$total Min.'),
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
+                    MetaPill(icon: Icons.people_alt_outlined, label: '$servings Personen'),
                   ],
                 ),
               ],
