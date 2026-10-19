@@ -114,11 +114,15 @@ void main() {
     );
 
     final favorite = find.byTooltip('Als Lieblingsrestaurant speichern');
+    final favoriteButton = find.ancestor(
+      of: favorite,
+      matching: find.byType(IconButton),
+    ).first;
     await tester.tap(favorite);
     await tester.pump();
 
     expect(calls, 1);
-    expect(tester.widget<IconButton>(favorite).onPressed, isNull);
+    expect(tester.widget<IconButton>(favoriteButton).onPressed, isNull);
 
     await tester.tap(favorite);
     await tester.pump();
