@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -120,6 +121,13 @@ void main() {
       'Schnitzel',
       'Pasta',
     ]);
+  });
+
+  test('Restaurantfavoriten-Kachel nutzt den neuen Titel ohne Untertitel und goldenes Herz', () {
+    final source = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
+    expect(source, contains("title: const Text('Meine Lieblingsrestaurants')"));
+    expect(source, isNot(contains('Ein gespeichertes Restaurant auswählen')));
+    expect(source, contains('color: Color(0xFFD4AF37)'));
   });
 
   testWidgets('Wir gehen essen zeigt Kategorien ohne ChatGPT-Suchbutton',
