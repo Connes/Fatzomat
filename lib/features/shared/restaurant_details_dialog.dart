@@ -9,6 +9,7 @@ Future<bool?> showRestaurantDetailsDialog(
   BuildContext context,
   Map<String, dynamic> restaurant, {
   String? extraActionLabel,
+  Future<bool> Function()? onCompleteVisit,
 }) {
   final name = restaurant['name']?.toString().trim() ?? 'Restaurant';
   final cuisine = restaurant['cuisine']?.toString();
@@ -50,6 +51,17 @@ Future<bool?> showRestaurantDetailsDialog(
         ),
       ),
       actions: [
+        if (onCompleteVisit != null)
+          TextButton.icon(
+            onPressed: () async {
+              final completed = await onCompleteVisit();
+              if (completed && dialogContext.mounted) {
+                Navigator.pop(dialogContext, true);
+              }
+            },
+            icon: const Icon(Icons.check_circle_outline_rounded),
+            label: const Text('Abschließen'),
+          ),
         TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Schließen')),
         if (extraActionLabel != null)
           FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(extraActionLabel)),
