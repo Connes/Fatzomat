@@ -17,6 +17,8 @@ void main() {
     expect(profile, contains("title: 'Lieblingsrestaurants'"));
     expect(profile, contains("subtitle: 'Deine gespeicherten Favoriten'"));
     expect(profile, contains("title: 'Connection'"));
+    expect(profile, contains('color: const Color(0xFFD4AF37)'));
+    expect(profile, contains('Icon(icon, color: const Color(0xFFD4AF37))'));
   });
 
   test('backup page only shows the create and restore actions without intro text', () {
