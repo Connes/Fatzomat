@@ -23,22 +23,33 @@ void main() {
     expect(action, isNot(contains('_openMode(FoodMode.dineOut)')));
   });
 
-  test('Today restaurant details offer completion and favorite confirmation', () {
+  test('Today restaurant details complete directly and expose a centered gold favorite heart', () {
     final dialog = File('lib/features/shared/restaurant_details_dialog.dart').readAsStringSync();
     expect(dialog, contains('onCompleteVisit'));
     expect(dialog, contains("const Text('Abschließen')"));
     expect(dialog, contains("const Text('Schließen')"));
+    expect(dialog, contains('textAlign: TextAlign.center'));
+    expect(dialog, contains('Icons.favorite_border_rounded'));
+    expect(dialog, contains('Icons.favorite_rounded'));
+    expect(dialog, contains('Color(0xFFD4AF37)'));
+    expect(dialog, contains('onToggleFavorite'));
 
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final start = source.indexOf('Future<bool> _completeRestaurantVisit(');
     final end = source.indexOf('\n  @override\n  Widget build(BuildContext context)', start);
     final completion = source.substring(start, end);
-    expect(completion, contains("const Text('Restaurantbesuch beenden?')"));
-    expect(completion, contains("const Text('Lieblingsrestaurant?')"));
-    expect(completion, contains('favoritesRepository.add(restaurant)'));
+    expect(completion, isNot(contains('showDialog<bool>')));
     expect(completion, contains("repo.updateStatus(selectedPlan.id, 'cooked')"));
     expect(completion, contains('RecipeCollectionEvents.notifyChanged()'));
+    expect(source, contains('onToggleFavorite: (currentlyFavorite) async'));
   });
+
+  test('favorite restaurant list uses a gold filled heart', () {
+    final source = File('lib/features/settings/restaurant_favorites_page.dart').readAsStringSync();
+    expect(source, contains('Icons.favorite_rounded, color: const Color(0xFFD4AF37)'));
+    expect(source, contains('onToggleFavorite: (currentlyFavorite) async'));
+  });
+
 
   test('decision card has fixed header and action sections with flexible content', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
