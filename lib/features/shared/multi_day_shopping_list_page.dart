@@ -219,6 +219,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     // Update the visible aggregate immediately; network latency should not
     // make a simple checkbox feel like a long-running operation.
     setState(() {
+      _updatingItems.add(item.key);
       _items = _items
           .map((source) => item.sources.any((target) => target.id == source.id)
               ? ShoppingItem(
