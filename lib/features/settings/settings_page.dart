@@ -148,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ? 'Gemeinsam Rezepte und Mahlzeiten nutzen'
                         : 'Optional gemeinsam mit einer Person nutzen',
                     trailing: connected
-                        ? const Icon(Icons.check_circle_rounded, color: const Color(0xFFD4AF37))
+                        ? const Icon(Icons.check_circle_rounded, color: Color(0xFFD4AF37))
                         : null,
                     onTap: openConnection,
                   ),
