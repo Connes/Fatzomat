@@ -78,8 +78,8 @@ void main() {
       item(id: 'b', name: 'äpfel', quantity: 3, unit: ' Stück '),
       item(id: 'c', name: 'Öl', quantity: 1, unit: 'Esslöffel'),
       item(id: 'd', name: 'öl', quantity: 2, unit: 'EL'),
-      item(id: 'e', name: 'Salz', quantity: 1, unit: 'Teelöffel'),
-      item(id: 'f', name: 'salz', quantity: 2, unit: ' TL '),
+      item(id: 'e', name: 'Zucker', quantity: 1, unit: 'Teelöffel'),
+      item(id: 'f', name: 'zucker', quantity: 2, unit: ' TL '),
       item(id: 'g', name: 'Butter', quantity: 1, unit: 'EL.'),
       item(id: 'h', name: 'butter', quantity: 2, unit: 'Essl.'),
     ]);
@@ -87,14 +87,14 @@ void main() {
     expect(rows, hasLength(4));
     final apples = rows.singleWhere((row) => row.name.toLowerCase() == 'äpfel');
     final oil = rows.singleWhere((row) => row.name.toLowerCase() == 'öl');
-    final salt = rows.singleWhere((row) => row.name.toLowerCase() == 'salz');
+    final sugar = rows.singleWhere((row) => row.name.toLowerCase() == 'zucker');
     final butter = rows.singleWhere((row) => row.name.toLowerCase() == 'butter');
     expect(apples.quantity, 5);
     expect(apples.unit, 'Stück');
     expect(oil.quantity, 3);
     expect(oil.unit, 'EL');
-    expect(salt.quantity, 3);
-    expect(salt.unit, 'TL');
+    expect(sugar.quantity, 3);
+    expect(sugar.unit, 'TL');
     expect(butter.quantity, 3);
     expect(butter.unit, 'EL');
   });
