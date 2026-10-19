@@ -109,7 +109,7 @@ class ShoppingListAggregator {
       'basilikum', 'thymian', 'rosmarin', 'majoran', 'koriander',
       'korianderpulver', 'knoblauchpulver', 'zwiebelpulver', 'nelken',
       'nelkenpulver', 'kardamom', 'wacholderbeeren', 'lorbeer', 'lorbeerblatt',
-      'chilipulver', 'chiliflocken', 'italienische kräuter', 'italienische kraeuter',
+      'chiliflocken', 'italienische kräuter', 'italienische kraeuter',
       'kräuter der provence', 'kraeuter der provence', 'gewürzmischung',
       'gewuerzmischung', 'garam masala', 'ras el hanout',
     };
