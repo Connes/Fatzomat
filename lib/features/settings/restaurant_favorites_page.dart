@@ -506,16 +506,27 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                                             await _confirmRemove(restaurant);
                                           }
                                         },
+                                        color: AppDesign.surfaceSoft,
+                                        surfaceTintColor: Colors.transparent,
+                                        elevation: 10,
+                                        shadowColor: Colors.black.withValues(alpha: .14),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+                                          side: const BorderSide(color: AppDesign.divider),
+                                        ),
+                                        constraints: const BoxConstraints(minWidth: 200, maxWidth: 260),
+                                        menuPadding: const EdgeInsets.symmetric(vertical: 6),
                                         itemBuilder: (context) => const [
-                                          PopupMenuItem(value: 'edit', child: ListTile(
-                                            leading: Icon(Icons.edit_outlined),
+                                          PopupMenuItem(value: 'edit', height: 48, child: ListTile(
+                                            leading: Icon(Icons.edit_outlined, color: AppDesign.secondaryText),
                                             title: Text('Bearbeiten'),
-                                            contentPadding: EdgeInsets.zero,
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
                                           )),
-                                          PopupMenuItem(value: 'delete', child: ListTile(
-                                            leading: Icon(Icons.delete_outline_rounded),
-                                            title: Text('Löschen'),
-                                            contentPadding: EdgeInsets.zero,
+                                          PopupMenuDivider(height: 1),
+                                          PopupMenuItem(value: 'delete', height: 48, child: ListTile(
+                                            leading: Icon(Icons.delete_outline_rounded, color: AppDesign.error),
+                                            title: Text('Löschen', style: TextStyle(color: AppDesign.error)),
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 8),
                                           )),
                                         ],
                                         child: const Padding(
