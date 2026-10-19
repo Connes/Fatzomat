@@ -10,6 +10,8 @@ Future<bool?> showRestaurantDetailsDialog(
   Map<String, dynamic> restaurant, {
   String? extraActionLabel,
   Future<bool> Function()? onCompleteVisit,
+  bool isFavorite = false,
+  Future<bool> Function(bool currentlyFavorite)? onToggleFavorite,
 }) {
   final name = restaurant['name']?.toString().trim() ?? 'Restaurant';
   final cuisine = restaurant['cuisine']?.toString();
@@ -20,8 +22,37 @@ Future<bool?> showRestaurantDetailsDialog(
 
   return showDialog<bool>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: Text(name),
+    builder: (dialogContext) => StatefulBuilder(
+      builder: (dialogContext, setDialogState) => AlertDialog(
+      title: SizedBox(
+        width: double.infinity,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 42),
+              child: Text(name, textAlign: TextAlign.center),
+            ),
+            if (onToggleFavorite != null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  tooltip: isFavorite ? 'Aus Lieblingsrestaurants entfernen' : 'Als Lieblingsrestaurant speichern',
+                  onPressed: () async {
+                    final updated = await onToggleFavorite(isFavorite);
+                    if (dialogContext.mounted) {
+                      setDialogState(() => isFavorite = updated);
+                    }
+                  },
+                  icon: Icon(
+                    isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    color: const Color(0xFFD4AF37),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,6 +97,7 @@ Future<bool?> showRestaurantDetailsDialog(
         if (extraActionLabel != null)
           FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(extraActionLabel)),
       ],
+    ),
     ),
   );
 }
