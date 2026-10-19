@@ -569,76 +569,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
   Future<bool> _completeRestaurantVisit(TodayPlan selectedPlan) async {
-    final restaurant = selectedPlan.restaurantData;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Restaurantbesuch beenden?'),
-        content: Text('Möchtest du den Besuch bei ${selectedPlan.restaurantName} wirklich abschließen?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Weiter offen lassen'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Besuch beenden'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return false;
-
-    final restaurantName = restaurant['name']?.toString().trim() ?? '';
-    if (restaurantName.isNotEmpty) {
-      final favoritesRepository = RestaurantFavoritesRepository();
-      try {
-        final alreadyFavorite = await favoritesRepository.contains(restaurant);
-        if (!mounted) return false;
-        if (!alreadyFavorite) {
-          final saveAsFavorite = await showDialog<bool>(
-            context: context,
-            builder: (dialogContext) => AlertDialog(
-              title: const Text('Lieblingsrestaurant?'),
-              content: Text(
-                'Möchtest du $restaurantName als Lieblingsrestaurant speichern?',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext, false),
-                  child: const Text('Nein, danke'),
-                ),
-                FilledButton.icon(
-                  onPressed: () => Navigator.pop(dialogContext, true),
-                  icon: const Icon(Icons.favorite_rounded),
-                  label: const Text('Als Favorit speichern'),
-                ),
-              ],
-            ),
-          );
-          if (saveAsFavorite == true) {
-            await favoritesRepository.add(restaurant);
-            if (!mounted) return false;
-            AppFeedback.showSnackBar(
-              context,
-              const SnackBar(content: Text('Restaurant als Favorit gespeichert.')),
-            );
-          }
-        }
-      } catch (error) {
-        if (!mounted) return false;
-        AppFeedback.showSnackBar(
-          context,
-          SnackBar(content: Text(friendlyError(error))),
-        );
-        return false;
-      }
-    }
-
     try {
       final completed = await repo.updateStatus(selectedPlan.id, 'cooked');
       if (!completed) {
-        throw StateError('Der Restaurantbesuch konnte nicht abgeschlossen werden.');
+        throw StateError('Die Tagesentscheidung konnte nicht abgeschlossen werden.');
       }
       RecipeCollectionEvents.notifyChanged();
       if (mounted) await load();
@@ -886,13 +820,46 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                     if (mounted) load();
                                   });
                                 } else if (plan!.decisionType == 'dine_out') {
-                                  showRestaurantDetailsDialog(
-                                    context,
-                                    plan!.restaurantData,
-                                    onCompleteVisit: _isSelectedDateToday && plan!.status != 'cooked'
-                                        ? () => _completeRestaurantVisit(plan!)
-                                        : null,
-                                  );
+                                  () async {
+                                    final restaurant = plan!.restaurantData;
+                                    final favoritesRepository = RestaurantFavoritesRepository();
+                                    try {
+                                      final isFavorite = await favoritesRepository.contains(restaurant);
+                                      if (!mounted) return;
+                                      await showRestaurantDetailsDialog(
+                                        context,
+                                        restaurant,
+                                        isFavorite: isFavorite,
+                                        onToggleFavorite: (currentlyFavorite) async {
+                                          try {
+                                            if (currentlyFavorite) {
+                                              await favoritesRepository.remove(restaurant);
+                                              return false;
+                                            }
+                                            await favoritesRepository.add(restaurant);
+                                            return true;
+                                          } catch (error) {
+                                            if (mounted) {
+                                              AppFeedback.showSnackBar(
+                                                context,
+                                                SnackBar(content: Text(friendlyError(error))),
+                                              );
+                                            }
+                                            return currentlyFavorite;
+                                          }
+                                        },
+                                        onCompleteVisit: _isSelectedDateToday && plan!.status != 'cooked'
+                                            ? () => _completeRestaurantVisit(plan!)
+                                            : null,
+                                      );
+                                    } catch (error) {
+                                      if (!mounted) return;
+                                      AppFeedback.showSnackBar(
+                                        context,
+                                        SnackBar(content: Text(friendlyError(error))),
+                                      );
+                                    }
+                                  }();
                                 } else if (plan!.decisionType == 'order') {
                                   Navigator.push(
                                     context,

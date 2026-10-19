@@ -282,7 +282,20 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
   }
 
   Future<void> _showRestaurantDetails(Map<String, dynamic> restaurant) async {
-    await showRestaurantDetailsDialog(context, restaurant);
+    await showRestaurantDetailsDialog(
+      context,
+      restaurant,
+      isFavorite: true,
+      onToggleFavorite: (currentlyFavorite) async {
+        if (currentlyFavorite) {
+          await _repository.remove(restaurant);
+          return false;
+        }
+        await _repository.add(restaurant);
+        return true;
+      },
+    );
+    if (mounted) await _load();
   }
 
   Future<void> _editRestaurant(Map<String, dynamic> restaurant) async {
@@ -491,7 +504,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                               child: ListTile(
                                 leading: const CircleAvatar(
                                   backgroundColor: AppDesign.softSurface,
-                                  child: Icon(Icons.favorite_rounded, color: AppDesign.primaryDark),
+                                  child: Icon(Icons.favorite_rounded, color: const Color(0xFFD4AF37)),
                                 ),
                                 title: Text(name, style: const TextStyle(color: AppDesign.text, fontWeight: FontWeight.w600)),
                                 subtitle: details.isEmpty ? null : Text(details, style: const TextStyle(color: AppDesign.text)),
