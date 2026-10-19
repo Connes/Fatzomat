@@ -105,7 +105,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
 Finde aktuelle Restaurants mit Küche „$_cuisine“ in der Nähe des folgenden Ausgangspunkts: $start
 Recherchiere mithilfe aktueller Webquellen. Bevorzuge offizielle Restaurant-Webseiten und verlässliche Quellen. Nenne zuerst eine übersichtliche Auswahl passender Restaurants. 
 Ermittle ausschließlich diese Daten: Name, Küche, Adresse, Telefonnummer, Webseite und Öffnungszeiten. Erfinde keine Angaben. Nicht verifizierbare oder unbekannte Telefonnummern, Webseiten oder Öffnungszeiten müssen null sein.
-Wenn ich ein Restaurant ausgewählt habe und ausdrücklich die Fatzomat-Importdatei anfordere, gib ausschließlich gültiges JSON ohne Markdown-Codeblock und ohne zusätzliche Erklärung aus. Verwende exakt dieses Schema und keine weiteren Felder:
+Sobald ich eines der vorgeschlagenen Restaurants auswähle oder eindeutig benenne, erstelle die Fatzomat-Importdatei AUTOMATISCH in derselben Antwort. Warte nicht darauf, dass ich die Datei zusätzlich anfordere, und frage nicht nach, ob ich sie haben möchte. Erzeuge eine echte, herunterladbare Datei als ChatGPT-Dateianhang im Format JSON und stelle sie mit einem direkten Download-Link bereit. Ein bloßer JSON-Text im Chat, eine Ankündigung oder eine Beschreibung der Datei genügt nicht. Verwende für den Dateinamen einen kurzen, aussagekräftigen Restaurantnamen, z. B. steakhouse_tango_import.json. Die Datei muss exakt dem folgenden Schema entsprechen und darf keine zusätzlichen Felder enthalten:
 {
   "schema_version": 1,
   "type": "fatzomat_restaurant_suggestion",
