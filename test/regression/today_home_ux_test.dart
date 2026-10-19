@@ -46,7 +46,7 @@ void main() {
     expect(today, isNot(contains('RestaurantDetailPage')));
     final restaurantDetails = File('lib/features/shared/restaurant_details_dialog.dart').readAsStringSync();
     expect(restaurantDetails, contains('Für dieses Restaurant sind keine weiteren Angaben gespeichert.'));
-    expect(today, contains('Als erledigt markieren'));
+    expect(today, contains('onCompleteVisit: () => _completeRestaurantVisit(plan!)'));
     final foodMode = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
     expect(foodMode, contains("'fatzomat_pending_restaurant_import_cuisine', cuisine"));
     expect(foodMode, contains('initialCuisine: cuisine'));

@@ -81,6 +81,7 @@ Future<bool?> showRestaurantDetailsDialog(
           ],
         ),
       ),
+      actionsAlignment: MainAxisAlignment.start,
       actions: [
         if (onCompleteVisit != null)
           TextButton.icon(
@@ -91,7 +92,7 @@ Future<bool?> showRestaurantDetailsDialog(
               }
             },
             icon: const Icon(Icons.check_circle_outline_rounded),
-            label: const Text('Abschließen'),
+            label: const Text('Erledigt'),
           ),
         TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Schließen')),
         if (extraActionLabel != null)
