@@ -23,6 +23,23 @@ void main() {
     expect(action, isNot(contains('_openMode(FoodMode.dineOut)')));
   });
 
+  test('Today restaurant details offer completion and favorite confirmation', () {
+    final dialog = File('lib/features/shared/restaurant_details_dialog.dart').readAsStringSync();
+    expect(dialog, contains('onCompleteVisit'));
+    expect(dialog, contains("const Text('Abschließen')"));
+    expect(dialog, contains("const Text('Schließen')"));
+
+    final source = File('lib/features/shared/today_page.dart').readAsStringSync();
+    final start = source.indexOf('Future<bool> _completeRestaurantVisit(');
+    final end = source.indexOf('\n  @override\n  Widget build(BuildContext context)', start);
+    final completion = source.substring(start, end);
+    expect(completion, contains("const Text('Restaurantbesuch beenden?')"));
+    expect(completion, contains("const Text('Lieblingsrestaurant?')"));
+    expect(completion, contains('favoritesRepository.add(restaurant)'));
+    expect(completion, contains("repo.updateStatus(selectedPlan.id, 'cooked')"));
+    expect(completion, contains('RecipeCollectionEvents.notifyChanged()'));
+  });
+
   test('decision card has fixed header and action sections with flexible content', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final card = source.substring(source.indexOf('class _TodayResultCard'));
