@@ -5,19 +5,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:food_app_mvp/features/shared/restaurant_details_dialog.dart';
 
 void main() {
-  Future<bool?> openDetails(
+  Future<void> openDetails(
     WidgetTester tester, {
     Future<bool> Function()? onCompleteVisit,
     Future<bool> Function(bool currentlyFavorite)? onToggleFavorite,
   }) async {
-    bool? result;
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                result = await showRestaurantDetailsDialog(
+                await showRestaurantDetailsDialog(
                   context,
                   const {'name': 'Testrestaurant'},
                   onCompleteVisit: onCompleteVisit,
@@ -32,7 +31,6 @@ void main() {
     );
     await tester.tap(find.text('Öffnen'));
     await tester.pumpAndSettle();
-    return result;
   }
 
   testWidgets('completion ignores duplicate taps while the request is in flight',
