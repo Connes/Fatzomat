@@ -88,7 +88,7 @@ class ShoppingListAggregator {
         .replaceAll('ß', 'ss')
         .replaceAll(RegExp(r'[^a-zäöü0-9]+'), ' ')
         .trim();
-    return RegExp(r'\b(salz|pfeffer|salt|pepper)\b').hasMatch(normalized);
+    return RegExp(r'\b(salz\w*|pfeffer\w*|salt\w*|pepper\w*)\b').hasMatch(normalized);
   }
 
   bool _isSpice(String name, String category) {
