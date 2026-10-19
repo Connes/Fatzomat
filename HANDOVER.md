@@ -63,6 +63,19 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 - Wenn ein PR absichtlich nicht gemergt wird, muss der konkrete Grund genannt werden. Keine offene PR stillschweigend als erledigt behandeln. Vor der Abschlussmeldung muss die offene PR-Liste leer sein oder jeder verbleibende PR ausdrücklich mit Grund aufgeführt werden.
 - Abschlussmeldung nur mit verifizierten Fakten: PR-Nummer/Link, Merge-Commit, Ergebnis der CI auf dem aktuellen `main` und gegebenenfalls klar benannter noch laufender Post-Merge-Prüfung. Nie „fertig“ sagen, wenn einer dieser erforderlichen Schritte noch offen ist.
 - Bei mehreren offenen PRs eine klare Reihenfolge verfolgen: ältere unabhängige PRs mit grüner CI zuerst; danach abhängige PRs in Reihenfolge ihrer Voraussetzungen; nach jedem Merge neu validieren.
+## Verbindlicher Abschlussmodus für Änderungsaufträge
+
+Wenn der Nutzer eine konkrete Änderung beauftragt, gilt bis zum verifizierten Abschluss ein durchgehender Arbeitszyklus:
+
+1. Den aktuellen Live-Stand und die relevanten Projektanweisungen prüfen, dann die angeforderte Änderung auf einem Branch implementieren und passende Regressionstests ergänzen.
+2. Die relevanten lokalen/CI-Prüfungen ausführen. Bei jedem Fehler Logs und Ursache untersuchen, den Fix selbst implementieren und die betroffenen Prüfungen erneut ausführen. Ein roter CI-Lauf ist kein Grund, die Aufgabe an den Nutzer zurückzugeben.
+3. Den Zyklus aus Fix und Prüfung wiederholen, bis alle erforderlichen Prüfungen für den aktuellen Commit erfolgreich sind. Ergebnisse älterer Commits gelten nicht für neuere Commits.
+4. Den PR auf Merge-Bedingungen prüfen, nach erfolgreicher CI mergen und danach den tatsächlichen Merge-Commit in `main` sowie die Post-Merge-CI verifizieren.
+5. Erst danach eine Abschlussmeldung senden. Sie nennt knapp PR-Link, Merge-Commit und verifizierte CI-Ergebnisse. Niemals eine Änderung als fertig melden, solange sie nur auf einem Branch liegt oder notwendige Prüfungen noch laufen/fehlschlagen.
+6. Nur bei einem echten Blocker anhalten: fehlende Berechtigungen/Zugriffe, erforderliche fachliche Nutzerentscheidung oder ein risikoreicher/destruktiver Schritt, der Rücksprache verlangt. Dann ausschließlich den konkreten Blocker nennen und bereits sichere, autorisierte Arbeit fortsetzen, sobald er entfällt.
+
+Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. Bei erneutem Nutzeraufruf zuerst den Live-Stand prüfen und denselben Auftrag nahtlos fortsetzen, statt bei null anzufangen.
+
 ## Kommunikationsregel: nur konkrete Schritte
 
 - **Rückmeldung erst nach vollständigem Abschluss:** Während eines autonomen Arbeitszyklus keine Zwischenstands- oder Fortschrittsmeldungen senden. Erst berichten, wenn der PR gemergt ist, die Änderung im aktuellen `main` verifiziert wurde und die Post-Merge-CI geprüft ist.
