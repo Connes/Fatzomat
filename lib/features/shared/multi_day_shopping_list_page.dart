@@ -30,6 +30,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   final Set<String> _selected = <String>{};
   final Set<String> _expanded = <String>{};
   final Set<String> _updatingItems = <String>{};
+  final Set<String> _temporarilyVisibleChecked = <String>{};
+  final Map<String, Timer> _checkedVisibilityTimers = <String, Timer>{};
   List<List<TodayPlan>> _plans = const [];
   List<ShoppingItem> _items = const [];
   bool _loading = true;
@@ -216,6 +218,22 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   Future<void> _toggleItem(AggregatedShoppingItem item, bool checked) async {
     if (_updatingItems.contains(item.key) || !mounted) return;
+    // Keep checked rows visible briefly when the open-only filter is active,
+    // so the user can see the checkmark before the row disappears.
+    if (checked && _showOnlyOpen) {
+      _checkedVisibilityTimers.remove(item.key)?.cancel();
+      setState(() => _temporarilyVisibleChecked.add(item.key));
+      _checkedVisibilityTimers[item.key] = Timer(const Duration(milliseconds: 700), () {
+        if (!mounted) return;
+        setState(() {
+          _temporarilyVisibleChecked.remove(item.key);
+          _checkedVisibilityTimers.remove(item.key);
+        });
+      });
+    } else {
+      _checkedVisibilityTimers.remove(item.key)?.cancel();
+      _temporarilyVisibleChecked.remove(item.key);
+    }
     // Update the visible aggregate immediately; network latency should not
     // make a simple checkbox feel like a long-running operation.
     setState(() {
@@ -327,6 +345,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   @override
   void dispose() {
     _dayBoundaryTimer?.cancel();
+    for (final timer in _checkedVisibilityTimers.values) {
+      timer.cancel();
+    }
+    _checkedVisibilityTimers.clear();
     WidgetsBinding.instance.removeObserver(this);
     if (_channel != null) {
       try {
@@ -363,7 +385,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         .toList(growable: false);
     final aggregated = _aggregator.aggregate(visibleItems);
     final filteredItems = _showOnlyOpen
-        ? aggregated.where((item) => !item.checked).toList(growable: false)
+        ? aggregated
+            .where((item) => !item.checked || _temporarilyVisibleChecked.contains(item.key))
+            .toList(growable: false)
         : aggregated;
     final checkedCount = aggregated.where((item) => item.checked).length;
     final progress = aggregated.isEmpty ? 0.0 : checkedCount / aggregated.length;
@@ -440,7 +464,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                           ),
                         )
                       else ...[
-                        AppSurface(
+                        if (activeDays.length > 1) AppSurface(
                           color: AppDesign.surface,
                           bordered: false,
                           padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
@@ -474,9 +498,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                             ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        for (final day in activeDays)
-                          Padding(
+                        if (activeDays.length > 1) const SizedBox(height: 10),
+                        if (activeDays.length > 1)
+                          for (final day in activeDays)
+                            Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Card(
                               color: AppDesign.surface,
@@ -566,6 +591,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                               children: [
                                 Text(
                                   'Zusammengefasste Zutaten',
+                                  textAlign: TextAlign.center,
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                       color: AppDesign.text,
                                       fontWeight: FontWeight.w700,
@@ -642,7 +668,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                             child: CircularProgressIndicator(strokeWidth: 2),
                                           )
                                         : const Icon(Icons.check_circle_outline_rounded),
-                                    label: const Text('Einkaufsliste erledigt'),
+                                    label: const Text('Einkaufsliste erledigen'),
                                   ),
                                 ),
                                 if (!canCompleteList) ...[

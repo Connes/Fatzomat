@@ -34,7 +34,7 @@ void main() {
     expect(page, isNot(contains('Zutatenpositionen')));
     expect(page, isNot(contains('geplante Rezepte ·')));
     expect(page, contains('TextDecoration.lineThrough'));
-    expect(page, contains("const Text('Einkaufsliste erledigt')"));
+    expect(page, contains("const Text('Einkaufsliste erledigen')"));
     expect(page, contains('_repo.completeShoppingList'));
   });
 
