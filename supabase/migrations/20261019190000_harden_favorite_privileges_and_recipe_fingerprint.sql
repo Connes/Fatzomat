@@ -4,6 +4,11 @@ revoke all on table public.restaurant_favorites from public, anon;
 grant select, insert, update, delete
   on table public.restaurant_favorites to authenticated;
 
+-- The global recipe library is read-only for non-owners. The broad UPDATE
+-- policy bypassed the owner-only predicate in the separate "own recipes"
+-- policy because permissive policies are combined with OR.
+drop policy if exists "recipes global update" on public.recipes;
+
 -- This immutable helper uses only PostgreSQL built-ins and JSON operators.
 -- Pinning the search_path prevents object-shadowing attacks through writable schemas.
 create or replace function public.recipe_fingerprint(
