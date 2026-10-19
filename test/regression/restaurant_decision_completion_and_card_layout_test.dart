@@ -4,12 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('restaurant completion updates status and refreshes Today', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
-    final start = source.indexOf("extraActionLabel: 'Als erledigt markieren'");
+    final start = source.indexOf('onCompleteVisit: () => _completeRestaurantVisit(plan!)');
     final end = source.indexOf('onOpenRecipe:', start);
     final action = source.substring(start, end);
-    expect(action, contains("repo.updateStatus(plan!.id, 'cooked')"));
+    expect(action, contains('_completeRestaurantVisit(plan!)'));
     expect(action, isNot(contains('repo.removeTodayPlan(plan!.id)')));
-    expect(action, contains('await load()'));
+    expect(action, isNot(contains("repo.updateStatus(plan!.id, 'cooked')")));
   });
 
   test('tapping the selected dine-out restaurant opens its details, not restaurant selection', () {
@@ -26,7 +26,8 @@ void main() {
   test('Today restaurant details complete directly and expose a centered gold favorite heart', () {
     final dialog = File('lib/features/shared/restaurant_details_dialog.dart').readAsStringSync();
     expect(dialog, contains('onCompleteVisit'));
-    expect(dialog, contains("const Text('Abschließen')"));
+    expect(dialog, contains("const Text('Erledigt')"));
+    expect(dialog, contains('actionsAlignment: MainAxisAlignment.start'));
     expect(dialog, contains("const Text('Schließen')"));
     expect(dialog, contains('textAlign: TextAlign.center'));
     expect(dialog, contains('Icons.favorite_border_rounded'));
