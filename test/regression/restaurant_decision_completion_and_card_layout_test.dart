@@ -12,6 +12,17 @@ void main() {
     expect(action, contains('await load()'));
   });
 
+  test('tapping the selected dine-out restaurant opens its details, not restaurant selection', () {
+    final source = File('lib/features/shared/today_page.dart').readAsStringSync();
+    final start = source.indexOf('onOpenDecisionTitle: () {');
+    final end = source.indexOf('\n                              },', start);
+    final action = source.substring(start, end);
+
+    expect(action, contains('showRestaurantDetailsDialog('));
+    expect(action, contains('plan!.restaurantData'));
+    expect(action, isNot(contains('_openMode(FoodMode.dineOut)')));
+  });
+
   test('decision card has fixed header and action sections with flexible content', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final card = source.substring(source.indexOf('class _TodayResultCard'));

@@ -801,7 +801,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                     if (mounted) load();
                                   });
                                 } else if (plan!.decisionType == 'dine_out') {
-                                  _openMode(FoodMode.dineOut);
+                                  showRestaurantDetailsDialog(
+                                    context,
+                                    plan!.restaurantData,
+                                  );
                                 } else if (plan!.decisionType == 'order') {
                                   Navigator.push(
                                     context,
