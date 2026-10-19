@@ -8,7 +8,7 @@ void main() {
 
     expect(source, contains('bool ingredientsExpanded = false;'));
     expect(source, contains('bool preparationExpanded = false;'));
-    expect(source, contains("MetaPill(icon: Icons.people_alt_outlined, label: '\$servings Personen')"));
+    expect(source, contains(r"MetaPill(icon: Icons.people_alt_outlined, label: '$servings Personen')"));
     expect(source, contains("initiallyExpanded: false"));
     expect(source, contains("title: const Text('Zutaten'"));
     expect(source, contains("title: const Text('Zubereitung'"));
