@@ -15,7 +15,7 @@ void main() {
   test('imported restaurants are saved through the account-scoped Supabase repository', () {
     final page = File('lib/features/settings/restaurant_favorites_page.dart').readAsStringSync();
     final repository = File('lib/data/repositories/restaurant_favorites_repository.dart').readAsStringSync();
-    final migration = File('supabase/migrations/20261017120000_cloud_restaurant_favorites.sql').readAsStringSync();
+    final migration = File('supabase/migrations/20261018045840_cloud_restaurant_favorites.sql').readAsStringSync();
     expect(page, contains('await _repository.add(normalized)'));
     expect(repository, contains("from('restaurant_favorites')"));
     expect(repository, contains(".eq('user_id', _userId)"));

@@ -15,7 +15,7 @@ void main() {
   });
 
   test('restaurant favorites table is account-scoped by row-level security', () {
-    final migration = File('supabase/migrations/20261017120000_cloud_restaurant_favorites.sql').readAsStringSync();
+    final migration = File('supabase/migrations/20261018045840_cloud_restaurant_favorites.sql').readAsStringSync();
     expect(migration, contains('alter table public.restaurant_favorites enable row level security'));
     expect(migration, contains('using (user_id = (select auth.uid()))'));
     expect(migration, contains('with check (user_id = (select auth.uid()))'));
