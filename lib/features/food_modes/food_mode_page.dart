@@ -247,10 +247,13 @@ class _FoodModePageState extends State<FoodModePage> {
                 Card(
                   child: ListTile(
                     leading: const CircleAvatar(
-                      child: Icon(Icons.favorite_rounded),
+                      backgroundColor: Color(0xFFFFF4D6),
+                      child: Icon(
+                        Icons.favorite_rounded,
+                        color: Color(0xFFD4AF37),
+                      ),
                     ),
-                    title: const Text('Meine Restaurantfavoriten'),
-                    subtitle: const Text('Ein gespeichertes Restaurant auswählen'),
+                    title: const Text('Meine Lieblingsrestaurants'),
                     trailing: const Icon(Icons.chevron_right_rounded),
                     onTap: () => _openRestaurantFavorites(context),
                   ),
