@@ -29,6 +29,14 @@ Wenn der Nutzer `Handover-Reset` schreibt, ohne weitere Erläuterung:
 
 Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um bloße Zusammenfassung. Er gilt in neuen Chats, sofern dieses Repository und diese Datei dort zugänglich sind.
 
+## Lebensmittel-Icon-Bibliothek (Arbeitsstand 2026-10-19)
+
+- Die Umsetzung läuft auf `feat/food-emoji-webp-assets`.
+- Erste Einzelgrafik angelegt: `assets/foods/apfel.webp`, echtes WebP mit 128 × 128 Pixeln und Alphakanal; lokal verifiziert mit ca. 4.8 KB.
+- `FoodItemImage` nutzt die dedizierte WebP-Datei für „Apfel“ und behält für alle noch nicht abgedeckten Lebensmittel die bestehende Emoji-/Kategorie-Fallback-Logik.
+- Die Asset-Zuordnung ist testbar; ein Regressionstest für den Apfel und den Fallback wurde ergänzt.
+- **Unvollständig:** Der Lebensmittelkatalog ist noch nicht vollständig mit Einzelgrafiken abgedeckt. Sammelbilder wurden nicht als Quelle ausgeschnitten. Die restlichen Motive, vollständige Asset-Abdeckungsprüfung sowie CI-/PR-Verifikation stehen aus.
+
 ## Autonomer Arbeitsmodus
 
 - „Fatzomat weiterentwickeln“ startet einen fortlaufenden Arbeitszyklus, nicht nur eine Bestandsaufnahme oder einen Vorschlag.
