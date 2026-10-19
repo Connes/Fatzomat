@@ -15,6 +15,20 @@ Wenn der Nutzer „Fatzomat weiterentwickeln“ schreibt:
 
 GitHub, CI und Supabase sind maßgeblich. Dieses Dokument ist Arbeitsgedächtnis, kein Beweis für den Live-Zustand.
 
+## Verbindlicher Kurz-Befehl: `Handover-Reset`
+
+Wenn der Nutzer `Handover-Reset` schreibt, ohne weitere Erläuterung:
+
+1. Diese HANDOVER.md und alle für die aktuelle Aufgabe relevanten Projektanweisungen erneut lesen.
+2. Den tatsächlichen Live-Zustand der aktuellen Aufgabe prüfen: relevante Dateien und Änderungen, Branch/Commits, offene PRs, Merge-Status sowie erforderliche CI- und Testergebnisse. Frühere Gesprächs- oder Handover-Angaben nicht als aktuellen Nachweis behandeln.
+3. Das bisherige Vorgehen gegen die Anweisungen prüfen, konkrete Abweichungen benennen und korrigieren.
+4. Die aktuelle Aufgabe anschließend aktiv und innerhalb des bereits erteilten Auftrags fortsetzen. Fehler beheben, soweit autorisiert; nicht bei einer bloßen Analyse oder Entschuldigung stehen bleiben.
+5. Keine eigenmächtigen Zusatzaufgaben oder unnötigen Änderungen beginnen. Bei fehlender Berechtigung, fehlendem Zugriff oder einer tatsächlich nötigen Nutzerentscheidung gezielt anhalten und nur den konkreten Blocker nennen.
+6. Nur tatsächlich verifizierte Ergebnisse als erledigt oder erfolgreich melden. Erforderliche Prüfungen abwarten und nach Änderungen erneut für den aktuellen Commit kontrollieren.
+7. Die bestehende Kommunikationsregel dieser Datei einhalten und erst dann berichten, wenn der vorgesehene Abschluss erreicht ist oder ein echter Blocker dies verhindert.
+
+Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um bloße Zusammenfassung. Er gilt in neuen Chats, sofern dieses Repository und diese Datei dort zugänglich sind.
+
 ## Autonomer Arbeitsmodus
 
 - „Fatzomat weiterentwickeln“ startet einen fortlaufenden Arbeitszyklus, nicht nur eine Bestandsaufnahme oder einen Vorschlag.
