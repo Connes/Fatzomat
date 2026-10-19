@@ -80,4 +80,14 @@ void main() {
     expect(page, contains("await load(showLoading: false);\n      if (mounted)"));
   });
 
+  test('multi-day shopping aggregation excludes salt and pepper and hides amounts for unitless spices', () {
+    final source = File('lib/data/services/shopping_list_aggregator.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(source, contains('if (_isSaltOrPepper(item.name)) continue;'));
+    expect(source, contains('showQuantity: first.unit.trim().isNotEmpty || !_isSpice(first.name, first.category)'));
+    expect(source, contains("category.toLowerCase().contains('gewürz')"));
+    expect(page, contains('subtitle: item.showQuantity'));
+    expect(page, contains(': null,'));
+  });
 }
