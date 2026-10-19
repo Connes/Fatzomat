@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// migration of favorites created by older app versions.
 class RestaurantFavoritesRepository {
   static const _legacyStorageKey = 'fatzomat_restaurant_favorites_v1';
+  static const _legacyCorruptBackupPrefix = '${_legacyStorageKey}_corrupt_backup_';
 
   final SupabaseClient? _client;
   SupabaseClient get client => _client ?? Supabase.instance.client;
@@ -41,10 +42,7 @@ class RestaurantFavoritesRepository {
     final name = restaurant['name']?.toString().trim() ?? '';
     if (name.isEmpty) throw ArgumentError('Ein Restaurantname ist erforderlich.');
     await _migrateLegacyFavorites();
-    final key = _identity(restaurant);
-    final favorites = await all();
-    if (favorites.any((item) => _identity(item) == key)) return false;
-    await client.from('restaurant_favorites').insert({
+    return _insertFavorite({
       'user_id': _userId,
       'name': name,
       'cuisine': _nullable(restaurant['cuisine']),
@@ -53,7 +51,18 @@ class RestaurantFavoritesRepository {
       'website': _nullable(restaurant['website']),
       'opening_hours': _nullable(restaurant['opening_hours']),
     });
-    return true;
+  }
+
+  /// The database's normalized unique index is the final authority when
+  /// separate screens or requests try to add the same favorite concurrently.
+  Future<bool> _insertFavorite(Map<String, dynamic> row) async {
+    try {
+      await client.from('restaurant_favorites').insert(row);
+      return true;
+    } on PostgrestException catch (error) {
+      if (error.code == '23505') return false;
+      rethrow;
+    }
   }
 
   Future<void> remove(Map<String, dynamic> restaurant) async {
@@ -77,8 +86,20 @@ class RestaurantFavoritesRepository {
 
     // Keep the legacy value until every row has been safely uploaded. This
     // makes an interrupted migration retryable without silently losing data.
-    final decoded = jsonDecode(raw);
+    dynamic decoded;
+    try {
+      decoded = jsonDecode(raw);
+    } on FormatException {
+      // Preserve the corrupt legacy payload for diagnosis instead of making
+      // every future favorites read fail or silently discarding the bytes.
+      final backupKey = '$_legacyCorruptBackupPrefix${DateTime.now().millisecondsSinceEpoch}';
+      await preferences.setString(backupKey, raw);
+      await preferences.remove(_legacyStorageKey);
+      return;
+    }
     if (decoded is! List) {
+      final backupKey = '$_legacyCorruptBackupPrefix${DateTime.now().millisecondsSinceEpoch}';
+      await preferences.setString(backupKey, raw);
       await preferences.remove(_legacyStorageKey);
       return;
     }
@@ -96,7 +117,7 @@ class RestaurantFavoritesRepository {
       final restaurant = Map<String, dynamic>.from(item);
       final name = restaurant['name']?.toString().trim() ?? '';
       if (name.isEmpty || !existing.add(_identity(restaurant))) continue;
-      await client.from('restaurant_favorites').insert({
+      await _insertFavorite({
         'user_id': userId,
         'name': name,
         'cuisine': _nullable(restaurant['cuisine']),
