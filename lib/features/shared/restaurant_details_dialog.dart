@@ -20,6 +20,7 @@ Future<bool?> showRestaurantDetailsDialog(
   final website = restaurant['website']?.toString();
   final hours = restaurant['opening_hours']?.toString();
   var isCompletingVisit = false;
+  var isTogglingFavorite = false;
 
   return showDialog<bool>(
     context: context,
@@ -39,12 +40,30 @@ Future<bool?> showRestaurantDetailsDialog(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   tooltip: isFavorite ? 'Aus Lieblingsrestaurants entfernen' : 'Als Lieblingsrestaurant speichern',
-                  onPressed: () async {
-                    final updated = await onToggleFavorite(isFavorite);
-                    if (dialogContext.mounted) {
-                      setDialogState(() => isFavorite = updated);
-                    }
-                  },
+                  onPressed: isTogglingFavorite
+                      ? null
+                      : () async {
+                          setDialogState(() => isTogglingFavorite = true);
+                          try {
+                            final updated = await onToggleFavorite(isFavorite);
+                            if (dialogContext.mounted) {
+                              setDialogState(() => isFavorite = updated);
+                            }
+                          } catch (_) {
+                            if (dialogContext.mounted) {
+                              AppFeedback.showSnackBar(
+                                dialogContext,
+                                const SnackBar(
+                                  content: Text('Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.'),
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (dialogContext.mounted) {
+                              setDialogState(() => isTogglingFavorite = false);
+                            }
+                          }
+                        },
                   icon: Icon(
                     isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                     color: const Color(0xFFD4AF37),
@@ -94,6 +113,15 @@ Future<bool?> showRestaurantDetailsDialog(
                       final completed = await onCompleteVisit();
                       if (completed && dialogContext.mounted) {
                         Navigator.pop(dialogContext, true);
+                      }
+                    } catch (_) {
+                      if (dialogContext.mounted) {
+                        AppFeedback.showSnackBar(
+                          dialogContext,
+                          const SnackBar(
+                            content: Text('Besuch konnte nicht abgeschlossen werden. Bitte versuche es erneut.'),
+                          ),
+                        );
                       }
                     } finally {
                       if (dialogContext.mounted) {
