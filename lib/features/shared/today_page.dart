@@ -731,7 +731,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                            final done = await showRestaurantDetailsDialog(
                                              context,
                                              restaurant,
-                                             extraActionLabel: 'Als erledigt markieren',
+                                             onCompleteVisit: () => _completeRestaurantVisit(plan!),
                                            );
                                            if (done != true) return;
                                            if ((restaurant['name']?.toString().trim() ?? '').isNotEmpty) {
@@ -772,17 +772,6 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                                  }
                                                }
                                              }
-                                           }
-                                           try {
-                                             final completed = await repo.updateStatus(plan!.id, 'cooked');
-                                             if (!completed) {
-                                               throw StateError('Die Tagesentscheidung konnte nicht abgeschlossen werden.');
-                                             }
-                                             RecipeCollectionEvents.notifyChanged();
-                                             if (mounted) await load();
-                                           } catch (error) {
-                                             if (!mounted) return;
-                                             AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
                                            }
                                          }
 : null,
