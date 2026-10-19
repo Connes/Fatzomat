@@ -99,12 +99,13 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Vor destruktiven Live-Datenbankänderungen oder risikoreichen Aktionen sorgfältig prüfen und bei wesentlichem Risiko vorher Rücksprache halten.
 - Migrationen versioniert und nachvollziehbar halten.
 
-## Aktueller Repository-Stand (geprüft 2026-10-18)
+## Aktueller Repository-Stand (geprüft 2026-10-19)
 
-- `main` steht auf `6a1ba4dbe6c31284ff5d8229bb50b111912ca469`: [Fix shopping list checkbox ink rendering (#221)](https://github.com/Connes/Fatzomat/pull/221).
-- Letzte Änderung: Die zusammengefasste Einkaufsliste erhält eine transparente `Material`-Ebene, damit Checkbox-Taps und Ink-Effekte korrekt dargestellt werden.
-- Bei der Live-Prüfung wurden keine offenen Pull Requests gefunden.
-- Für den aktuellen Main-Commit lieferte GitHub keine Statuschecks und keine Workflow-Runs. Post-Merge-CI ist daher **nicht als erfolgreich verifiziert**.
+- `main` enthält PR [#234 – Prevent duplicate restaurant completion actions](https://github.com/Connes/Fatzomat/pull/234), Merge-Commit `e71c725c898b0ac7b44c0e9067df5564a4d09533`.
+- Die Restaurant-Detailaktion `Erledigt` wird während des asynchronen Abschlusses deaktiviert, damit schnelle Mehrfach-Taps keine parallelen Abschlussversuche auslösen. Bei fehlgeschlagenem Abschluss wird die Aktion wieder aktiviert.
+- Regressionstest für den In-Flight-Zustand ergänzt.
+- Für den PR-Head `d6cdcbc28e79d1818b00b82cd3005543b2923224` waren beide Qualitätsworkflows erfolgreich: `Quality Gate` (Run 846; Test und Analyze) sowie `Flutter quality gate` (Run 1486; Hygiene, Analyze und Test).
+- Auf dem Merge-Commit `e71c725c898b0ac7b44c0e9067df5564a4d09533` wurden bei der Prüfung keine Post-Merge-Workflow-Runs und keine Statuschecks zurückgegeben; Post-Merge-CI ist daher **nicht als erfolgreich verifiziert**.
 - Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
 
 ## Nächster Schritt
