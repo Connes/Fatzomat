@@ -148,7 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ? 'Gemeinsam Rezepte und Mahlzeiten nutzen'
                         : 'Optional gemeinsam mit einer Person nutzen',
                     trailing: connected
-                        ? const Icon(Icons.check_circle_rounded, color: AppDesign.primary)
+                        ? const Icon(Icons.check_circle_rounded, color: const Color(0xFFD4AF37))
                         : null,
                     onTap: openConnection,
                   ),
@@ -217,7 +217,7 @@ class _SettingsTile extends StatelessWidget {
                   color: AppDesign.softSurface,
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon, color: AppDesign.primaryDark),
+                child: Icon(icon, color: const Color(0xFFD4AF37)),
               ),
               const SizedBox(width: 14),
               Expanded(
