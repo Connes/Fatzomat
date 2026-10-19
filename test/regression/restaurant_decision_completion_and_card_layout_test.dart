@@ -28,6 +28,9 @@ void main() {
     expect(dialog, contains('onCompleteVisit'));
     expect(dialog, contains("const Text('Erledigt')"));
     expect(dialog, contains('actionsAlignment: MainAxisAlignment.start'));
+    expect(dialog, contains('var isCompletingVisit = false'));
+    expect(dialog, contains('onPressed: isCompletingVisit'));
+    expect(dialog, contains('setDialogState(() => isCompletingVisit = true)'));
     expect(dialog, contains("const Text('Schließen')"));
     expect(dialog, contains('textAlign: TextAlign.center'));
     expect(dialog, contains('Icons.favorite_border_rounded'));

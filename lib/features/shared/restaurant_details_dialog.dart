@@ -19,6 +19,7 @@ Future<bool?> showRestaurantDetailsDialog(
   final phone = restaurant['phone']?.toString();
   final website = restaurant['website']?.toString();
   final hours = restaurant['opening_hours']?.toString();
+  var isCompletingVisit = false;
 
   return showDialog<bool>(
     context: context,
@@ -85,12 +86,21 @@ Future<bool?> showRestaurantDetailsDialog(
       actions: [
         if (onCompleteVisit != null)
           TextButton.icon(
-            onPressed: () async {
-              final completed = await onCompleteVisit();
-              if (completed && dialogContext.mounted) {
-                Navigator.pop(dialogContext, true);
-              }
-            },
+            onPressed: isCompletingVisit
+                ? null
+                : () async {
+                    setDialogState(() => isCompletingVisit = true);
+                    try {
+                      final completed = await onCompleteVisit();
+                      if (completed && dialogContext.mounted) {
+                        Navigator.pop(dialogContext, true);
+                      }
+                    } finally {
+                      if (dialogContext.mounted) {
+                        setDialogState(() => isCompletingVisit = false);
+                      }
+                    }
+                  },
             icon: const Icon(Icons.check_circle_outline_rounded),
             label: const Text('Erledigt'),
           ),
