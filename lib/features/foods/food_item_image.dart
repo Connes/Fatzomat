@@ -76,6 +76,15 @@ class FoodItemImage extends StatelessWidget {
     return _categoryEmoji[category?.trim().toLowerCase()] ?? '🍽️';
   }
 
+  static String? assetFor(String name) {
+    switch (name.trim().toLowerCase()) {
+      case 'apfel':
+        return 'assets/foods/apfel.webp';
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final icon = emojiFor(foodName, category: category);
@@ -90,7 +99,9 @@ class FoodItemImage extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: SvgPicture.string(svg, width: size, height: size),
+        child: assetFor(foodName) != null
+            ? Image.asset(assetFor(foodName)!, width: size, height: size, fit: BoxFit.contain)
+            : SvgPicture.string(svg, width: size, height: size),
       ),
     );
   }
