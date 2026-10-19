@@ -81,7 +81,7 @@ void main() {
     expect(page, contains('Timer(const Duration(milliseconds: 700)'));
   });
 
-  test('multi-day aggregated item updates prevent concurrent toggles and unlock on failure', {
+  test('multi-day aggregated item updates prevent concurrent toggles and unlock on failure', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(page, contains("if (_updatingItems.contains(item.key) || !mounted) return;"));
