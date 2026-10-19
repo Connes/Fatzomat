@@ -10,6 +10,7 @@ class AggregatedShoppingItem {
   final String unit;
   final bool checked;
   final String category;
+  final bool showQuantity;
   final List<ShoppingItem> sources;
 
   const AggregatedShoppingItem({
@@ -19,6 +20,7 @@ class AggregatedShoppingItem {
     required this.unit,
     required this.checked,
     required this.category,
+    required this.showQuantity,
     required this.sources,
   });
 }
@@ -29,6 +31,7 @@ class ShoppingListAggregator {
   List<AggregatedShoppingItem> aggregate(Iterable<ShoppingItem> input) {
     final buckets = <String, List<ShoppingItem>>{};
     for (final item in input) {
+      if (_isSaltOrPepper(item.name)) continue;
       final unit = _unitFamily(item.unit);
       final nameKey = item.name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
       final normalizedFoodId = item.foodId?.trim();
@@ -65,6 +68,7 @@ class ShoppingListAggregator {
         unit: targetUnit,
         checked: sourceItems.every((item) => item.checked),
         category: first.category,
+        showQuantity: first.unit.trim().isNotEmpty || !_isSpice(first.name, first.category),
         sources: List<ShoppingItem>.unmodifiable(sourceItems),
       );
     }).toList()
@@ -76,6 +80,40 @@ class ShoppingListAggregator {
         return a.key.compareTo(b.key);
       });
     return List<AggregatedShoppingItem>.unmodifiable(result);
+  }
+
+  bool _isSaltOrPepper(String raw) {
+    final normalized = raw
+        .toLowerCase()
+        .replaceAll('ß', 'ss')
+        .replaceAll(RegExp(r'[^a-zäöü0-9]+'), ' ')
+        .trim();
+    return RegExp(r'\b(salz|pfeffer|salt|pepper)\b').hasMatch(normalized);
+  }
+
+  bool _isSpice(String name, String category) {
+    if (category.toLowerCase().contains('gewürz') ||
+        category.toLowerCase().contains('gewuerz') ||
+        category.toLowerCase().contains('spice')) {
+      return true;
+    }
+    final normalized = name
+        .toLowerCase()
+        .replaceAll('ß', 'ss')
+        .replaceAll(RegExp(r'[^a-zäöü0-9]+'), ' ')
+        .trim();
+    const spiceNames = {
+      'paprika', 'paprikapulver', 'chilipulver', 'chili', 'cayennepfeffer',
+      'currypulver', 'curry', 'kurkuma', 'kreuzkümmel', 'kreuzkuemmel',
+      'kümmel', 'kuemmel', 'muskat', 'muskatnuss', 'zimt', 'oregano',
+      'basilikum', 'thymian', 'rosmarin', 'majoran', 'koriander',
+      'korianderpulver', 'knoblauchpulver', 'zwiebelpulver', 'nelken',
+      'nelkenpulver', 'kardamom', 'wacholderbeeren', 'lorbeer', 'lorbeerblatt',
+      'chilipulver', 'chiliflocken', 'italienische kräuter', 'italienische kraeuter',
+      'kräuter der provence', 'kraeuter der provence', 'gewürzmischung',
+      'gewuerzmischung', 'garam masala', 'ras el hanout',
+    };
+    return spiceNames.contains(normalized);
   }
 
   String _unitFamily(String raw) {
