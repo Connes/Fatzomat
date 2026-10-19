@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:food_app_mvp/data/models/shopping_item.dart';
+import 'package:food_app_mvp/data/services/shopping_list_aggregator.dart';
 
 void main() {
   test('V84 retains shopping list editing, sync and completed cleanup', () {
@@ -78,6 +80,35 @@ void main() {
     expect(page, isNot(contains("secondary: _updatingItems.contains(item.key)")));
     expect(page, contains("Icons.favorite_rounded"));
     expect(page, contains("await load(showLoading: false);\n      if (mounted)"));
+  });
+
+  test('multi-day shopping aggregation excludes salt and pepper and hides amounts for unitless spices', () {
+    final source = File('lib/data/services/shopping_list_aggregator.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(source, contains('if (_isSaltOrPepper(item.name)) continue;'));
+    expect(source, contains('showQuantity: first.unit.trim().isNotEmpty || !_isSpice(first.name, first.category)'));
+    expect(source, contains("category.toLowerCase().contains('gewürz')"));
+    expect(page, contains('subtitle: item.showQuantity'));
+    expect(page, contains(': null,'));
+  });
+  test('shopping aggregator omits salt and pepper and hides quantities for unitless spices', () {
+    const aggregator = ShoppingListAggregator();
+    const items = [
+      ShoppingItem(id: 'salt', name: 'Salz', quantity: 1, unit: '', checked: false),
+      ShoppingItem(id: 'pepper', name: 'Schwarze Pfefferkörner', quantity: 1, unit: '', checked: false),
+      ShoppingItem(id: 'spice', name: 'Paprikapulver', quantity: 2, unit: '', checked: false, category: 'Gewürze'),
+      ShoppingItem(id: 'spice-unit', name: 'Paprikapulver', quantity: 2, unit: 'TL', checked: false, category: 'Gewürze'),
+      ShoppingItem(id: 'potatoes', name: 'Kartoffeln', quantity: 4, unit: '', checked: false, category: 'Gemüse'),
+    ];
+
+    final result = aggregator.aggregate(items);
+
+    expect(result.map((item) => item.name), isNot(contains('Salz')));
+    expect(result.map((item) => item.name), isNot(contains('Schwarze Pfefferkörner')));
+    expect(result.singleWhere((item) => item.name == 'Paprikapulver' && item.unit.isEmpty).showQuantity, isFalse);
+    expect(result.singleWhere((item) => item.name == 'Paprikapulver' && item.unit == 'TL').showQuantity, isTrue);
+    expect(result.singleWhere((item) => item.name == 'Kartoffeln').showQuantity, isTrue);
   });
 
 }
