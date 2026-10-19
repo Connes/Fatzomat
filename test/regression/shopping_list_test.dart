@@ -72,10 +72,11 @@ void main() {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(page, contains("if (_updatingItems.contains(item.key) || !mounted) return;"));
-    expect(page, contains("setState(() => _updatingItems.add(item.key));"));
+    expect(page, contains("_updatingItems.add(item.key);"));
     expect(page, contains("finally {\n      if (mounted) setState(() => _updatingItems.remove(item.key));"));
     expect(page, contains("onChanged: _updatingItems.contains(item.key)"));
-    expect(page, contains('child: CircularProgressIndicator(strokeWidth: 2)'));
+    expect(page, isNot(contains("secondary: _updatingItems.contains(item.key)")));
+    expect(page, contains("Icons.favorite_rounded"));
     expect(page, contains("await load(showLoading: false);\n      if (mounted)"));
   });
 

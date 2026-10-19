@@ -216,7 +216,26 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   Future<void> _toggleItem(AggregatedShoppingItem item, bool checked) async {
     if (_updatingItems.contains(item.key) || !mounted) return;
-    setState(() => _updatingItems.add(item.key));
+    // Update the visible aggregate immediately; network latency should not
+    // make a simple checkbox feel like a long-running operation.
+    setState(() {
+      _updatingItems.add(item.key);
+      _items = _items
+          .map((source) => item.sources.any((target) => target.id == source.id)
+              ? ShoppingItem(
+                  id: source.id,
+                  name: source.name,
+                  quantity: source.quantity,
+                  unit: source.unit,
+                  checked: checked,
+                  foodId: source.foodId,
+                  category: source.category,
+                  source: source.source,
+                  planId: source.planId,
+                )
+              : source)
+          .toList(growable: false);
+    });
     try {
       await Future.wait(item.sources
           .where((source) => source.checked != checked)
@@ -688,7 +707,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                               ),
                                             ),
                                             subtitle: Text(
-                                              '${item.quantity} ${item.unit}'.trim(),
+                                              '${item.quantity} ${item.unit.trim().isEmpty ? 'Stück' : item.unit}'.trim(),
                                               style: TextStyle(
                                                 color: AppDesign.secondaryText,
                                                 decoration: item.checked
@@ -697,16 +716,11 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                 decorationColor: AppDesign.secondaryText,
                                               ),
                                             ),
-                                            secondary: _updatingItems.contains(item.key)
-                                                ? const SizedBox(
-                                                    width: 20,
-                                                    height: 20,
-                                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                                  )
-                                                : Text(
-                                                    '${item.sources.length}×',
-                                                    style: const TextStyle(color: AppDesign.secondaryText),
-                                                  ),
+                                            secondary: const Icon(
+                                              Icons.favorite_rounded,
+                                              size: 18,
+                                              color: Colors.red,
+                                            ),
                                           )),
                                   ],
                               ],
