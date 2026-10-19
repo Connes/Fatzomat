@@ -119,3 +119,16 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Für Tests und Regressionen die bestehenden Testmuster unter `test/` verwenden.
 - Supabase-Migrationen liegen im Repository unter `supabase/migrations/`; Live-Anwendung und Funktionsdefinitionen müssen separat geprüft werden.
 - Relevante dauerhafte Setup-, Sicherheits-, Test- und Release-Dokumentation liegt unter `docs/`. Diese Dokumente nicht durch historische Einzelberichte ersetzen.
+
+
+## Technische Härtung: Restaurantaktionen und Supabase (2026-10-19)
+
+Aktueller Arbeitsbranch: `fix/restaurant-favorites-and-security-audit`. Noch nicht als abgeschlossen betrachten, bis PR-CI, Merge, Post-Merge-CI und gegebenenfalls die sichere Live-Migration verifiziert sind.
+
+- Restaurantdetails-Dialog: Favoriten-Toggle während eines laufenden Requests deaktivieren; Fehler zeigen eine generische Rückmeldung und geben die Aktion wieder frei. Fehler beim Restaurantabschluss werden ebenfalls abgefangen, ohne den Dialog fälschlich als erfolgreich zu schließen.
+- Favoriten-Repository: Datenbank-Unique-Constraint-Fehler `23505` werden als bereits vorhandener Favorit behandelt. Beschädigte Legacy-JSON-Werte werden in einen separaten lokalen Backup-Key verschoben, bevor der aktive Migrationsschlüssel entfernt wird.
+- Neue Widgettests prüfen doppelte Abschluss-Taps, Abschlussfehler, parallel gestartete Favoriten-Taps und Favoriten-Retry nach einem Fehler. CI muss diese Tests noch ausführen.
+- Live-Supabase-Projekt `oidxezjdwqktpxuypbfb` wurde read-only geprüft: `restaurant_favorites` hat RLS aktiviert, eine `authenticated`-Policy mit `user_id = auth.uid()`, einen normalisierten Unique-Index auf Benutzer/Name/Adresse und derzeit keine doppelten normalisierten Identitäten. Das Tabellen-Schema ist im Live-Projekt vorhanden.
+- Die Live-Migration `20261018045840_cloud_restaurant_favorites` war in der Migration-Historie vorhanden, ihre SQL-Datei fehlte jedoch auf `main`. Die Migration wurde im Arbeitsbranch aus dem tatsächlich geprüften Schema rekonstruiert, damit neue Umgebungen die Tabelle reproduzieren können.
+- Der Supabase Security Advisor meldete `public.recipe_fingerprint(jsonb,jsonb)` mit veränderlichem `search_path`. Eine versionierte Korrektur setzt ihn auf `pg_catalog, pg_temp`. Eine separate Migration entzieht `anon` unnötige direkte Tabellenprivilegien und belässt CRUD für `authenticated` unter der bestehenden RLS-Policy.
+- Die neuen SQL-Migrationen wurden noch nicht auf das Live-Projekt angewendet. Erst nach erfolgreichem PR-Merge wird die nicht-destruktive Härtung angewendet und danach durch SQL-Abfragen sowie den Security Advisor verifiziert. Es wurden keine Produktionsdaten geändert.
