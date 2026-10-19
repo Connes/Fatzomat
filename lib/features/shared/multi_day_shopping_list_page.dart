@@ -706,16 +706,18 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                 decorationColor: AppDesign.secondaryText,
                                               ),
                                             ),
-                                            subtitle: Text(
-                                              '${item.quantity} ${item.unit.trim().isEmpty ? 'Stück' : item.unit}'.trim(),
-                                              style: TextStyle(
-                                                color: AppDesign.secondaryText,
-                                                decoration: item.checked
-                                                    ? TextDecoration.lineThrough
-                                                    : TextDecoration.none,
-                                                decorationColor: AppDesign.secondaryText,
-                                              ),
-                                            ),
+                                            subtitle: item.showQuantity
+                                                ? Text(
+                                                    '${item.quantity} ${item.unit.trim().isEmpty ? 'Stück' : item.unit}'.trim(),
+                                                    style: TextStyle(
+                                                      color: AppDesign.secondaryText,
+                                                      decoration: item.checked
+                                                          ? TextDecoration.lineThrough
+                                                          : TextDecoration.none,
+                                                      decorationColor: AppDesign.secondaryText,
+                                                    ),
+                                                  )
+                                                : null,
                                             secondary: const Icon(
                                               Icons.favorite_rounded,
                                               size: 18,
