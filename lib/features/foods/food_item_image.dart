@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 /// Shared emoji illustration for catalog and custom foods.
 class FoodItemImage extends StatelessWidget {
@@ -132,51 +131,51 @@ class FoodItemImage extends StatelessWidget {
       case 'wassermelone':
         return 'assets/foods/wassermelone.webp';
       case 'avocado':
-        return 'assets/foods/avocado.svg';
+        return 'assets/foods/avocado.webp';
       case 'aubergine':
-        return 'assets/foods/aubergine.svg';
+        return 'assets/foods/aubergine.webp';
       case 'champignons':
       case 'austernpilze':
       case 'shiitake-pilze':
-        return 'assets/foods/champignons.svg';
+        return 'assets/foods/champignons.webp';
       case 'erbsen':
-        return 'assets/foods/erbsen.svg';
+        return 'assets/foods/erbsen.webp';
       case 'mais':
-        return 'assets/foods/mais.svg';
+        return 'assets/foods/mais.webp';
       case 'kürbis':
       case 'kuerbis':
-        return 'assets/foods/kuerbis.svg';
+        return 'assets/foods/kuerbis.webp';
       case 'frühlingszwiebel':
       case 'fruehlingszwiebel':
-        return 'assets/foods/fruehlingszwiebel.svg';
+        return 'assets/foods/fruehlingszwiebel.webp';
       case 'gurke':
-        return 'assets/foods/gurke.svg';
+        return 'assets/foods/gurke.webp';
       case 'paprika':
-        return 'assets/foods/paprika.svg';
+        return 'assets/foods/paprika.webp';
       case 'zucchini':
-        return 'assets/foods/zucchini.svg';
+        return 'assets/foods/zucchini.webp';
       case 'blumenkohl':
-        return 'assets/foods/blumenkohl.svg';
+        return 'assets/foods/blumenkohl.webp';
       case 'spinat':
-        return 'assets/foods/spinat.svg';
+        return 'assets/foods/spinat.webp';
       case 'knoblauch':
-        return 'assets/foods/knoblauch.svg';
+        return 'assets/foods/knoblauch.webp';
       case 'brokkoli':
-        return 'assets/foods/brokkoli.svg';
+        return 'assets/foods/brokkoli.webp';
       case 'karotte':
       case 'karotten':
-        return 'assets/foods/karotte.svg';
+        return 'assets/foods/karotte.webp';
       case 'kartoffel':
       case 'kartoffeln':
-        return 'assets/foods/kartoffel.svg';
+        return 'assets/foods/kartoffel.webp';
       case 'tomate':
       case 'tomaten':
       case 'cherrytomaten':
-        return 'assets/foods/tomate.svg';
+        return 'assets/foods/tomate.webp';
       case 'zwiebel':
       case 'zwiebeln':
       case 'schalotte':
-        return 'assets/foods/zwiebel.svg';
+        return 'assets/foods/zwiebel.webp';
       default:
         return null;
     }
@@ -185,17 +184,19 @@ class FoodItemImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final icon = emojiFor(foodName, category: category);
-    final svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-        '<circle cx="32" cy="32" r="29" fill="#FFF4E8"/>'
-        '<text x="32" y="43" text-anchor="middle" font-size="32" '
-        'font-family="Noto Color Emoji, Apple Color Emoji, Segoe UI Emoji">$icon</text>'
-        '</svg>';
     final asset = assetFor(foodName);
     final Widget illustration;
     if (asset == null) {
-      illustration = SvgPicture.string(svg, width: size, height: size);
-    } else if (asset.endsWith('.svg')) {
-      illustration = SvgPicture.asset(asset, width: size, height: size, fit: BoxFit.contain);
+      illustration = Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFF4E8),
+          shape: BoxShape.circle,
+        ),
+        child: Text(icon, style: TextStyle(fontSize: size * 0.52)),
+      );
     } else {
       illustration = Image.asset(asset, width: size, height: size, fit: BoxFit.contain);
     }
