@@ -768,7 +768,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
   State<ChatGptRecipeSetupPage> createState() => _ChatGptRecipeSetupPageState();
 }
 
-class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
+class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with WidgetsBindingObserver {
   final FoodRepository repository = FoodRepository();
   String? mainChoice;
   Set<String> selectedFoodIds = <String>{};
@@ -776,15 +776,34 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
   bool loading = true;
   String? error;
   bool opening = false;
+  bool awaitingChatGptReturn = false;
+  bool showSelectionSummary = false;
 
   static const choices = <String>['Rind', 'Schwein', 'Huhn', 'Fisch', 'Vegetarisch'];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     mainChoice = widget.initialMainChoice;
     selectedFoodIds = {...widget.initialSelectedFoodIds};
     _loadFoods();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && awaitingChatGptReturn && mounted) {
+      setState(() {
+        awaitingChatGptReturn = false;
+        showSelectionSummary = true;
+      });
+    }
   }
 
   Future<void> _loadFoods() async {
@@ -865,7 +884,11 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
     await Clipboard.setData(ClipboardData(text: prompt));
     if (!mounted) return;
 
-    setState(() => opening = true);
+    setState(() {
+      opening = true;
+      awaitingChatGptReturn = true;
+      showSelectionSummary = false;
+    });
     try {
       // ChatGPT's q parameter opens a conversation with the generated prompt
       // prefilled, instead of merely opening an empty chat.
@@ -878,9 +901,15 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
         const SnackBar(content: Text('Rezept-Prompt an ChatGPT übergeben.')),
       );
     } on PlatformException catch (e) {
-      if (mounted) showAppError(context, StateError(e.message ?? 'ChatGPT konnte nicht geöffnet werden.'));
+      if (mounted) {
+        setState(() => awaitingChatGptReturn = false);
+        showAppError(context, StateError(e.message ?? 'ChatGPT konnte nicht geöffnet werden.'));
+      }
     } catch (e) {
-      if (mounted) showAppError(context, e);
+      if (mounted) {
+        setState(() => awaitingChatGptReturn = false);
+        showAppError(context, e);
+      }
     } finally {
       if (mounted) setState(() => opening = false);
     }
@@ -902,6 +931,10 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
   @override
   Widget build(BuildContext context) {
     final selectedCount = selectedFoodIds.length;
+    final selectedFoods = selectedFoodIds
+        .map((id) => foods.where((food) => food.id == id).firstOrNull)
+        .whereType<Food>()
+        .toList(growable: false);
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: const TogetherAppBar(title: Text('Mit ChatGPT erstellen')),
@@ -913,7 +946,60 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
               : ListView(
                   padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
                   children: [
-                    GridView.builder(
+                    if (showSelectionSummary) ...[
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppDesign.surface.withValues(alpha: .96),
+                          borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+                          boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Deine Rezeptauswahl', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
+                            const SizedBox(height: 16),
+                            Text('Hauptzutat', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 8),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: AppDesign.secondarySurface,
+                                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(_icon(mainChoice ?? ''), color: AppDesign.primaryDark, size: 28),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(mainChoice ?? 'Keine Hauptzutat ausgewählt', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text('Beilagen und ausgewählte Zutaten', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 8),
+                            if (selectedFoods.isEmpty)
+                              const Text('Keine zusätzlichen Zutaten ausgewählt.')
+                            else
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: selectedFoods.map((food) => Chip(
+                                  avatar: const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
+                                  label: Text(food.name),
+                                  backgroundColor: AppDesign.secondarySurface,
+                                  side: BorderSide.none,
+                                )).toList(growable: false),
+                              ),
+                            const SizedBox(height: 16),
+                            const Text('Deine Auswahl bleibt erhalten. Importiere hier die von ChatGPT erstellte Rezeptdatei.'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (!showSelectionSummary) GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -982,8 +1068,8 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
-                    FilledButton.icon(
+                    if (!showSelectionSummary) const SizedBox(height: 20),
+                    if (!showSelectionSummary) FilledButton.icon(
                       onPressed: _selectIngredients,
                       icon: const Icon(Icons.add_circle_outline_rounded),
                       label: Text(selectedCount == 0 ? 'Zutaten auswählen' : 'Zutaten ändern ($selectedCount)'),
@@ -991,7 +1077,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         minimumSize: const Size.fromHeight(54),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    if (showSelectionSummary) const SizedBox(height: 4) else const SizedBox(height: 10),
                     FilledButton.icon(
                       onPressed: _importRecipeFile,
                       icon: const Icon(Icons.file_upload_rounded),
@@ -1000,8 +1086,8 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> {
                         minimumSize: const Size.fromHeight(54),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    FilledButton.icon(
+                    if (!showSelectionSummary) const SizedBox(height: 10),
+                    if (!showSelectionSummary) FilledButton.icon(
                       onPressed: opening ? null : _copyPromptAndOpenChatGpt,
                       icon: opening
                           ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
