@@ -149,3 +149,9 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - In Arbeit auf Branch `ux/recipe-import-save-feedback`: Wenn ein Rezept bereits erfolgreich gespeichert wurde, der optionale Bild-Upload danach aber fehlschlägt, soll der gesamte Import nicht fälschlich als fehlgeschlagen erscheinen. Das Rezept wird als gespeichert bestätigt, der Bildfehler separat angezeigt und die Vorschau wie im Erfolgsfall geschlossen.
 - Regressionstest ergänzt. Lokale Flutter-Tests wurden über die GitHub-Datei-API nicht ausgeführt; PR-CI muss den aktuellen Stand verifizieren.
 - Kein Accessibility-Refactoring. Kein Release oder Geräte-Test.
+
+
+## UX-Härtung: Standortabfrage mit Timeout (2026-10-20)
+
+- Standortbestimmung für die ChatGPT-Restaurantsuche ist jetzt auf 15 Sekunden begrenzt. Bei Timeout erscheint eine verständliche Fehlermeldung mit erneutem Versuch als nächstem Schritt; die UI bleibt nicht unbegrenzt im Ladezustand.
+- Regressionstest ergänzt. CI muss den aktuellen PR-Head prüfen. Kein Geräte-Test und kein Release.
