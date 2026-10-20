@@ -43,6 +43,10 @@ void main() {
     expect(FoodItemImage.assetFor('Kuerbis'), 'assets/foods/kuerbis.webp');
     expect(FoodItemImage.assetFor('Frühlingszwiebel'), 'assets/foods/fruehlingszwiebel.webp');
     expect(FoodItemImage.assetFor('Fruehlingszwiebel'), 'assets/foods/fruehlingszwiebel.webp');
+    expect(FoodItemImage.assetFor('Pastinake'), 'assets/foods/pastinake.webp');
+    expect(FoodItemImage.assetFor('Fenchel'), 'assets/foods/fenchel.webp');
+    expect(FoodItemImage.assetFor('Radieschen'), 'assets/foods/radieschen.webp');
+    expect(FoodItemImage.assetFor('Rote Bete'), 'assets/foods/rote_bete.webp');
     expect(FoodItemImage.assetFor('Gurke'), 'assets/foods/gurke.webp');
     expect(FoodItemImage.assetFor('Paprika'), 'assets/foods/paprika.webp');
     expect(FoodItemImage.assetFor('Zucchini'), 'assets/foods/zucchini.webp');
@@ -85,6 +89,10 @@ void main() {
       'Frühlingszwiebel',
       'Fruehlingszwiebel',
       'Gurke',
+      'Fenchel',
+      'Pastinake',
+      'Radieschen',
+      'Rote Bete',
       'Paprika',
       'Zucchini',
       'Blumenkohl',
@@ -120,6 +128,10 @@ void main() {
       'brokkoli.webp',
       'champignons.webp',
       'erbsen.webp',
+      'fenchel.webp',
+      'pastinake.webp',
+      'radieschen.webp',
+      'rote_bete.webp',
       'fruehlingszwiebel.webp',
       'gurke.webp',
       'karotte.webp',

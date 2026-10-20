@@ -145,6 +145,14 @@ class FoodItemImage extends StatelessWidget {
       case 'kürbis':
       case 'kuerbis':
         return 'assets/foods/kuerbis.webp';
+      case 'fenchel':
+        return 'assets/foods/fenchel.webp';
+      case 'radieschen':
+        return 'assets/foods/radieschen.webp';
+      case 'rote bete':
+        return 'assets/foods/rote_bete.webp';
+      case 'pastinake':
+        return 'assets/foods/pastinake.webp';
       case 'frühlingszwiebel':
       case 'fruehlingszwiebel':
         return 'assets/foods/fruehlingszwiebel.webp';
