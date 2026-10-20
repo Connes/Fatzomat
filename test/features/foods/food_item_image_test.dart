@@ -46,6 +46,11 @@ void main() {
     expect(FoodItemImage.assetFor('Pastinake'), 'assets/foods/pastinake.webp');
     expect(FoodItemImage.assetFor('Pak Choi'), 'assets/foods/pak_choi.webp');
     expect(FoodItemImage.assetFor('Chinakohl'), 'assets/foods/chinakohl.webp');
+    expect(FoodItemImage.assetFor('Chicorée'), 'assets/foods/chicoree.webp');
+    expect(FoodItemImage.assetFor('Chicoree'), 'assets/foods/chicoree.webp');
+    expect(FoodItemImage.assetFor('Endivie'), 'assets/foods/endivie.webp');
+    expect(FoodItemImage.assetFor('Lauch'), 'assets/foods/lauch.webp');
+    expect(FoodItemImage.assetFor('Mangold'), 'assets/foods/mangold.webp');
     expect(FoodItemImage.assetFor('Weißkohl'), 'assets/foods/weisskohl.webp');
     expect(FoodItemImage.assetFor('Weisskohl'), 'assets/foods/weisskohl.webp');
     expect(FoodItemImage.assetFor('Artischocke'), 'assets/foods/artischocke.webp');
@@ -99,6 +104,11 @@ void main() {
       'Fenchel',
       'Pak Choi',
       'Chinakohl',
+      'Chicorée',
+      'Chicoree',
+      'Endivie',
+      'Lauch',
+      'Mangold',
       'Weißkohl',
       'Weisskohl',
       'Artischocke',
@@ -147,6 +157,10 @@ void main() {
       'chinakohl.webp',
       'weisskohl.webp',
       'artischocke.webp',
+      'chicoree.webp',
+      'endivie.webp',
+      'lauch.webp',
+      'mangold.webp',
       'kohlrabi.webp',
       'rosenkohl.webp',
       'pastinake.webp',
@@ -195,7 +209,7 @@ void main() {
   });
 
   test('dedicated food asset mappings never reference SVG files', () {
-    const foods = ['Artischocke', 'Kohlrabi', 'Rosenkohl', 'Pak Choi', 'Chinakohl', 'Weißkohl'];
+    const foods = ['Artischocke', 'Chicorée', 'Chicoree', 'Endivie', 'Lauch', 'Mangold', 'Kohlrabi', 'Rosenkohl', 'Pak Choi', 'Chinakohl', 'Weißkohl'];
     for (final food in foods) {
       final asset = FoodItemImage.assetFor(food);
       expect(asset, isNotNull, reason: '$food should have a dedicated asset');
