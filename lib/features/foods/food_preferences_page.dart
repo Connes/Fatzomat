@@ -295,6 +295,9 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
 
                                       return ListTile(
                                         dense: false,
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                        horizontalTitleGap: 8,
+                                        minLeadingWidth: 24,
                                         title: Text(name),
                                         subtitle: Text(category),
                                         leading: FoodItemImage(foodName: name, category: category),
