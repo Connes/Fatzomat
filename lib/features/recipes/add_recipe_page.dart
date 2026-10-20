@@ -986,7 +986,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: selectedFoods.map((food) => Chip(
-                                  avatar: const Icon(Icons.check_circle_rounded, size: 18, color: AppDesign.primaryDark),
+                                  avatar: const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
                                   label: Text(food.name),
                                   backgroundColor: AppDesign.secondarySurface,
                                   side: BorderSide.none,
