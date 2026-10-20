@@ -28,6 +28,24 @@ void main() {
     expect(source, isNot(contains('widget.onNavigateToToday?.call();')));
   });
 
+  test('ChatGPT restaurant launch is blocked until location permission is granted', () {
+    final source = File('lib/features/food_modes/chatgpt_restaurant_page.dart').readAsStringSync();
+    expect(source, contains('Geolocator.requestPermission()'));
+    expect(source, contains('Geolocator.openAppSettings()'));
+    expect(source, contains("label: const Text('Systemeinstellungen öffnen')"));
+    expect(source, contains("label: const Text('Berechtigung prüfen und fortfahren')"));
+    expect(source, contains('_waitingForLocationSettings'));
+    expect(source, contains('!_waitingForLocationSettings && _locationController.text.trim().isNotEmpty'));
+    expect(source, contains('Ohne Standortfreigabe kann Fatzomat keine Restaurants in deiner Nähe suchen.'));
+  });
+
+  test('first app launch requests location permission without blocking startup', () {
+    final source = File('lib/core/launch_page.dart').readAsStringSync();
+    expect(source, contains("'fatzomat_location_permission_requested'"));
+    expect(source, contains('Geolocator.requestPermission()'));
+    expect(source, contains('A startup permission failure must not block the app.'));
+  });
+
   test('ChatGPT restaurant search is an additional option on dine-out page', () {
     final source = File('lib/features/food_modes/food_mode_page.dart').readAsStringSync();
     expect(source, contains("import 'chatgpt_restaurant_page.dart';"));
