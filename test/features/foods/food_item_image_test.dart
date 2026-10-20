@@ -144,44 +144,18 @@ void main() {
     }
   });
 
-  test('dedicated produce WebP assets are exactly 128x128', () async {
-    const assets = [
-      'aubergine.webp',
-      'avocado.webp',
-      'blumenkohl.webp',
-      'brokkoli.webp',
-      'champignons.webp',
-      'erbsen.webp',
-      'fenchel.webp',
-      'pak_choi.webp',
-      'chinakohl.webp',
-      'weisskohl.webp',
-      'artischocke.webp',
-      'chicoree.webp',
-      'endivie.webp',
-      'lauch.webp',
-      'mangold.webp',
-      'kohlrabi.webp',
-      'rosenkohl.webp',
-      'pastinake.webp',
-      'radieschen.webp',
-      'rote_bete.webp',
-      'fruehlingszwiebel.webp',
-      'gurke.webp',
-      'karotte.webp',
-      'kartoffel.webp',
-      'knoblauch.webp',
-      'kuerbis.webp',
-      'mais.webp',
-      'paprika.webp',
-      'spinat.webp',
-      'tomate.webp',
-      'zucchini.webp',
-      'zwiebel.webp',
-    ];
+  test('every food WebP asset is exactly 128x128', () async {
+    final manifest = json.decode(
+      await rootBundle.loadString('AssetManifest.json'),
+    ) as Map<String, dynamic>;
+    final assets = manifest.keys
+        .where((path) => path.startsWith('assets/foods/') && path.endsWith('.webp'))
+        .toList()
+      ..sort();
 
+    expect(assets, isNotEmpty);
     for (final asset in assets) {
-      final data = await rootBundle.load('assets/foods/$asset');
+      final data = await rootBundle.load(asset);
       final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       expect(ascii.decode(bytes.sublist(0, 4)), 'RIFF', reason: '$asset RIFF header');
       expect(ascii.decode(bytes.sublist(8, 12)), 'WEBP', reason: '$asset WebP header');
