@@ -32,14 +32,14 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 ## Lebensmittel-Icon-Bibliothek (Arbeitsstand 2026-10-19)
 
 - Die Umsetzung läuft auf `feat/food-emoji-webp-assets`.
-- `assets/foods/apfel.webp`: echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,812 Bytes; lokal validiert.
-- `assets/foods/forelle.webp`: aus einem einzeln generierten Forellen-PNG mit echtem Alpha-Kanal erzeugt; echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,796 Bytes; lokal validiert und in `FoodItemImage` zugeordnet.
-- `assets/foods/dorade.webp`: aus einem einzeln generierten Doraden-PNG mit echtem Alpha-Kanal erzeugt; echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,986 Bytes; lokal validiert und in `FoodItemImage` zugeordnet.
+- `assets/foods/apfel.webp`: eigenständige stilisierte Illustration, echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 1,320 Bytes; lokal validiert und im Git-Blob identisch.
+- `assets/foods/forelle.webp`: stilisierte Einzelillustration, echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 1,924 Bytes; lokal validiert und im Git-Blob identisch.
+- `assets/foods/dorade.webp`: stilisierte Einzelillustration, echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 2,010 Bytes; lokal validiert und im Git-Blob identisch.
 - `assets/foods/heilbutt.webp`: separates Einzelmotiv, als WebP mit 128 × 128 Pixeln und RGBA/Alphakanal lokal validiert; 5,550 Bytes. In `FoodItemImage` zugeordnet.
 - `assets/foods/hering.webp`: einzelnes Heringmotiv, als WebP mit 128 × 128 Pixeln und echtem RGBA-Alphakanal lokal validiert; 4,032 Bytes. In `FoodItemImage` zugeordnet; Regressionstest ergänzt.
 - `FoodItemImage` nutzt dedizierte WebP-Dateien für Apfel, Forelle, Dorade, Heilbutt und Hering; für alle noch nicht abgedeckten Lebensmittel bleibt die Emoji-/Kategorie-Fallback-Logik bestehen.
 - Regressionstests prüfen die Zuordnung, den Fallback und das tatsächliche Rendern/Decodieren aller fünf Assets im Widget.
-- **Unvollständig:** Der Lebensmittelkatalog ist noch nicht vollständig mit Einzelgrafiken abgedeckt. Sammelbilder wurden nicht als Quelle ausgeschnitten. Weitere Motive und CI für den aktuellen Head stehen noch aus.
+- **Unvollständig:** Der Lebensmittelkatalog ist noch nicht vollständig mit Einzelgrafiken abgedeckt. Sammelbilder wurden nicht als Quelle ausgeschnitten. Die drei ersten Dateien wurden nach fehlgeschlagenen Widget-Decodiertests durch geprüfte, kleinere RGBA-WebPs ersetzt. CI für den neuen Head steht noch aus.
 
 ## Autonomer Arbeitsmodus
 
