@@ -32,6 +32,12 @@ void main() {
     expect(FoodItemImage.assetFor('Pfirsich'), 'assets/foods/pfirsich.webp');
     expect(FoodItemImage.assetFor('Wassermelone'), 'assets/foods/wassermelone.webp');
     expect(FoodItemImage.assetFor('Avocado'), 'assets/foods/avocado.svg');
+    expect(FoodItemImage.assetFor('Gurke'), 'assets/foods/gurke.svg');
+    expect(FoodItemImage.assetFor('Paprika'), 'assets/foods/paprika.svg');
+    expect(FoodItemImage.assetFor('Zucchini'), 'assets/foods/zucchini.svg');
+    expect(FoodItemImage.assetFor('Blumenkohl'), 'assets/foods/blumenkohl.svg');
+    expect(FoodItemImage.assetFor('Spinat'), 'assets/foods/spinat.svg');
+    expect(FoodItemImage.assetFor('Knoblauch'), 'assets/foods/knoblauch.svg');
     expect(FoodItemImage.assetFor('Brokkoli'), 'assets/foods/brokkoli.svg');
     expect(FoodItemImage.assetFor('Karotte'), 'assets/foods/karotte.svg');
     expect(FoodItemImage.assetFor('Karotten'), 'assets/foods/karotte.svg');
@@ -58,6 +64,12 @@ void main() {
   testWidgets('dedicated vegetable SVG assets render without errors', (tester) async {
     const foods = [
       'Avocado',
+      'Gurke',
+      'Paprika',
+      'Zucchini',
+      'Blumenkohl',
+      'Spinat',
+      'Knoblauch',
       'Brokkoli',
       'Karotte',
       'Karotten',
