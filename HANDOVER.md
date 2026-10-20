@@ -155,3 +155,9 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 
 - Standortbestimmung für die ChatGPT-Restaurantsuche ist jetzt auf 15 Sekunden begrenzt. Bei Timeout erscheint eine verständliche Fehlermeldung mit erneutem Versuch als nächstem Schritt; die UI bleibt nicht unbegrenzt im Ladezustand.
 - Regressionstest ergänzt. CI muss den aktuellen PR-Head prüfen. Kein Geräte-Test und kein Release.
+
+
+## UX-Härtung: Standortberechtigung erst bei Restaurantsuche (2026-10-20)
+
+- Die Launch-Seite fordert keine Standortberechtigung mehr direkt beim ersten App-Start an. Die Berechtigung wird weiterhin im konkreten Restaurant-Suchablauf angefragt, in dem sie benötigt wird.
+- Regressionstest aktualisiert. Keine Änderung an Berechtigungsmodellen oder Datenschutzkonfiguration. CI-Prüfung und Post-Merge-Verifikation stehen noch aus.
