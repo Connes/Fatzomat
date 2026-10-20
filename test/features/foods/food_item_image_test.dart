@@ -1,4 +1,4 @@
-import 'dart:ui' as ui;
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -136,12 +136,14 @@ void main() {
 
     for (final asset in assets) {
       final data = await rootBundle.load('assets/foods/$asset');
-      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
-      final frame = await codec.getNextFrame();
-      expect(frame.image.width, 128, reason: '$asset width');
-      expect(frame.image.height, 128, reason: '$asset height');
-      frame.image.dispose();
-      codec.dispose();
+      final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      expect(ascii.decode(bytes.sublist(0, 4)), 'RIFF', reason: '$asset RIFF header');
+      expect(ascii.decode(bytes.sublist(8, 12)), 'WEBP', reason: '$asset WebP header');
+      expect(ascii.decode(bytes.sublist(12, 16)), 'VP8 ', reason: '$asset lossy WebP frame');
+      final width = bytes[26] | ((bytes[27] & 0x3f) << 8);
+      final height = bytes[28] | ((bytes[29] & 0x3f) << 8);
+      expect(width, 128, reason: '$asset width');
+      expect(height, 128, reason: '$asset height');
     }
   });
 
