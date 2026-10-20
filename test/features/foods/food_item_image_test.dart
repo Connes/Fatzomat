@@ -136,7 +136,7 @@ void main() {
 
     for (final asset in assets) {
       final data = await rootBundle.load('assets/foods/$asset');
-      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes));
       final frame = await codec.getNextFrame();
       expect(frame.image.width, 128, reason: '$asset width');
       expect(frame.image.height, 128, reason: '$asset height');
