@@ -8,6 +8,8 @@ void main() {
     expect(source, contains('Noch keine Lieblingsrestaurants vorhanden'));
     expect(source, contains('Füge über das Plus oben rechts dein erstes Lieblingsrestaurant hinzu.'));
     expect(source, contains('color: AppDesign.surface'));
+    expect(source, contains("Text('💛', style: TextStyle(fontSize: 42, height: 1.1))"));
+    expect(source, isNot(contains('Icons.restaurant_menu_rounded')));
   });
 
   test('load failure remains distinct from an empty list and is readable', () {
