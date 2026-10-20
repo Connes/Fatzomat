@@ -103,4 +103,14 @@ void main() {
     expect(plan.restaurantAddress, 'Marktplatz 2');
     expect(plan.restaurantPhone, '01234');
   });
+
+  test('location lookup has a bounded wait and a clear retryable timeout state', () {
+    final source = File('lib/features/food_modes/chatgpt_restaurant_page.dart').readAsStringSync();
+    expect(source, contains("Geolocator.getCurrentPosition().timeout("));
+    expect(source, contains('const Duration(seconds: 15)'));
+    expect(source, contains('on TimeoutException'));
+    expect(source, contains('Der Standort konnte nicht rechtzeitig ermittelt werden.'));
+    expect(source, contains('_waitingForLocationSettings = false;'));
+    expect(source, contains("label: const Text('Berechtigung prüfen und fortfahren')"));
+  });
 }
