@@ -12,11 +12,12 @@ void main() {
     expect(FoodItemImage.assetFor('Banane'), 'assets/foods/banane.webp');
     expect(FoodItemImage.assetFor('Zitrone'), 'assets/foods/zitrone.webp');
     expect(FoodItemImage.assetFor('Erdbeeren'), 'assets/foods/erdbeeren.webp');
+    expect(FoodItemImage.assetFor('Heidelbeeren'), 'assets/foods/heidelbeeren.webp');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
   });
 
   testWidgets('dedicated food assets decode when rendered', (tester) async {
-    for (final food in ['Apfel', 'Forelle', 'Dorade', 'Heilbutt', 'Hering', 'Banane', 'Zitrone', 'Erdbeeren']) {
+    for (final food in ['Apfel', 'Forelle', 'Dorade', 'Heilbutt', 'Hering', 'Banane', 'Zitrone', 'Erdbeeren', 'Heidelbeeren']) {
       await tester.pumpWidget(MaterialApp(home: Scaffold(body: FoodItemImage(foodName: food))));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: '$food asset should decode');
