@@ -136,10 +136,6 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       _waitingForLocationSettings = false;
     });
     await _determineCurrentLocation();
-    if (!mounted) return;
-    if (_locationController.text.trim().isNotEmpty && !_waitingForLocationSettings) {
-      await _launchChatGptWithPrompt();
-    }
   }
 
   @override
