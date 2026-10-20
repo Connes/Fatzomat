@@ -158,9 +158,22 @@ void main() {
       final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       expect(ascii.decode(bytes.sublist(0, 4)), 'RIFF', reason: '$asset RIFF header');
       expect(ascii.decode(bytes.sublist(8, 12)), 'WEBP', reason: '$asset WebP header');
-      expect(ascii.decode(bytes.sublist(12, 16)), 'VP8 ', reason: '$asset lossy WebP frame');
-      final width = bytes[26] | ((bytes[27] & 0x3f) << 8);
-      final height = bytes[28] | ((bytes[29] & 0x3f) << 8);
+      final chunkType = ascii.decode(bytes.sublist(12, 16));
+      late final int width;
+      late final int height;
+      if (chunkType == 'VP8 ') {
+        // Lossy WebP stores 14-bit dimensions in the frame header.
+        width = bytes[26] | ((bytes[27] & 0x3f) << 8);
+        height = bytes[28] | ((bytes[29] & 0x3f) << 8);
+      } else if (chunkType == 'VP8L') {
+        // Lossless WebP packs width and height minus one into four bytes.
+        expect(bytes[20], 0x2f, reason: '$asset VP8L signature');
+        width = 1 + bytes[21] + ((bytes[22] & 0x3f) << 8);
+        height = 1 + ((bytes[22] >> 6) & 0x03) + (bytes[23] << 2) +
+            ((bytes[24] & 0x0f) << 10);
+      } else {
+        fail('$asset uses unsupported WebP chunk type: $chunkType');
+      }
       expect(width, 128, reason: '$asset width');
       expect(height, 128, reason: '$asset height');
     }
