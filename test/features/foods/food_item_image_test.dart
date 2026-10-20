@@ -1,4 +1,6 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:food_app_mvp/features/foods/food_item_image.dart';
 
@@ -107,6 +109,39 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: '$food WebP should render');
       expect(find.byType(Image), findsOneWidget, reason: '$food should use its WebP asset');
+    }
+  });
+
+  test('dedicated produce WebP assets are exactly 128x128', () async {
+    const assets = [
+      'aubergine.webp',
+      'avocado.webp',
+      'blumenkohl.webp',
+      'brokkoli.webp',
+      'champignons.webp',
+      'erbsen.webp',
+      'fruehlingszwiebel.webp',
+      'gurke.webp',
+      'karotte.webp',
+      'kartoffel.webp',
+      'knoblauch.webp',
+      'kuerbis.webp',
+      'mais.webp',
+      'paprika.webp',
+      'spinat.webp',
+      'tomate.webp',
+      'zucchini.webp',
+      'zwiebel.webp',
+    ];
+
+    for (final asset in assets) {
+      final data = await rootBundle.load('assets/foods/$asset');
+      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+      final frame = await codec.getNextFrame();
+      expect(frame.image.width, 128, reason: '$asset width');
+      expect(frame.image.height, 128, reason: '$asset height');
+      frame.image.dispose();
+      codec.dispose();
     }
   });
 
