@@ -17,6 +17,13 @@ import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../../data/repositories/restaurant_favorites_repository.dart';
 
+
+class _LocationAccessRequired implements Exception {
+  final String message;
+
+  const _LocationAccessRequired(this.message);
+}
+
 class ChatGptRestaurantPage extends StatefulWidget {
   final DateTime? planDate;
   final String initialCuisine;
@@ -39,6 +46,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
   Map<String, dynamic>? _restaurant;
   bool _importing = false;
   bool _locating = false;
+  bool _waitingForLocationSettings = false;
 
   @override
   void initState() {
@@ -54,12 +62,19 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
     });
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
-        throw Exception('Standortdienste sind deaktiviert. Bitte aktiviere sie in den Geräteeinstellungen.');
+        throw const _LocationAccessRequired(
+          'Die Standortdienste sind ausgeschaltet. Aktiviere sie, damit Fatzomat Restaurants in deiner Nähe finden kann.',
+        );
       }
-      final permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        throw Exception('Standortzugriff ist nicht freigegeben. Bitte erteile Fatzomat die Standortberechtigung in den Systemeinstellungen. Es wird nicht bei jeder ChatGPT-Übergabe erneut gefragt.');
+        throw const _LocationAccessRequired(
+          'Ohne Standortfreigabe kann Fatzomat keine Restaurants in deiner Nähe suchen. Öffne die Systemeinstellungen und erlaube den Standortzugriff. Danach kannst du hier fortfahren.',
+        );
       }
       final position = await Geolocator.getCurrentPosition();
       final placemarks = await placemarkFromCoordinates(
@@ -79,15 +94,40 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
           : '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
       if (!mounted) return;
       _locationController.text = location;
+    } on _LocationAccessRequired catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.message;
+        _waitingForLocationSettings = true;
+      });
     } catch (error) {
       if (!mounted) return;
       setState(() => _error = error.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _locating = false);
-      if (mounted && widget.autoOpenChatGpt) {
+      if (mounted && widget.autoOpenChatGpt && !_waitingForLocationSettings && _locationController.text.trim().isNotEmpty) {
         await _launchChatGptWithPrompt();
       }
     }
+  }
+
+  Future<void> _openLocationSettings() async {
+    final opened = await Geolocator.openAppSettings();
+    if (!opened && mounted) {
+      AppFeedback.showSnackBar(
+        context,
+        const SnackBar(content: Text('Die Systemeinstellungen konnten nicht geöffnet werden. Bitte öffne sie manuell.')),
+      );
+    }
+  }
+
+  Future<void> _retryLocationAndContinue() async {
+    if (!mounted) return;
+    setState(() {
+      _error = null;
+      _waitingForLocationSettings = false;
+    });
+    await _determineCurrentLocation();
   }
 
   @override
@@ -343,6 +383,20 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
               if (_error != null) ...[
                 const SizedBox(height: 10),
                 Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                if (_waitingForLocationSettings) ...[
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _openLocationSettings,
+                    icon: const Icon(Icons.settings_rounded),
+                    label: const Text('Systemeinstellungen öffnen'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: _locating ? null : _retryLocationAndContinue,
+                    icon: const Icon(Icons.check_circle_outline_rounded),
+                    label: const Text('Berechtigung prüfen und fortfahren'),
+                  ),
+                ],
               ],
               if (_restaurant != null) ...[
                 const SizedBox(height: 14),
