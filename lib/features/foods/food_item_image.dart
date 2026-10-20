@@ -160,6 +160,12 @@ class FoodItemImage extends StatelessWidget {
       case 'weißkohl':
       case 'weisskohl':
         return 'assets/foods/weisskohl.webp';
+      case 'artischocke':
+        return 'assets/foods/artischocke.webp';
+      case 'kohlrabi':
+        return 'assets/foods/kohlrabi.webp';
+      case 'rosenkohl':
+        return 'assets/foods/rosenkohl.webp';
       case 'frühlingszwiebel':
       case 'fruehlingszwiebel':
         return 'assets/foods/fruehlingszwiebel.webp';
