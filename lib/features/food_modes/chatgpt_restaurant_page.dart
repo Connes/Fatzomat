@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -76,7 +77,9 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
           'Ohne Standortfreigabe kann Fatzomat keine Restaurants in deiner Nähe suchen. Öffne die Systemeinstellungen und erlaube den Standortzugriff. Danach kannst du hier fortfahren.',
         );
       }
-      final position = await Geolocator.getCurrentPosition();
+      final position = await Geolocator.getCurrentPosition().timeout(
+        const Duration(seconds: 15),
+      );
       final placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -99,6 +102,12 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       setState(() {
         _error = error.message;
         _waitingForLocationSettings = true;
+      });
+    } on TimeoutException {
+      if (!mounted) return;
+      setState(() {
+        _error = 'Der Standort konnte nicht rechtzeitig ermittelt werden. Prüfe GPS und versuche es erneut.';
+        _waitingForLocationSettings = false;
       });
     } catch (error) {
       if (!mounted) return;
