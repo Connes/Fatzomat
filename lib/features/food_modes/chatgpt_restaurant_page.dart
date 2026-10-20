@@ -20,14 +20,8 @@ import '../../data/repositories/restaurant_favorites_repository.dart';
 
 class _LocationAccessRequired implements Exception {
   final String message;
-  final bool permanentlyDenied;
-  final bool serviceDisabled;
 
-  const _LocationAccessRequired(
-    this.message, {
-    this.permanentlyDenied = false,
-    this.serviceDisabled = false,
-  });
+  const _LocationAccessRequired(this.message);
 }
 
 class ChatGptRestaurantPage extends StatefulWidget {
@@ -70,7 +64,6 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       if (!await Geolocator.isLocationServiceEnabled()) {
         throw const _LocationAccessRequired(
           'Die Standortdienste sind ausgeschaltet. Aktiviere sie, damit Fatzomat Restaurants in deiner Nähe finden kann.',
-          serviceDisabled: true,
         );
       }
       var permission = await Geolocator.checkPermission();
@@ -81,7 +74,6 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
           permission == LocationPermission.deniedForever) {
         throw const _LocationAccessRequired(
           'Ohne Standortfreigabe kann Fatzomat keine Restaurants in deiner Nähe suchen. Öffne die Systemeinstellungen und erlaube den Standortzugriff. Danach kannst du hier fortfahren.',
-          permanentlyDenied: true,
         );
       }
       final position = await Geolocator.getCurrentPosition();
