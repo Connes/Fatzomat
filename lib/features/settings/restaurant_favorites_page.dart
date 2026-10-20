@@ -466,7 +466,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                           color: AppDesign.surface,
                           child: Column(
                             children: [
-                              const Icon(Icons.restaurant_menu_rounded, size: 38, color: AppDesign.primaryDark),
+                              const Text('💛', style: TextStyle(fontSize: 42, height: 1.1)),
                               const SizedBox(height: 8),
                               Text(
                                 'Noch keine Lieblingsrestaurants vorhanden',
