@@ -32,6 +32,16 @@ void main() {
     expect(FoodItemImage.assetFor('Pfirsich'), 'assets/foods/pfirsich.webp');
     expect(FoodItemImage.assetFor('Wassermelone'), 'assets/foods/wassermelone.webp');
     expect(FoodItemImage.assetFor('Avocado'), 'assets/foods/avocado.svg');
+    expect(FoodItemImage.assetFor('Aubergine'), 'assets/foods/aubergine.svg');
+    expect(FoodItemImage.assetFor('Champignons'), 'assets/foods/champignons.svg');
+    expect(FoodItemImage.assetFor('Austernpilze'), 'assets/foods/champignons.svg');
+    expect(FoodItemImage.assetFor('Shiitake-Pilze'), 'assets/foods/champignons.svg');
+    expect(FoodItemImage.assetFor('Erbsen'), 'assets/foods/erbsen.svg');
+    expect(FoodItemImage.assetFor('Mais'), 'assets/foods/mais.svg');
+    expect(FoodItemImage.assetFor('Kürbis'), 'assets/foods/kuerbis.svg');
+    expect(FoodItemImage.assetFor('Kuerbis'), 'assets/foods/kuerbis.svg');
+    expect(FoodItemImage.assetFor('Frühlingszwiebel'), 'assets/foods/fruehlingszwiebel.svg');
+    expect(FoodItemImage.assetFor('Fruehlingszwiebel'), 'assets/foods/fruehlingszwiebel.svg');
     expect(FoodItemImage.assetFor('Gurke'), 'assets/foods/gurke.svg');
     expect(FoodItemImage.assetFor('Paprika'), 'assets/foods/paprika.svg');
     expect(FoodItemImage.assetFor('Zucchini'), 'assets/foods/zucchini.svg');
@@ -64,6 +74,15 @@ void main() {
   testWidgets('dedicated vegetable SVG assets render without errors', (tester) async {
     const foods = [
       'Avocado',
+      'Aubergine',
+      'Champignons',
+      'Austernpilze',
+      'Shiitake-Pilze',
+      'Erbsen',
+      'Mais',
+      'Kürbis',
+      'Frühlingszwiebel',
+      'Fruehlingszwiebel',
       'Gurke',
       'Paprika',
       'Zucchini',
