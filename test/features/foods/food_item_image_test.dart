@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:food_app_mvp/features/foods/food_item_image.dart';
 
 void main() {
@@ -31,34 +30,34 @@ void main() {
     expect(FoodItemImage.assetFor('Mandarine'), 'assets/foods/mandarine.webp');
     expect(FoodItemImage.assetFor('Pfirsich'), 'assets/foods/pfirsich.webp');
     expect(FoodItemImage.assetFor('Wassermelone'), 'assets/foods/wassermelone.webp');
-    expect(FoodItemImage.assetFor('Avocado'), 'assets/foods/avocado.svg');
-    expect(FoodItemImage.assetFor('Aubergine'), 'assets/foods/aubergine.svg');
-    expect(FoodItemImage.assetFor('Champignons'), 'assets/foods/champignons.svg');
-    expect(FoodItemImage.assetFor('Austernpilze'), 'assets/foods/champignons.svg');
-    expect(FoodItemImage.assetFor('Shiitake-Pilze'), 'assets/foods/champignons.svg');
-    expect(FoodItemImage.assetFor('Erbsen'), 'assets/foods/erbsen.svg');
-    expect(FoodItemImage.assetFor('Mais'), 'assets/foods/mais.svg');
-    expect(FoodItemImage.assetFor('Kürbis'), 'assets/foods/kuerbis.svg');
-    expect(FoodItemImage.assetFor('Kuerbis'), 'assets/foods/kuerbis.svg');
-    expect(FoodItemImage.assetFor('Frühlingszwiebel'), 'assets/foods/fruehlingszwiebel.svg');
-    expect(FoodItemImage.assetFor('Fruehlingszwiebel'), 'assets/foods/fruehlingszwiebel.svg');
-    expect(FoodItemImage.assetFor('Gurke'), 'assets/foods/gurke.svg');
-    expect(FoodItemImage.assetFor('Paprika'), 'assets/foods/paprika.svg');
-    expect(FoodItemImage.assetFor('Zucchini'), 'assets/foods/zucchini.svg');
-    expect(FoodItemImage.assetFor('Blumenkohl'), 'assets/foods/blumenkohl.svg');
-    expect(FoodItemImage.assetFor('Spinat'), 'assets/foods/spinat.svg');
-    expect(FoodItemImage.assetFor('Knoblauch'), 'assets/foods/knoblauch.svg');
-    expect(FoodItemImage.assetFor('Brokkoli'), 'assets/foods/brokkoli.svg');
-    expect(FoodItemImage.assetFor('Karotte'), 'assets/foods/karotte.svg');
-    expect(FoodItemImage.assetFor('Karotten'), 'assets/foods/karotte.svg');
-    expect(FoodItemImage.assetFor('Kartoffel'), 'assets/foods/kartoffel.svg');
-    expect(FoodItemImage.assetFor('Kartoffeln'), 'assets/foods/kartoffel.svg');
-    expect(FoodItemImage.assetFor('Tomate'), 'assets/foods/tomate.svg');
-    expect(FoodItemImage.assetFor('Tomaten'), 'assets/foods/tomate.svg');
-    expect(FoodItemImage.assetFor('Cherrytomaten'), 'assets/foods/tomate.svg');
-    expect(FoodItemImage.assetFor('Zwiebel'), 'assets/foods/zwiebel.svg');
-    expect(FoodItemImage.assetFor('Zwiebeln'), 'assets/foods/zwiebel.svg');
-    expect(FoodItemImage.assetFor('Schalotte'), 'assets/foods/zwiebel.svg');
+    expect(FoodItemImage.assetFor('Avocado'), 'assets/foods/avocado.webp');
+    expect(FoodItemImage.assetFor('Aubergine'), 'assets/foods/aubergine.webp');
+    expect(FoodItemImage.assetFor('Champignons'), 'assets/foods/champignons.webp');
+    expect(FoodItemImage.assetFor('Austernpilze'), 'assets/foods/champignons.webp');
+    expect(FoodItemImage.assetFor('Shiitake-Pilze'), 'assets/foods/champignons.webp');
+    expect(FoodItemImage.assetFor('Erbsen'), 'assets/foods/erbsen.webp');
+    expect(FoodItemImage.assetFor('Mais'), 'assets/foods/mais.webp');
+    expect(FoodItemImage.assetFor('Kürbis'), 'assets/foods/kuerbis.webp');
+    expect(FoodItemImage.assetFor('Kuerbis'), 'assets/foods/kuerbis.webp');
+    expect(FoodItemImage.assetFor('Frühlingszwiebel'), 'assets/foods/fruehlingszwiebel.webp');
+    expect(FoodItemImage.assetFor('Fruehlingszwiebel'), 'assets/foods/fruehlingszwiebel.webp');
+    expect(FoodItemImage.assetFor('Gurke'), 'assets/foods/gurke.webp');
+    expect(FoodItemImage.assetFor('Paprika'), 'assets/foods/paprika.webp');
+    expect(FoodItemImage.assetFor('Zucchini'), 'assets/foods/zucchini.webp');
+    expect(FoodItemImage.assetFor('Blumenkohl'), 'assets/foods/blumenkohl.webp');
+    expect(FoodItemImage.assetFor('Spinat'), 'assets/foods/spinat.webp');
+    expect(FoodItemImage.assetFor('Knoblauch'), 'assets/foods/knoblauch.webp');
+    expect(FoodItemImage.assetFor('Brokkoli'), 'assets/foods/brokkoli.webp');
+    expect(FoodItemImage.assetFor('Karotte'), 'assets/foods/karotte.webp');
+    expect(FoodItemImage.assetFor('Karotten'), 'assets/foods/karotte.webp');
+    expect(FoodItemImage.assetFor('Kartoffel'), 'assets/foods/kartoffel.webp');
+    expect(FoodItemImage.assetFor('Kartoffeln'), 'assets/foods/kartoffel.webp');
+    expect(FoodItemImage.assetFor('Tomate'), 'assets/foods/tomate.webp');
+    expect(FoodItemImage.assetFor('Tomaten'), 'assets/foods/tomate.webp');
+    expect(FoodItemImage.assetFor('Cherrytomaten'), 'assets/foods/tomate.webp');
+    expect(FoodItemImage.assetFor('Zwiebel'), 'assets/foods/zwiebel.webp');
+    expect(FoodItemImage.assetFor('Zwiebeln'), 'assets/foods/zwiebel.webp');
+    expect(FoodItemImage.assetFor('Schalotte'), 'assets/foods/zwiebel.webp');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
   });
 
@@ -71,7 +70,7 @@ void main() {
     }
   });
 
-  testWidgets('dedicated vegetable SVG assets render without errors', (tester) async {
+  testWidgets('dedicated vegetable WebP assets render without errors', (tester) async {
     const foods = [
       'Avocado',
       'Aubergine',
@@ -106,8 +105,8 @@ void main() {
         home: Scaffold(body: FoodItemImage(foodName: food)),
       ));
       await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull, reason: '$food SVG should render');
-      expect(find.byType(SvgPicture), findsOneWidget, reason: '$food should use its SVG asset');
+      expect(tester.takeException(), isNull, reason: '$food WebP should render');
+      expect(find.byType(Image), findsOneWidget, reason: '$food should use its WebP asset');
     }
   });
 
