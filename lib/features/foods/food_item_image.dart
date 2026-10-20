@@ -90,6 +90,8 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/makrele.webp';
       case 'pangasius':
         return 'assets/foods/pangasius.webp';
+      case 'raeucherlachs':
+        return 'assets/foods/raeucherlachs.webp';
       case 'dorade':
         return 'assets/foods/dorade.webp';
       case 'heilbutt':
