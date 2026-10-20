@@ -133,6 +133,18 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/wassermelone.webp';
       case 'avocado':
         return 'assets/foods/avocado.svg';
+      case 'gurke':
+        return 'assets/foods/gurke.svg';
+      case 'paprika':
+        return 'assets/foods/paprika.svg';
+      case 'zucchini':
+        return 'assets/foods/zucchini.svg';
+      case 'blumenkohl':
+        return 'assets/foods/blumenkohl.svg';
+      case 'spinat':
+        return 'assets/foods/spinat.svg';
+      case 'knoblauch':
+        return 'assets/foods/knoblauch.svg';
       case 'brokkoli':
         return 'assets/foods/brokkoli.svg';
       case 'karotte':
