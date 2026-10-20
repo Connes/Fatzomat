@@ -80,6 +80,8 @@ class FoodItemImage extends StatelessWidget {
     switch (name.trim().toLowerCase()) {
       case 'apfel':
         return 'assets/foods/apfel.webp';
+      case 'forelle':
+        return 'assets/foods/forelle.webp';
       default:
         return null;
     }
