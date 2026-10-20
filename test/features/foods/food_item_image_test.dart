@@ -4,6 +4,7 @@ import 'package:food_app_mvp/features/foods/food_item_image.dart';
 void main() {
   test('known foods resolve to dedicated WebP assets', () {
     expect(FoodItemImage.assetFor('Apfel'), 'assets/foods/apfel.webp');
+    expect(FoodItemImage.assetFor(' Forelle '), 'assets/foods/forelle.webp');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
   });
 
