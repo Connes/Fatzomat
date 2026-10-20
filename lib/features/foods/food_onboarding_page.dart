@@ -268,7 +268,7 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
                                 IconButton(
                                   tooltip: 'Mag ich',
                                   onPressed: saving ? null : () => choose(id, 'like'),
-                                  icon: Icon(Icons.favorite_rounded, color: value == 'like' ? AppDesign.primary : AppDesign.divider),
+                                  icon: Icon(Icons.favorite_rounded, color: value == 'like' ? Colors.red : AppDesign.divider),
                                 ),
                                 IconButton(
                                   tooltip: 'Mag ich nicht',
