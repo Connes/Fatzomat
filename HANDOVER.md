@@ -32,7 +32,8 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 ## Lebensmittel-Icon-Bibliothek (Arbeitsstand 2026-10-19)
 
 - Die Umsetzung läuft auf `feat/food-emoji-webp-assets`.
-- Erste Einzelgrafik angelegt: `assets/foods/apfel.webp`, echtes WebP mit 128 × 128 Pixeln und Alphakanal; lokal verifiziert mit ca. 4.8 KB.
+- `assets/foods/apfel.webp`: echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,812 Bytes; lokal validiert.
+- `assets/foods/forelle.webp`: aus einem einzeln generierten Forellen-PNG mit echtem Alpha-Kanal erzeugt; echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,796 Bytes; lokal validiert. Die Datei liegt im Branch und ist in `FoodItemImage` zugeordnet.
 - `FoodItemImage` nutzt die dedizierte WebP-Datei für „Apfel“ und behält für alle noch nicht abgedeckten Lebensmittel die bestehende Emoji-/Kategorie-Fallback-Logik.
 - Die Asset-Zuordnung ist testbar; ein Regressionstest für den Apfel und den Fallback wurde ergänzt.
 - **Unvollständig:** Der Lebensmittelkatalog ist noch nicht vollständig mit Einzelgrafiken abgedeckt. Sammelbilder wurden nicht als Quelle ausgeschnitten. Die restlichen Motive, vollständige Asset-Abdeckungsprüfung sowie CI-/PR-Verifikation stehen aus.
