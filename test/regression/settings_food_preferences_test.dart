@@ -24,6 +24,9 @@ void main() {
     expect(source, contains('Scrollbar('));
     expect(source, contains('thumbVisibility: true'));
     expect(source, contains('ListView.builder('));
+    expect(source, contains('contentPadding: const EdgeInsets.symmetric(horizontal: 8)'));
+    expect(source, contains('horizontalTitleGap: 8'));
+    expect(source, contains('minLeadingWidth: 24'));
     expect(source, contains('clamp(140.0, 420.0)'));
     expect(source, contains("ValueKey<String>('food_preferences_empty_state_box')"));
     expect(source, contains('padding: const EdgeInsets.fromLTRB(0, 4, 0, 12)'));
