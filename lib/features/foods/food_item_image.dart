@@ -110,6 +110,8 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/trauben.webp';
       case 'kiwi':
         return 'assets/foods/kiwi.webp';
+      case 'limette':
+        return 'assets/foods/limette.webp';
       default:
         return null;
     }
