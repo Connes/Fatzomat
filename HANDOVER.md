@@ -29,6 +29,15 @@ Wenn der Nutzer `Handover-Reset` schreibt, ohne weitere Erläuterung:
 
 Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um bloße Zusammenfassung. Er gilt in neuen Chats, sofern dieses Repository und diese Datei dort zugänglich sind.
 
+## Lebensmittel-Icon-Bibliothek (Arbeitsstand 2026-10-20)
+
+- Die Umsetzung läuft auf `feat/food-emoji-webp-assets`; PR #238 ist der inkrementelle erste Rollout.
+- `assets/foods/` enthält 26 eigenständige WebP-Illustrationen: Apfel, Ananas, Banane, Birne, Dorade, Erdbeeren, Forelle, Heidelbeeren, Heilbutt, Himbeeren, Hering, Kabeljau, Kiwi, Lachs, Limette, Makrele, Mandarine, Mango, Orange, Pangasius, Pfirsich, Räucherlachs, Rotbarsch, Trauben, Wassermelone und Zitrone.
+- Alle 26 Dateien sind in `FoodItemImage.assetFor` zugeordnet und werden vom Widgettest auf tatsächliches Rendern/Decodieren geprüft; der Test prüft außerdem den unbekannten Namen und den bestehenden Emoji-/Kategorie-Fallback.
+- Ein CI-Fehler am 2026-10-20 wurde auf die fehlende Akzentvariante `räucherlachs` in der Asset-Auflösung zurückgeführt. Der Lookup akzeptiert nun sowohl `Räucherlachs` als auch `Raeucherlachs`; beide erforderlichen Workflows sind für Head `95bf19e5e9716c1ec64953eadadcec9b18d688c9` erfolgreich.
+- Es werden keine Sammelbilder zerschnitten. Die 26 Motive sind einzelne Assets.
+- **Unvollständig:** Der gesamte Lebensmittelkatalog ist noch nicht mit individuellen Illustrationen abgedeckt. Nicht zugeordnete Lebensmittel nutzen weiterhin den bestehenden Emoji-/Kategorie-Fallback. Vor einer späteren Erweiterung Katalognamen gegen `FoodItemImage.assetFor` und `assets/foods/` abgleichen; für jede neue Datei Asset-Decoding-Regressionstests ergänzen.
+
 ## Autonomer Arbeitsmodus
 
 - „Fatzomat weiterentwickeln“ startet einen fortlaufenden Arbeitszyklus, nicht nur eine Bestandsaufnahme oder einen Vorschlag.

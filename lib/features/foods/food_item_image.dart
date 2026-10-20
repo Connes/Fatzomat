@@ -76,6 +76,66 @@ class FoodItemImage extends StatelessWidget {
     return _categoryEmoji[category?.trim().toLowerCase()] ?? '🍽️';
   }
 
+  static String? assetFor(String name) {
+    switch (name.trim().toLowerCase()) {
+      case 'apfel':
+        return 'assets/foods/apfel.webp';
+      case 'forelle':
+        return 'assets/foods/forelle.webp';
+      case 'lachs':
+        return 'assets/foods/lachs.webp';
+      case 'kabeljau':
+        return 'assets/foods/kabeljau.webp';
+      case 'makrele':
+        return 'assets/foods/makrele.webp';
+      case 'pangasius':
+        return 'assets/foods/pangasius.webp';
+      case 'räucherlachs':
+      case 'raeucherlachs':
+        return 'assets/foods/raeucherlachs.webp';
+      case 'rotbarsch':
+        return 'assets/foods/rotbarsch.webp';
+      case 'dorade':
+        return 'assets/foods/dorade.webp';
+      case 'heilbutt':
+        return 'assets/foods/heilbutt.webp';
+      case 'hering':
+        return 'assets/foods/hering.webp';
+      case 'banane':
+        return 'assets/foods/banane.webp';
+      case 'zitrone':
+        return 'assets/foods/zitrone.webp';
+      case 'erdbeeren':
+        return 'assets/foods/erdbeeren.webp';
+      case 'heidelbeeren':
+        return 'assets/foods/heidelbeeren.webp';
+      case 'himbeeren':
+        return 'assets/foods/himbeeren.webp';
+      case 'birne':
+        return 'assets/foods/birne.webp';
+      case 'orange':
+        return 'assets/foods/orange.webp';
+      case 'mango':
+        return 'assets/foods/mango.webp';
+      case 'ananas':
+        return 'assets/foods/ananas.webp';
+      case 'trauben':
+        return 'assets/foods/trauben.webp';
+      case 'kiwi':
+        return 'assets/foods/kiwi.webp';
+      case 'limette':
+        return 'assets/foods/limette.webp';
+      case 'mandarine':
+        return 'assets/foods/mandarine.webp';
+      case 'pfirsich':
+        return 'assets/foods/pfirsich.webp';
+      case 'wassermelone':
+        return 'assets/foods/wassermelone.webp';
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final icon = emojiFor(foodName, category: category);
@@ -90,7 +150,9 @@ class FoodItemImage extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: SvgPicture.string(svg, width: size, height: size),
+        child: assetFor(foodName) != null
+            ? Image.asset(assetFor(foodName)!, width: size, height: size, fit: BoxFit.contain)
+            : SvgPicture.string(svg, width: size, height: size),
       ),
     );
   }

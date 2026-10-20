@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/branding/
     - assets/icons/
+    - assets/foods/
     - assets/together/clean/icons/
     - assets/together/clean/background/
     - assets/food_choices/cooking/
