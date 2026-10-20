@@ -82,6 +82,8 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/apfel.webp';
       case 'forelle':
         return 'assets/foods/forelle.webp';
+      case 'dorade':
+        return 'assets/foods/dorade.webp';
       default:
         return null;
     }
