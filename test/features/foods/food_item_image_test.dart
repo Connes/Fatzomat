@@ -161,7 +161,11 @@ void main() {
       final chunkType = ascii.decode(bytes.sublist(12, 16));
       late final int width;
       late final int height;
-      if (chunkType == 'VP8 ') {
+      if (chunkType == 'VP8X') {
+        // Extended WebP stores 24-bit canvas dimensions minus one at bytes 24-29.
+        width = 1 + bytes[24] + (bytes[25] << 8) + (bytes[26] << 16);
+        height = 1 + bytes[27] + (bytes[28] << 8) + (bytes[29] << 16);
+      } else if (chunkType == 'VP8 ') {
         // Lossy WebP stores 14-bit dimensions in the frame header.
         width = bytes[26] | ((bytes[27] & 0x3f) << 8);
         height = bytes[28] | ((bytes[29] & 0x3f) << 8);
