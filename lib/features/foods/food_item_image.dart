@@ -133,6 +133,22 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/wassermelone.webp';
       case 'avocado':
         return 'assets/foods/avocado.svg';
+      case 'aubergine':
+        return 'assets/foods/aubergine.svg';
+      case 'champignons':
+      case 'austernpilze':
+      case 'shiitake-pilze':
+        return 'assets/foods/champignons.svg';
+      case 'erbsen':
+        return 'assets/foods/erbsen.svg';
+      case 'mais':
+        return 'assets/foods/mais.svg';
+      case 'kürbis':
+      case 'kuerbis':
+        return 'assets/foods/kuerbis.svg';
+      case 'frühlingszwiebel':
+      case 'fruehlingszwiebel':
+        return 'assets/foods/fruehlingszwiebel.svg';
       case 'gurke':
         return 'assets/foods/gurke.svg';
       case 'paprika':
