@@ -48,6 +48,9 @@ void main() {
     expect(FoodItemImage.assetFor('Chinakohl'), 'assets/foods/chinakohl.webp');
     expect(FoodItemImage.assetFor('Weißkohl'), 'assets/foods/weisskohl.webp');
     expect(FoodItemImage.assetFor('Weisskohl'), 'assets/foods/weisskohl.webp');
+    expect(FoodItemImage.assetFor('Artischocke'), 'assets/foods/artischocke.webp');
+    expect(FoodItemImage.assetFor('Kohlrabi'), 'assets/foods/kohlrabi.webp');
+    expect(FoodItemImage.assetFor('Rosenkohl'), 'assets/foods/rosenkohl.webp');
     expect(FoodItemImage.assetFor('Fenchel'), 'assets/foods/fenchel.webp');
     expect(FoodItemImage.assetFor('Radieschen'), 'assets/foods/radieschen.webp');
     expect(FoodItemImage.assetFor('Rote Bete'), 'assets/foods/rote_bete.webp');
@@ -98,6 +101,9 @@ void main() {
       'Chinakohl',
       'Weißkohl',
       'Weisskohl',
+      'Artischocke',
+      'Kohlrabi',
+      'Rosenkohl',
       'Pastinake',
       'Radieschen',
       'Rote Bete',
@@ -140,6 +146,9 @@ void main() {
       'pak_choi.webp',
       'chinakohl.webp',
       'weisskohl.webp',
+      'artischocke.webp',
+      'kohlrabi.webp',
+      'rosenkohl.webp',
       'pastinake.webp',
       'radieschen.webp',
       'rote_bete.webp',
