@@ -428,12 +428,19 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
 
       final recipeId = await repository.saveRecipeModel(_recipe);
 
+      var imageUploadFailed = false;
       if (selectedImage != null) {
-        final upload = await RecipeImageService().upload(
-          recipeId: recipeId,
-          file: selectedImage!,
-        );
-        await repository.setRecipeImage(recipeId, upload);
+        try {
+          final upload = await RecipeImageService().upload(
+            recipeId: recipeId,
+            file: selectedImage!,
+          );
+          await repository.setRecipeImage(recipeId, upload);
+        } catch (_) {
+          // The recipe itself is already saved. An optional image failure
+          // must not make the user retry the whole import and hit a duplicate.
+          imageUploadFailed = true;
+        }
       }
 
       // A collaboration decision is resolved for the shared flow only. It must
@@ -457,8 +464,12 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       }
 
       if (!mounted) return;
-      AppFeedback.showSnackBar(context, 
-        SnackBar(content: Text('„${_recipe.name}“ wurde gespeichert.')),
+      AppFeedback.showSnackBar(context,
+        SnackBar(
+          content: Text(imageUploadFailed
+              ? '„${_recipe.name}“ wurde gespeichert, das Bild konnte aber nicht hochgeladen werden.'
+              : '„${_recipe.name}“ wurde gespeichert.'),
+        ),
       );
       Navigator.pop(context, true);
     } catch (e) {
