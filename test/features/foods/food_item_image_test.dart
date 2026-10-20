@@ -5,6 +5,7 @@ void main() {
   test('known foods resolve to dedicated WebP assets', () {
     expect(FoodItemImage.assetFor('Apfel'), 'assets/foods/apfel.webp');
     expect(FoodItemImage.assetFor(' Forelle '), 'assets/foods/forelle.webp');
+    expect(FoodItemImage.assetFor('Dorade'), 'assets/foods/dorade.webp');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
   });
 
