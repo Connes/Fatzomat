@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:food_app_mvp/features/foods/food_item_image.dart';
 
@@ -9,6 +10,15 @@ void main() {
     expect(FoodItemImage.assetFor('Heilbutt'), 'assets/foods/heilbutt.webp');
     expect(FoodItemImage.assetFor('Hering'), 'assets/foods/hering.webp');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
+  });
+
+  testWidgets('dedicated food assets decode when rendered', (tester) async {
+    for (final food in ['Apfel', 'Forelle', 'Dorade', 'Heilbutt', 'Hering']) {
+      await tester.pumpWidget(MaterialApp(home: Scaffold(body: FoodItemImage(foodName: food))));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: '$food asset should decode');
+      expect(find.byType(Image), findsOneWidget, reason: '$food should use its WebP asset');
+    }
   });
 
   test('catalog foods have stable emoji illustrations', () {
