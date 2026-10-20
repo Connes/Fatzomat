@@ -7,6 +7,7 @@ void main() {
     expect(FoodItemImage.assetFor(' Forelle '), 'assets/foods/forelle.webp');
     expect(FoodItemImage.assetFor('Dorade'), 'assets/foods/dorade.webp');
     expect(FoodItemImage.assetFor('Heilbutt'), 'assets/foods/heilbutt.webp');
+    expect(FoodItemImage.assetFor('Hering'), 'assets/foods/hering.webp');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
   });
 
