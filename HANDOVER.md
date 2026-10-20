@@ -33,7 +33,8 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 
 - Die Umsetzung läuft auf `feat/food-emoji-webp-assets`.
 - `assets/foods/apfel.webp`: echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,812 Bytes; lokal validiert.
-- `assets/foods/forelle.webp`: aus einem einzeln generierten Forellen-PNG mit echtem Alpha-Kanal erzeugt; echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,796 Bytes; lokal validiert. Die Datei liegt im Branch und ist in `FoodItemImage` zugeordnet.
+- `assets/foods/forelle.webp`: aus einem einzeln generierten Forellen-PNG mit echtem Alpha-Kanal erzeugt; echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,796 Bytes; lokal validiert und in `FoodItemImage` zugeordnet.
+- `assets/foods/dorade.webp`: aus einem einzeln generierten Doraden-PNG mit echtem Alpha-Kanal erzeugt; echtes WebP, 128 × 128 Pixel, RGBA/Alphakanal, 4,986 Bytes; lokal validiert und in `FoodItemImage` zugeordnet.
 - `FoodItemImage` nutzt die dedizierte WebP-Datei für „Apfel“ und behält für alle noch nicht abgedeckten Lebensmittel die bestehende Emoji-/Kategorie-Fallback-Logik.
 - Die Asset-Zuordnung ist testbar; ein Regressionstest für den Apfel und den Fallback wurde ergänzt.
 - **Unvollständig:** Der Lebensmittelkatalog ist noch nicht vollständig mit Einzelgrafiken abgedeckt. Sammelbilder wurden nicht als Quelle ausgeschnitten. Die restlichen Motive, vollständige Asset-Abdeckungsprüfung sowie CI-/PR-Verifikation stehen aus.
