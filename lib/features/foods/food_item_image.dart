@@ -157,6 +157,15 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/pak_choi.webp';
       case 'chinakohl':
         return 'assets/foods/chinakohl.webp';
+      case 'chicorée':
+      case 'chicoree':
+        return 'assets/foods/chicoree.webp';
+      case 'endivie':
+        return 'assets/foods/endivie.webp';
+      case 'lauch':
+        return 'assets/foods/lauch.webp';
+      case 'mangold':
+        return 'assets/foods/mangold.webp';
       case 'weißkohl':
       case 'weisskohl':
         return 'assets/foods/weisskohl.webp';
