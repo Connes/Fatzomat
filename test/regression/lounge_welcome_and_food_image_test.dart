@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:food_app_mvp/features/foods/food_item_image.dart';
 import 'package:food_app_mvp/features/home/home_page.dart';
@@ -27,6 +26,6 @@ void main() {
     await tester.pump();
 
     expect(find.byType(FoodItemImage), findsOneWidget);
-    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
   });
 }
