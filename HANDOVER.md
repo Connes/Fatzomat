@@ -31,12 +31,13 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 
 ## Lebensmittel-Icon-Bibliothek (Arbeitsstand 2026-10-20)
 
-- Die Umsetzung läuft auf `feat/food-emoji-webp-assets`; PR #238 ist der inkrementelle erste Rollout.
+- PR [#238 – Add dedicated food WebP assets (initial rollout)](https://github.com/Connes/Fatzomat/pull/238) wurde in `main` gemergt. Merge-Commit: `0dc23c283efe26e66503925c7dc9aa810eb316f3`.
 - `assets/foods/` enthält 26 eigenständige WebP-Illustrationen: Apfel, Ananas, Banane, Birne, Dorade, Erdbeeren, Forelle, Heidelbeeren, Heilbutt, Himbeeren, Hering, Kabeljau, Kiwi, Lachs, Limette, Makrele, Mandarine, Mango, Orange, Pangasius, Pfirsich, Räucherlachs, Rotbarsch, Trauben, Wassermelone und Zitrone.
-- Alle 26 Dateien sind in `FoodItemImage.assetFor` zugeordnet und werden vom Widgettest auf tatsächliches Rendern/Decodieren geprüft; der Test prüft außerdem den unbekannten Namen und den bestehenden Emoji-/Kategorie-Fallback.
-- Ein CI-Fehler am 2026-10-20 wurde auf die fehlende Akzentvariante `räucherlachs` in der Asset-Auflösung zurückgeführt. Der Lookup akzeptiert nun sowohl `Räucherlachs` als auch `Raeucherlachs`; beide erforderlichen Workflows sind für Head `95bf19e5e9716c1ec64953eadadcec9b18d688c9` erfolgreich.
-- Es werden keine Sammelbilder zerschnitten. Die 26 Motive sind einzelne Assets.
-- **Unvollständig:** Der gesamte Lebensmittelkatalog ist noch nicht mit individuellen Illustrationen abgedeckt. Nicht zugeordnete Lebensmittel nutzen weiterhin den bestehenden Emoji-/Kategorie-Fallback. Vor einer späteren Erweiterung Katalognamen gegen `FoodItemImage.assetFor` und `assets/foods/` abgleichen; für jede neue Datei Asset-Decoding-Regressionstests ergänzen.
+- Der Resolver akzeptiert für Räucherlachs sowohl `Räucherlachs` als auch `Raeucherlachs`. Die WebP-Zuordnungen und tatsächliches Rendern/Decodieren werden in `test/features/foods/food_item_image_test.dart` geprüft.
+- Beide Post-Merge-Workflows für Merge-Commit `0dc23c283efe26e66503925c7dc9aa810eb316f3` sind erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39411957809) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39411956709).
+- Folgebatch in PR [#239 – Add dedicated vegetable SVG illustrations](https://github.com/Connes/Fatzomat/pull/239): sechs eigenständige SVG-Illustrationen für Avocado, Brokkoli, Karotte, Kartoffel, Tomate und Zwiebel. Resolver-Aliase sind Karotte/Karotten, Kartoffel/Kartoffeln, Tomate/Tomaten/Cherrytomaten und Zwiebel/Zwiebeln/Schalotte. Tests prüfen Zuordnung und Rendern; den aktuellen Merge- und CI-Status live prüfen.
+- Es werden keine Sammelbilder zerschnitten. Die Assets sind eigenständige Dateien.
+- **Unvollständig:** Der gesamte Lebensmittelkatalog ist weiterhin nicht mit individuellen Illustrationen abgedeckt. Nicht zugeordnete Lebensmittel behalten den bestehenden Emoji-/Kategorie-Fallback. Katalognamen vor jedem weiteren Batch gegen `FoodItemImage.assetFor` und `assets/foods/` abgleichen; für neue Assets Dateivorhandensein und tatsächliches Rendern testen.
 
 ## Autonomer Arbeitsmodus
 

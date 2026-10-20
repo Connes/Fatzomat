@@ -131,6 +131,24 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/pfirsich.webp';
       case 'wassermelone':
         return 'assets/foods/wassermelone.webp';
+      case 'avocado':
+        return 'assets/foods/avocado.svg';
+      case 'brokkoli':
+        return 'assets/foods/brokkoli.svg';
+      case 'karotte':
+      case 'karotten':
+        return 'assets/foods/karotte.svg';
+      case 'kartoffel':
+      case 'kartoffeln':
+        return 'assets/foods/kartoffel.svg';
+      case 'tomate':
+      case 'tomaten':
+      case 'cherrytomaten':
+        return 'assets/foods/tomate.svg';
+      case 'zwiebel':
+      case 'zwiebeln':
+      case 'schalotte':
+        return 'assets/foods/zwiebel.svg';
       default:
         return null;
     }
@@ -144,16 +162,19 @@ class FoodItemImage extends StatelessWidget {
         '<text x="32" y="43" text-anchor="middle" font-size="32" '
         'font-family="Noto Color Emoji, Apple Color Emoji, Segoe UI Emoji">$icon</text>'
         '</svg>';
+    final asset = assetFor(foodName);
+    final Widget illustration;
+    if (asset == null) {
+      illustration = SvgPicture.string(svg, width: size, height: size);
+    } else if (asset.endsWith('.svg')) {
+      illustration = SvgPicture.asset(asset, width: size, height: size, fit: BoxFit.contain);
+    } else {
+      illustration = Image.asset(asset, width: size, height: size, fit: BoxFit.contain);
+    }
     return Semantics(
       image: true,
       label: foodName,
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: assetFor(foodName) != null
-            ? Image.asset(assetFor(foodName)!, width: size, height: size, fit: BoxFit.contain)
-            : SvgPicture.string(svg, width: size, height: size),
-      ),
+      child: SizedBox(width: size, height: size, child: illustration),
     );
   }
 }
