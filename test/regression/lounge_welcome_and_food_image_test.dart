@@ -15,7 +15,7 @@ void main() {
     expect(text.textAlign, TextAlign.center);
   });
 
-  testWidgets('Lebensmittelbild ersetzt das alte Restaurant-Icon', (tester) async {
+  testWidgets('Lebensmittelzeile zeigt keine Lebensmittelgrafik', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -26,6 +26,8 @@ void main() {
     await tester.pump();
 
     expect(find.byType(FoodItemImage), findsOneWidget);
-    expect(find.byType(Image), findsOneWidget);
+    expect(find.byType(Image), findsNothing);
+    expect(find.byType(Icon), findsNothing);
+    expect(find.byType(Text), findsNothing);
   });
 }
