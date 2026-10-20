@@ -29,15 +29,14 @@ Wenn der Nutzer `Handover-Reset` schreibt, ohne weitere Erläuterung:
 
 Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um bloße Zusammenfassung. Er gilt in neuen Chats, sofern dieses Repository und diese Datei dort zugänglich sind.
 
-## Lebensmittel-Icon-Bibliothek (Arbeitsstand 2026-10-20)
+## Lebensmittelbilder (Arbeitsstand 2026-10-20)
 
-- PR [#238 – Add dedicated food WebP assets (initial rollout)](https://github.com/Connes/Fatzomat/pull/238) wurde gemergt: 26 eigenständige WebP-Illustrationen für Obst und Fisch.
-- Die PRs [#239](https://github.com/Connes/Fatzomat/pull/239), [#240](https://github.com/Connes/Fatzomat/pull/240) und [#242](https://github.com/Connes/Fatzomat/pull/242) hatten zwischenzeitlich SVG-Assets hinzugefügt. Die Abweichung wurde durch PR [#244](https://github.com/Connes/Fatzomat/pull/244) korrigiert und gemergt; Merge-Commit `584461f7c73adc01e6799fb931611dcbd6a4c5d7`. Alle 18 Food-SVG-Dateien wurden durch einzelne WebP-Dateien mit exakt 128 × 128 Pixeln ersetzt und aus `assets/foods/` entfernt.
-- Der Asset-Katalog umfasst nach dieser Korrektur 48 dedizierte Bilddateien: 26 ursprüngliche WebP-Assets, 18 WebP-Assets aus der Korrektur und 4 zusätzliche 128 × 128-WebP-Assets für Fenchel, Pastinake, Radieschen und Rote Bete. Der Resolver verwendet ausschließlich .webp; FoodItemImage rendert dedizierte Bilder mit Image.asset. Der Emoji-Fallback ist Text und erzeugt keine SVGs.
-- Neue WebP-Zuordnungen umfassen Avocado, Aubergine, Blumenkohl, Brokkoli, Champignons (auch Austernpilze/Shiitake-Pilze), Erbsen, Fenchel, Frühlingszwiebel, Gurke, Karotte/Karotten, Kartoffel/Kartoffeln, Knoblauch, Kürbis/Kuerbis, Mais, Paprika, Pastinake, Radieschen, Rote Bete, Spinat, Tomate/Tomaten/Cherrytomaten, Zucchini sowie Zwiebel/Zwiebeln/Schalotte.
-- test/features/foods/food_item_image_test.dart prüft Zuordnungen und tatsächliches Rendern der WebP-Dateien. Unbekannte Namen verwenden weiterhin den Emoji-/Kategorie-Fallback.
-- PR `feat/food-webp-root-vegetables` ergänzt vier weitere eigenständige WebP-Illustrationen (Fenchel, Pastinake, Radieschen, Rote Bete); zugehörige Tests prüfen Asset-Zuordnung, Rendering und 128 × 128 Pixel. **Unvollständig:** Der gesamte Lebensmittelkatalog hat weiterhin keine individuellen Illustrationen. Vor neuen Batches tatsächliche Katalognamen gegen FoodItemImage.assetFor und assets/foods/ abgleichen. **Verbindliche Bildvorgabe: ausschließlich WebP, exakt 128 × 128 Pixel, keine SVG-Dateien und keine SVG-Rendering-Abhängigkeit.**
-- PR-Head `36cb68dd00c0774d136a4ec646b3c29190f4bc10`: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39432153385) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39432153369) erfolgreich. Post-Merge-CI für `584461f7c73adc01e6799fb931611dcbd6a4c5d7` ebenfalls erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39432465209) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39432465332).
+- Die individuellen Lebensmittelbilder unter `assets/foods/` wurden entfernt, da die Lebensmittelpräferenzliste bewusst textbasiert dargestellt wird und keine dieser Illustrationen mehr verwendet.
+- Der Eintrag `assets/foods/` wurde aus `pubspec.yaml` entfernt, damit Flutter die nicht mehr benötigten Dateien nicht als App-Assets bündelt.
+- Die Kategorie-Illustrationen unter `assets/food_choices/` bleiben bestehen: Sie werden in anderen Abläufen (Kochen, Lieferdienste und Restaurantarten) verwendet und sind nicht die Lebensmittelbilder der Präferenzliste.
+- `FoodItemImage` bleibt vorerst als rückwärtskompatibler leerer Widget-Shim bestehen, bis alle Aufrufer aufgeräumt sind. Es rendert keinerlei Bild, Icon, Emoji oder Platzhalter.
+- Verbindliche UI-Vorgabe für die Lebensmittelliste: Name und Kategorie linksbündig ausrichten; keine Lebensmittelbilder anzeigen oder mitliefern.
+
 ## Autonomer Arbeitsmodus
 
 - „Fatzomat weiterentwickeln“ startet einen fortlaufenden Arbeitszyklus, nicht nur eine Bestandsaufnahme oder einen Vorschlag.
