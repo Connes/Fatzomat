@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:food_app_mvp/features/foods/food_item_image.dart';
 
 void main() {
@@ -30,6 +31,18 @@ void main() {
     expect(FoodItemImage.assetFor('Mandarine'), 'assets/foods/mandarine.webp');
     expect(FoodItemImage.assetFor('Pfirsich'), 'assets/foods/pfirsich.webp');
     expect(FoodItemImage.assetFor('Wassermelone'), 'assets/foods/wassermelone.webp');
+    expect(FoodItemImage.assetFor('Avocado'), 'assets/foods/avocado.svg');
+    expect(FoodItemImage.assetFor('Brokkoli'), 'assets/foods/brokkoli.svg');
+    expect(FoodItemImage.assetFor('Karotte'), 'assets/foods/karotte.svg');
+    expect(FoodItemImage.assetFor('Karotten'), 'assets/foods/karotte.svg');
+    expect(FoodItemImage.assetFor('Kartoffel'), 'assets/foods/kartoffel.svg');
+    expect(FoodItemImage.assetFor('Kartoffeln'), 'assets/foods/kartoffel.svg');
+    expect(FoodItemImage.assetFor('Tomate'), 'assets/foods/tomate.svg');
+    expect(FoodItemImage.assetFor('Tomaten'), 'assets/foods/tomate.svg');
+    expect(FoodItemImage.assetFor('Cherrytomaten'), 'assets/foods/tomate.svg');
+    expect(FoodItemImage.assetFor('Zwiebel'), 'assets/foods/zwiebel.svg');
+    expect(FoodItemImage.assetFor('Zwiebeln'), 'assets/foods/zwiebel.svg');
+    expect(FoodItemImage.assetFor('Schalotte'), 'assets/foods/zwiebel.svg');
     expect(FoodItemImage.assetFor('Unbekanntes Lebensmittel'), isNull);
   });
 
@@ -39,6 +52,31 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: '$food asset should decode');
       expect(find.byType(Image), findsOneWidget, reason: '$food should use its WebP asset');
+    }
+  });
+
+  testWidgets('dedicated vegetable SVG assets render without errors', (tester) async {
+    const foods = [
+      'Avocado',
+      'Brokkoli',
+      'Karotte',
+      'Karotten',
+      'Kartoffel',
+      'Kartoffeln',
+      'Tomate',
+      'Tomaten',
+      'Cherrytomaten',
+      'Zwiebel',
+      'Zwiebeln',
+      'Schalotte',
+    ];
+    for (final food in foods) {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(body: FoodItemImage(foodName: food)),
+      ));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: '$food SVG should render');
+      expect(find.byType(SvgPicture), findsOneWidget, reason: '$food should use its SVG asset');
     }
   });
 
