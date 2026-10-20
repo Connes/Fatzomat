@@ -194,6 +194,15 @@ void main() {
     }
   });
 
+  test('dedicated food asset mappings never reference SVG files', () {
+    const foods = ['Artischocke', 'Kohlrabi', 'Rosenkohl', 'Pak Choi', 'Chinakohl', 'Weißkohl'];
+    for (final food in foods) {
+      final asset = FoodItemImage.assetFor(food);
+      expect(asset, isNotNull, reason: '$food should have a dedicated asset');
+      expect(asset, endsWith('.webp'), reason: '$food must use WebP, never SVG');
+    }
+  });
+
   test('unknown foods use a category-specific emoji fallback', () {
     expect(FoodItemImage.emojiFor('Halloumi', category: 'Milchprodukte & Eier'), '🥚');
     expect(FoodItemImage.emojiFor('Eigenes Gemüse', category: 'Gemüse'), '🥬');
