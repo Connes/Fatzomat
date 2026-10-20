@@ -84,6 +84,8 @@ class FoodItemImage extends StatelessWidget {
         return 'assets/foods/forelle.webp';
       case 'lachs':
         return 'assets/foods/lachs.webp';
+      case 'kabeljau':
+        return 'assets/foods/kabeljau.webp';
       case 'dorade':
         return 'assets/foods/dorade.webp';
       case 'heilbutt':
