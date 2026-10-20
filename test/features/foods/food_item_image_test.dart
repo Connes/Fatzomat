@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -145,10 +144,9 @@ void main() {
   });
 
   test('every food WebP asset is exactly 128x128', () async {
-    final manifest = json.decode(
-      await rootBundle.loadString('AssetManifest.json'),
-    ) as Map<String, dynamic>;
-    final assets = manifest.keys
+    final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+    final assets = manifest
+        .listAssets()
         .where((path) => path.startsWith('assets/foods/') && path.endsWith('.webp'))
         .toList()
       ..sort();
