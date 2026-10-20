@@ -115,4 +115,18 @@ void main() {
     expect(migration, contains('source_recipe.image_path'));
     expect(migration, contains('where r.image_path = name'));
   });
+
+  test('optional image upload failure does not turn a saved recipe import into a failed save', () {
+    final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+    final saveBlock = source.substring(
+      source.indexOf('final recipeId = await repository.saveRecipeModel(_recipe);'),
+      source.indexOf('String _formatQuantity(num value)'),
+    );
+
+    expect(saveBlock, contains('var imageUploadFailed = false;'));
+    expect(saveBlock, contains('catch (_)'));
+    expect(saveBlock, contains('imageUploadFailed = true;'));
+    expect(saveBlock, contains('wurde gespeichert, das Bild konnte aber nicht hochgeladen werden.'));
+    expect(saveBlock, contains('Navigator.pop(context, true);'));
+  });
 }
