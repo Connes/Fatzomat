@@ -408,7 +408,6 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
                             return _FoodSelectionTile(
                               name: name,
                               checked: checked,
-                              favorite: widget.category == IngredientCategory.favorites,
                               onTap: () => _toggle(id),
                             );
                           },
@@ -438,45 +437,14 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
 class _FoodSelectionTile extends StatelessWidget {
   final String name;
   final bool checked;
-  final bool favorite;
   final VoidCallback onTap;
 
   const _FoodSelectionTile({
     required this.name,
     required this.checked,
-    required this.favorite,
     required this.onTap,
   });
 
-  String get _foodEmoji {
-    final value = name.toLowerCase();
-    if (value.contains('reis')) return '🍚';
-    if (value.contains('nudel') || value.contains('pasta') || value.contains('lasagne')) return '🍝';
-    if (value.contains('süßkartoffel')) return '🍠';
-    if (value.contains('kartoffel')) return '🥔';
-    if (value.contains('couscous') || value.contains('bulgur') || value.contains('quinoa')) return '🌾';
-    if (value.contains('brot') || value.contains('toast') || value.contains('baguette')) return '🍞';
-    if (value.contains('tortilla')) return '🫓';
-    if (value.contains('gnocchi')) return '🥟';
-    if (value.contains('bohne') || value.contains('erbse') || value.contains('linsen') || value.contains('kichererbse')) return '🫘';
-    if (value.contains('brokkoli') || value.contains('blumenkohl') || value.contains('romanesco')) return '🥦';
-    if (value.contains('karotte') || value.contains('möhre')) return '🥕';
-    if (value.contains('tomate')) return '🍅';
-    if (value.contains('zwiebel') || value.contains('schalotte')) return '🧅';
-    if (value.contains('paprika') || value.contains('chili')) return '🫑';
-    if (value.contains('gurke') || value.contains('zucchini')) return '🥒';
-    if (value.contains('mais')) return '🌽';
-    if (value.contains('pilz') || value.contains('champignon')) return '🍄';
-    if (value.contains('aubergine')) return '🍆';
-    if (value.contains('knoblauch')) return '🧄';
-    if (value.contains('salat') || value.contains('spinat') || value.contains('rucola') || value.contains('kohl') || value.contains('pak choi')) return '🥬';
-    if (value.contains('kürbis')) return '🎃';
-    if (value.contains('avocado')) return '🥑';
-    if (value.contains('ingwer')) return '🫚';
-    if (value.contains('sellerie') || value.contains('fenchel') || value.contains('spargel')) return '🌿';
-    if (value.contains('rettich') || value.contains('radieschen')) return '🌱';
-    return favorite ? '❤️' : '🥗';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -491,18 +459,9 @@ class _FoodSelectionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               children: [
-                SizedBox(
-                  width: 42,
-                  child: Text(
-                    _foodEmoji,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 27),
-                  ),
-                ),
-                const SizedBox(width: 14),
                 Expanded(
                   child: Text(
                     name,

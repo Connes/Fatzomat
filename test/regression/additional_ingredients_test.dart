@@ -64,8 +64,21 @@ void main() {
     expect(find.text('Couscous'), findsOneWidget);
     expect(find.text('Quinoa'), findsOneWidget);
     expect(find.text('Kichererbsen'), findsOneWidget);
-    expect(find.text('🍚'), findsOneWidget);
-    expect(find.text('🍞'), findsOneWidget);
+    expect(find.text('🍚'), findsNothing);
+    expect(find.text('🍞'), findsNothing);
+  });
+
+  testWidgets('Beilagen und Gemüse zeigen Lebensmittel ohne Emojis und linksbündig', (tester) async {
+    await _openCategory(tester, 'Gemüse');
+
+    expect(find.text('Brokkoli'), findsOneWidget);
+    expect(find.text('🥦'), findsNothing);
+    final name = tester.widget<Text>(find.text('Brokkoli'));
+    expect(name.textAlign, isNot(TextAlign.center));
+    final row = tester.widget<Row>(
+      find.ancestor(of: find.text('Brokkoli'), matching: find.byType(Row)).first,
+    );
+    expect(row.children.first, isA<Expanded>());
   });
 
   testWidgets('V92 Gemüse schließt Kartoffeln aus', (tester) async {
