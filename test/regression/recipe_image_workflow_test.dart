@@ -123,10 +123,11 @@ void main() {
       source.indexOf('String _formatQuantity(num value)'),
     );
 
-    expect(saveBlock, contains('var imageUploadFailed = false;'));
+    expect(saveBlock, contains('if (selectedImage != null && !_imageUploadAttempted)'));
     expect(saveBlock, contains('catch (_)'));
-    expect(saveBlock, contains('imageUploadFailed = true;'));
+    expect(saveBlock, contains('_imageUploadFailed = true;'));
     expect(saveBlock, contains('wurde gespeichert, das Bild konnte aber nicht hochgeladen werden.'));
+    expect(saveBlock, contains('content: Text(_imageUploadFailed'));
     expect(saveBlock, contains('Navigator.pop(context, true);'));
   });
 
