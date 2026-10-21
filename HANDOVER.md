@@ -161,3 +161,10 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 
 - Die Launch-Seite fordert keine Standortberechtigung mehr direkt beim ersten App-Start an. Die Berechtigung wird weiterhin im konkreten Restaurant-Suchablauf angefragt, in dem sie benötigt wird.
 - Regressionstest aktualisiert. Keine Änderung an Berechtigungsmodellen oder Datenschutzkonfiguration. CI-Prüfung und Post-Merge-Verifikation stehen noch aus.
+
+
+## UX-Härtung: Rezeptimport nach Teilerfolg fortsetzen (2026-10-21)
+
+- Befund: `RecipeImportPreviewPage._save()` speichert das Rezept zuerst und verknüpft es danach optional mit „Heute“ oder löst eine gemeinsame Entscheidungsanfrage auf. Schlägt die spätere Verknüpfung fehl, blieb die Vorschau offen; ein erneuter Tap startete vorher erneut die Duplikatprüfung und konnte nicht sauber mit dem bereits gespeicherten Rezept fortfahren.
+- Änderung auf Branch `fix/retry-recipe-import-finalization`: die erfolgreiche Rezept-ID bleibt im Vorschau-State erhalten. Erneute Versuche überspringen den Insert und setzen die nachgelagerte Verknüpfung fort. Das optionale Bild wird nicht bei jedem Retry erneut hochgeladen; ein Bildfehler bleibt in der Rückmeldung erhalten.
+- Regressionstest prüft die Retry-Guard-Bedingung, den einmaligen Insert und die beiden Verknüpfungspfade. CI und Merge sind noch nicht abgeschlossen. Lokale Flutter-Tests und Gerätetests wurden nicht ausgeführt.
