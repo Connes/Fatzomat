@@ -151,19 +151,26 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              _RecipeActionButton(
-                key: const Key('cook-summary-new-recipes'),
-                icon: Icons.auto_awesome_rounded,
-                label: 'Neue Rezepte suchen',
-                onPressed: _findNewRecipes,
-              ),
-              const SizedBox(height: 12),
-              _RecipeActionButton(
-                key: const Key('cook-summary-saved-recipes'),
-                icon: Icons.menu_book_rounded,
-                label: 'Aus meinen Rezepten suchen',
-                onPressed: _findSavedRecipes,
-                secondary: true,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _RecipeActionButton(
+                      key: const Key('cook-summary-new-recipes'),
+                      label: 'Neues Rezept suchen',
+                      onPressed: _findNewRecipes,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _RecipeActionButton(
+                      key: const Key('cook-summary-saved-recipes'),
+                      label: 'Meine Rezepte',
+                      onPressed: _findSavedRecipes,
+                      secondary: true,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -382,14 +389,12 @@ class _AdditionalIngredientsAction extends StatelessWidget {
 }
 
 class _RecipeActionButton extends StatelessWidget {
-  final IconData icon;
   final String label;
   final VoidCallback onPressed;
   final bool secondary;
 
   const _RecipeActionButton({
     super.key,
-    required this.icon,
     required this.label,
     required this.onPressed,
     this.secondary = false,
@@ -397,24 +402,41 @@ class _RecipeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = secondary
-        ? FilledButton.icon(
-            onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppDesign.surface,
-              foregroundColor: AppDesign.primaryDark,
-              side: const BorderSide(color: AppDesign.divider),
-              elevation: 0,
+    final foreground = secondary ? AppDesign.primaryDark : AppDesign.surface;
+    return SizedBox(
+      height: 84,
+      child: Material(
+        color: secondary ? AppDesign.surface : AppDesign.primary,
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          key: key,
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(22),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: foreground,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: foreground,
+                  size: 22,
+                ),
+              ],
             ),
-          )
-        : FilledButton.icon(
-            onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
-          );
-    return SizedBox(height: 56, child: button);
+          ),
+        ),
+      ),
+    );
   }
 }
 
