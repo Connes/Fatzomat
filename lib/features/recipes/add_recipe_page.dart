@@ -343,6 +343,12 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
   bool saving = false;
   XFile? selectedImage;
 
+  // Keep the successful recipe insert across retries if a later step (such as
+  // linking it to Today or resolving a shared request) fails.
+  String? _savedRecipeId;
+  bool _imageUploadAttempted = false;
+  bool _imageUploadFailed = false;
+
   @override
   void initState() {
     super.initState();
@@ -390,7 +396,11 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     try {
       final image = await RecipeImageService().pickImage(source: source);
       if (image == null || !mounted) return;
-      setState(() => selectedImage = image);
+      setState(() {
+        selectedImage = image;
+        _imageUploadAttempted = false;
+        _imageUploadFailed = false;
+      });
     } catch (e) {
       if (mounted) showAppError(context, e);
     }
@@ -405,7 +415,8 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     if (saving) return;
     setState(() => saving = true);
     try {
-      final duplicate = await repository.findDuplicateRecipe(_recipe);
+      if (_savedRecipeId == null) {
+        final duplicate = await repository.findDuplicateRecipe(_recipe);
         if (duplicate != null && mounted) {
           setState(() => saving = false);
           final action = await showDialog<String>(
@@ -426,10 +437,15 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           return;
         }
 
-      final recipeId = await repository.saveRecipeModel(_recipe);
+        // Persist the ID immediately after the insert succeeds. If a later
+        // association fails, the next tap resumes finalization instead of
+        // inserting the recipe again.
+        _savedRecipeId = await repository.saveRecipeModel(_recipe);
+      }
 
-      var imageUploadFailed = false;
-      if (selectedImage != null) {
+      final recipeId = _savedRecipeId!;
+      if (selectedImage != null && !_imageUploadAttempted) {
+        _imageUploadAttempted = true;
         try {
           final upload = await RecipeImageService().upload(
             recipeId: recipeId,
@@ -439,7 +455,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
         } catch (_) {
           // The recipe itself is already saved. An optional image failure
           // must not make the user retry the whole import and hit a duplicate.
-          imageUploadFailed = true;
+          _imageUploadFailed = true;
         }
       }
 
@@ -466,7 +482,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       if (!mounted) return;
       AppFeedback.showSnackBar(context,
         SnackBar(
-          content: Text(imageUploadFailed
+          content: Text(_imageUploadFailed
               ? '„${_recipe.name}“ wurde gespeichert, das Bild konnte aber nicht hochgeladen werden.'
               : '„${_recipe.name}“ wurde gespeichert.'),
         ),

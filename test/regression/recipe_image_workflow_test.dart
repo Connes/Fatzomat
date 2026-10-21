@@ -119,14 +119,32 @@ void main() {
   test('optional image upload failure does not turn a saved recipe import into a failed save', () {
     final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
     final saveBlock = source.substring(
-      source.indexOf('final recipeId = await repository.saveRecipeModel(_recipe);'),
+      source.indexOf('Future<void> _save() async {'),
       source.indexOf('String _formatQuantity(num value)'),
     );
 
-    expect(saveBlock, contains('var imageUploadFailed = false;'));
+    expect(saveBlock, contains('if (selectedImage != null && !_imageUploadAttempted)'));
     expect(saveBlock, contains('catch (_)'));
-    expect(saveBlock, contains('imageUploadFailed = true;'));
+    expect(saveBlock, contains('_imageUploadFailed = true;'));
     expect(saveBlock, contains('wurde gespeichert, das Bild konnte aber nicht hochgeladen werden.'));
+    expect(saveBlock, contains('content: Text(_imageUploadFailed'));
     expect(saveBlock, contains('Navigator.pop(context, true);'));
+  });
+
+  test('retry after recipe insert resumes finalization without inserting a duplicate', () {
+    final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+    final saveBlock = source.substring(
+      source.indexOf('Future<void> _save() async {'),
+      source.indexOf('String _formatQuantity(num value)'),
+    );
+
+    expect(saveBlock, contains('if (_savedRecipeId == null)'));
+    expect(saveBlock, contains('_savedRecipeId = await repository.saveRecipeModel(_recipe);'));
+    expect(saveBlock, contains('final recipeId = _savedRecipeId!;'));
+    expect(saveBlock, contains('if (widget.decisionRequestId != null)'));
+    expect(saveBlock, contains('if (widget.selectForToday && widget.decisionRequestId == null)'));
+    expect(saveBlock, contains('_imageUploadAttempted'));
+    expect(saveBlock, contains('_imageUploadFailed'));
+    expect(RegExp(r'repository\.saveRecipeModel\(_recipe\)').allMatches(saveBlock).length, 1);
   });
 }
