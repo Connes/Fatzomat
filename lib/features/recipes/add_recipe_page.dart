@@ -347,6 +347,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
   // linking it to Today or resolving a shared request) fails.
   String? _savedRecipeId;
   bool _imageUploadAttempted = false;
+  bool _imageUploadFailed = false;
 
   @override
   void initState() {
@@ -395,7 +396,11 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     try {
       final image = await RecipeImageService().pickImage(source: source);
       if (image == null || !mounted) return;
-      setState(() => selectedImage = image);
+      setState(() {
+        selectedImage = image;
+        _imageUploadAttempted = false;
+        _imageUploadFailed = false;
+      });
     } catch (e) {
       if (mounted) showAppError(context, e);
     }
@@ -439,7 +444,6 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       }
 
       final recipeId = _savedRecipeId!;
-      var imageUploadFailed = false;
       if (selectedImage != null && !_imageUploadAttempted) {
         _imageUploadAttempted = true;
         try {
@@ -451,7 +455,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
         } catch (_) {
           // The recipe itself is already saved. An optional image failure
           // must not make the user retry the whole import and hit a duplicate.
-          imageUploadFailed = true;
+          _imageUploadFailed = true;
         }
       }
 
@@ -478,7 +482,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       if (!mounted) return;
       AppFeedback.showSnackBar(context,
         SnackBar(
-          content: Text(imageUploadFailed
+          content: Text(_imageUploadFailed
               ? '„${_recipe.name}“ wurde gespeichert, das Bild konnte aber nicht hochgeladen werden.'
               : '„${_recipe.name}“ wurde gespeichert.'),
         ),
