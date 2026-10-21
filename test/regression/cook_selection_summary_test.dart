@@ -163,8 +163,8 @@ void main() {
     expect(summaryList, findsOneWidget);
     await tester.drag(summaryList, const Offset(0, -500));
     await tester.pumpAndSettle();
-    expect(find.text('Neue Rezepte suchen'), findsOneWidget);
-    expect(find.text('Aus meinen Rezepten suchen'), findsOneWidget);
+    expect(find.text('Neues Rezept suchen'), findsOneWidget);
+    expect(find.text('Meine Rezepte'), findsOneWidget);
     await tester.tap(find.byKey(const Key('cook-summary-saved-recipes')));
     await tester.pumpAndSettle();
 
@@ -172,6 +172,33 @@ void main() {
       SavedRecipesPage,
     ), findsOneWidget);
   });
+  testWidgets('V94 zeigt zwei kompakte Rezeptaktionen nebeneinander ohne Symbole', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CookNextStepPage(
+          mainChoice: 'Schwein',
+          repository: _FakeFoodRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final newAction = find.byKey(const Key('cook-summary-new-recipes'));
+    final savedAction = find.byKey(const Key('cook-summary-saved-recipes'));
+    expect(find.text('Neues Rezept suchen'), findsOneWidget);
+    expect(find.text('Meine Rezepte'), findsOneWidget);
+    expect(find.text('Neue Rezepte suchen'), findsNothing);
+    expect(find.text('Aus meinen Rezepten suchen'), findsNothing);
+    expect(find.byIcon(Icons.auto_awesome_rounded), findsNothing);
+    expect(find.byIcon(Icons.menu_book_rounded), findsNothing);
+
+    final newRect = tester.getRect(newAction);
+    final savedRect = tester.getRect(savedAction);
+    expect(newRect.top, savedRect.top);
+    expect(newRect.right, lessThanOrEqualTo(savedRect.left));
+    expect(newRect.height, savedRect.height);
+  });
+
   testWidgets('V94 trennt neue und gespeicherte Rezeptsuche', (tester) async {
     final observer = _RecordingNavigatorObserver();
     await tester.pumpWidget(
