@@ -119,7 +119,7 @@ void main() {
   test('optional image upload failure does not turn a saved recipe import into a failed save', () {
     final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
     final saveBlock = source.substring(
-      source.indexOf('final recipeId = await repository.saveRecipeModel(_recipe);'),
+      source.indexOf('Future<void> _save() async {'),
       source.indexOf('String _formatQuantity(num value)'),
     );
 
