@@ -274,15 +274,6 @@ class _MyChoiceCard extends StatelessWidget {
     );
   }
 
-  static IconData _foodIcon(String name) {
-    final value = name.toLowerCase();
-    if (value.contains('reis')) return Icons.rice_bowl_rounded;
-    if (value.contains('nudel') || value.contains('pasta')) return Icons.ramen_dining_rounded;
-    if (value.contains('kartoffel')) return Icons.breakfast_dining_rounded;
-    if (value.contains('brokkoli') || value.contains('salat') || value.contains('spinat')) return Icons.eco_rounded;
-    if (value.contains('karotte') || value.contains('möhre')) return Icons.local_florist_rounded;
-    return Icons.restaurant_rounded;
-  }
 }
 
 class _MainChoiceImage extends StatelessWidget {
@@ -300,7 +291,7 @@ class _MainChoiceImage extends StatelessWidget {
         color: AppDesign.secondarySurface,
         borderRadius: BorderRadius.circular(size < 80 ? 16 : 22),
       ),
-      child: const Icon(
+      child: Icon(
         Icons.restaurant_menu_rounded,
         size: size * 0.38,
         color: AppDesign.primaryDark,
@@ -313,7 +304,7 @@ class _MainChoiceImage extends StatelessWidget {
       image: true,
       label: 'Bild für die Auswahl',
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(size < 80 ? 16 : 22),
         child: SizedBox(
           width: size,
           height: size,
