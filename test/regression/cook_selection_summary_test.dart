@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:food_app_mvp/data/repositories/food_repository.dart';
-import 'package:food_app_mvp/core/app_design.dart';
 import 'package:food_app_mvp/core/food_mode.dart';
 import 'package:food_app_mvp/core/services/food_choice_asset_service.dart';
 import 'package:food_app_mvp/data/models/food.dart';
