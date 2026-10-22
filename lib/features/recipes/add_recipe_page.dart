@@ -948,6 +948,41 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
     AppFeedback.showSnackBar(context, SnackBar(content: Text(message)));
   }
 
+  String _selectionSummary(String? choice, List<Food> selectedFoods) {
+    final mainIngredient = choice?.trim().isNotEmpty == true ? choice!.trim() : 'deiner Hauptzutat';
+    if (selectedFoods.isEmpty) {
+      return 'Eine Variation vom $mainIngredient';
+    }
+
+    final vegetables = selectedFoods
+        .where((food) => food.category.toLowerCase().contains('gemüse'))
+        .map((food) => food.name)
+        .toList(growable: false);
+    final sides = selectedFoods
+        .where((food) => food.category.toLowerCase().contains('beilage'))
+        .map((food) => food.name)
+        .toList(growable: false);
+    final otherFoods = selectedFoods
+        .where((food) =>
+            !food.category.toLowerCase().contains('gemüse') &&
+            !food.category.toLowerCase().contains('beilage'))
+        .map((food) => food.name)
+        .toList(growable: false);
+
+    final parts = <String>[];
+    if (vegetables.isNotEmpty) parts.add('mit ${_joinNames(vegetables)}');
+    if (sides.isNotEmpty) parts.add('dazu ${_joinNames(sides)}');
+    if (otherFoods.isNotEmpty) parts.add('und ${_joinNames(otherFoods)}');
+
+    return 'Eine Variation vom $mainIngredient ${parts.join(', ')}';
+  }
+
+  String _joinNames(List<String> names) {
+    if (names.length < 2) return names.join();
+    if (names.length == 2) return '${names[0]} und ${names[1]}';
+    return '${names.sublist(0, names.length - 1).join(', ')} und ${names.last}';
+  }
+
   IconData _icon(String choice) => switch (choice) {
         'Rind' => Icons.lunch_dining_rounded,
         'Schwein' => Icons.restaurant_rounded,
@@ -992,45 +1027,27 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
                           boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Text('Deine Rezeptauswahl', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-                            const SizedBox(height: 16),
-                            Text('Hauptzutat', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: AppDesign.secondarySurface,
-                                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(_icon(mainChoice ?? ''), color: AppDesign.primaryDark, size: 28),
-                                  const SizedBox(width: 12),
-                                  Expanded(child: Text(mainChoice ?? 'Keine Hauptzutat ausgewählt', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
-                                ],
-                              ),
+                            Text(
+                              'Deine Rezeptauswahl',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                             ),
-                            const SizedBox(height: 16),
-                            Text('Beilagen und ausgewählte Zutaten', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                            const SizedBox(height: 8),
-                            if (selectedFoods.isEmpty)
-                              const Text('Keine zusätzlichen Zutaten ausgewählt.')
-                            else
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: selectedFoods.map((food) => Chip(
-                                  avatar: const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
-                                  label: Text(food.name),
-                                  backgroundColor: AppDesign.secondarySurface,
-                                  side: BorderSide.none,
-                                )).toList(growable: false),
-                              ),
-                            const SizedBox(height: 16),
-                            const Text('Deine Auswahl bleibt erhalten. Importiere hier die von ChatGPT erstellte Rezeptdatei.'),
+                            const SizedBox(height: 20),
+                            Text(
+                              _selectionSummary(mainChoice, selectedFoods),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.4,
+                                  ),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Importiere hier die von ChatGPT erstellte Rezeptdatei.',
+                              textAlign: TextAlign.center,
+                            ),
                           ],
                         ),
                       ),
