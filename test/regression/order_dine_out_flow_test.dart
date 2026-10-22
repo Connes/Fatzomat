@@ -62,7 +62,8 @@ void main() {
       // The auto-launch flow deliberately hides the restaurant form until
       // location lookup finishes, so Android's permission dialog has a neutral
       // background rather than the previous app screen.
-      expect(find.text('Standort wird ermittelt …'), findsOneWidget);
+      expect(find.text('Love'), findsOneWidget);
+      expect(find.text('Standort wird ermittelt …'), findsNothing);
       expect(find.byType(DropdownButtonFormField<String>), findsNothing);
     });
   }

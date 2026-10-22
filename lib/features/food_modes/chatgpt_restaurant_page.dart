@@ -40,20 +40,29 @@ class ChatGptRestaurantPage extends StatefulWidget {
   State<ChatGptRestaurantPage> createState() => _ChatGptRestaurantPageState();
 }
 
-class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
+class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> with WidgetsBindingObserver {
   late String _cuisine;
   final _locationController = TextEditingController();
   String? _error;
   Map<String, dynamic>? _restaurant;
   bool _importing = false;
   bool _locating = false;
+  bool _launchingChatGpt = false;
   bool _waitingForLocationSettings = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cuisine = widget.initialCuisine;
     _determineCurrentLocation();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _launchingChatGpt && mounted) {
+      setState(() => _launchingChatGpt = false);
+    }
   }
 
   Future<void> _determineCurrentLocation() async {
@@ -113,8 +122,16 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       if (!mounted) return;
       setState(() => _error = error.toString().replaceFirst('Exception: ', ''));
     } finally {
-      if (mounted) setState(() => _locating = false);
-      if (mounted && widget.autoOpenChatGpt && !_waitingForLocationSettings && _locationController.text.trim().isNotEmpty) {
+      final shouldAutoOpen = widget.autoOpenChatGpt &&
+          !_waitingForLocationSettings &&
+          _locationController.text.trim().isNotEmpty;
+      if (mounted) {
+        setState(() {
+          _locating = false;
+          _launchingChatGpt = shouldAutoOpen;
+        });
+      }
+      if (mounted && shouldAutoOpen) {
         await _launchChatGptWithPrompt();
       }
     }
@@ -141,6 +158,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _locationController.dispose();
     super.dispose();
   }
@@ -185,6 +203,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
   Future<void> _launchChatGptWithPrompt() async {
     final launched = await _tryLaunchChatGpt();
     if (!launched && mounted) {
+      setState(() => _launchingChatGpt = false);
       AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('ChatGPT konnte nicht automatisch geöffnet werden. Du kannst den Prompt unten manuell öffnen.')),
       );
@@ -343,28 +362,33 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
 
   @override
   Widget build(BuildContext context) {
-    // When launched directly from a cuisine choice, keep the app content
-    // neutral while Android displays the location permission dialog.
-    if (widget.autoOpenChatGpt && _locating) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF4F1EA),
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
+    // Match the recipe flow: keep one branded handoff screen visible
+    // throughout location lookup and the external ChatGPT launch. In
+    // particular, never flash the restaurant import page between the two.
+    if (widget.autoOpenChatGpt && (_locating || _launchingChatGpt)) {
+      return Scaffold(
+        backgroundColor: AppDesign.background,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/branding/launch_heart.png',
+                width: 76,
+                height: 76,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: 12),
+              Text(
+                'Love',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppDesign.text,
                 ),
-                SizedBox(height: 16),
-                Text(
-                  'Standort wird ermittelt …',
-                  style: TextStyle(color: Color(0xFF514D46)),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );

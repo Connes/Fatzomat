@@ -35,7 +35,7 @@ void main() {
     expect(source, contains("label: const Text('Systemeinstellungen öffnen')"));
     expect(source, contains("label: const Text('Berechtigung prüfen und fortfahren')"));
     expect(source, contains('_waitingForLocationSettings'));
-    expect(source, contains('!_waitingForLocationSettings && _locationController.text.trim().isNotEmpty'));
+    expect(source, contains('!_waitingForLocationSettings &&\n          _locationController.text.trim().isNotEmpty'));
     expect(source, contains('Ohne Standortfreigabe kann Fatzomat keine Restaurants in deiner Nähe suchen.'));
   });
 
