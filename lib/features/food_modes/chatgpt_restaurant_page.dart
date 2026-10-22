@@ -47,6 +47,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
   Map<String, dynamic>? _restaurant;
   bool _importing = false;
   bool _locating = false;
+  bool _launchingChatGpt = false;
   bool _waitingForLocationSettings = false;
 
   @override
@@ -113,8 +114,16 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
       if (!mounted) return;
       setState(() => _error = error.toString().replaceFirst('Exception: ', ''));
     } finally {
-      if (mounted) setState(() => _locating = false);
-      if (mounted && widget.autoOpenChatGpt && !_waitingForLocationSettings && _locationController.text.trim().isNotEmpty) {
+      final shouldAutoOpen = widget.autoOpenChatGpt &&
+          !_waitingForLocationSettings &&
+          _locationController.text.trim().isNotEmpty;
+      if (mounted) {
+        setState(() {
+          _locating = false;
+          _launchingChatGpt = shouldAutoOpen;
+        });
+      }
+      if (mounted && shouldAutoOpen) {
         await _launchChatGptWithPrompt();
       }
     }
@@ -343,28 +352,33 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
 
   @override
   Widget build(BuildContext context) {
-    // When launched directly from a cuisine choice, keep the app content
-    // neutral while Android displays the location permission dialog.
-    if (widget.autoOpenChatGpt && _locating) {
+    // Match the recipe flow: keep one branded handoff screen visible
+    // throughout location lookup and the external ChatGPT launch. In
+    // particular, never flash the restaurant import page between the two.
+    if (widget.autoOpenChatGpt && (_locating || _launchingChatGpt)) {
       return const Scaffold(
-        backgroundColor: Color(0xFFF4F1EA),
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
+        backgroundColor: AppDesign.background,
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/branding/launch_heart.png',
+                width: 76,
+                height: 76,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(height: 12),
+              Text(
+                'Love',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppDesign.text,
                 ),
-                SizedBox(height: 16),
-                Text(
-                  'Standort wird ermittelt …',
-                  style: TextStyle(color: Color(0xFF514D46)),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
