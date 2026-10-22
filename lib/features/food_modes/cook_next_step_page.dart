@@ -147,23 +147,31 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                     loadingFoods: loadingFoods,
                     loadError: foodLoadError,
                     onAddIngredients: _openAdditionalIngredients,
+                    onRemoveIngredient: (id) => setState(() => selectedFoodIds.remove(id)),
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              _RecipeActionButton(
-                key: const Key('cook-summary-new-recipes'),
-                icon: Icons.auto_awesome_rounded,
-                label: 'Neue Rezepte suchen',
-                onPressed: _findNewRecipes,
-              ),
-              const SizedBox(height: 12),
-              _RecipeActionButton(
-                key: const Key('cook-summary-saved-recipes'),
-                icon: Icons.menu_book_rounded,
-                label: 'Aus meinen Rezepten suchen',
-                onPressed: _findSavedRecipes,
-                secondary: true,
+              const SizedBox(height: 18),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _RecipeActionButton(
+                      key: const Key('cook-summary-new-recipes'),
+                      label: 'Neues Rezept suchen',
+                      onPressed: _findNewRecipes,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _RecipeActionButton(
+                      key: const Key('cook-summary-saved-recipes'),
+                      label: 'Aus meinen Rezepten suchen',
+                      onPressed: _findSavedRecipes,
+                      secondary: true,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -180,6 +188,7 @@ class _MyChoiceCard extends StatelessWidget {
   final bool loadingFoods;
   final String? loadError;
   final VoidCallback onAddIngredients;
+  final ValueChanged<String> onRemoveIngredient;
 
   const _MyChoiceCard({
     required this.mainChoice,
@@ -188,6 +197,7 @@ class _MyChoiceCard extends StatelessWidget {
     required this.loadingFoods,
     required this.loadError,
     required this.onAddIngredients,
+    required this.onRemoveIngredient,
   });
 
   @override
@@ -206,42 +216,54 @@ class _MyChoiceCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
               ),
             ),
-            const SizedBox(height: 18),
-            Center(
-              child: Column(
-                children: [
-                  _MainChoiceImage(assetPath: mainChoiceAsset),
-                  const SizedBox(height: 12),
-                  Text(
+            const SizedBox(height: 24),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _MainChoiceImage(assetPath: mainChoiceAsset, size: 64),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
                     mainChoice,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             if (loadingFoods) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 22),
               const LinearProgressIndicator(minHeight: 2),
             ] else if (loadError != null) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 18),
               Text(loadError!, style: Theme.of(context).textTheme.bodySmall),
             ] else if (selectedFoods.isNotEmpty) ...[
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
+                padding: EdgeInsets.symmetric(vertical: 22),
                 child: Divider(height: 1),
               ),
-              ...selectedFoods.map(
-                (food) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _ChoiceRow(
-                    icon: _foodIcon(food.name),
-                    label: food.name,
+              Text(
+                'Beilagen',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 10,
+                runSpacing: 12,
+                children: selectedFoods.map((food) => InputChip(
+                  label: Text(food.name),
+                  onDeleted: () => onRemoveIngredient(food.id),
+                  deleteIcon: const Icon(Icons.close_rounded, size: 18),
+                  backgroundColor: AppDesign.primarySoft,
+                  side: BorderSide.none,
+                  labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppDesign.primaryDark,
+                    fontWeight: FontWeight.w600,
                   ),
-                ),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                )).toList(),
               ),
             ],
-            const SizedBox(height: 6),
+            const SizedBox(height: 24),
             _AdditionalIngredientsAction(
               selectedCount: selectedFoods.length,
               onTap: onAddIngredients,
@@ -265,21 +287,22 @@ class _MyChoiceCard extends StatelessWidget {
 
 class _MainChoiceImage extends StatelessWidget {
   final String? assetPath;
+  final double size;
 
-  const _MainChoiceImage({required this.assetPath});
+  const _MainChoiceImage({required this.assetPath, this.size = 128});
 
   @override
   Widget build(BuildContext context) {
     final fallback = Container(
-      width: 128,
-      height: 128,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: AppDesign.secondarySurface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(size < 80 ? 16 : 22),
       ),
       child: const Icon(
         Icons.restaurant_menu_rounded,
-        size: 48,
+        size: size * 0.38,
         color: AppDesign.primaryDark,
       ),
     );
@@ -292,8 +315,8 @@ class _MainChoiceImage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: SizedBox(
-          width: 128,
-          height: 128,
+          width: size,
+          height: size,
           child: Image.asset(
             assetPath!,
             fit: BoxFit.cover,
@@ -303,38 +326,6 @@ class _MainChoiceImage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _ChoiceRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _ChoiceRow({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppDesign.secondarySurface,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(icon, size: 26, color: AppDesign.primaryDark),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -351,27 +342,35 @@ class _AdditionalIngredientsAction extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'Weitere Zutaten hinzufügen',
-      child: Card(
-        color: AppDesign.primarySoft,
-        clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
+          borderRadius: BorderRadius.circular(AppDesign.radiusLg),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
             child: Row(
               children: [
-                const Icon(Icons.add_rounded, size: 28, color: AppDesign.primary),
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppDesign.primarySoft,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(Icons.add_rounded, size: 21, color: AppDesign.primaryDark),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Weitere Zutaten hinzufügen$suffix',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: AppDesign.primaryDark,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppDesign.secondaryText,
                     ),
                   ),
                 ),
-                const Icon(Icons.chevron_right_rounded),
+                const Icon(Icons.chevron_right_rounded, color: AppDesign.mutedText, size: 20),
               ],
             ),
           ),
@@ -382,14 +381,12 @@ class _AdditionalIngredientsAction extends StatelessWidget {
 }
 
 class _RecipeActionButton extends StatelessWidget {
-  final IconData icon;
   final String label;
   final VoidCallback onPressed;
   final bool secondary;
 
   const _RecipeActionButton({
     super.key,
-    required this.icon,
     required this.label,
     required this.onPressed,
     this.secondary = false,
@@ -398,10 +395,9 @@ class _RecipeActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final button = secondary
-        ? FilledButton.icon(
+        ? OutlinedButton(
             onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
+            child: Text(label, textAlign: TextAlign.center),
             style: FilledButton.styleFrom(
               backgroundColor: AppDesign.surface,
               foregroundColor: AppDesign.primaryDark,
@@ -409,12 +405,14 @@ class _RecipeActionButton extends StatelessWidget {
               elevation: 0,
             ),
           )
-        : FilledButton.icon(
+        : FilledButton(
             onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
+            child: Text(label, textAlign: TextAlign.center),
           );
-    return SizedBox(height: 56, child: button);
+    return SizedBox(
+      height: 68,
+      child: button,
+    );
   }
 }
 
