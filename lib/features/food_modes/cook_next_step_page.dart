@@ -203,6 +203,15 @@ class _MyChoiceCard extends StatelessWidget {
     required this.onAddIngredients,
   });
 
+  List<Food> get _vegetableFoods => selectedFoods
+      .where((food) => food.category.toLowerCase().contains('gemüse') ||
+          food.category.toLowerCase().contains('vegetable'))
+      .toList(growable: false);
+
+  List<Food> get _sideFoods => selectedFoods
+      .where((food) => !_vegetableFoods.contains(food))
+      .toList(growable: false);
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -243,12 +252,29 @@ class _MyChoiceCard extends StatelessWidget {
               Text(loadError!, style: Theme.of(context).textTheme.bodySmall),
             ] else if (selectedFoods.isNotEmpty) ...[
               const SizedBox(height: 14),
-              ...selectedFoods.map(
-                (food) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _ChoiceRow(label: food.name),
+              if (_vegetableFoods.isNotEmpty) ...[
+                const _IngredientGroupHeading('Gemüse'),
+                ..._vegetableFoods.map(
+                  (food) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _ChoiceRow(label: food.name),
+                  ),
                 ),
-              ),
+              ],
+              if (_vegetableFoods.isNotEmpty && _sideFoods.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                const Divider(height: 1),
+                const SizedBox(height: 12),
+              ],
+              if (_sideFoods.isNotEmpty) ...[
+                const _IngredientGroupHeading('Beilage'),
+                ..._sideFoods.map(
+                  (food) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _ChoiceRow(label: food.name),
+                  ),
+                ),
+              ],
             ],
             const SizedBox(height: 6),
             _AdditionalIngredientsAction(
@@ -261,6 +287,25 @@ class _MyChoiceCard extends StatelessWidget {
   }
 
 
+}
+
+class _IngredientGroupHeading extends StatelessWidget {
+  final String title;
+
+  const _IngredientGroupHeading(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+      ),
+    );
+  }
 }
 
 class _DottedSeparator extends StatelessWidget {
