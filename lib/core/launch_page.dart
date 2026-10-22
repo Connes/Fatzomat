@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_design.dart';
 import 'startup_page.dart';
-import '../features/food_modes/chatgpt_restaurant_page.dart';
 
 /// Minimum time the launch screen remains visible before the app continues.
 const kLaunchMinimumDuration = Duration(seconds: 4);
@@ -79,15 +78,15 @@ class _LaunchPageState extends State<LaunchPage>
   Future<void> _continue(StartupLoadResult result) async {
     if (!mounted || _transitionStarted) return;
     _transitionStarted = true;
+    // A pending restaurant import belongs to the current in-app session only.
+    // Never restore the import page after a cold app start: opening ChatGPT
+    // and then force-closing the app must return to the normal Today flow.
     final preferences = await SharedPreferences.getInstance();
-    final pendingCuisine = preferences.getString('fatzomat_pending_restaurant_import_cuisine');
+    await preferences.remove('fatzomat_pending_restaurant_import_cuisine');
     if (!mounted) return;
-    final Widget nextPage = pendingCuisine == null || pendingCuisine.trim().isEmpty
-        ? StartupPage(initialResult: result)
-        : ChatGptRestaurantPage(initialCuisine: pendingCuisine, autoOpenChatGpt: false);
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
-        pageBuilder: (_, __, ___) => nextPage,
+        pageBuilder: (_, __, ___) => StartupPage(initialResult: result),
         transitionDuration: kLaunchTransitionDuration,
         reverseTransitionDuration: Duration.zero,
         transitionsBuilder: (_, animation, __, child) => FadeTransition(
