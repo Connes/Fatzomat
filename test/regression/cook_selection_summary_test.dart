@@ -129,7 +129,8 @@ void main() {
     expect(find.text('Meine Wahl'), findsOneWidget);
     expect(find.text('Schwein'), findsOneWidget);
     expect(find.text('Reis'), findsOneWidget);
-    expect(find.text('Weitere Zutaten hinzufügen (1 ausgewählt)'), findsOneWidget);
+    expect(find.text('Weitere Zutaten hinzufügen'), findsOneWidget);
+    expect(find.textContaining('ausgewählt'), findsNothing);
   });
 
   testWidgets('V94 öffnet die gespeicherte Rezeptsuche mit der Auswahl', (tester) async {
