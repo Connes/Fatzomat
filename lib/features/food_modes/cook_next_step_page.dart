@@ -138,15 +138,22 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(top: 8, bottom: 20),
-                  child: _MyChoiceCard(
-                    mainChoice: widget.mainChoice,
-                    mainChoiceAsset: FoodChoiceAssetService.assetFor(FoodMode.cook, widget.mainChoice),
-                    selectedFoods: selectedFoods,
-                    loadingFoods: loadingFoods,
-                    loadError: foodLoadError,
-                    onAddIngredients: _openAdditionalIngredients,
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    padding: const EdgeInsets.only(top: 8, bottom: 20),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight - 28).clamp(0.0, double.infinity),
+                      ),
+                      child: _MyChoiceCard(
+                        mainChoice: widget.mainChoice,
+                        mainChoiceAsset: FoodChoiceAssetService.assetFor(FoodMode.cook, widget.mainChoice),
+                        selectedFoods: selectedFoods,
+                        loadingFoods: loadingFoods,
+                        loadError: foodLoadError,
+                        onAddIngredients: _openAdditionalIngredients,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -239,10 +246,7 @@ class _MyChoiceCard extends StatelessWidget {
               ...selectedFoods.map(
                 (food) => Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: _ChoiceRow(
-                    icon: _foodIcon(food.name),
-                    label: food.name,
-                  ),
+                  child: _ChoiceRow(label: food.name),
                 ),
               ),
             ],
@@ -257,15 +261,7 @@ class _MyChoiceCard extends StatelessWidget {
     );
   }
 
-  static IconData _foodIcon(String name) {
-    final value = name.toLowerCase();
-    if (value.contains('reis')) return Icons.rice_bowl_rounded;
-    if (value.contains('nudel') || value.contains('pasta')) return Icons.ramen_dining_rounded;
-    if (value.contains('kartoffel')) return Icons.breakfast_dining_rounded;
-    if (value.contains('brokkoli') || value.contains('salat') || value.contains('spinat')) return Icons.eco_rounded;
-    if (value.contains('karotte') || value.contains('möhre')) return Icons.local_florist_rounded;
-    return Icons.restaurant_rounded;
-  }
+
 }
 
 class _DottedSeparator extends StatelessWidget {
@@ -352,33 +348,22 @@ class _MainChoiceImage extends StatelessWidget {
 }
 
 class _ChoiceRow extends StatelessWidget {
-  final IconData icon;
   final String label;
-  const _ChoiceRow({required this.icon, required this.label});
+  const _ChoiceRow({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppDesign.secondarySurface,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(icon, size: 26, color: AppDesign.primaryDark),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: SizedBox(
+        width: double.infinity,
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
         ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
