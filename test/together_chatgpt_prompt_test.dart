@@ -13,7 +13,7 @@ void main() {
       ],
     );
 
-    expect(prompt, contains('Hauptauswahl / Rezeptbasis:\\nHuhn'));
+    expect(prompt, contains('Hauptauswahl / Rezeptbasis:\nHuhn'));
     expect(prompt, contains('- Brokkoli'));
     expect(prompt, contains('- Reis'));
     expect(prompt, isNot(contains('(Einheit:')));
@@ -34,7 +34,7 @@ void main() {
       selectedFoods: const [],
     );
 
-    expect(prompt, contains('Hauptauswahl / Rezeptbasis:\\nVegetarisch'));
+    expect(prompt, contains('Hauptauswahl / Rezeptbasis:\nVegetarisch'));
     expect(prompt, contains('Keine zusätzlichen Zutaten ausgewählt.'));
     expect(prompt, contains('Du darfst sinnvolle zusätzliche Zutaten ergänzen'));
   });
