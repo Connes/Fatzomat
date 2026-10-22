@@ -296,10 +296,10 @@ class _MainChoiceImage extends StatelessWidget {
       image: true,
       label: 'Bild für die Auswahl',
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
         child: SizedBox(
-          width: 128,
-          height: 128,
+          width: 64,
+          height: 64,
           child: Image.asset(
             assetPath!,
             fit: BoxFit.cover,
