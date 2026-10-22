@@ -269,15 +269,6 @@ class _MyChoiceCard extends StatelessWidget {
     );
   }
 
-  static IconData _foodIcon(String name) {
-    final value = name.toLowerCase();
-    if (value.contains('reis')) return Icons.rice_bowl_rounded;
-    if (value.contains('nudel') || value.contains('pasta')) return Icons.ramen_dining_rounded;
-    if (value.contains('kartoffel')) return Icons.breakfast_dining_rounded;
-    if (value.contains('brokkoli') || value.contains('salat') || value.contains('spinat')) return Icons.eco_rounded;
-    if (value.contains('karotte') || value.contains('möhre')) return Icons.local_florist_rounded;
-    return Icons.restaurant_rounded;
-  }
 }
 
 class _MainChoiceImage extends StatelessWidget {
