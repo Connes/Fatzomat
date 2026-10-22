@@ -151,19 +151,25 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              _RecipeActionButton(
-                key: const Key('cook-summary-new-recipes'),
-                icon: Icons.auto_awesome_rounded,
-                label: 'Neue Rezepte suchen',
-                onPressed: _findNewRecipes,
-              ),
-              const SizedBox(height: 12),
-              _RecipeActionButton(
-                key: const Key('cook-summary-saved-recipes'),
-                icon: Icons.menu_book_rounded,
-                label: 'Aus meinen Rezepten suchen',
-                onPressed: _findSavedRecipes,
-                secondary: true,
+              Row(
+                children: [
+                  Expanded(
+                    child: _RecipeActionButton(
+                      key: const Key('cook-summary-new-recipes'),
+                      label: 'Neue Rezepte suchen',
+                      onPressed: _findNewRecipes,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _RecipeActionButton(
+                      key: const Key('cook-summary-saved-recipes'),
+                      label: 'Aus meinen Rezepten suchen',
+                      onPressed: _findSavedRecipes,
+                      secondary: true,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -382,14 +388,12 @@ class _AdditionalIngredientsAction extends StatelessWidget {
 }
 
 class _RecipeActionButton extends StatelessWidget {
-  final IconData icon;
   final String label;
   final VoidCallback onPressed;
   final bool secondary;
 
   const _RecipeActionButton({
     super.key,
-    required this.icon,
     required this.label,
     required this.onPressed,
     this.secondary = false,
@@ -397,24 +401,28 @@ class _RecipeActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = secondary
-        ? FilledButton.icon(
-            onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppDesign.surface,
-              foregroundColor: AppDesign.primaryDark,
-              side: const BorderSide(color: AppDesign.divider),
-              elevation: 0,
-            ),
-          )
-        : FilledButton.icon(
-            onPressed: onPressed,
-            icon: Icon(icon),
-            label: Text(label),
-          );
-    return SizedBox(height: 56, child: button);
+    final style = FilledButton.styleFrom(
+      minimumSize: const Size(0, 48),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      backgroundColor: secondary ? AppDesign.surface : null,
+      foregroundColor: secondary ? AppDesign.primaryDark : null,
+      side: secondary ? const BorderSide(color: AppDesign.divider) : null,
+      elevation: secondary ? 0 : null,
+    );
+    return SizedBox(
+      height: 48,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: style,
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
   }
 }
 
