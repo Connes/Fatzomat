@@ -163,7 +163,7 @@ void main() {
     expect(summaryList, findsOneWidget);
     await tester.drag(summaryList, const Offset(0, -500));
     await tester.pumpAndSettle();
-    expect(find.text('Neue Rezepte suchen'), findsOneWidget);
+    expect(find.text('Neues Rezept suchen'), findsOneWidget);
     expect(find.text('Aus meinen Rezepten suchen'), findsOneWidget);
     await tester.tap(find.byKey(const Key('cook-summary-saved-recipes')));
     await tester.pumpAndSettle();

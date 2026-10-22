@@ -156,7 +156,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                   Expanded(
                     child: _RecipeActionButton(
                       key: const Key('cook-summary-new-recipes'),
-                      label: 'Neue Rezepte suchen',
+                      label: 'Neues Rezept suchen',
                       onPressed: _findNewRecipes,
                     ),
                   ),
@@ -213,18 +213,18 @@ class _MyChoiceCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            Center(
-              child: Column(
-                children: [
-                  _MainChoiceImage(assetPath: mainChoiceAsset),
-                  const SizedBox(height: 12),
-                  Text(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _MainChoiceImage(assetPath: mainChoiceAsset),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
                     mainChoice,
-                    textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             if (loadingFoods) ...[
               const SizedBox(height: 12),
@@ -277,15 +277,15 @@ class _MainChoiceImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallback = Container(
-      width: 128,
-      height: 128,
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         color: AppDesign.secondarySurface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: const Icon(
         Icons.restaurant_menu_rounded,
-        size: 48,
+        size: 28,
         color: AppDesign.primaryDark,
       ),
     );
@@ -296,10 +296,10 @@ class _MainChoiceImage extends StatelessWidget {
       image: true,
       label: 'Bild für die Auswahl',
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
         child: SizedBox(
-          width: 128,
-          height: 128,
+          width: 64,
+          height: 64,
           child: Image.asset(
             assetPath!,
             fit: BoxFit.cover,
