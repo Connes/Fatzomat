@@ -116,11 +116,19 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Auf dem Merge-Commit `e71c725c898b0ac7b44c0e9067df5564a4d09533` wurden bei der Prüfung keine Post-Merge-Workflow-Runs und keine Statuschecks zurückgegeben; Post-Merge-CI ist daher **nicht als erfolgreich verifiziert**.
 - Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
 
+## Live-Status (verifiziert 2026-10-22)
+
+- Aktueller `main`-Commit: `7f957c9338491d87baab8428301232a948a05f20` (Lebensmittel-Auswahl ohne Emojis).
+- Beide CI-Workflows sind für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39561970787) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39561970624). Der erste Workflow enthält erfolgreiche Analyze- und Test-Jobs; der zweite Workflow ist ebenfalls erfolgreich abgeschlossen.
+- Die Live-Abfrage der offenen Pull Requests ergab keine offenen PRs.
+- PR [#267 – Make cooking recipe actions compact and side by side](https://github.com/Connes/Fatzomat/pull/267) wurde am 2026-10-22 geschlossen, ohne Merge. Nicht als umgesetzt behandeln und nicht eigenständig wieder öffnen; bei späterem Bedarf neu anhand des aktuellen Codes bewerten.
+- Geräteprüfung wurde nicht durchgeführt. Supabase wurde in dieser Sitzung nicht geprüft, da keine Backend- oder Migrationsänderung vorgenommen wurde.
+
 ## Nächster Schritt
 
 1. Zu Beginn jeder Sitzung `main`, offene PRs und CI live erneut prüfen.
-2. Nur die letzte aktuelle Änderung in diesem Dokument zusammenfassen. Historische PR-Listen und alte Sitzungsberichte gehören nicht hierher.
-3. Den nächsten Arbeitspunkt aus einem aktuellen Code-/Testbefund ableiten; alte Feature-Branches nicht ungeprüft wiederverwenden.
+2. Nur den aktuellen Live-Status in diesem Abschnitt aktualisieren; historische Einzelberichte gehören in die jeweiligen thematischen Abschnitte.
+3. Den nächsten Arbeitspunkt aus einem aktuellen Code-/Testbefund ableiten; geschlossene, nicht gemergte Feature-Branches nicht ungeprüft wiederverwenden.
 
 ## Technische Orientierung
 
