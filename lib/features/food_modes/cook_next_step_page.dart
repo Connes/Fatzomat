@@ -156,7 +156,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                   Expanded(
                     child: _RecipeActionButton(
                       key: const Key('cook-summary-new-recipes'),
-                      label: 'Neue Rezepte suchen',
+                      label: 'Neues Rezept suchen',
                       onPressed: _findNewRecipes,
                     ),
                   ),
