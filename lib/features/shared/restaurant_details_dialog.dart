@@ -21,6 +21,8 @@ Future<bool?> showRestaurantDetailsDialog(
   final hours = restaurant['opening_hours']?.toString();
   var isCompletingVisit = false;
   var isTogglingFavorite = false;
+  String? favoriteNotice;
+  var favoriteNoticeError = false;
 
   return showDialog<bool>(
     context: context,
@@ -47,26 +49,30 @@ Future<bool?> showRestaurantDetailsDialog(
                           try {
                             final updated = await onToggleFavorite(isFavorite);
                             if (dialogContext.mounted) {
-                              setDialogState(() => isFavorite = updated);
-                              AppFeedback.showSnackBar(
-                                dialogContext,
-                                SnackBar(
-                                  content: Text(
-                                    updated
-                                        ? 'Restaurant in Lieblingsrestaurants gespeichert.'
-                                        : 'Restaurant aus Lieblingsrestaurants entfernt.',
-                                  ),
-                                ),
-                              );
+                              setDialogState(() {
+                                isFavorite = updated;
+                                favoriteNotice = updated
+                                    ? 'Restaurant in Lieblingsrestaurants gespeichert.'
+                                    : 'Restaurant aus Lieblingsrestaurants entfernt.';
+                                favoriteNoticeError = false;
+                              });
+                              Future<void>.delayed(const Duration(seconds: 2), () {
+                                if (dialogContext.mounted) {
+                                  setDialogState(() => favoriteNotice = null);
+                                }
+                              });
                             }
                           } catch (_) {
                             if (dialogContext.mounted) {
-                              AppFeedback.showSnackBar(
-                                dialogContext,
-                                const SnackBar(
-                                  content: Text('Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.'),
-                                ),
-                              );
+                              setDialogState(() {
+                                favoriteNotice = 'Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.';
+                                favoriteNoticeError = true;
+                              });
+                              Future<void>.delayed(const Duration(seconds: 2), () {
+                                if (dialogContext.mounted) {
+                                  setDialogState(() => favoriteNotice = null);
+                                }
+                              });
                             }
                           } finally {
                             if (dialogContext.mounted) {
@@ -88,6 +94,28 @@ Future<bool?> showRestaurantDetailsDialog(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (favoriteNotice != null) ...[
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: favoriteNoticeError
+                      ? Theme.of(dialogContext).colorScheme.errorContainer
+                      : AppDesign.primarySoft,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  favoriteNotice!,
+                  style: TextStyle(
+                    color: favoriteNoticeError
+                        ? Theme.of(dialogContext).colorScheme.onErrorContainer
+                        : AppDesign.primaryDark,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
             if (_has(cuisine)) _detailRow(Icons.restaurant_menu_rounded, 'Küche', cuisine!),
             if (_has(address))
               _detailRow(Icons.location_on_outlined, 'Adresse', _formatAddress(address!), onTap: () {
