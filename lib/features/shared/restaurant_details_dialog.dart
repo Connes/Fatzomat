@@ -48,6 +48,16 @@ Future<bool?> showRestaurantDetailsDialog(
                             final updated = await onToggleFavorite(isFavorite);
                             if (dialogContext.mounted) {
                               setDialogState(() => isFavorite = updated);
+                              AppFeedback.showSnackBar(
+                                dialogContext,
+                                SnackBar(
+                                  content: Text(
+                                    updated
+                                        ? 'Restaurant in Lieblingsrestaurants gespeichert.'
+                                        : 'Restaurant aus Lieblingsrestaurants entfernt.',
+                                  ),
+                                ),
+                              );
                             }
                           } catch (_) {
                             if (dialogContext.mounted) {
