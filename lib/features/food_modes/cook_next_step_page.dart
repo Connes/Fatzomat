@@ -213,18 +213,18 @@ class _MyChoiceCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            Center(
-              child: Column(
-                children: [
-                  _MainChoiceImage(assetPath: mainChoiceAsset),
-                  const SizedBox(height: 12),
-                  Text(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _MainChoiceImage(assetPath: mainChoiceAsset),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
                     mainChoice,
-                    textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             if (loadingFoods) ...[
               const SizedBox(height: 12),
@@ -277,15 +277,15 @@ class _MainChoiceImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallback = Container(
-      width: 128,
-      height: 128,
+      width: 64,
+      height: 64,
       decoration: BoxDecoration(
         color: AppDesign.secondarySurface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: const Icon(
         Icons.restaurant_menu_rounded,
-        size: 48,
+        size: 28,
         color: AppDesign.primaryDark,
       ),
     );
