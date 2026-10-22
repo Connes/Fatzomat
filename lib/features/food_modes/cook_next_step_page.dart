@@ -252,7 +252,6 @@ class _MyChoiceCard extends StatelessWidget {
             ],
             const SizedBox(height: 6),
             _AdditionalIngredientsAction(
-              selectedCount: selectedFoods.length,
               onTap: onAddIngredients,
             ),
           ],
@@ -369,14 +368,12 @@ class _ChoiceRow extends StatelessWidget {
 }
 
 class _AdditionalIngredientsAction extends StatelessWidget {
-  final int selectedCount;
   final VoidCallback onTap;
 
-  const _AdditionalIngredientsAction({required this.selectedCount, required this.onTap});
+  const _AdditionalIngredientsAction({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final suffix = selectedCount == 0 ? '' : ' ($selectedCount ausgewählt)';
     return Semantics(
       button: true,
       label: 'Weitere Zutaten hinzufügen',
@@ -392,7 +389,7 @@ class _AdditionalIngredientsAction extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Weitere Zutaten hinzufügen$suffix',
+                  'Weitere Zutaten hinzufügen',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
