@@ -48,7 +48,11 @@ void main() {
     expect(prompt, contains('generiere AUTOMATISCH und direkt anschließend'));
     expect(prompt, contains('fotorealistisches, appetitliches Bild'));
     expect(prompt, contains('Warte nicht auf eine weitere Aufforderung.'));
-    expect(prompt, contains('Die JSON-Datei muss ausschließlich die oben definierten Rezeptdaten enthalten.'));
+    expect(prompt, contains('ERSTE PRIORITÄT: Erstelle das vollständige Rezept'));
+    expect(prompt, contains('recipe.title'));
+    expect(prompt, contains('Auch in diesem Ersatzfall muss das vollständige Rezept ausgegeben werden.'));
+    expect(prompt, contains('Die Bildgenerierung darf die Rezeptausgabe weder ersetzen noch verhindern.'));
+    expect(prompt, contains('JSON-only-Regel gilt nur für den Dateiinhalt'));
     expect(prompt, isNot(contains('Wenn ich danach schreibe')));
   });
 
