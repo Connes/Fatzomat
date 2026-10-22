@@ -129,6 +129,8 @@ void main() {
     expect(calls, 1);
 
     toggle.complete(true);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Aus Lieblingsrestaurants entfernen'), findsOneWidget);
@@ -156,8 +158,12 @@ void main() {
       find.text('Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.'),
       findsOneWidget,
     );
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Als Lieblingsrestaurant speichern'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
     await tester.pumpAndSettle();
     expect(calls, 2);
     expect(find.byTooltip('Aus Lieblingsrestaurants entfernen'), findsOneWidget);
