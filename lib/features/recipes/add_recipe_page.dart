@@ -916,6 +916,10 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
       awaitingChatGptReturn = true;
       showSelectionSummary = false;
     });
+    // Paint the handoff screen before Android switches tasks. Otherwise the
+    // activity snapshot can briefly show the stale recipe-selection page.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
     try {
       // ChatGPT's q parameter opens a conversation with the generated prompt
       // prefilled, instead of merely opening an empty chat.
@@ -923,10 +927,8 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication) && mounted) {
         throw StateError('ChatGPT konnte nicht geöffnet werden.');
       }
-      if (!mounted) return;
-      AppFeedback.showSnackBar(context, 
-        const SnackBar(content: Text('Rezept-Prompt an ChatGPT übergeben.')),
-      );
+      // Keep the handoff visually quiet. The app resumes into the selection
+      // summary when the user returns from ChatGPT.
     } on PlatformException catch (e) {
       if (mounted) {
         setState(() => awaitingChatGptReturn = false);
@@ -962,6 +964,14 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
         .map((id) => foods.where((food) => food.id == id).firstOrNull)
         .whereType<Food>()
         .toList(growable: false);
+
+    // Hide the previous page completely during the external-app handoff.
+    // On resume, didChangeAppLifecycleState switches to the real selection
+    // summary, so this screen is only shown while ChatGPT is opening.
+    if (awaitingChatGptReturn && !showSelectionSummary) {
+      return const _ChatGptHandoffLoadingPage();
+    }
+
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: const TogetherAppBar(title: Text('Mit ChatGPT erstellen')),
@@ -1801,3 +1811,39 @@ class _IngredientRow extends StatelessWidget {
     );
   }
 }
+
+/// Minimal branded transition shown while handing control to ChatGPT.
+class _ChatGptHandoffLoadingPage extends StatelessWidget {
+  const _ChatGptHandoffLoadingPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppDesign.background,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/branding/launch_heart.png',
+              width: 76,
+              height: 76,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Love',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppDesign.text,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
