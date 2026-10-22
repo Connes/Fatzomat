@@ -40,7 +40,7 @@ class ChatGptRestaurantPage extends StatefulWidget {
   State<ChatGptRestaurantPage> createState() => _ChatGptRestaurantPageState();
 }
 
-class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
+class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> with WidgetsBindingObserver {
   late String _cuisine;
   final _locationController = TextEditingController();
   String? _error;
@@ -53,8 +53,16 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cuisine = widget.initialCuisine;
     _determineCurrentLocation();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _launchingChatGpt && mounted) {
+      setState(() => _launchingChatGpt = false);
+    }
   }
 
   Future<void> _determineCurrentLocation() async {
@@ -150,6 +158,7 @@ class _ChatGptRestaurantPageState extends State<ChatGptRestaurantPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _locationController.dispose();
     super.dispose();
   }
@@ -194,6 +203,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
   Future<void> _launchChatGptWithPrompt() async {
     final launched = await _tryLaunchChatGpt();
     if (!launched && mounted) {
+      setState(() => _launchingChatGpt = false);
       AppFeedback.showSnackBar(context, 
         const SnackBar(content: Text('ChatGPT konnte nicht automatisch geöffnet werden. Du kannst den Prompt unten manuell öffnen.')),
       );
