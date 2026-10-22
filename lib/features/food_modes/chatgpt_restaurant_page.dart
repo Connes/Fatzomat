@@ -366,7 +366,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     // throughout location lookup and the external ChatGPT launch. In
     // particular, never flash the restaurant import page between the two.
     if (widget.autoOpenChatGpt && (_locating || _launchingChatGpt)) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppDesign.background,
         body: Center(
           child: Column(
