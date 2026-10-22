@@ -39,14 +39,24 @@ void main() {
     expect(prompt, contains('Du darfst sinnvolle zusätzliche Zutaten ergänzen'));
   });
 
-  test('prompt keeps recipe data available for the separate manual image step', () {
+  test('requests automatic image generation after creating the recipe file', () {
     final prompt = TogetherChatGptPrompt.build(
       mainChoice: 'Fisch',
       selectedFoods: const [],
     );
-  
-    expect(prompt, contains('Erstelle jetzt anhand des gerade erzeugten Rezepts ein Bild des fertigen Gerichts.'));
-    expect(prompt, contains('Die Bildgenerierung ist bewusst getrennt von der JSON-Datei.'));
-    expect(prompt, contains('Füge kein Bild, keine Base64-Daten und keinen Bildpfad in die JSON ein.'));
+
+    expect(prompt, contains('generiere AUTOMATISCH und direkt anschließend'));
+    expect(prompt, contains('fotorealistisches, appetitliches Bild'));
+    expect(prompt, contains('Warte nicht auf eine weitere Aufforderung.'));
+    expect(prompt, contains('Die JSON-Datei muss ausschließlich die oben definierten Rezeptdaten enthalten.'));
+    expect(prompt, isNot(contains('Wenn ich danach schreibe')));
+  });
+
+  test('photo import prompt continues to return only recipe JSON', () {
+    final prompt = TogetherChatGptPrompt.buildPhotoImportPrompt();
+
+    expect(prompt, contains('together_recipe.json'));
+    expect(prompt, contains('Das Ergebnis muss syntaktisch gültiges JSON sein.'));
+    expect(prompt, contains('Gib nur das JSON bzw. die erzeugte Datei zurück.'));
   });
 }

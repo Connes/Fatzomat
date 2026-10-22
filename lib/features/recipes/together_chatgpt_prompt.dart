@@ -11,7 +11,7 @@ class TogetherChatGptPrompt {
         ? 'Keine zusätzlichen Zutaten ausgewählt.'
         : selectedFoods
             .map((food) => '- ${food.name}')
-            .join('\n');
+            .join('\\n');
 
     return '''Erstelle für mich ein passendes Rezept und lege das Ergebnis als herunterladbare Datei ab.
 
@@ -65,9 +65,10 @@ Regeln:
 11. "servings", "prep_time_minutes" und "cook_time_minutes" müssen ganze Zahlen sein.
 12. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
 13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
-14. Gib nach Möglichkeit ausschließlich die Datei zum Download aus. Wenn die Dateierstellung in deiner aktuellen Umgebung technisch nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON ohne Markdown aus, damit ich es als together_recipe.json speichern kann.
-15. Nachdem die Rezeptdatei erfolgreich erstellt wurde, bleiben die vollständigen Rezeptdaten in diesem Chat erhalten. Wenn ich danach schreibe „Erstelle jetzt anhand des gerade erzeugten Rezepts ein Bild des fertigen Gerichts.“, verwende genau dieses Rezept als Grundlage für die Bildgenerierung. Ich möchte das Rezept dafür nicht erneut übergeben müssen.
-16. Die Bildgenerierung ist bewusst getrennt von der JSON-Datei. Füge kein Bild, keine Base64-Daten und keinen Bildpfad in die JSON ein.''';
+14. Erstelle zuerst die gültige Rezeptdatei „together_recipe.json“. Wenn die Dateierstellung in deiner aktuellen Umgebung technisch nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON ohne Markdown aus, damit ich es als together_recipe.json speichern kann.
+15. Nachdem die Rezeptdatei erstellt wurde, generiere AUTOMATISCH und direkt anschließend ein separates, fotorealistisches, appetitliches Bild des fertig zubereiteten Gerichts. Warte nicht auf eine weitere Aufforderung. Verwende exakt das gerade erstellte Rezept als Grundlage und bilde die beschriebenen Zutaten und Zubereitung möglichst realistisch ab. Präsentiere das Gericht wie auf einem hochwertigen professionellen Food-Foto mit natürlichem Licht und ansprechendem Anrichten.
+16. Das Bild ist ein separates Ergebnis und darf die Rezeptdatei nicht verändern. Füge kein Bild, keine Base64-Daten und keinen Bildpfad in die JSON ein. Die JSON-Datei muss ausschließlich die oben definierten Rezeptdaten enthalten.
+17. Stelle die Rezeptdatei bereit und erstelle anschließend das Bild im Chat. Die Anweisung zur Bildgenerierung ist ausdrücklich Teil dieses Auftrags und keine optionale spätere Aufgabe.''';
   }
 
   static String buildPhotoImportPrompt() {
@@ -130,5 +131,4 @@ Zusätzliche Regeln:
 5. Prüfe vor der Ausgabe, dass das Ergebnis dem together_recipe-Format Version 1 entspricht.
 6. Gib nur das JSON bzw. die erzeugte Datei zurück.''';
   }
-
 }
