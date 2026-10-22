@@ -39,21 +39,20 @@ void main() {
     expect(prompt, contains('Du darfst sinnvolle zusätzliche Zutaten ergänzen'));
   });
 
-  test('requests automatic image generation after creating the recipe file', () {
+  test('prioritizes recipe file output and does not request image generation in the same prompt', () {
     final prompt = TogetherChatGptPrompt.build(
       mainChoice: 'Fisch',
       selectedFoods: const [],
     );
 
-    expect(prompt, contains('generiere AUTOMATISCH und direkt anschließend'));
-    expect(prompt, contains('fotorealistisches, appetitliches Bild'));
-    expect(prompt, contains('Warte nicht auf eine weitere Aufforderung.'));
-    expect(prompt, contains('ERSTE PRIORITÄT: Erstelle das vollständige Rezept'));
+    expect(prompt, contains('DATEINAME: together_recipe.json'));
+    expect(prompt, contains('Erstelle ausschließlich ein vollständiges Rezept'));
+    expect(prompt, contains('Erzeuge aus dem vollständigen Rezept zuerst die Datei'));
     expect(prompt, contains('recipe.title'));
-    expect(prompt, contains('Auch in diesem Ersatzfall muss das vollständige Rezept ausgegeben werden.'));
-    expect(prompt, contains('Die Bildgenerierung darf die Rezeptausgabe weder ersetzen noch verhindern.'));
-    expect(prompt, contains('JSON-only-Regel gilt nur für den Dateiinhalt'));
-    expect(prompt, isNot(contains('Wenn ich danach schreibe')));
+    expect(prompt, contains('das vollständige rohe JSON als Chat-Antwort'));
+    expect(prompt, contains('Generiere kein Bild und rufe keine Bildgenerierung auf.'));
+    expect(prompt, isNot(contains('generiere AUTOMATISCH und direkt anschließend')));
+    expect(prompt, isNot(contains('fotorealistisches, appetitliches Bild')));
   });
 
   test('photo import prompt continues to return only recipe JSON', () {
