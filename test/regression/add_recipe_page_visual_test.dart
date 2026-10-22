@@ -168,13 +168,17 @@ test('Import-Vorschau bietet Bearbeiten vor dem Speichern an', () {
   expect(source, isNot(contains('final missingUnits = _recipe.ingredients')));
 });
 
-test('ChatGPT-Rückkehr zeigt nur die Auswahlübersicht und den Dateiimport', () {
+test('ChatGPT-Rückkehr zeigt die zentrierte Auswahlzusammenfassung und den Dateiimport', () {
   final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
   expect(source, contains('showSelectionSummary = true'));
-  expect(source, contains("Text('Deine Rezeptauswahl'"));
-  expect(source, contains("Text('Hauptzutat'"));
-  expect(source, contains("Text('Beilagen und ausgewählte Zutaten'"));
-  expect(source, contains('selectedFoods.map((food) => Chip('));
+  expect(source, contains("'Deine Rezeptauswahl'"));
+  expect(source, contains('textAlign: TextAlign.center'));
+  expect(source, contains('_selectionSummary(mainChoice, selectedFoods)'));
+  expect(source, contains('Eine Variation vom'));
+  expect(source, isNot(contains("Text('Hauptzutat'")));
+  expect(source, isNot(contains("Text('Beilagen und ausgewählte Zutaten'")));
+  expect(source, isNot(contains('selectedFoods.map((food) => Chip(')));
+  expect(source, contains('Importiere hier die von ChatGPT erstellte Rezeptdatei.'));
   expect(source, contains('if (!showSelectionSummary) GridView.builder('));
   expect(source, contains('if (!showSelectionSummary) FilledButton.icon(\n                      onPressed: _selectIngredients'));
   expect(source, contains('if (!showSelectionSummary) FilledButton.icon(\n                      onPressed: opening ? null : _copyPromptAndOpenChatGpt'));
