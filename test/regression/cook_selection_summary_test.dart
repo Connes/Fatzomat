@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:food_app_mvp/data/repositories/food_repository.dart';
-import 'package:food_app_mvp/core/app_design.dart';
 import 'package:food_app_mvp/core/food_mode.dart';
 import 'package:food_app_mvp/core/services/food_choice_asset_service.dart';
 import 'package:food_app_mvp/data/models/food.dart';
@@ -38,13 +37,8 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Weitere Zutaten hinzufügen'), findsOneWidget);
-    final actionCard = tester.widget<Card>(
-      find.ancestor(
-        of: find.text('Weitere Zutaten hinzufügen'),
-        matching: find.byType(Card),
-      ).first,
-    );
-    expect(actionCard.color, AppDesign.primarySoft);
+    expect(find.byIcon(Icons.add_circle_outline_rounded), findsOneWidget);
+    expect(find.byType(CustomPaint), findsWidgets);
   });
 
   testWidgets('V94 verwendet das passende bestehende Bild für jede Hauptauswahl', (tester) async {

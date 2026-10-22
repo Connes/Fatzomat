@@ -226,6 +226,8 @@ class _MyChoiceCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 18),
+            const _DottedSeparator(),
             if (loadingFoods) ...[
               const SizedBox(height: 12),
               const LinearProgressIndicator(minHeight: 2),
@@ -233,10 +235,7 @@ class _MyChoiceCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(loadError!, style: Theme.of(context).textTheme.bodySmall),
             ] else if (selectedFoods.isNotEmpty) ...[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
-                child: Divider(height: 1),
-              ),
+              const SizedBox(height: 14),
               ...selectedFoods.map(
                 (food) => Padding(
                   padding: const EdgeInsets.only(bottom: 10),
@@ -267,6 +266,45 @@ class _MyChoiceCard extends StatelessWidget {
     if (value.contains('karotte') || value.contains('möhre')) return Icons.local_florist_rounded;
     return Icons.restaurant_rounded;
   }
+}
+
+class _DottedSeparator extends StatelessWidget {
+  const _DottedSeparator();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 2,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _DottedSeparatorPainter(
+          color: Theme.of(context).colorScheme.outlineVariant,
+        ),
+      ),
+    );
+  }
+}
+
+class _DottedSeparatorPainter extends CustomPainter {
+  final Color color;
+
+  const _DottedSeparatorPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    const diameter = 1.5;
+    const spacing = 4.0;
+    for (double x = diameter / 2; x < size.width; x += spacing) {
+      canvas.drawCircle(Offset(x, size.height / 2), diameter / 2, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DottedSeparatorPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _MainChoiceImage extends StatelessWidget {
@@ -357,29 +395,26 @@ class _AdditionalIngredientsAction extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'Weitere Zutaten hinzufügen',
-      child: Card(
-        color: AppDesign.primarySoft,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                const Icon(Icons.add_rounded, size: 28, color: AppDesign.primary),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Weitere Zutaten hinzufügen$suffix',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: AppDesign.primaryDark,
-                    ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.add_circle_outline_rounded, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Weitere Zutaten hinzufügen$suffix',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const Icon(Icons.chevron_right_rounded),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
