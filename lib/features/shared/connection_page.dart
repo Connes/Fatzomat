@@ -213,10 +213,8 @@ class _ConnectionPageState extends State<ConnectionPage> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Icon(
-                    memberCount >= 2
-                        ? Icons.people_alt_rounded
-                        : Icons.person_add_alt_1_rounded,
+                  const Icon(
+                    Icons.people_alt_outlined,
                     size: 56,
                     color: AppDesign.primaryDark,
                   ),
