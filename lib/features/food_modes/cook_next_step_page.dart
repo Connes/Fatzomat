@@ -300,7 +300,7 @@ class _IngredientGroupHeading extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w800,
             ),
       ),
@@ -397,16 +397,34 @@ class _ChoiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.titleMedium;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: SizedBox(
-        width: double.infinity,
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
+      padding: const EdgeInsets.only(left: 14, top: 7, bottom: 7),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface,
+                shape: BoxShape.circle,
               ),
-        ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: textStyle?.copyWith(
+                fontSize: (textStyle.fontSize ?? 16) * 0.92,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
