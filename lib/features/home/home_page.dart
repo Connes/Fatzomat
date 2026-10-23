@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                                         softWrap: false,
                                         style: TextStyle(
                                           fontFamily: 'Inter',
-                                          fontSize: 17,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
