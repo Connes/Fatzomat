@@ -1851,7 +1851,6 @@ class _ChatGptHandoffLoadingPage extends StatelessWidget {
             const Text(
               'Love',
               style: TextStyle(
-                fontFamily: 'Inter',
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: AppDesign.text,
