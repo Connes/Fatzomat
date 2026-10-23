@@ -122,7 +122,13 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
 
   void _shiftSelectedDate(int days) {
     final today = _dateOnly(DateTime.now());
-    final target = _dateOnly(_selectedDate.add(Duration(days: days)));
+    // Move by calendar date, not by 24 elapsed hours. A local day can be 23 or 25 hours
+    // across daylight-saving transitions, which would otherwise keep the date unchanged.
+    final target = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day + days,
+    );
     if (target.isBefore(today)) return;
     setState(() {
       _selectedDate = target;
