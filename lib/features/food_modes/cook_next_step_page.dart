@@ -484,7 +484,7 @@ class _RecipeActionButton extends StatelessWidget {
     final style = FilledButton.styleFrom(
       minimumSize: const Size(0, 48),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
       backgroundColor: secondary ? AppDesign.surface : null,
       foregroundColor: secondary ? AppDesign.primaryDark : null,
       side: secondary ? const BorderSide(color: AppDesign.divider) : null,
