@@ -160,7 +160,6 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
   }
 
   Future<void> _showAddOptions() async {
-    if (widget.selectForToday) return;
     final choice = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
@@ -400,10 +399,8 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.settings,
       appBar: TogetherAppBar(
-        title: Text(widget.selectForToday ? 'Meine Restaurantfavoriten' : 'Lieblingsrestaurants'),
-        actions: widget.selectForToday
-            ? null
-            : [
+        title: const Text('Lieblingsrestaurants'),
+        actions: [
                 IconButton(
                   tooltip: 'Lieblingsrestaurant hinzufügen oder importieren',
                   onPressed: _showAddOptions,
@@ -478,12 +475,18 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Füge über das Plus oben rechts dein erstes Lieblingsrestaurant hinzu. Es erscheint dann hier.',
+                                'Füge dein erstes Lieblingsrestaurant hinzu. Es erscheint dann hier und du kannst es direkt auswählen.',
                                 textAlign: TextAlign.center,
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: AppDesign.text,
                                   height: 1.4,
                                 ),
+                              ),
+                              const SizedBox(height: 16),
+                              FilledButton.icon(
+                                onPressed: _showAddOptions,
+                                icon: const Icon(Icons.add_rounded),
+                                label: const Text('Lieblingsrestaurant hinzufügen'),
                               ),
                             ],
                           ),
