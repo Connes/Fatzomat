@@ -386,9 +386,9 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFF7A1528),
-                  Color(0xFF310512),
-                  Color(0xFF19030A),
+                  Color(0xFFFFFCF5),
+                  Color(0xFFF7F2E8),
+                  Color(0xFFEFE5D2),
                 ],
               ),
               borderRadius: BorderRadius.circular(28),
@@ -422,7 +422,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10070A),
+                    color: const Color(0xFFFFFCF5),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color: const Color(0xFFB98736),
