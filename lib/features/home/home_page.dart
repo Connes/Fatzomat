@@ -164,7 +164,6 @@ class _HomePageState extends State<HomePage> {
                                   'Willkommen',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: 'Inter',
                                     fontSize: 24,
                                     fontWeight: FontWeight.w800,
                                     color: Colors.white,
@@ -233,7 +232,6 @@ class _HomePageState extends State<HomePage> {
                                         maxLines: 1,
                                         softWrap: false,
                                         style: TextStyle(
-                                          fontFamily: 'Inter',
                                           fontSize: 18,
                                           fontWeight: FontWeight.w700,
                                         ),
