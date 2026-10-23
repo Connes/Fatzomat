@@ -162,7 +162,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
             child: Row(
               children: [
                 Chip(
-                  avatar: const Icon(Icons.favorite, size: 16),
+                  avatar: const Icon(Icons.favorite, size: 16, color: Colors.red),
                   label: Text('$likedCount mag ich'),
                 ),
                 const SizedBox(width: 8),
@@ -293,7 +293,10 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                                       final category = food.category;
                                       final preference = preferences[id];
 
-                                      return ListTile(
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
                                         dense: false,
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                         horizontalTitleGap: 8,
