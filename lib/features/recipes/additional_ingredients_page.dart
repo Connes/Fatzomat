@@ -465,7 +465,7 @@ class _FoodSelectionTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     name,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                 ),
                 Icon(
