@@ -21,8 +21,6 @@ Future<bool?> showRestaurantDetailsDialog(
   final hours = restaurant['opening_hours']?.toString();
   var isCompletingVisit = false;
   var isTogglingFavorite = false;
-  String? favoriteNotice;
-  var favoriteNoticeError = false;
 
   return showDialog<bool>(
     context: context,
@@ -49,30 +47,21 @@ Future<bool?> showRestaurantDetailsDialog(
                           try {
                             final updated = await onToggleFavorite(isFavorite);
                             if (dialogContext.mounted) {
-                              setDialogState(() {
-                                isFavorite = updated;
-                                favoriteNotice = updated
+                              setDialogState(() => isFavorite = updated);
+                              _showFavoriteToast(
+                                dialogContext,
+                                updated
                                     ? 'Restaurant in Lieblingsrestaurants gespeichert.'
-                                    : 'Restaurant aus Lieblingsrestaurants entfernt.';
-                                favoriteNoticeError = false;
-                              });
-                              Future<void>.delayed(const Duration(seconds: 2), () {
-                                if (dialogContext.mounted) {
-                                  setDialogState(() => favoriteNotice = null);
-                                }
-                              });
+                                    : 'Restaurant aus Lieblingsrestaurants entfernt.',
+                              );
                             }
                           } catch (_) {
                             if (dialogContext.mounted) {
-                              setDialogState(() {
-                                favoriteNotice = 'Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.';
-                                favoriteNoticeError = true;
-                              });
-                              Future<void>.delayed(const Duration(seconds: 2), () {
-                                if (dialogContext.mounted) {
-                                  setDialogState(() => favoriteNotice = null);
-                                }
-                              });
+                              _showFavoriteToast(
+                                dialogContext,
+                                'Favorit konnte nicht aktualisiert werden. Bitte versuche es erneut.',
+                                isError: true,
+                              );
                             }
                           } finally {
                             if (dialogContext.mounted) {
@@ -94,28 +83,6 @@ Future<bool?> showRestaurantDetailsDialog(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (favoriteNotice != null) ...[
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: favoriteNoticeError
-                      ? Theme.of(dialogContext).colorScheme.errorContainer
-                      : AppDesign.primarySoft,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  favoriteNotice!,
-                  style: TextStyle(
-                    color: favoriteNoticeError
-                        ? Theme.of(dialogContext).colorScheme.onErrorContainer
-                        : AppDesign.primaryDark,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
             if (_has(cuisine)) _detailRow(Icons.restaurant_menu_rounded, 'Küche', cuisine!),
             if (_has(address))
               _detailRow(Icons.location_on_outlined, 'Adresse', _formatAddress(address!), onTap: () {
@@ -236,4 +203,55 @@ Widget _detailRow(IconData icon, String label, String value, {VoidCallback? onTa
       ),
     ),
   );
+}
+
+
+void _showFavoriteToast(
+  BuildContext context,
+  String message, {
+  bool isError = false,
+}) {
+  final overlay = Overlay.of(context, rootOverlay: true);
+  late final OverlayEntry entry;
+  entry = OverlayEntry(
+    builder: (overlayContext) => Positioned(
+      left: 24,
+      right: 24,
+      bottom: 34,
+      child: SafeArea(
+        child: IgnorePointer(
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 440),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF424242),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x26000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isError ? const Color(0xFFFFDAD6) : Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  overlay.insert(entry);
+  Future<void>.delayed(const Duration(seconds: 2), entry.remove);
 }
