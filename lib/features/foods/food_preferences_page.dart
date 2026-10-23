@@ -75,6 +75,10 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
     setState(() {
       foods.add(result);
       preferences[result.id] = 'like';
+      // Make the newly created food visible even when previous filters hid it.
+      searchController.clear();
+      preferenceFilter = 'all';
+      categoryFilter = result.category;
     });
   }
 

@@ -3,6 +3,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../cache/offline_cache.dart';
 import '../models/food.dart';
 
+class DuplicateFoodException implements Exception {
+  final String name;
+  const DuplicateFoodException(this.name);
+
+  @override
+  String toString() => 'Das Lebensmittel „$name“ gibt es bereits.';
+}
+
 class FoodRepository {
   final SupabaseClient? _client;
   final OfflineCache _cache;
@@ -40,11 +48,26 @@ class FoodRepository {
     required String category,
     required String defaultUnit,
   }) async {
+    final normalizedName = name.trim().replaceAll(RegExp(r'\\s+'), ' ');
+    if (normalizedName.isEmpty) {
+      throw ArgumentError.value(name, 'name', 'Der Name darf nicht leer sein.');
+    }
+
+    // Friendly pre-check; the unique database index also protects concurrent inserts.
+    final existing = await client
+        .from('foods')
+        .select('name')
+        .not('created_by', 'is', null);
+    final duplicate = existing.any((row) =>
+        row['name'].toString().trim().replaceAll(RegExp(r'\\s+'), ' ').toLowerCase() ==
+        normalizedName.toLowerCase());
+    if (duplicate) throw DuplicateFoodException(normalizedName);
+
     final id =
         'custom_${DateTime.now().microsecondsSinceEpoch}_${_userId.substring(0, 8)}';
     final row = await client.from('foods').insert({
       'id': id,
-      'name': name.trim(),
+      'name': normalizedName,
       'category': category,
       'default_unit': defaultUnit.trim().isEmpty ? 'Stück' : defaultUnit.trim(),
       'created_by': _userId,
