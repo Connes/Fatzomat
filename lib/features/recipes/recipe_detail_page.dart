@@ -411,7 +411,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               child: ExpansionTile(
               initiallyExpanded: false,
               onExpansionChanged: (expanded) => setState(() => ingredientsExpanded = expanded),
-              title: const Text('Zutaten', style: TextStyle(fontWeight: FontWeight.w800)),
+              title: Text('Zutaten', style: Theme.of(context).textTheme.titleLarge),
               subtitle: Text('${ingredients.length} Zutaten'),
               trailing: Icon(ingredientsExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded),
               childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -455,7 +455,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               child: ExpansionTile(
               initiallyExpanded: false,
               onExpansionChanged: (expanded) => setState(() => preparationExpanded = expanded),
-              title: const Text('Zubereitung', style: TextStyle(fontWeight: FontWeight.w800)),
+              title: Text('Zubereitung', style: Theme.of(context).textTheme.titleLarge),
               subtitle: Text('${steps.length} Schritte'),
               trailing: Icon(preparationExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded),
               childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
