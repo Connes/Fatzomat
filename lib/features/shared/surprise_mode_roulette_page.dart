@@ -208,7 +208,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
+                    side: const BorderSide(color: Colors.transparent, width: 1.5),
                   ),
                 ),
                 ),
@@ -231,7 +231,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
+                    side: const BorderSide(color: Colors.transparent, width: 1.5),
                   ),
                 ),
                 ),
