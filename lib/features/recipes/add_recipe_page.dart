@@ -21,6 +21,7 @@ import '../../data/repositories/food_repository.dart';
 import 'additional_ingredients_page.dart';
 import 'recipe_detail_page.dart';
 import 'together_chatgpt_prompt.dart';
+import 'food_preference_recipe_guard.dart';
 import '../../data/services/together_recipe_file_service.dart';
 import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/collaboration_repository.dart';
@@ -800,6 +801,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
   String? mainChoice;
   Set<String> selectedFoodIds = <String>{};
   List<Food> foods = <Food>[];
+  Map<String, String> foodPreferences = <String, String>{};
   bool loading = true;
   String? error;
   bool opening = false;
@@ -836,9 +838,11 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
   Future<void> _loadFoods() async {
     try {
       final rows = await repository.foods();
+      final preferences = await repository.preferences();
       if (!mounted) return;
       setState(() {
         foods = rows;
+        foodPreferences = preferences;
         loading = false;
         error = null;
       });
@@ -873,6 +877,15 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
     try {
       final recipe = await const TogetherRecipeFileService().pickRecipe();
       if (recipe == null || !mounted) return;
+      final conflicts = FoodPreferenceRecipeGuard.findDislikedIngredients(
+        recipe: recipe,
+        foods: foods,
+        preferences: foodPreferences,
+      );
+      if (conflicts.isNotEmpty) {
+        _show('Dieses Rezept enthält Lebensmittel, die du nicht magst: ${conflicts.join(', ')}. Bitte lasse ChatGPT das Rezept ohne diese Zutaten neu erstellen.');
+        return;
+      }
 
       final saved = await Navigator.push<bool>(
         context,
@@ -903,9 +916,18 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
       _show('Bitte zuerst eine Hauptauswahl wählen.');
       return;
     }
+    final dislikedSelected = selectedFoods
+        .where((food) => foodPreferences[food.id] == 'dislike')
+        .toList(growable: false);
+    if (dislikedSelected.isNotEmpty) {
+      _show('Diese ausgewählten Zutaten sind als „Mag ich nicht“ markiert: ${dislikedSelected.map((food) => food.name).join(', ')}. Ändere die Auswahl oder deine Lebensmittelpräferenz zuerst.');
+      return;
+    }
     final prompt = TogetherChatGptPrompt.build(
       mainChoice: mainChoice!,
       selectedFoods: selectedFoods,
+      likedFoods: foods.where((food) => foodPreferences[food.id] == 'like').toList(growable: false),
+      dislikedFoods: foods.where((food) => foodPreferences[food.id] == 'dislike').toList(growable: false),
     );
 
     await Clipboard.setData(ClipboardData(text: prompt));

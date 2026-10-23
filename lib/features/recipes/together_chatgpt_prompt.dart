@@ -6,12 +6,21 @@ class TogetherChatGptPrompt {
   static String build({
     required String mainChoice,
     required List<Food> selectedFoods,
+    List<Food> likedFoods = const <Food>[],
+    List<Food> dislikedFoods = const <Food>[],
   }) {
     final ingredientLines = selectedFoods.isEmpty
         ? 'Keine zusätzlichen Zutaten ausgewählt.'
         : selectedFoods
             .map((food) => '- ${food.name}')
             .join('\\n');
+
+    final likedLines = likedFoods.isEmpty
+        ? 'Keine gespeicherten Lieblingslebensmittel.'
+        : likedFoods.map((food) => '- ${food.name}').join('\\n');
+    final dislikedLines = dislikedFoods.isEmpty
+        ? 'Keine gespeicherten ausgeschlossenen Lebensmittel.'
+        : dislikedFoods.map((food) => '- ${food.name}${food.aliases.isEmpty ? '' : ' (auch bekannt als: ${food.aliases.join(', ')})'}').join('\\n');
 
     return '''Erstelle ausschließlich ein vollständiges Rezept und stelle es als herunterladbare JSON-Datei bereit. Generiere in diesem Schritt KEIN Bild.
 
@@ -24,6 +33,12 @@ $mainChoice
 
 Von mir ausgewählte Zutaten:
 $ingredientLines
+
+Lebensmittel, die ich mag (bevorzugen, wenn es sinnvoll zum Rezept passt):
+$likedLines
+
+Lebensmittel, die ich NICHT mag (streng ausschließen, auch in Saucen, Gewürzmischungen, Marinaden und optionalen Zutaten):
+$dislikedLines
 
 Regeln:
 1. Die Hauptauswahl ist zwingende Grundlage des Rezepts. Bei „Huhn“, „Rind“, „Schwein“ oder „Fisch“ muss eine passende Zutat dieser Kategorie im Rezept enthalten sein. Bei „Vegetarisch“ darf das Rezept kein Fleisch und keinen Fisch enthalten.
@@ -67,7 +82,9 @@ Regeln:
 13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
 14. Gib ausschließlich das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
 15. Erzeuge aus dem vollständigen Rezept zuerst die Datei „together_recipe.json“ und stelle sie zum Download bereit. Prüfe, dass die Datei gültiges JSON im together_recipe-Format Version 1 enthält. Wenn die Dateierstellung in deiner aktuellen Umgebung technisch nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON als Chat-Antwort aus, damit ich es als together_recipe.json speichern kann.
-16. WICHTIG: Diese Anfrage dient ausschließlich der Rezept- und Dateierstellung. Generiere kein Bild und rufe keine Bildgenerierung auf. Die Bildgenerierung wird in einem getrennten Schritt angefordert, nachdem das Rezept vorliegt.
+16. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
+17. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.
+18. WICHTIG: Diese Anfrage dient ausschließlich der Rezept- und Dateierstellung. Generiere kein Bild und rufe keine Bildgenerierung auf. Die Bildgenerierung wird in einem getrennten Schritt angefordert, nachdem das Rezept vorliegt.
 ''';
   }
 
