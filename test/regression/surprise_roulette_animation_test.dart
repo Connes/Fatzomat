@@ -28,6 +28,11 @@ void main() {
     expect(page, isNot(contains('Tippe auf STOPP und lass den Zufall entscheiden.')));
     expect(page, isNot(contains('Die Walzen bremsen')));
     expect(page, contains("label: const Text('NOCHMAL DREHEN')"));
+    expect(page, contains('class _CasinoMarqueeButton extends StatefulWidget'));
+    expect(page, contains('class _CasinoMarqueePainter extends CustomPainter'));
+    expect(page, contains('Duration(milliseconds: 1800)'));
+    expect(page, contains('Color(0xFFFFE8A0)'));
+    expect(page, contains('Colors.transparent, width: 1.5'));
     expect(page, isNot(contains('_labels[mode]!')));
     expect(page, contains('Color(0xFFEFE5D2)'));
     expect(page, contains('static const _gold = AppDesign.iconGold;'));
