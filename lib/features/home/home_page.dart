@@ -164,8 +164,8 @@ class _HomePageState extends State<HomePage> {
                                   'Willkommen',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w800,
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
                                 ),
