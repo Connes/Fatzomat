@@ -327,7 +327,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                               Icon(
                                 Icons.notifications_active_outlined,
                                 size: 56,
-                                color: AppDesign.primaryDark,
+                                color: AppDesign.iconGold,
                               ),
                               const SizedBox(height: 18),
                               Text(
