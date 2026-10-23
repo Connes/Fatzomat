@@ -381,9 +381,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
               SizedBox(height: 12),
               Text(
                 'Love',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   color: AppDesign.text,
                 ),
               ),
