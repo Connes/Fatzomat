@@ -64,9 +64,9 @@ class _DiagnosticsPageState extends State<DiagnosticsPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
+          Text(
             'App-Konfiguration',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
           ListTile(
