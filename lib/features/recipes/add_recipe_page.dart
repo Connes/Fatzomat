@@ -1110,7 +1110,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
                                         Text(
                                           choice,
                                           textAlign: TextAlign.center,
-                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                                         ),
                                       ],
                                     ),
@@ -1186,7 +1186,7 @@ class _OptionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+                    Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 4),
                     Text(subtitle),
                   ],
@@ -1594,7 +1594,7 @@ class _RecipeSectionCard extends StatelessWidget {
                 child: Icon(icon, color: AppDesign.primaryDark),
               ),
               const SizedBox(width: 10),
-              Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: AppDesign.text)),
+              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppDesign.text)),
             ],
           ),
           const SizedBox(height: 10),
