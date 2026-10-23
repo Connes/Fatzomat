@@ -1232,7 +1232,7 @@ class _TodayDecisionCard extends StatelessWidget {
                                     'Entscheide Du',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 17,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: 0.1,
                                     ),
@@ -1535,7 +1535,7 @@ class _TodayDecisionCardActions extends StatelessWidget {
                     label: const Text('Teilen'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppDesign.primaryDark,
-                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
@@ -1548,7 +1548,7 @@ class _TodayDecisionCardActions extends StatelessWidget {
                     label: const Text('Entfernen'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppDesign.secondaryText,
-                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
@@ -2117,7 +2117,7 @@ class _ShoppingGroup extends StatelessWidget {
                         child: Text(itemLabel(item)),
                       ),
                       subtitle: item.source == 'manual'
-                          ? Text('Manuell hinzugefügt', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText, fontSize: 13))
+                          ? Text('Manuell hinzugefügt', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText, fontSize: 12))
                           : null,
                       // Artikel werden nur über das Drei-Punkte-Menü bearbeitet.
                       onTap: null,
