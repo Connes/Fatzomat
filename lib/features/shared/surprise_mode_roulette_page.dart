@@ -172,7 +172,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
               _buildWinner(context, result),
             const SizedBox(height: 18),
             if (_finished && result != null) ...[
-              FilledButton.icon(
+              _CasinoMarqueeButton(
+                child: FilledButton.icon(
                 onPressed: _spinAgain,
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('NOCHMAL DREHEN'),
@@ -186,12 +187,14 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
+                    side: const BorderSide(color: Colors.transparent, width: 1.5),
                   ),
+                ),
                 ),
               ),
               const SizedBox(height: 10),
-              FilledButton.icon(
+              _CasinoMarqueeButton(
+                child: FilledButton.icon(
                 onPressed: () => Navigator.pop(context, result),
                 icon: const Icon(Icons.arrow_forward_rounded),
                 label: Text('WEITER MIT „${_labels[result]}“'),
@@ -205,12 +208,14 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
+                    side: const BorderSide(color: Colors.transparent, width: 1.5),
                   ),
+                ),
                 ),
               ),
             ] else
-              FilledButton.icon(
+              _CasinoMarqueeButton(
+                child: FilledButton.icon(
                 // Keep the button's appearance unchanged while the reels stop.
                 // _stopRoulette ignores additional taps while _stopping is true.
                 onPressed: _spinning ? _stopRoulette : null,
@@ -226,8 +231,9 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
+                    side: const BorderSide(color: Colors.transparent, width: 1.5),
                   ),
+                ),
                 ),
               ),
           ],
@@ -463,6 +469,60 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       ),
     );
   }
+}
+
+
+class _CasinoMarqueeButton extends StatefulWidget {
+  const _CasinoMarqueeButton({required this.child});
+  final Widget child;
+  @override
+  State<_CasinoMarqueeButton> createState() => _CasinoMarqueeButtonState();
+}
+
+class _CasinoMarqueeButtonState extends State<_CasinoMarqueeButton> with SingleTickerProviderStateMixin {
+  late final AnimationController _lights = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat();
+  @override
+  void dispose() { _lights.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _lights,
+    builder: (context, _) => CustomPaint(
+      painter: _CasinoMarqueePainter(_lights.value),
+      child: Padding(padding: const EdgeInsets.all(5), child: widget.child),
+    ),
+  );
+}
+
+class _CasinoMarqueePainter extends CustomPainter {
+  const _CasinoMarqueePainter(this.progress);
+  final double progress;
+  static const _bulbCount = 32;
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final rect = Offset.zero & size;
+    final outer = RRect.fromRectAndRadius(rect.deflate(1.5), Radius.circular(size.height / 2));
+    final border = Paint()..style = PaintingStyle.stroke..strokeWidth = 3..shader = const LinearGradient(colors: [Color(0xFFB98736), Color(0xFFFFE8A0), Color(0xFFD4A63C)]).createShader(rect);
+    canvas.drawRRect(outer, border);
+    final path = Path()..addRRect(outer);
+    final metrics = path.computeMetrics().toList();
+    if (metrics.isEmpty) return;
+    final metric = metrics.first;
+    final bulbs = Paint()..style = PaintingStyle.fill;
+    final glow = Paint()..style = PaintingStyle.fill..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    for (var i = 0; i < _bulbCount; i++) {
+      final phase = (i / _bulbCount + progress) % 1;
+      final point = metric.getTangentForOffset(metric.length * phase)?.position;
+      if (point == null) continue;
+      final lit = ((i / _bulbCount - progress + 1) % 1) < .22;
+      if (lit) { glow.color = const Color(0xFFFFD66B).withValues(alpha: .9); canvas.drawCircle(point, 4.4, glow); }
+      bulbs.color = lit ? const Color(0xFFFFF4C6) : const Color(0xFFD9A63B);
+      canvas.drawCircle(point, lit ? 2.7 : 2.1, bulbs);
+      if (lit) { bulbs.color = Colors.white.withValues(alpha: .9); canvas.drawCircle(point, 1, bulbs); }
+    }
+  }
+  @override
+  bool shouldRepaint(covariant _CasinoMarqueePainter oldDelegate) => oldDelegate.progress != progress;
 }
 
 class _CasinoReel extends StatelessWidget {
