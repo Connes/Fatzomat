@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/app_design.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
@@ -105,7 +106,7 @@ class _BackupActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
         child: ListTile(
-          leading: Icon(icon, size: 30),
+          leading: Icon(icon, size: 30, color: AppDesign.iconGold),
           title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
           subtitle: Text(subtitle),
           trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
