@@ -29,10 +29,11 @@ void main() {
     expect(page, isNot(contains('Die Walzen bremsen')));
     expect(page, contains("label: const Text('NOCHMAL DREHEN')"));
     expect(page, isNot(contains('_labels[mode]!')));
-    expect(page, contains('Color(0xFF19030A)'));
+    expect(page, contains('Color(0xFFEFE5D2)'));
+    expect(page, contains('static const _gold = AppDesign.iconGold;'));
     expect(page, contains('borderRadius: BorderRadius.circular(28)'));
-    expect(page, contains('backgroundColor: _deepRed'));
-    expect(page, contains('foregroundColor: _gold'));
+    expect(page, contains('backgroundColor: const Color(0xFFFFFCF5)'));
+    expect(page, contains('foregroundColor: AppDesign.primaryDark'));
     expect(page, isNot(contains('AnimatedSwitcher')));
     expect(page, isNot(contains('Timer(')));
   });
