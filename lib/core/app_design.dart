@@ -193,7 +193,7 @@ abstract final class AppDesign {
         disabledColor: surfaceMuted,
         side: const BorderSide(color: divider),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusPill)),
-        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: text),
+        labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: text),
         secondaryLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: primaryDark),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       ),
@@ -225,7 +225,7 @@ abstract final class AppDesign {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusHero)),
         titleTextStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: text),
-        contentTextStyle: const TextStyle(fontSize: 15, height: 1.45, color: secondaryText),
+        contentTextStyle: const TextStyle(fontSize: 14, height: 1.45, color: secondaryText),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: surface,

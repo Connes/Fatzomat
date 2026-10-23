@@ -163,7 +163,6 @@ class _LaunchArtwork extends StatelessWidget {
               const Text(
                 'Schmackofatz',
                 style: TextStyle(
-                  fontFamily: 'Inter',
                   fontSize: 40,
                   height: 1,
                   fontWeight: FontWeight.w700,

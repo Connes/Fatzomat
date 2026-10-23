@@ -747,7 +747,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                             secondary: const Icon(
                                               Icons.favorite_rounded,
                                               size: 18,
-                                              color: Colors.red,
+                                              color: AppDesign.error,
                                             ),
                                           )),
                                   ],

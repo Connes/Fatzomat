@@ -415,7 +415,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                     color: _gold,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.2,
-                    fontSize: 13,
+                    fontSize: 12,
                   ),
                 ),
                 const SizedBox(height: 12),
