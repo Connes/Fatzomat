@@ -129,11 +129,6 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
             onPressed: saving ? null : addFood,
             icon: const Icon(Icons.add),
           ),
-          IconButton(
-            tooltip: 'Neu laden',
-            onPressed: saving ? null : load,
-            icon: const Icon(Icons.refresh),
-          ),
         ],
       ),
       body: Column(
@@ -171,6 +166,11 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                   label: Text('$dislikedCount nicht'),
                 ),
                 const Spacer(),
+                IconButton(
+                  tooltip: 'Lebensmittel neu laden',
+                  onPressed: saving ? null : load,
+                  icon: const Icon(Icons.refresh),
+                ),
                 if (saving)
                   const SizedBox(
                     width: 18,
