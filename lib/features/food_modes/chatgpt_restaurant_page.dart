@@ -382,7 +382,6 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
               Text(
                 'Love',
                 style: TextStyle(
-                  fontFamily: 'Inter',
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: AppDesign.text,
