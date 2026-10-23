@@ -41,5 +41,5 @@ class FoodPreferenceRecipeGuard {
       .toLowerCase()
       .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), ' ')
       .trim()
-      .replaceAll(RegExp(r'\\s+'), ' ');
+      .replaceAll(RegExp(r'\s+'), ' ');
 }
