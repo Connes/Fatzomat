@@ -15,12 +15,15 @@ import '../../core/recipe_collection_events.dart';
 
 import '../../data/models/today_plan.dart';
 import '../../data/models/recipe.dart';
+import '../../data/models/food.dart';
+import '../../data/repositories/food_repository.dart';
 import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../shared/today_page.dart';
 
 import 'add_recipe_page.dart';
+import 'food_preference_recipe_guard.dart';
 import 'recipe_detail_page.dart';
 import '../../data/services/recipe_image_service.dart';
 
@@ -33,9 +36,22 @@ bool recipeModelMatchesSelection(
   Recipe recipe, {
   String? mainChoice,
   Set<String> selectedFoodIds = const <String>{},
+  List<Food> availableFoods = const <Food>[],
 }) {
-  final ids = recipe.ingredients.map((i) => i.foodId).whereType<String>().toSet();
-  if (!selectedFoodIds.every(ids.contains)) return false;
+  final ingredients = recipe.ingredients;
+  final ids = ingredients.map((i) => i.foodId).whereType<String>().toSet();
+  if (!selectedFoodIds.every((id) {
+    if (ids.contains(id)) return true;
+    final food = availableFoods.where((item) => item.id == id).firstOrNull;
+    if (food == null) return false;
+    final terms = <String>{food.name, ...food.aliases, ...food.searchTerms}
+        .map(_normalizeRecipeFoodName)
+        .where((term) => term.length >= 3);
+    return ingredients.any((ingredient) {
+      final name = _normalizeRecipeFoodName(ingredient.name);
+      return terms.any((term) => name == term || name.contains(term));
+    });
+  })) return false;
   if (mainChoice == null || mainChoice.isEmpty) return true;
   final names = recipe.ingredients.map((i) => i.name.toLowerCase()).toList();
   if (mainChoice == 'Vegetarisch') {
@@ -52,6 +68,12 @@ bool recipeModelMatchesSelection(
   return needles.isEmpty || names.any((name) => needles.any(name.contains));
 }
 
+
+String _normalizeRecipeFoodName(String value) => value
+    .toLowerCase()
+    .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), ' ')
+    .trim()
+    .replaceAll(RegExp(r'\s+'), ' ');
 
 /// Legacy map-based compatibility helper used by regression tests. New code
 /// should use [recipeModelMatchesSelection] with the typed [Recipe] model.
@@ -185,6 +207,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   final searchController = TextEditingController();
   bool loading = true;
   List<Recipe> recipes = [];
+  List<Food> availableFoods = const <Food>[];
+  Map<String, String> foodPreferences = const <String, String>{};
   String query = '';
   String? mainIngredientFilter;
   TodayPlan? todayPlan;
@@ -288,6 +312,18 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       recipeError = error;
     }
 
+    // Food preferences enrich recipe filtering, but must not make the saved
+    // collection unavailable if preference data cannot be loaded offline.
+    List<Food> loadedFoods = const <Food>[];
+    Map<String, String> loadedPreferences = const <String, String>{};
+    try {
+      final foodRepository = FoodRepository();
+      loadedFoods = await foodRepository.foods();
+      loadedPreferences = await foodRepository.preferences();
+    } catch (_) {
+      // Keep the recipe collection usable when preferences are unavailable.
+    }
+
     // The recipe collection is the primary content of this screen. Connection
     // and Today metadata are auxiliary and must not prevent saved recipes from
     // being displayed when one of those secondary requests fails.
@@ -302,6 +338,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     if (!mounted || generation != _loadGeneration) return;
     setState(() {
       recipes = rows;
+      availableFoods = loadedFoods;
+      foodPreferences = loadedPreferences;
       todayPlan = today;
       loading = false;
     });
@@ -570,10 +608,18 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           )) {
         return false;
       }
+      if (FoodPreferenceRecipeGuard.findDislikedIngredients(
+        recipe: recipe,
+        foods: availableFoods,
+        preferences: foodPreferences,
+      ).isNotEmpty) {
+        return false;
+      }
       return recipeModelMatchesSelection(
         recipe,
         mainChoice: widget.mainChoice,
         selectedFoodIds: widget.selectedFoodIds,
+        availableFoods: availableFoods,
       );
     }).toList(growable: false);
   }
