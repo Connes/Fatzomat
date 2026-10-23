@@ -116,13 +116,14 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Auf dem Merge-Commit `e71c725c898b0ac7b44c0e9067df5564a4d09533` wurden bei der Prüfung keine Post-Merge-Workflow-Runs und keine Statuschecks zurückgegeben; Post-Merge-CI ist daher **nicht als erfolgreich verifiziert**.
 - Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
 
-## Live-Status (verifiziert 2026-10-22)
+## Live-Status (verifiziert 2026-10-23)
 
-- Aktueller `main`-Commit: `7f957c9338491d87baab8428301232a948a05f20` (Lebensmittel-Auswahl ohne Emojis).
-- Beide CI-Workflows sind für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39561970787) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39561970624). Der erste Workflow enthält erfolgreiche Analyze- und Test-Jobs; der zweite Workflow ist ebenfalls erfolgreich abgeschlossen.
-- Die Live-Abfrage der offenen Pull Requests ergab keine offenen PRs.
-- PR [#267 – Make cooking recipe actions compact and side by side](https://github.com/Connes/Fatzomat/pull/267) wurde am 2026-10-22 geschlossen, ohne Merge. Nicht als umgesetzt behandeln und nicht eigenständig wieder öffnen; bei späterem Bedarf neu anhand des aktuellen Codes bewerten.
-- Geräteprüfung wurde nicht durchgeführt. Supabase wurde in dieser Sitzung nicht geprüft, da keine Backend- oder Migrationsänderung vorgenommen wurde.
+- Aktueller `main`-Commit: `434120e65be9cf8cf3420a542594f2e7557e589d` (PR [#301 – Fix custom food saving and duplicate prevention](https://github.com/Connes/Fatzomat/pull/301)).
+- Beide Post-Merge-CI-Workflows sind für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39958328215) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39958328233).
+- Die Live-Abfrage offener Pull Requests ergab keine offenen PRs.
+- Die Migration zur Verhinderung normalisierter Duplikate benutzerdefinierter Lebensmittel wurde auf dem Live-Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet und read-only verifiziert. Die Datenbank registrierte sie unter Version `20261023132447`; der Repository-Dateiname verwendete zunächst `20261023150000`. Ein Folge-PR gleicht den Dateinamen an die tatsächlich registrierte Live-Version an.
+- Vor der Migration wurde geprüft, dass keine benutzerdefinierten Lebensmittel mit gleichem kleingeschriebenem, getrimmtem Namen existieren. Der Unique-Index `foods_custom_name_normalized_unique` ist in der Live-Datenbank vorhanden. Keine vorhandenen Datensätze wurden verändert.
+- Geräteprüfung wurde nicht durchgeführt.
 
 ## Nächster Schritt
 
