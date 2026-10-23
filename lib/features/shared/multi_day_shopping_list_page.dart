@@ -433,7 +433,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 width: 64,
                                 height: 64,
                                 decoration: BoxDecoration(
-                                  color: AppDesign.primarySoft,
+                                  color: AppDesign.softSurface,
                                   borderRadius: BorderRadius.circular(AppDesign.radiusXl),
                                 ),
                                 child: const Icon(
