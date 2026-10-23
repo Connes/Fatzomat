@@ -35,7 +35,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   List<List<TodayPlan>> _plans = const [];
   List<ShoppingItem> _items = const [];
   bool _loading = true;
-  bool _showOnlyOpen = false;
+  bool _showOnlyOpen = true;
   bool _completingList = false;
   bool _hasInitializedExpansion = false;
   Object? _error;
@@ -651,6 +651,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 FilterChip(
                                   label: const Text('Nur offene Zutaten'),
                                   selected: _showOnlyOpen,
+                                  showCheckmark: false,
+                                  selectedColor: AppDesign.primarySoft,
                                   avatar: const Icon(Icons.checklist_rounded),
                                   onSelected: (selected) => setState(() => _showOnlyOpen = selected),
                                 ),
@@ -714,7 +716,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                   ),
                                   ...filteredItems
                                       .where((item) => _categoryName(item.category) == category)
-                                      .map((item) => CheckboxListTile(
+                                      .map((item) => Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              CheckboxListTile(
                                             contentPadding: EdgeInsets.zero,
                                             value: item.checked,
                                             onChanged: _updatingItems.contains(item.key)
@@ -744,11 +749,18 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                     ),
                                                   )
                                                 : null,
-                                            secondary: const Icon(
-                                              Icons.favorite_rounded,
-                                              size: 18,
-                                              color: AppDesign.error,
-                                            ),
+                                                secondary: const Icon(
+                                                  Icons.favorite_rounded,
+                                                  size: 18,
+                                                  color: AppDesign.error,
+                                                ),
+                                              ),
+                                              const Divider(
+                                                height: 1,
+                                                thickness: 1,
+                                                color: AppDesign.surfaceMuted,
+                                              ),
+                                            ],
                                           )),
                                   ],
                               ],
