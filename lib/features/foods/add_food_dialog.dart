@@ -38,7 +38,13 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
 
   Future<void> save() async {
     final value = name.text.trim();
-    if (value.isEmpty) return;
+    if (value.isEmpty) {
+      AppFeedback.showSnackBar(
+        context,
+        const SnackBar(content: Text('Bitte gib einen Namen für das Lebensmittel ein.')),
+      );
+      return;
+    }
     setState(() => saving = true);
     try {
       final food = await FoodRepository().addFoodModel(
@@ -47,9 +53,17 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
         defaultUnit: unit.text,
       );
       if (mounted) Navigator.pop(context, food);
+    } on DuplicateFoodException catch (e) {
+      if (mounted) {
+        AppFeedback.showSnackBar(
+          context,
+          SnackBar(content: Text(e.toString())),
+        );
+      }
     } on PostgrestException catch (e) {
       if (mounted) {
-        AppFeedback.showSnackBar(context, 
+        AppFeedback.showSnackBar(
+          context,
           SnackBar(content: Text(e.code == '23505'
               ? 'Dieses Lebensmittel gibt es bereits.'
               : 'Speichern fehlgeschlagen.')),
@@ -57,7 +71,8 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
       }
     } catch (e) {
       if (mounted) {
-        AppFeedback.showSnackBar(context, 
+        AppFeedback.showSnackBar(
+          context,
           SnackBar(content: Text(friendlyError(e))),
         );
       }
