@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../core/food_mode.dart';
+import '../../core/app_design.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 
@@ -35,8 +36,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
     'assets/together/clean/icons/icon_restaurant.png',
   ];
 
-  static const _gold = Color(0xFFFFD779);
-  static const _deepRed = Color(0xFF4A0717);
+  static const _gold = AppDesign.iconGold;
+  static const _deepRed = Color(0xFFF7F2E8);
   static const _tileExtent = 116.0;
   static const _reelHeight = 200.0;
 
@@ -176,8 +177,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('NOCHMAL DREHEN'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: _deepRed,
-                  foregroundColor: _gold,
+                  backgroundColor: const Color(0xFFFFFCF5),
+                  foregroundColor: AppDesign.primaryDark,
                   minimumSize: const Size.fromHeight(54),
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.w900,
@@ -195,8 +196,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                 icon: const Icon(Icons.arrow_forward_rounded),
                 label: Text('WEITER MIT „${_labels[result]}“'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: _deepRed,
-                  foregroundColor: _gold,
+                  backgroundColor: const Color(0xFFFFFCF5),
+                  foregroundColor: AppDesign.primaryDark,
                   minimumSize: const Size.fromHeight(54),
                   textStyle: const TextStyle(
                     fontWeight: FontWeight.w900,
@@ -259,9 +260,9 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF7A1528),
-            Color(0xFF310512),
-            Color(0xFF19030A),
+            Color(0xFFFFFCF5),
+            Color(0xFFF7F2E8),
+            Color(0xFFEFE5D2),
           ],
         ),
         borderRadius: BorderRadius.circular(28),
@@ -303,9 +304,9 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF10070A),
+              color: const Color(0xFFFFFCF5),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFB98736), width: 2),
+              border: Border.all(color: AppDesign.iconGold, width: 2),
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black54,
@@ -485,10 +486,10 @@ class _CasinoReel extends StatelessWidget {
     return Container(
       height: reelHeight,
       decoration: BoxDecoration(
-        color: const Color(0xFF21151A),
+        color: const Color(0xFFF7F2E8),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: stopped ? _gold : const Color(0xFF775A3A),
+          color: stopped ? _gold : const Color(0xFFD8C9A8),
           width: stopped ? 2 : 1,
         ),
       ),
