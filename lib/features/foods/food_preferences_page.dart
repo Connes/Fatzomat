@@ -297,34 +297,41 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           ListTile(
-                                        dense: false,
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                                        horizontalTitleGap: 8,
-                                        minLeadingWidth: 24,
-                                        title: Text(name),
-                                        subtitle: Text(category),
-                                        leading: FoodItemImage(foodName: name, category: category),
-                                        trailing: Wrap(
-                                          spacing: 0,
-                                          children: [
-                                            IconButton(
-                                              tooltip: preference == 'like' ? 'Mag ich entfernen' : 'Mag ich',
-                                              onPressed: saving ? null : () => setPreference(id, 'like'),
-                                              icon: Icon(
-                                                Icons.favorite,
-                                                color: preference == 'like' ? Colors.red : Colors.grey,
-                                              ),
+                                            dense: false,
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                            horizontalTitleGap: 8,
+                                            minLeadingWidth: 24,
+                                            title: Text(name),
+                                            subtitle: Text(category),
+                                            leading: FoodItemImage(foodName: name, category: category),
+                                            trailing: Wrap(
+                                              spacing: 0,
+                                              children: [
+                                                IconButton(
+                                                  tooltip: preference == 'like' ? 'Mag ich entfernen' : 'Mag ich',
+                                                  onPressed: saving ? null : () => setPreference(id, 'like'),
+                                                  icon: Icon(
+                                                    Icons.favorite,
+                                                    color: preference == 'like' ? Colors.red : Colors.grey,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  tooltip: preference == 'dislike' ? 'Nicht mögen entfernen' : 'Mag ich nicht',
+                                                  onPressed: saving ? null : () => setPreference(id, 'dislike'),
+                                                  icon: Icon(
+                                                    Icons.block,
+                                                    color: preference == 'dislike' ? Colors.black : Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            IconButton(
-                                              tooltip: preference == 'dislike' ? 'Nicht mögen entfernen' : 'Mag ich nicht',
-                                              onPressed: saving ? null : () => setPreference(id, 'dislike'),
-                                              icon: Icon(
-                                                Icons.block,
-                                                color: preference == 'dislike' ? Colors.black : Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                          const Divider(
+                                            height: 1,
+                                            thickness: 1,
+                                            color: AppDesign.surfaceMuted,
+                                          ),
+                                        ],
                                       );
                                     },
                                   ),
