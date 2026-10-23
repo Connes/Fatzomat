@@ -439,7 +439,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 child: const Icon(
                                   Icons.shopping_basket_outlined,
                                   size: 30,
-                                  color: AppDesign.primaryDark,
+                                  color: AppDesign.iconGold,
                                 ),
                               ),
                               const SizedBox(height: 18),
