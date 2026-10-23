@@ -216,7 +216,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
                   const Icon(
                     Icons.people_alt_outlined,
                     size: 56,
-                    color: AppDesign.primaryDark,
+                    color: AppDesign.iconGold,
                   ),
                   const SizedBox(height: 16),
                   Text(
