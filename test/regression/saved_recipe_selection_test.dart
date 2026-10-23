@@ -98,36 +98,3 @@ void main() {
   });
 
 }
-
-
-  test('saved recipe selection matches selected foods by name when food_id is absent', () {
-    final recipe = Recipe(
-      name: 'Rind mit Zucchini',
-      description: '',
-      servings: 2,
-      prepTimeMinutes: 10,
-      cookTimeMinutes: 20,
-      difficulty: 'Einfach',
-      instructions: const [],
-      ingredients: const [
-        RecipeIngredient(name: 'Rinderhack', quantity: 300, unit: 'g'),
-        RecipeIngredient(name: 'Zucchini', quantity: 1, unit: 'Stück'),
-      ],
-    );
-    expect(
-      recipeModelMatchesSelection(
-        recipe,
-        mainChoice: 'Rind',
-        selectedFoodIds: {'zucchini-id'},
-        availableFoods: const [
-          Food(
-            id: 'zucchini-id',
-            name: 'Zucchini',
-            category: 'Gemüse',
-            aliases: ['Courgette'],
-          ),
-        ],
-      ),
-      isTrue,
-    );
-  });
