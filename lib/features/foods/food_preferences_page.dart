@@ -129,11 +129,6 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
             onPressed: saving ? null : addFood,
             icon: const Icon(Icons.add),
           ),
-          IconButton(
-            tooltip: 'Neu laden',
-            onPressed: saving ? null : load,
-            icon: const Icon(Icons.refresh),
-          ),
         ],
       ),
       body: Column(
@@ -162,7 +157,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
             child: Row(
               children: [
                 Chip(
-                  avatar: const Icon(Icons.favorite, size: 16),
+                  avatar: const Icon(Icons.favorite, size: 16, color: Colors.red),
                   label: Text('$likedCount mag ich'),
                 ),
                 const SizedBox(width: 8),
@@ -171,6 +166,11 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                   label: Text('$dislikedCount nicht'),
                 ),
                 const Spacer(),
+                IconButton(
+                  tooltip: 'Lebensmittel neu laden',
+                  onPressed: saving ? null : load,
+                  icon: const Icon(Icons.refresh),
+                ),
                 if (saving)
                   const SizedBox(
                     width: 18,
@@ -293,35 +293,45 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                                       final category = food.category;
                                       final preference = preferences[id];
 
-                                      return ListTile(
-                                        dense: false,
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                                        horizontalTitleGap: 8,
-                                        minLeadingWidth: 24,
-                                        title: Text(name),
-                                        subtitle: Text(category),
-                                        leading: FoodItemImage(foodName: name, category: category),
-                                        trailing: Wrap(
-                                          spacing: 0,
-                                          children: [
-                                            IconButton(
-                                              tooltip: preference == 'like' ? 'Mag ich entfernen' : 'Mag ich',
-                                              onPressed: saving ? null : () => setPreference(id, 'like'),
-                                              icon: Icon(
-                                                Icons.favorite,
-                                                color: preference == 'like' ? Colors.red : Colors.grey,
-                                              ),
+                                      return Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
+                                            dense: false,
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                                            horizontalTitleGap: 8,
+                                            minLeadingWidth: 24,
+                                            title: Text(name),
+                                            subtitle: Text(category),
+                                            leading: FoodItemImage(foodName: name, category: category),
+                                            trailing: Wrap(
+                                              spacing: 0,
+                                              children: [
+                                                IconButton(
+                                                  tooltip: preference == 'like' ? 'Mag ich entfernen' : 'Mag ich',
+                                                  onPressed: saving ? null : () => setPreference(id, 'like'),
+                                                  icon: Icon(
+                                                    Icons.favorite,
+                                                    color: preference == 'like' ? Colors.red : Colors.grey,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  tooltip: preference == 'dislike' ? 'Nicht mögen entfernen' : 'Mag ich nicht',
+                                                  onPressed: saving ? null : () => setPreference(id, 'dislike'),
+                                                  icon: Icon(
+                                                    Icons.block,
+                                                    color: preference == 'dislike' ? Colors.black : Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            IconButton(
-                                              tooltip: preference == 'dislike' ? 'Nicht mögen entfernen' : 'Mag ich nicht',
-                                              onPressed: saving ? null : () => setPreference(id, 'dislike'),
-                                              icon: Icon(
-                                                Icons.block,
-                                                color: preference == 'dislike' ? Colors.black : Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                          const Divider(
+                                            height: 1,
+                                            thickness: 1,
+                                            color: AppDesign.surfaceMuted,
+                                          ),
+                                        ],
                                       );
                                     },
                                   ),
