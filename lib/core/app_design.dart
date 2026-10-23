@@ -347,7 +347,7 @@ class MetaPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
       decoration: BoxDecoration(color: AppDesign.surfaceSoft, borderRadius: BorderRadius.circular(AppDesign.radiusPill)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 16, color: AppDesign.secondaryText),
+        Icon(icon, size: 16, color: AppDesign.iconGold),
         const SizedBox(width: 6),
         Text(label, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppDesign.text)),
       ]),
@@ -369,7 +369,7 @@ class AppBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(color: backgroundColor ?? AppDesign.primarySoft, borderRadius: BorderRadius.circular(AppDesign.radiusPill)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        if (icon != null) ...[Icon(icon, size: 14, color: foreground), const SizedBox(width: 5)],
+        if (icon != null) ...[Icon(icon, size: 14, color: AppDesign.iconGold), const SizedBox(width: 5)],
         Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: foreground)),
       ]),
     );
