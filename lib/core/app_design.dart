@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 abstract final class AppDesign {
   // Brand palette
   static const primary = Color(0xFF2F8F63);
+  static const iconGold = Color(0xFFD4AF37);
   static const primaryDark = Color(0xFF1F6948);
   static const primarySoft = Color(0xFFE5F4EB);
   static const accent = Color(0xFFFF7B5C);
@@ -91,6 +92,7 @@ abstract final class AppDesign {
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
+      iconTheme: const IconThemeData(color: iconGold),
       fontFamily: 'Inter',
       visualDensity: VisualDensity.standard,
       splashFactory: InkSparkle.splashFactory,
@@ -197,12 +199,13 @@ abstract final class AppDesign {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surface,
+        iconTheme: WidgetStateProperty.all(const IconThemeData(color: iconGold)),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         height: 78,
         indicatorColor: primarySoft,
         indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radiusPill)),
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
               fontSize: 11,
               fontWeight: states.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
