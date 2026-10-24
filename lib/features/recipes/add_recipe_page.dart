@@ -528,13 +528,31 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
                   Text(recipe.description, style: Theme.of(context).textTheme.bodyLarge),
                 ],
                 const SizedBox(height: 14),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                Row(
                   children: [
-                    _MetaChip(icon: Icons.people_outline, label: '${recipe.servings} Portionen'),
-                    _MetaChip(icon: Icons.schedule_outlined, label: '${recipe.prepTimeMinutes + recipe.cookTimeMinutes} Min.'),
-                    _MetaChip(icon: Icons.bar_chart_outlined, label: recipe.difficulty),
+                    Expanded(
+                      child: _MetaChip(
+                        icon: Icons.people_outline,
+                        label: '${recipe.servings} Portionen',
+                        compact: true,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MetaChip(
+                        icon: Icons.schedule_outlined,
+                        label: '${recipe.prepTimeMinutes + recipe.cookTimeMinutes} Min.',
+                        compact: true,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MetaChip(
+                        icon: Icons.bar_chart_outlined,
+                        label: recipe.difficulty,
+                        compact: true,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -563,70 +581,95 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
             ),
           ),
           const SizedBox(height: 16),
-          _SectionTitle(title: 'Zutaten'),
-          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
             decoration: BoxDecoration(
               color: AppDesign.surface.withValues(alpha: .96),
               borderRadius: BorderRadius.circular(AppDesign.radiusXl),
             ),
             child: Column(
-              children: _ingredientSections(recipe.ingredients).expand((group) => [
-                if (group.$1 != null) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 4),
-                    child: Text(group.$1!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppDesign.primaryDark)),
-                  ),
-                ],
-                ...group.$2.map((ingredient) {
-                  final amount = ingredient.isQualitative ? '' : '${_formatQuantity(ingredient.quantity)} ';
-                  final unit = ingredient.unit.trim();
-                  final separator = amount.isEmpty || unit.isEmpty ? '' : ' ';
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Zutaten',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppDesign.primaryDark),
+                ),
+                const SizedBox(height: 8),
+                ..._ingredientSections(recipe.ingredients).asMap().entries.expand((sectionEntry) {
+                  final index = sectionEntry.key;
+                  final group = sectionEntry.value;
+                  return [
+                    if (index > 0)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Divider(height: 1, thickness: 1, color: AppDesign.divider),
+                      ),
+                    if (group.$1 != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 4),
+                        child: Text(
+                          group.$1!,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppDesign.primaryDark),
+                        ),
+                      ),
+                    ...group.$2.map((ingredient) {
+                      final amount = ingredient.isQualitative ? '' : '${_formatQuantity(ingredient.quantity)} ';
+                      final unit = ingredient.unit.trim();
+                      final separator = amount.isEmpty || unit.isEmpty ? '' : ' ';
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(padding: EdgeInsets.only(top: 7), child: Icon(Icons.circle, size: 7, color: AppDesign.primary)),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text('$amount$unit$separator${ingredient.name}')),
+                          ],
+                        ),
+                      );
+                    }),
+                  ];
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            decoration: BoxDecoration(
+              color: AppDesign.surface.withValues(alpha: .96),
+              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Bearbeitungsschritte',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppDesign.primaryDark),
+                ),
+                const SizedBox(height: 8),
+                ...recipe.instructions.asMap().entries.map((entry) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(padding: EdgeInsets.only(top: 7), child: Icon(Icons.circle, size: 7, color: AppDesign.primary)),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(color: AppDesign.primary, shape: BoxShape.circle),
+                          child: Text('${entry.key + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: Text('$amount$unit$separator${ingredient.name}')),
+                        Expanded(child: Text(entry.value)),
                       ],
                     ),
                   );
                 }),
-              ]).toList(growable: false),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _SectionTitle(title: 'Zubereitung'),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            decoration: BoxDecoration(
-              color: AppDesign.surface.withValues(alpha: .96),
-              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
-            ),
-            child: Column(
-              children: recipe.instructions.asMap().entries.map((entry) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(color: AppDesign.primary, shape: BoxShape.circle),
-                        child: Text('${entry.key + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(entry.value)),
-                    ],
-                  ),
-                );
-              }).toList(growable: false),
+              ],
             ),
           ),
         ],
@@ -722,51 +765,51 @@ class _RecipeImagePickerCard extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppDesign.surface.withValues(alpha: .96),
-        borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-      ),
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-      ),
-    );
-  }
-}
-
 class _MetaChip extends StatelessWidget {
   final IconData icon;
   final String label;
+  final bool compact;
 
-  const _MetaChip({required this.icon, required this.label});
+  const _MetaChip({
+    required this.icon,
+    required this.label,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      width: compact ? double.infinity : null,
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 7 : 10,
+        vertical: compact ? 8 : 7,
+      ),
       decoration: BoxDecoration(
         color: AppDesign.primarySoft,
         borderRadius: BorderRadius.circular(AppDesign.radiusPill),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisAlignment: compact ? MainAxisAlignment.center : MainAxisAlignment.start,
         children: [
-          Icon(icon, size: 17, color: AppDesign.primaryDark),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(color: AppDesign.primaryDark, fontWeight: FontWeight.w600)),
+          Icon(icon, size: compact ? 15 : 17, color: AppDesign.iconGold),
+          SizedBox(width: compact ? 4 : 6),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: compact ? Alignment.centerLeft : Alignment.center,
+              child: Text(
+                label,
+                maxLines: 1,
+                softWrap: false,
+                style: TextStyle(
+                  color: AppDesign.primaryDark,
+                  fontWeight: FontWeight.w600,
+                  fontSize: compact ? 12 : 14,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1386,7 +1429,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       extendBody: true,
-      appBar: TogetherAppBar(title: Text(editing ? 'Rezept bearbeiten' : 'Rezept manuell erstellen')),
+      appBar: const TogetherAppBar(title: Text('Rezept bearbeiten')),
       body: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 140),
@@ -1551,7 +1594,7 @@ class _RecipeFieldCard extends StatelessWidget {
               color: AppDesign.primarySoft,
               borderRadius: BorderRadius.circular(AppDesign.radiusLg),
             ),
-            child: Icon(icon, color: AppDesign.primaryDark, size: 28),
+            child: Icon(icon, color: AppDesign.iconGold, size: 28),
           ),
           Expanded(
             child: TextField(
@@ -1606,7 +1649,7 @@ class _RecipeSectionCard extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(color: AppDesign.primarySoft, borderRadius: BorderRadius.circular(AppDesign.radiusMd)),
-                child: Icon(icon, color: AppDesign.primaryDark),
+                child: Icon(icon, color: AppDesign.iconGold),
               ),
               const SizedBox(width: 10),
               Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppDesign.text)),

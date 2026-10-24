@@ -115,6 +115,23 @@ void main() {
     expect(unitField, findsOneWidget);
   });
 
+test('Rezeptvorschau hält Metadaten in einer Zeile und verwendet goldene Karten-Icons', () {
+  final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+  expect(source, contains('compact: true'));
+  expect(source, contains('Expanded(\n                      child: _MetaChip'));
+  expect(source, contains('color: AppDesign.iconGold'));
+  expect(source, contains('color: AppDesign.primarySoft'));
+  expect(source, isNot(contains('runSpacing: 8,\n                  children: [\n                    _MetaChip')));
+});
+
+test('Manuelle Rezeptseite heißt auch beim Neuanlegen Rezept bearbeiten', () {
+  final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+  expect(source, contains("appBar: const TogetherAppBar(title: Text('Rezept bearbeiten'))"));
+  expect(source, isNot(contains("Text(editing ? 'Rezept bearbeiten' : 'Rezept manuell erstellen')")));
+});
+
 test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutatenstruktur', () {
   final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
 
@@ -150,7 +167,6 @@ test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutaten
     expect(source, contains('crossAxisSpacing: 10'));
     expect(source, contains('childAspectRatio: 1.82'));
     expect(source, isNot(contains("selectedFoodIds\n                            .map((id) => foods.where((food) => food.id == id).firstOrNull?.name)")));
-    expect(source, contains('width: double.infinity'));
     expect(source, contains('fit: BoxFit.cover'));
     expect(source, contains('padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7)'));
     expect(source, contains('color: selected\n                              ? AppDesign.secondarySurface'));
@@ -184,5 +200,16 @@ test('ChatGPT-Rückkehr zeigt die zentrierte Auswahlzusammenfassung und den Date
   expect(source, contains('if (!showSelectionSummary) FilledButton.icon(\n                      onPressed: opening ? null : _copyPromptAndOpenChatGpt'));
   expect(source, contains('onPressed: _importRecipeFile'));
 });
+
+test('Rezeptvorschau integriert Überschriften in Karten und trennt Zutatenbereiche', () {
+  final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+  expect(source, contains("'Zutaten',"));
+  expect(source, contains("'Bearbeitungsschritte',"));
+  expect(source, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
+  expect(source, isNot(contains("_SectionTitle(title: 'Zutaten')")));
+  expect(source, isNot(contains("_SectionTitle(title: 'Zubereitung')")));
+});
+
 
 }

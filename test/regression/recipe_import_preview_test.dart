@@ -10,7 +10,9 @@ void main() {
     expect(source, contains("label: const Text('Rezept bearbeiten')"));
     expect(source, contains("backgroundColor: AppDesign.primarySoft"));
     expect(source, contains("foregroundColor: AppDesign.primaryDark"));
-    expect(source, contains("class _SectionTitle extends StatelessWidget"));
+    expect(source, contains("'Zutaten',"));
+    expect(source, contains("'Bearbeitungsschritte',"));
+    expect(source, contains("Divider(height: 1, thickness: 1, color: AppDesign.divider)"));
     expect(source, contains("textAlign: TextAlign.center"));
     expect(source, contains("color: AppDesign.surface.withValues(alpha: .96)"));
   });
