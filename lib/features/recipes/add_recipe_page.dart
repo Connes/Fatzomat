@@ -916,13 +916,6 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
       _show('Bitte zuerst eine Hauptauswahl wählen.');
       return;
     }
-    final dislikedSelected = selectedFoods
-        .where((food) => foodPreferences[food.id] == 'dislike')
-        .toList(growable: false);
-    if (dislikedSelected.isNotEmpty) {
-      _show('Diese ausgewählten Zutaten sind als „Mag ich nicht“ markiert: ${dislikedSelected.map((food) => food.name).join(', ')}. Ändere die Auswahl oder deine Lebensmittelpräferenz zuerst.');
-      return;
-    }
     final prompt = TogetherChatGptPrompt.build(
       mainChoice: mainChoice!,
       selectedFoods: selectedFoods,
