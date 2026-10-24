@@ -63,17 +63,9 @@ class FoodNameNormalizer {
   }
 
   static String _singularize(String word) {
-    final known = _pluralForms[word];
-    if (known != null) return known;
-    if (word.length < 5) return word;
-
-    // Conservative fallback for regular German plurals. Keep ambiguous forms
-    // unchanged unless a known mapping above handles them.
-    if (word.endsWith('s') && word.length > 5) return word.substring(0, word.length - 1);
-    if (word.endsWith('en') && word.length > 6) return word.substring(0, word.length - 2);
-    if (word.endsWith('n') && word.length > 5) return word.substring(0, word.length - 1);
-    if (word.endsWith('e') && word.length > 5) return word.substring(0, word.length - 1);
-    return word;
+    // Only normalize explicitly known plural forms. Generic suffix stripping
+    // corrupts valid singular names such as "Champignon".
+    return _pluralForms[word] ?? word;
   }
 
   static bool matches(String value, String query) {
