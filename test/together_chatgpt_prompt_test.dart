@@ -19,6 +19,7 @@ void main() {
     expect(prompt, isNot(contains('(Einheit:')));
     expect(prompt, contains('"format": "together_recipe"'));
     expect(prompt, contains('"version": 1'));
+    expect(prompt, isNot(contains('PDF-Datei')));
     expect(prompt, contains('DATEINAME: together_recipe.json'));
     expect(prompt, contains('echte Datei „together_recipe.json“'));
     expect(prompt, contains('Huhn'));
@@ -46,8 +47,12 @@ void main() {
     );
 
     expect(prompt, contains('DATEINAME: together_recipe.json'));
-    expect(prompt, contains('Erstelle ausschließlich ein vollständiges Rezept'));
-    expect(prompt, contains('Erzeuge aus dem vollständigen Rezept zuerst die Datei'));
+    expect(prompt, contains('PHASE 1 – DREI VORSCHLÄGE'));
+    expect(prompt, contains('genau drei deutlich unterschiedliche Gerichte'));
+    expect(prompt, contains('PHASE 2 – NACH MEINER AUSWAHL'));
+    expect(prompt, contains('keine JSON-Ausgabe, kein vollständiges Rezept, keine Datei'));
+    expect(prompt, contains('Erst nach meiner Auswahl'));
+    expect(prompt, contains('Erst nach meiner Auswahl: Erzeuge „together_recipe.json“'));
     expect(prompt, contains('recipe.title'));
     expect(prompt, contains('das vollständige rohe JSON als Chat-Antwort'));
     expect(prompt, contains('Generiere kein Bild und rufe keine Bildgenerierung auf.'));

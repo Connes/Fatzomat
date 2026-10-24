@@ -28,11 +28,23 @@ class TogetherChatGptPrompt {
         ? 'Keine weiteren ausgeschlossenen Lebensmittel.'
         : excludedDislikedFoods.map((food) => '- ${food.name}${food.aliases.isEmpty ? '' : ' (auch bekannt als: ${food.aliases.join(', ')})'}').join('\\n');
 
-    return '''Erstelle ausschließlich ein vollständiges Rezept und stelle es als herunterladbare JSON-Datei bereit. Generiere in diesem Schritt KEIN Bild.
+    return '''Arbeite in zwei klar getrennten Phasen. In deiner ERSTEN Antwort machst du ausschließlich drei Rezeptvorschläge. Erstelle noch KEIN vollständiges Rezept und KEINE Datei, bis ich einen Vorschlag ausgewählt habe.
+
+PHASE 1 – DREI VORSCHLÄGE:
+- Schlage genau drei deutlich unterschiedliche Gerichte vor, die zur Hauptauswahl, meinen ausgewählten Zutaten und meinen Vorlieben passen.
+- Berücksichtige in jedem Vorschlag alle ausdrücklich ausgewählten Zutaten, soweit kulinarisch sinnvoll, und verwende keine ausgeschlossenen Lebensmittel.
+- Gib pro Vorschlag einen kurzen Namen, eine knappe Beschreibung, die wichtigsten Zutaten und eine ungefähre Zubereitungszeit an.
+- Nummeriere die Vorschläge exakt mit 1, 2 und 3.
+- Frage am Ende kurz, welchen Vorschlag ich wählen möchte.
+- In dieser Phase keine JSON-Ausgabe, kein vollständiges Rezept, keine Datei und keine Bildgenerierung.
+
+PHASE 2 – NACH MEINER AUSWAHL:
+- Sobald ich 1, 2, 3 oder den Namen eines Vorschlags auswähle, erstelle nur für dieses Gericht das vollständige Rezept.
+- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann.
+- Stelle die JSON-Datei zum Download bereit. Falls Dateierstellung nicht verfügbar ist, gib das vollständige gültige JSON als Chat-Antwort aus.
+- Generiere in keiner Phase ein Bild und starte keine Bildgenerierung.
 
 DATEINAME: together_recipe.json
-
-WICHTIG: Deine einzige Aufgabe in dieser Anfrage ist das vollständige Rezept. Erstelle eine echte Datei „together_recipe.json“, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann. Verwende die Dateierstellung bzw. Download-Funktion, falls verfügbar. Gib kein Bild aus und starte keine Bildgenerierung. Falls du keine Datei erstellen kannst, gib stattdessen das vollständige gültige JSON als Chat-Antwort aus.
 
 Hauptauswahl / Rezeptbasis:
 $mainChoice
@@ -53,7 +65,7 @@ Regeln:
 4. Du darfst sinnvolle zusätzliche Zutaten ergänzen, wenn sie für ein vollständiges Rezept nötig sind. Markiere diese mit "is_user_selected": false und "is_additional": true.
 5. Verwende bei Zutaten, die als einzelne Stücke gezählt werden, KEINE Einheit. Schreibe z. B. "amount": 1, "unit": "" für eine Zwiebel, ein Ei, eine Karotte oder eine Kartoffel. Verwende niemals "Stück", "Stk." oder "Stk" als Einheit. Bei messbaren Mengen wie g, kg, ml, l, EL, TL oder Pck. soll die passende Einheit erhalten bleiben.
 6. Erstelle ein realistisches Rezept für 2 Portionen mit Zubereitungs- und Kochzeit sowie einer Schwierigkeit.
-7. Die Datei muss ein gültiges JSON-Objekt enthalten. Die JSON-Datei selbst enthält ausschließlich die Rezeptdaten, ohne Markdown-Codeblöcke, Einleitung oder Erklärung. Diese Einschränkung gilt nur für den Dateiinhalt, nicht für separate Chat-Ergebnisse wie das anschließend generierte Bild.
+7. Diese JSON-Regeln gelten ausschließlich in Phase 2, nachdem ich einen Vorschlag ausgewählt habe. Die JSON-Datei selbst enthält ausschließlich die Rezeptdaten, ohne Markdown-Codeblöcke, Einleitung oder Erklärung.
 8. Verwende exakt dieses Format und diese Feldnamen:
 {
   "format": "together_recipe",
@@ -86,8 +98,8 @@ Regeln:
 11. "servings", "prep_time_minutes" und "cook_time_minutes" müssen ganze Zahlen sein.
 12. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
 13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
-14. Gib ausschließlich das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
-15. Erzeuge aus dem vollständigen Rezept zuerst die Datei „together_recipe.json“ und stelle sie zum Download bereit. Prüfe, dass die Datei gültiges JSON im together_recipe-Format Version 1 enthält. Wenn die Dateierstellung in deiner aktuellen Umgebung technisch nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON als Chat-Antwort aus, damit ich es als together_recipe.json speichern kann.
+14. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
+15. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle die Datei zum Download bereit. Prüfe, dass die JSON-Datei gültiges JSON im together_recipe-Format Version 1 enthält. Wenn Dateierstellung nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON als Chat-Antwort aus, damit ich es als together_recipe.json speichern kann.
 16. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
 17. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.
 18. WICHTIG: Diese Anfrage dient ausschließlich der Rezept- und Dateierstellung. Generiere kein Bild und rufe keine Bildgenerierung auf. Die Bildgenerierung wird in einem getrennten Schritt angefordert, nachdem das Rezept vorliegt.
