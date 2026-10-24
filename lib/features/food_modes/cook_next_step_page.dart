@@ -162,26 +162,33 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _RecipeActionButton(
-                      key: const Key('cook-summary-new-recipes'),
-                      label: 'Neues Rezept suchen',
-                      onPressed: _findNewRecipes,
+              if (!widget.selectForToday)
+                _RecipeActionButton(
+                  key: const Key('cook-summary-new-recipes'),
+                  label: 'Neues Rezept suchen',
+                  onPressed: _findNewRecipes,
+                )
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: _RecipeActionButton(
+                        key: const Key('cook-summary-new-recipes'),
+                        label: 'Neues Rezept suchen',
+                        onPressed: _findNewRecipes,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _RecipeActionButton(
-                      key: const Key('cook-summary-saved-recipes'),
-                      label: 'Aus meinen Rezepten suchen',
-                      onPressed: _findSavedRecipes,
-                      secondary: true,
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _RecipeActionButton(
+                        key: const Key('cook-summary-saved-recipes'),
+                        label: 'Aus meinen Rezepten suchen',
+                        onPressed: _findSavedRecipes,
+                        secondary: true,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),
