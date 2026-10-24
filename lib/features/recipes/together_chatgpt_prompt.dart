@@ -18,9 +18,15 @@ class TogetherChatGptPrompt {
     final likedLines = likedFoods.isEmpty
         ? 'Keine gespeicherten Lieblingslebensmittel.'
         : likedFoods.map((food) => '- ${food.name}').join('\\n');
-    final dislikedLines = dislikedFoods.isEmpty
-        ? 'Keine gespeicherten ausgeschlossenen Lebensmittel.'
-        : dislikedFoods.map((food) => '- ${food.name}${food.aliases.isEmpty ? '' : ' (auch bekannt als: ${food.aliases.join(', ')})'}').join('\\n');
+    // An explicit ingredient choice is intentional and takes precedence over
+    // the saved dislike preference for this recipe.
+    final selectedIds = selectedFoods.map((food) => food.id).toSet();
+    final excludedDislikedFoods = dislikedFoods
+        .where((food) => !selectedIds.contains(food.id))
+        .toList(growable: false);
+    final dislikedLines = excludedDislikedFoods.isEmpty
+        ? 'Keine weiteren ausgeschlossenen Lebensmittel.'
+        : excludedDislikedFoods.map((food) => '- ${food.name}${food.aliases.isEmpty ? '' : ' (auch bekannt als: ${food.aliases.join(', ')})'}').join('\\n');
 
     return '''Erstelle ausschließlich ein vollständiges Rezept und stelle es als herunterladbare JSON-Datei bereit. Generiere in diesem Schritt KEIN Bild.
 
@@ -37,12 +43,12 @@ $ingredientLines
 Lebensmittel, die ich mag (bevorzugen, wenn es sinnvoll zum Rezept passt):
 $likedLines
 
-Lebensmittel, die ich NICHT mag (streng ausschließen, auch in Saucen, Gewürzmischungen, Marinaden und optionalen Zutaten):
+Lebensmittel, die ich NICHT mag (streng ausschließen, außer ich habe sie oben ausdrücklich ausgewählt; auch in Saucen, Gewürzmischungen, Marinaden und optionalen Zutaten):
 $dislikedLines
 
 Regeln:
 1. Die Hauptauswahl ist zwingende Grundlage des Rezepts. Bei „Huhn“, „Rind“, „Schwein“ oder „Fisch“ muss eine passende Zutat dieser Kategorie im Rezept enthalten sein. Bei „Vegetarisch“ darf das Rezept kein Fleisch und keinen Fisch enthalten.
-2. Verwende alle von mir ausgewählten Zutaten als Bestandteil des Rezepts.
+2. Verwende alle von mir ausgewählten Zutaten als Bestandteil des Rezepts. Eine ausdrücklich ausgewählte Zutat hat für dieses Rezept Vorrang vor einer gespeicherten „Mag ich nicht“-Präferenz; verwende sie trotzdem und warne nicht davor.
 3. Markiere jede von mir ausgewählte Zutat mit "is_user_selected": true und "is_additional": false.
 4. Du darfst sinnvolle zusätzliche Zutaten ergänzen, wenn sie für ein vollständiges Rezept nötig sind. Markiere diese mit "is_user_selected": false und "is_additional": true.
 5. Verwende bei Zutaten, die als einzelne Stücke gezählt werden, KEINE Einheit. Schreibe z. B. "amount": 1, "unit": "" für eine Zwiebel, ein Ei, eine Karotte oder eine Kartoffel. Verwende niemals "Stück", "Stk." oder "Stk" als Einheit. Bei messbaren Mengen wie g, kg, ml, l, EL, TL oder Pck. soll die passende Einheit erhalten bleiben.
