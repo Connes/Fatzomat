@@ -330,7 +330,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                                                   onPressed: saving ? null : () => setPreference(id, 'dislike'),
                                                   icon: Icon(
                                                     Icons.block,
-                                                    color: preference == 'dislike' ? Colors.black : Colors.grey,
+                                                    color: preference == 'dislike' ? Colors.red : Colors.grey,
                                                   ),
                                                 ),
                                               ],
