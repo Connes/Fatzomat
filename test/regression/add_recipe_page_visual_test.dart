@@ -97,22 +97,12 @@ void main() {
     // The ingredient section is below several fields in a lazy ListView.
     // Scroll the list directly instead of using scrollUntilVisible on a target
     // that may not have been built yet.
-    final ingredientNameField = find.byWidgetPredicate(
-      (widget) => widget is TextField && widget.decoration?.labelText == 'Zutat',
-    );
-    expect(ingredientNameField, findsOneWidget);
+    expect(find.text('Zutat'), findsOneWidget);
     expect(find.text('Menge'), findsOneWidget);
     expect(find.text('Einheit'), findsOneWidget);
     expect(find.byType(DropdownButtonFormField<String>), findsNothing);
 
-    final quantityField = find.byWidgetPredicate(
-      (widget) => widget is TextField && widget.decoration?.labelText == 'Menge',
-    );
-    final unitField = find.byWidgetPredicate(
-      (widget) => widget is TextField && widget.decoration?.labelText == 'Einheit',
-    );
-    expect(quantityField, findsOneWidget);
-    expect(unitField, findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(4));
   });
 
 test('Rezeptvorschau hält Metadaten in einer Zeile und verwendet goldene Karten-Icons', () {
@@ -137,8 +127,9 @@ test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutaten
 
   expect(source, contains('await RecipeRepository().saveRecipeModel(recipe);'));
   expect(source, contains("label: Text(saving ? 'Speichern …' : (editing ? 'Änderungen speichern' : 'Rezept speichern'))"));
-  expect(source, contains("labelText: 'Menge'"));
-  expect(source, contains("labelText: 'Einheit'"));
+  expect(source, contains("label: 'Menge'"));
+  expect(source, contains("label: 'Einheit'"));
+  expect(source, contains('class _IngredientInput extends StatelessWidget'));
   expect(source, contains('controller: draft.amount'));
   expect(source, contains('controller: draft.unit'));
   expect(source, isNot(contains('DropdownButtonFormField<String>')));
