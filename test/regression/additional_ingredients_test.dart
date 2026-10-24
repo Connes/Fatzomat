@@ -38,7 +38,7 @@ void main() {
 
     expect(find.textContaining('Hauptauswahl'), findsNothing);
     expect(find.text('Rind'), findsNothing);
-    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Beilagen'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
   });
 
