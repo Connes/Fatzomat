@@ -91,28 +91,6 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
               subtitle: 'Frisches Gemüse für euer Rezept',
               onTap: () => _openCategory(IngredientCategory.vegetables),
             ),
-            if (widget.mainChoice != null) ...[
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppDesign.secondarySurface,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.restaurant_menu_rounded, color: AppDesign.primaryDark),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Hauptauswahl: ${widget.mainChoice}',
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
             if (selectedFoodIds.isNotEmpty) ...[
               const SizedBox(height: 20),
               Container(

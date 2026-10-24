@@ -24,6 +24,23 @@ void main() {
     expect(find.text('Hauptauswahl:'), findsNothing);
   });
 
+  testWidgets('Hauptzutat wird auf der Seite Weitere Zutaten nicht angezeigt', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AdditionalIngredientsPage(
+          mainChoice: 'Rind',
+          repository: _FakeFoodRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Hauptauswahl'), findsNothing);
+    expect(find.text('Rind'), findsNothing);
+    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Gemüse'), findsOneWidget);
+  });
+
   testWidgets('Ausgewählte Zutaten werden namentlich statt nur als Anzahl angezeigt', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

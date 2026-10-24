@@ -99,7 +99,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AdditionalIngredientsPage), findsOneWidget);
-    expect(find.textContaining('Huhn'), findsWidgets);
+    expect(find.textContaining('Huhn'), findsNothing);
     expect(find.text('Beilage'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
     expect(find.text('Favoriten'), findsNothing);
