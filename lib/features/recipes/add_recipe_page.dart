@@ -765,31 +765,6 @@ class _RecipeImagePickerCard extends StatelessWidget {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppDesign.surface.withValues(alpha: .96),
-        borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-      ),
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-      ),
-    );
-  }
-}
-
 class _MetaChip extends StatelessWidget {
   final IconData icon;
   final String label;
