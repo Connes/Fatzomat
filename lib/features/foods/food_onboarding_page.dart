@@ -6,6 +6,7 @@ import '../../core/widgets/together_background.dart';
 import '../../core/async_error.dart';
 import '../../core/app_design.dart';
 import '../../core/constants.dart';
+import '../../core/food_name_normalizer.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
 import '../../data/repositories/profile_repository.dart';
@@ -79,9 +80,8 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
       final foodCategory = food.category;
       if (category != 'Alle' && foodCategory != category) return false;
       if (query.isEmpty) return true;
-      final name = food.name.toLowerCase();
-      final terms = [...food.searchTerms, ...food.aliases];
-      return name.contains(query) || terms.any((term) => term.toLowerCase().contains(query));
+      final terms = [food.name, ...food.searchTerms, ...food.aliases];
+      return terms.any((term) => FoodNameNormalizer.matches(term, query));
     }).toList();
   }
 
