@@ -396,21 +396,35 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
                             ),
                           ),
                         )
-                      : ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
-                          itemCount: foods.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 8),
-                          itemBuilder: (_, index) {
-                            final food = foods[index];
-                            final id = food.id;
-                            final name = food.name;
-                            final checked = selectedFoodIds.contains(id);
-                            return _FoodSelectionTile(
-                              name: name,
-                              checked: checked,
-                              onTap: () => _toggle(id),
-                            );
-                          },
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                          child: Material(
+                            color: AppDesign.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            clipBehavior: Clip.antiAlias,
+                            child: ListView.separated(
+                              padding: EdgeInsets.zero,
+                              itemCount: foods.length,
+                              separatorBuilder: (_, __) => const Divider(
+                                height: 1,
+                                thickness: 1,
+                                indent: 20,
+                                endIndent: 20,
+                                color: AppDesign.divider,
+                              ),
+                              itemBuilder: (_, index) {
+                                final food = foods[index];
+                                final id = food.id;
+                                final name = food.name;
+                                final checked = selectedFoodIds.contains(id);
+                                return _FoodSelectionTile(
+                                  name: name,
+                                  checked: checked,
+                                  onTap: () => _toggle(id),
+                                );
+                              },
+                            ),
+                          ),
                         ),
             ),
           ],
@@ -452,29 +466,24 @@ class _FoodSelectionTile extends StatelessWidget {
       button: true,
       checked: checked,
       label: name,
-      child: Material(
-        color: checked ? AppDesign.secondarySurface : AppDesign.surface,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    name,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                  ),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  name,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                 ),
-                Icon(
-                  checked ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-                  color: checked ? AppDesign.primary : AppDesign.secondaryText,
-                  size: 26,
-                ),
-              ],
-            ),
+              ),
+              Icon(
+                checked ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+                color: checked ? AppDesign.primary : AppDesign.secondaryText,
+                size: 26,
+              ),
+            ],
           ),
         ),
       ),
