@@ -19,6 +19,7 @@ import '../../data/models/recipe.dart';
 import '../../data/models/food.dart';
 import '../../data/repositories/food_repository.dart';
 import 'additional_ingredients_page.dart';
+import '../food_modes/food_mode_page.dart';
 import 'recipe_detail_page.dart';
 import 'together_chatgpt_prompt.dart';
 import 'food_preference_recipe_guard.dart';
@@ -43,10 +44,20 @@ class AddRecipePage extends StatelessWidget {
             icon: Icons.auto_awesome_rounded,
             title: 'Mit ChatGPT erstellen',
             subtitle: 'Ein Rezept anhand deiner Auswahl mit ChatGPT erstellen lassen.',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ChatGptRecipeSetupPage()),
-            ),
+            onTap: () async {
+              final completed = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FoodModePage(
+                    mode: FoodMode.cook,
+                    selectForToday: false,
+                  ),
+                ),
+              );
+              if (completed == true && context.mounted) {
+                Navigator.pop(context, true);
+              }
+            },
           ),
           const SizedBox(height: 12),
           _OptionCard(

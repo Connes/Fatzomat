@@ -23,6 +23,7 @@ class CookNextStepPage extends StatefulWidget {
   final VoidCallback? onNavigateToToday;
   final String? decisionRequestId;
   final FoodRepository? repository;
+  final bool selectForToday;
 
   const CookNextStepPage({
     super.key,
@@ -31,6 +32,7 @@ class CookNextStepPage extends StatefulWidget {
     this.onNavigateToToday,
     this.decisionRequestId,
     this.repository,
+    this.selectForToday = true,
   });
 
   @override
@@ -96,7 +98,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           initialMainChoice: widget.mainChoice,
           initialSelectedFoodIds: Set<String>.from(selectedFoodIds),
           decisionRequestId: widget.decisionRequestId,
-          selectForToday: true,
+          selectForToday: widget.selectForToday,
           autoOpenPrompt: true,
           planDate: widget.planDate,
         ),

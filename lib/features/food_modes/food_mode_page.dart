@@ -22,6 +22,7 @@ class FoodModePage extends StatefulWidget {
   final DateTime? planDate;
   final VoidCallback? onNavigateToToday;
   final String? decisionRequestId;
+  final bool selectForToday;
 
   const FoodModePage({
     super.key,
@@ -29,6 +30,7 @@ class FoodModePage extends StatefulWidget {
     this.planDate,
     this.onNavigateToToday,
     this.decisionRequestId,
+    this.selectForToday = true,
   });
 
   @override
@@ -51,6 +53,7 @@ class _FoodModePageState extends State<FoodModePage> {
           decisionRequestId: widget.decisionRequestId,
           planDate: widget.planDate,
           onNavigateToToday: widget.onNavigateToToday,
+          selectForToday: widget.selectForToday,
         ),
       ),
     );

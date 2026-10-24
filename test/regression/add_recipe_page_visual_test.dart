@@ -47,7 +47,8 @@ void main() {
     expect(source, contains("title: 'Rezept aus Foto erstellen'"));
     expect(source, contains("title: 'Rezeptdatei importieren'"));
     expect(source, contains('_importFile(context)'));
-    expect(source, contains('const ChatGptRecipeSetupPage()'));
+    expect(source, contains('const FoodModePage('));
+    expect(source, contains('selectForToday: false'));
     expect(source, contains('const PhotoRecipeChatGptPage()'));
     expect(source, isNot(contains('Schmackofatz verarbeitet beim Dateiimport')));
   });
