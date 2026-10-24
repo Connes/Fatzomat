@@ -115,6 +115,16 @@ void main() {
     expect(unitField, findsOneWidget);
   });
 
+test('Rezeptvorschau hält Metadaten in einer Zeile und verwendet goldene Karten-Icons', () {
+  final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+  expect(source, contains('compact: true'));
+  expect(source, contains('Expanded(\n                      child: _MetaChip'));
+  expect(source, contains('color: AppDesign.iconGold'));
+  expect(source, contains('color: AppDesign.primarySoft'));
+  expect(source, isNot(contains('runSpacing: 8,\n                  children: [\n                    _MetaChip')));
+});
+
 test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutatenstruktur', () {
   final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
 
