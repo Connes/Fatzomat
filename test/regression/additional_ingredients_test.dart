@@ -68,6 +68,19 @@ void main() {
     expect(find.text('🍞'), findsNothing);
   });
 
+  testWidgets('Beilagen werden in einer gemeinsamen Karte mit feinen Trennlinien angezeigt', (tester) async {
+    await _openCategory(tester, 'Beilage');
+
+    final listView = find.byType(ListView).last;
+    final card = find.ancestor(of: listView, matching: find.byType(Material)).first;
+    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(6));
+
+    final cardPadding = tester.widget<Padding>(
+      find.ancestor(of: card, matching: find.byType(Padding)).first,
+    );
+    expect(cardPadding.padding, const EdgeInsets.fromLTRB(20, 16, 20, 8));
+  });
+
   testWidgets('Beilagen und Gemüse zeigen Lebensmittel ohne Emojis und linksbündig', (tester) async {
     await _openCategory(tester, 'Gemüse');
 
