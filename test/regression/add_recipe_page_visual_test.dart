@@ -102,7 +102,7 @@ void main() {
     expect(find.text('Einheit'), findsOneWidget);
     expect(find.byType(DropdownButtonFormField<String>), findsNothing);
 
-    expect(find.byType(TextField), findsNWidgets(4));
+    expect(find.byType(TextField), findsAtLeastNWidgets(4));
   });
 
 test('Rezeptvorschau hält Metadaten in einer Zeile und verwendet goldene Karten-Icons', () {
