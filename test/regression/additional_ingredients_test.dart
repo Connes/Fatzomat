@@ -62,7 +62,7 @@ void main() {
   });
 
   testWidgets('V92 Kategorieauswahl zeigt keinen unboxed Untertitel und nutzt extendBody', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
 
     expect(find.text('Reis, Nudeln oder Kartoffeln'), findsNothing);
     expect(find.text('Beilagen auswählen'), findsOneWidget);
@@ -72,7 +72,7 @@ void main() {
   });
 
   testWidgets('Beilagen umfassen die passenden Lebensmittel aus dem Katalog', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
 
     expect(find.text('Reis'), findsOneWidget);
     expect(find.text('Nudeln'), findsOneWidget);
@@ -88,11 +88,11 @@ void main() {
   });
 
   testWidgets('Beilagen werden in einer gemeinsamen Karte mit feinen Trennlinien angezeigt', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
 
     final listView = find.byType(ListView).last;
     final card = find.ancestor(of: listView, matching: find.byType(Material)).first;
-    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(6));
+    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(7));
 
     final cardPadding = tester.widget<Padding>(
       find.ancestor(of: card, matching: find.byType(Padding)).first,
@@ -147,7 +147,7 @@ void main() {
   });
 
   testWidgets('V92 Auswahl bleibt beim Kategorie-Wechsel erhalten', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
     await tester.tap(find.text('Reis'));
     await tester.pump();
     await tester.tap(find.text('Auswahl übernehmen (1)'));
