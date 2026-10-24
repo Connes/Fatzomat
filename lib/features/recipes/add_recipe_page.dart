@@ -1429,7 +1429,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       extendBody: true,
-      appBar: TogetherAppBar(title: Text(editing ? 'Rezept bearbeiten' : 'Rezept manuell erstellen')),
+      appBar: const TogetherAppBar(title: Text('Rezept bearbeiten')),
       body: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 140),
