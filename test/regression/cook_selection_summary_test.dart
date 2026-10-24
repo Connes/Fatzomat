@@ -100,8 +100,9 @@ void main() {
 
     expect(find.byType(AdditionalIngredientsPage), findsOneWidget);
     expect(find.textContaining('Huhn'), findsNothing);
-    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Beilagen'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
+    expect(find.text('Sonstiges'), findsOneWidget);
     expect(find.text('Favoriten'), findsNothing);
   });
 
@@ -117,7 +118,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Weitere Zutaten hinzufügen'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Beilage'));
+    await tester.tap(find.text('Beilagen'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reis'));
     await tester.pump();
@@ -133,6 +134,33 @@ void main() {
     expect(find.textContaining('ausgewählt'), findsNothing);
   });
 
+
+  testWidgets('Sonstiges erscheint als eigene Gruppe in Meine Wahl', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CookNextStepPage(
+          mainChoice: 'Rind',
+          repository: _FakeFoodRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Weitere Zutaten hinzufügen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sonstiges'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Paprikapulver'));
+    await tester.pump();
+    await tester.tap(find.text('Auswahl übernehmen (1)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Auswahl übernehmen (1)'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sonstiges'), findsOneWidget);
+    expect(find.text('Paprikapulver'), findsOneWidget);
+    expect(find.text('Rind'), findsOneWidget);
+  });
+
   testWidgets('V94 öffnet die gespeicherte Rezeptsuche mit der Auswahl', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -145,7 +173,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Weitere Zutaten hinzufügen'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Beilage'));
+    await tester.tap(find.text('Beilagen'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Reis'));
     await tester.pump();
@@ -220,6 +248,8 @@ class _FakeFoodRepository extends FoodRepository {
         const Food(id: 'pasta', name: 'Nudeln', category: 'Pasta', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'potato', name: 'Kartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'broccoli', name: 'Brokkoli', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'sweet-potato', name: 'Süßkartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'beef-spice', name: 'Paprikapulver', category: 'Gewürze', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
       ];
 
   @override

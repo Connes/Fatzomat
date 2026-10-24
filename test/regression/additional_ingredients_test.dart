@@ -16,8 +16,9 @@ void main() {
       ),
     );
 
-    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Beilagen'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
+    expect(find.text('Sonstiges'), findsOneWidget);
     expect(find.text('Favoriten'), findsNothing);
     expect(find.text('Was möchtet ihr hinzufügen?'), findsNothing);
     expect(find.text('Wählt Beilage, Gemüse oder eure Favoriten.'), findsNothing);
@@ -37,7 +38,7 @@ void main() {
 
     expect(find.textContaining('Hauptauswahl'), findsNothing);
     expect(find.text('Rind'), findsNothing);
-    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Beilagen'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
   });
 
@@ -61,21 +62,22 @@ void main() {
   });
 
   testWidgets('V92 Kategorieauswahl zeigt keinen unboxed Untertitel und nutzt extendBody', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
 
     expect(find.text('Reis, Nudeln oder Kartoffeln'), findsNothing);
-    expect(find.text('Beilage auswählen'), findsOneWidget);
+    expect(find.text('Beilagen auswählen'), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
     expect(scaffold.extendBody, isTrue);
   });
 
   testWidgets('Beilagen umfassen die passenden Lebensmittel aus dem Katalog', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
 
     expect(find.text('Reis'), findsOneWidget);
     expect(find.text('Nudeln'), findsOneWidget);
     expect(find.text('Kartoffel'), findsOneWidget);
+    expect(find.text('Süßkartoffel'), findsOneWidget);
     expect(find.text('Haferflocken'), findsNothing);
     expect(find.text('Brot'), findsOneWidget);
     expect(find.text('Couscous'), findsOneWidget);
@@ -86,11 +88,11 @@ void main() {
   });
 
   testWidgets('Beilagen werden in einer gemeinsamen Karte mit feinen Trennlinien angezeigt', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
 
     final listView = find.byType(ListView).last;
     final card = find.ancestor(of: listView, matching: find.byType(Material)).first;
-    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(6));
+    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(7));
 
     final cardPadding = tester.widget<Padding>(
       find.ancestor(of: card, matching: find.byType(Padding)).first,
@@ -119,6 +121,15 @@ void main() {
     expect(find.text('Kartoffel'), findsNothing);
   });
 
+  testWidgets('Sonstiges enthält übrige Lebensmittel, aber keine Gemüse- oder Beilagen-Einträge', (tester) async {
+    await _openCategory(tester, 'Sonstiges');
+    expect(find.text('Haferflocken'), findsOneWidget);
+    expect(find.text('Paprikapulver'), findsOneWidget);
+    expect(find.text('Brokkoli'), findsNothing);
+    expect(find.text('Reis'), findsNothing);
+    expect(find.text('Süßkartoffel'), findsNothing);
+  });
+
   testWidgets('V92 Favoriten werden intern weiter korrekt gefiltert', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -136,7 +147,7 @@ void main() {
   });
 
   testWidgets('V92 Auswahl bleibt beim Kategorie-Wechsel erhalten', (tester) async {
-    await _openCategory(tester, 'Beilage');
+    await _openCategory(tester, 'Beilagen');
     await tester.tap(find.text('Reis'));
     await tester.pump();
     await tester.tap(find.text('Auswahl übernehmen (1)'));
@@ -201,6 +212,8 @@ class _FakeFoodRepository extends FoodRepository {
         const Food(id: 'broccoli', name: 'Brokkoli', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'zucchini', name: 'Zucchini', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'carrot', name: 'Karotte', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'sweet-potato', name: 'Süßkartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'paprika-powder', name: 'Paprikapulver', category: 'Gewürze', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
       ];
 
   @override

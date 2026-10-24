@@ -215,13 +215,36 @@ class _MyChoiceCard extends StatelessWidget {
   });
 
   List<Food> get _vegetableFoods => selectedFoods
-      .where((food) => food.category.toLowerCase().contains('gemüse') ||
-          food.category.toLowerCase().contains('vegetable'))
+      .where((food) => _isVegetable(food) && !_isPotato(food))
       .toList(growable: false);
 
   List<Food> get _sideFoods => selectedFoods
-      .where((food) => !_vegetableFoods.contains(food))
+      .where(_isSideFood)
       .toList(growable: false);
+
+  List<Food> get _otherFoods => selectedFoods
+      .where((food) => !_isVegetable(food) && !_isPotato(food) && !_isSideFood(food))
+      .toList(growable: false);
+
+  bool _isVegetable(Food food) =>
+      food.category.toLowerCase().contains('gemüse') ||
+      food.category.toLowerCase().contains('vegetable');
+
+  bool _isPotato(Food food) => food.name.toLowerCase().contains('kartoffel');
+
+  bool _isSideFood(Food food) {
+    final category = food.category.trim();
+    final name = food.name.toLowerCase();
+    if (['weisse bohne', 'weiße bohne', 'kidney bohne', 'grune bohne', 'grüne bohne', 'tortilla', 'toast']
+        .any(name.contains)) return false;
+    return name.contains('reis') || name.contains('nudel') || name.contains('pasta') ||
+        name.contains('kartoffel') ||
+        (category == 'Getreide & Beilagen' &&
+            !['haferflocken', 'semmelbrösel'].any(name.contains)) ||
+        category == 'Hülsenfrüchte' ||
+        ['couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette', 'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse']
+            .any(name.contains);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -278,8 +301,22 @@ class _MyChoiceCard extends StatelessWidget {
                 const SizedBox(height: 12),
               ],
               if (_sideFoods.isNotEmpty) ...[
-                const _IngredientGroupHeading('Beilage'),
+                const _IngredientGroupHeading('Beilagen'),
                 ..._sideFoods.map(
+                  (food) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _ChoiceRow(label: food.name),
+                  ),
+                ),
+              ],
+              if (_otherFoods.isNotEmpty) ...[
+                if (_vegetableFoods.isNotEmpty || _sideFoods.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  const Divider(height: 1),
+                  const SizedBox(height: 12),
+                ],
+                const _IngredientGroupHeading('Sonstiges'),
+                ..._otherFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),
