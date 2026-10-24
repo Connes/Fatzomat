@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
+import '../../core/food_name_normalizer.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
@@ -261,19 +262,15 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
 
   bool _matchesCategory(Food food, Map<String, String> preferences) {
     final category = food.category.trim();
-    final name = food.name.trim().toLowerCase();
+    final name = FoodNameNormalizer.normalize(food.name);
     // These catalog entries are intentionally unavailable when creating recipes.
-    if (_containsAny(name, const [
-      'süßkartoffel', 'suesskartoffel', 'susskartoffel',
-    ])) {
+    if (_containsAny(name, const ['suesskartoffel'])) {
       return false;
     }
     // Keep these items out of the side-dish picker while leaving other beans available.
     if (widget.category == IngredientCategory.side &&
         _containsAny(name, const [
-          'weiße bohnen', 'weisse bohnen', 'kidneybohnen', 'kidney-bohnen',
-          'grüne bohnen', 'grune bohnen', 'gruen bohnen', 'grünbohnen',
-          'tortilla', 'toast',
+          'weisse bohne', 'kidney bohne', 'grune bohne', 'tortilla', 'toast',
         ])) {
       return false;
     }
@@ -303,7 +300,7 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
   }
 
   bool _containsAny(String value, List<String> terms) =>
-      terms.any(value.contains);
+      terms.any((term) => FoodNameNormalizer.equivalentOrContains(value, term));
 
   void _toggle(String id) {
     setState(() {
