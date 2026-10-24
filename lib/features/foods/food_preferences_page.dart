@@ -166,7 +166,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                 ),
                 const SizedBox(width: 8),
                 Chip(
-                  avatar: const Icon(Icons.block, size: 16),
+                  avatar: const Icon(Icons.block, size: 16, color: Colors.red),
                   label: Text('$dislikedCount nicht'),
                 ),
                 const Spacer(),
@@ -250,7 +250,7 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.search_off_rounded, size: 38, color: AppDesign.primaryDark),
+                              Icon(Icons.search_off_rounded, size: 38, color: AppDesign.iconGold),
                               const SizedBox(height: 12),
                               Text(
                                 'Keine Lebensmittel gefunden.',
