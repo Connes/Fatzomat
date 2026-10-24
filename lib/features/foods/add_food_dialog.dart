@@ -82,9 +82,18 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final availableHeight = media.size.height - media.viewInsets.bottom -
+        media.padding.vertical - 32;
+    return AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+        contentPadding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         title: const Text('Eigenes Lebensmittel hinzufügen'),
-        content: SingleChildScrollView(
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: availableHeight.clamp(180, 420)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -97,7 +106,7 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
                   hintText: 'z. B. Halloumi',
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 initialValue: category,
                 decoration: const InputDecoration(labelText: 'Kategorie'),
@@ -128,4 +137,5 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
           ),
         ],
       );
+  }
 }
