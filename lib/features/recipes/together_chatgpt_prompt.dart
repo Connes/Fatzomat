@@ -40,9 +40,8 @@ PHASE 1 – DREI VORSCHLÄGE:
 
 PHASE 2 – NACH MEINER AUSWAHL:
 - Sobald ich 1, 2, 3 oder den Namen eines Vorschlags auswähle, erstelle nur für dieses Gericht das vollständige Rezept.
-- Stelle das vollständige Rezept als herunterladbare PDF-Datei bereit, sofern die Dateierstellung verfügbar ist.
 - Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann. Stelle beide Dateien zum Download bereit, sofern möglich.
-- Falls PDF-Erstellung nicht verfügbar ist, stelle mindestens die JSON-Datei bereit. Falls auch keine Dateierstellung verfügbar ist, gib das vollständige gültige JSON als Chat-Antwort aus.
+- Stelle die JSON-Datei zum Download bereit. Falls Dateierstellung nicht verfügbar ist, gib das vollständige gültige JSON als Chat-Antwort aus.
 - Generiere in keiner Phase ein Bild und starte keine Bildgenerierung.
 
 DATEINAME DER IMPORTDATEI: together_recipe.json
@@ -100,7 +99,7 @@ Regeln:
 12. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
 13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
 14. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
-15. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle die Datei zum Download bereit. Erstelle außerdem eine gut formatierte PDF-Datei mit demselben vollständigen Rezept und stelle sie ebenfalls zum Download bereit, sofern technisch möglich. Prüfe, dass die JSON-Datei gültiges JSON im together_recipe-Format Version 1 enthält. Wenn Dateierstellung nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON als Chat-Antwort aus, damit ich es als together_recipe.json speichern kann.
+15. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle die Datei zum Download bereit. Prüfe, dass die JSON-Datei gültiges JSON im together_recipe-Format Version 1 enthält. Wenn Dateierstellung nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON als Chat-Antwort aus, damit ich es als together_recipe.json speichern kann.
 16. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
 17. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.
 18. WICHTIG: Diese Anfrage dient ausschließlich der Rezept- und Dateierstellung. Generiere kein Bild und rufe keine Bildgenerierung auf. Die Bildgenerierung wird in einem getrennten Schritt angefordert, nachdem das Rezept vorliegt.
