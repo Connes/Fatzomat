@@ -48,7 +48,10 @@ class AddRecipePage extends StatelessWidget {
               final completed = await Navigator.push<bool>(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const FoodModePage(mode: FoodMode.cook),
+                  builder: (_) => const FoodModePage(
+                    mode: FoodMode.cook,
+                    selectForToday: false,
+                  ),
                 ),
               );
               if (completed == true && context.mounted) {
