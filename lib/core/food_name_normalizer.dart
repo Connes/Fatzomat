@@ -2,31 +2,77 @@
 class FoodNameNormalizer {
   const FoodNameNormalizer._();
 
+  static const Map<String, String> _pluralForms = {
+    'tomaten': 'tomate',
+    'kidneybohnen': 'kidneybohne',
+    'champignons': 'champignon',
+    'cashews': 'cashew',
+    'erbsen': 'erbse',
+    'erdbeeren': 'erdbeere',
+    'erdnuesse': 'erdnuss',
+    'garnelen': 'garnele',
+    'heidelbeeren': 'heidelbeere',
+    'himbeeren': 'himbeere',
+    'kichererbsen': 'kichererbse',
+    'linsen': 'linse',
+    'mandeln': 'mandel',
+    'pistazien': 'pistazie',
+    'trauben': 'traube',
+    'walnuesse': 'walnuss',
+    'zuckerschoten': 'zuckerschote',
+    'suesskartoffeln': 'suesskartoffel',
+    'kidney bohnen': 'kidney bohne',
+    'weisse bohnen': 'weisse bohne',
+    'grune bohnen': 'grune bohne',
+    'haselnuesse': 'haselnuss',
+    'kuerbiskerne': 'kuerbiskern',
+    'sonnenblumenkerne': 'sonnenblumenkern',
+    'tortillas': 'tortilla',
+    'oliven': 'olive',
+    'kartoffeln': 'kartoffel',
+    'karotten': 'karotte',
+    'zwiebeln': 'zwiebel',
+    'gurken': 'gurke',
+    'aepfel': 'apfel',
+    'birnen': 'birne',
+    'bananen': 'banane',
+  };
+
   static String normalize(String value) {
     var result = value.toLowerCase().trim();
     const replacements = <String, String>{
-      'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss',
+      'ä': 'ae',
+      'ö': 'oe',
+      'ü': 'ue',
+      'ß': 'ss',
     };
     replacements.forEach((from, to) => result = result.replaceAll(from, to));
     result = result.replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
-    return result.replaceAll(RegExp(r'\\s+'), ' ');
+    return result.replaceAll(RegExp(r'\s+'), ' ');
   }
 
-  /// Normalizes common German singular/plural endings for matching only.
-  /// It never changes the canonical display name stored in the catalog.
+  /// Maps known plural forms to their canonical singular form for matching.
+  /// This is search-only and never changes catalog display names.
   static String canonicalTerm(String value) {
     final normalized = normalize(value);
+    final direct = _pluralForms[normalized];
+    if (direct != null) return direct;
+
     final words = normalized.split(' ');
-    return words.map(_singularize).join(' ');
+    return words.map((word) => _singularize(word)).join(' ');
   }
 
   static String _singularize(String word) {
+    final known = _pluralForms[word];
+    if (known != null) return known;
     if (word.length < 5) return word;
-    if (word.endsWith('nen') && word.length > 6) return word.substring(0, word.length - 1);
-    if (word.endsWith('en') && word.length > 5) return word.substring(0, word.length - 2);
-    if (word.endsWith('ern') && word.length > 6) return word.substring(0, word.length - 1);
-    if (word.endsWith('e') && word.length > 5) return word.substring(0, word.length - 1);
+
+    // Conservative fallback for regular German plurals. Keep ambiguous forms
+    // unchanged unless a known mapping above handles them.
+    if (word.endsWith('s') && word.length > 5) return word.substring(0, word.length - 1);
+    if (word.endsWith('en') && word.length > 6) return word.substring(0, word.length - 2);
     if (word.endsWith('n') && word.length > 5) return word.substring(0, word.length - 1);
+    if (word.endsWith('e') && word.length > 5) return word.substring(0, word.length - 1);
     return word;
   }
 
@@ -34,16 +80,23 @@ class FoodNameNormalizer {
     final normalizedValue = normalize(value);
     final normalizedQuery = normalize(query);
     if (normalizedQuery.isEmpty) return true;
+
+    // Preserve ordinary prefix/substring search for the user's typed query.
     if (normalizedValue.contains(normalizedQuery)) return true;
+
     final canonicalValue = canonicalTerm(value);
     final canonicalQuery = canonicalTerm(query);
-    return canonicalValue.contains(canonicalQuery) ||
-        canonicalQuery.contains(canonicalValue);
+    return canonicalValue.contains(canonicalQuery);
   }
 
+  /// Matches equivalent names or a whole phrase contained in another name.
+  /// It deliberately avoids reverse substring matching (e.g. Paprika matching
+  /// Paprikapulver) to reduce false positives in preference checks.
   static bool equivalentOrContains(String left, String right) {
     final a = canonicalTerm(left);
     final b = canonicalTerm(right);
-    return a == b || a.contains(b) || (b.length >= 5 && b.contains(a));
+    if (a == b) return true;
+    if (a.isEmpty || b.isEmpty) return false;
+    return (' $a ').contains(' $b ');
   }
 }
