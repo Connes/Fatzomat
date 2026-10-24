@@ -581,70 +581,95 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
             ),
           ),
           const SizedBox(height: 16),
-          _SectionTitle(title: 'Zutaten'),
-          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
             decoration: BoxDecoration(
               color: AppDesign.surface.withValues(alpha: .96),
               borderRadius: BorderRadius.circular(AppDesign.radiusXl),
             ),
             child: Column(
-              children: _ingredientSections(recipe.ingredients).expand((group) => [
-                if (group.$1 != null) ...[
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 4),
-                    child: Text(group.$1!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppDesign.primaryDark)),
-                  ),
-                ],
-                ...group.$2.map((ingredient) {
-                  final amount = ingredient.isQualitative ? '' : '${_formatQuantity(ingredient.quantity)} ';
-                  final unit = ingredient.unit.trim();
-                  final separator = amount.isEmpty || unit.isEmpty ? '' : ' ';
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Zutaten',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppDesign.primaryDark),
+                ),
+                const SizedBox(height: 8),
+                ..._ingredientSections(recipe.ingredients).asMap().entries.expand((sectionEntry) {
+                  final index = sectionEntry.key;
+                  final group = sectionEntry.value;
+                  return [
+                    if (index > 0)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Divider(height: 1, thickness: 1, color: AppDesign.divider),
+                      ),
+                    if (group.$1 != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 4),
+                        child: Text(
+                          group.$1!,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppDesign.primaryDark),
+                        ),
+                      ),
+                    ...group.$2.map((ingredient) {
+                      final amount = ingredient.isQualitative ? '' : '${_formatQuantity(ingredient.quantity)} ';
+                      final unit = ingredient.unit.trim();
+                      final separator = amount.isEmpty || unit.isEmpty ? '' : ' ';
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(padding: EdgeInsets.only(top: 7), child: Icon(Icons.circle, size: 7, color: AppDesign.primary)),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text('$amount$unit$separator${ingredient.name}')),
+                          ],
+                        ),
+                      );
+                    }),
+                  ];
+                }),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+            decoration: BoxDecoration(
+              color: AppDesign.surface.withValues(alpha: .96),
+              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Bearbeitungsschritte',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppDesign.primaryDark),
+                ),
+                const SizedBox(height: 8),
+                ...recipe.instructions.asMap().entries.map((entry) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(padding: EdgeInsets.only(top: 7), child: Icon(Icons.circle, size: 7, color: AppDesign.primary)),
+                        Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(color: AppDesign.primary, shape: BoxShape.circle),
+                          child: Text('${entry.key + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: Text('$amount$unit$separator${ingredient.name}')),
+                        Expanded(child: Text(entry.value)),
                       ],
                     ),
                   );
                 }),
-              ]).toList(growable: false),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _SectionTitle(title: 'Zubereitung'),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-            decoration: BoxDecoration(
-              color: AppDesign.surface.withValues(alpha: .96),
-              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
-            ),
-            child: Column(
-              children: recipe.instructions.asMap().entries.map((entry) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(color: AppDesign.primary, shape: BoxShape.circle),
-                        child: Text('${entry.key + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(entry.value)),
-                    ],
-                  ),
-                );
-              }).toList(growable: false),
+              ],
             ),
           ),
         ],
