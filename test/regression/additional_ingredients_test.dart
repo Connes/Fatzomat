@@ -16,8 +16,9 @@ void main() {
       ),
     );
 
-    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Beilagen'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
+    expect(find.text('Sonstiges'), findsOneWidget);
     expect(find.text('Favoriten'), findsNothing);
     expect(find.text('Was möchtet ihr hinzufügen?'), findsNothing);
     expect(find.text('Wählt Beilage, Gemüse oder eure Favoriten.'), findsNothing);
@@ -64,7 +65,7 @@ void main() {
     await _openCategory(tester, 'Beilage');
 
     expect(find.text('Reis, Nudeln oder Kartoffeln'), findsNothing);
-    expect(find.text('Beilage auswählen'), findsOneWidget);
+    expect(find.text('Beilagen auswählen'), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
     expect(scaffold.extendBody, isTrue);
@@ -76,6 +77,7 @@ void main() {
     expect(find.text('Reis'), findsOneWidget);
     expect(find.text('Nudeln'), findsOneWidget);
     expect(find.text('Kartoffel'), findsOneWidget);
+    expect(find.text('Süßkartoffel'), findsOneWidget);
     expect(find.text('Haferflocken'), findsNothing);
     expect(find.text('Brot'), findsOneWidget);
     expect(find.text('Couscous'), findsOneWidget);
@@ -117,6 +119,15 @@ void main() {
     expect(find.text('Brokkoli'), findsOneWidget);
     expect(find.text('Zucchini'), findsOneWidget);
     expect(find.text('Kartoffel'), findsNothing);
+  });
+
+  testWidgets('Sonstiges enthält übrige Lebensmittel, aber keine Gemüse- oder Beilagen-Einträge', (tester) async {
+    await _openCategory(tester, 'Sonstiges');
+    expect(find.text('Haferflocken'), findsOneWidget);
+    expect(find.text('Paprikapulver'), findsOneWidget);
+    expect(find.text('Brokkoli'), findsNothing);
+    expect(find.text('Reis'), findsNothing);
+    expect(find.text('Süßkartoffel'), findsNothing);
   });
 
   testWidgets('V92 Favoriten werden intern weiter korrekt gefiltert', (tester) async {
@@ -201,6 +212,8 @@ class _FakeFoodRepository extends FoodRepository {
         const Food(id: 'broccoli', name: 'Brokkoli', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'zucchini', name: 'Zucchini', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'carrot', name: 'Karotte', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'sweet-potato', name: 'Süßkartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'paprika-powder', name: 'Paprikapulver', category: 'Gewürze', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
       ];
 
   @override
