@@ -528,13 +528,31 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
                   Text(recipe.description, style: Theme.of(context).textTheme.bodyLarge),
                 ],
                 const SizedBox(height: 14),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                Row(
                   children: [
-                    _MetaChip(icon: Icons.people_outline, label: '${recipe.servings} Portionen'),
-                    _MetaChip(icon: Icons.schedule_outlined, label: '${recipe.prepTimeMinutes + recipe.cookTimeMinutes} Min.'),
-                    _MetaChip(icon: Icons.bar_chart_outlined, label: recipe.difficulty),
+                    Expanded(
+                      child: _MetaChip(
+                        icon: Icons.people_outline,
+                        label: '${recipe.servings} Portionen',
+                        compact: true,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MetaChip(
+                        icon: Icons.schedule_outlined,
+                        label: '${recipe.prepTimeMinutes + recipe.cookTimeMinutes} Min.',
+                        compact: true,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MetaChip(
+                        icon: Icons.bar_chart_outlined,
+                        label: recipe.difficulty,
+                        compact: true,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -750,23 +768,48 @@ class _SectionTitle extends StatelessWidget {
 class _MetaChip extends StatelessWidget {
   final IconData icon;
   final String label;
+  final bool compact;
 
-  const _MetaChip({required this.icon, required this.label});
+  const _MetaChip({
+    required this.icon,
+    required this.label,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      width: compact ? double.infinity : null,
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 7 : 10,
+        vertical: compact ? 8 : 7,
+      ),
       decoration: BoxDecoration(
         color: AppDesign.primarySoft,
         borderRadius: BorderRadius.circular(AppDesign.radiusPill),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisAlignment: compact ? MainAxisAlignment.center : MainAxisAlignment.start,
         children: [
-          Icon(icon, size: 17, color: AppDesign.primaryDark),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(color: AppDesign.primaryDark, fontWeight: FontWeight.w600)),
+          Icon(icon, size: compact ? 15 : 17, color: AppDesign.iconGold),
+          SizedBox(width: compact ? 4 : 6),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: compact ? Alignment.centerLeft : Alignment.center,
+              child: Text(
+                label,
+                maxLines: 1,
+                softWrap: false,
+                style: TextStyle(
+                  color: AppDesign.primaryDark,
+                  fontWeight: FontWeight.w600,
+                  fontSize: compact ? 12 : 14,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1551,7 +1594,7 @@ class _RecipeFieldCard extends StatelessWidget {
               color: AppDesign.primarySoft,
               borderRadius: BorderRadius.circular(AppDesign.radiusLg),
             ),
-            child: Icon(icon, color: AppDesign.primaryDark, size: 28),
+            child: Icon(icon, color: AppDesign.iconGold, size: 28),
           ),
           Expanded(
             child: TextField(
@@ -1606,7 +1649,7 @@ class _RecipeSectionCard extends StatelessWidget {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(color: AppDesign.primarySoft, borderRadius: BorderRadius.circular(AppDesign.radiusMd)),
-                child: Icon(icon, color: AppDesign.primaryDark),
+                child: Icon(icon, color: AppDesign.iconGold),
               ),
               const SizedBox(width: 10),
               Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppDesign.text)),
