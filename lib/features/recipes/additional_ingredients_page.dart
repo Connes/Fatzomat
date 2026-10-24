@@ -82,15 +82,21 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
           children: [
             _CategoryCard(
-              title: 'Beilage',
-              subtitle: 'Reis, Nudeln oder Kartoffeln',
+              title: 'Gemüse',
+              subtitle: 'Frisches Gemüse für euer Rezept',
+              onTap: () => _openCategory(IngredientCategory.vegetables),
+            ),
+            const SizedBox(height: 12),
+            _CategoryCard(
+              title: 'Beilagen',
+              subtitle: 'Reis, Nudeln, Kartoffeln und mehr',
               onTap: () => _openCategory(IngredientCategory.side),
             ),
             const SizedBox(height: 12),
             _CategoryCard(
-              title: 'Gemüse',
-              subtitle: 'Frisches Gemüse für euer Rezept',
-              onTap: () => _openCategory(IngredientCategory.vegetables),
+              title: 'Sonstiges',
+              subtitle: 'Alle weiteren Lebensmittel',
+              onTap: () => _openCategory(IngredientCategory.other),
             ),
             if (selectedFoodIds.isNotEmpty) ...[
               const SizedBox(height: 20),
@@ -152,7 +158,7 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
   }
 }
 
-enum IngredientCategory { side, vegetables, favorites }
+enum IngredientCategory { side, vegetables, other, favorites }
 
 class _CategoryCard extends StatelessWidget {
   final String title;
@@ -222,14 +228,16 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
   String? error;
 
   String get title => switch (widget.category) {
-        IngredientCategory.side => 'Beilage auswählen',
+        IngredientCategory.side => 'Beilagen auswählen',
         IngredientCategory.vegetables => 'Gemüse auswählen',
+        IngredientCategory.other => 'Sonstiges auswählen',
         IngredientCategory.favorites => 'Favoriten auswählen',
       };
 
   String get subtitle => switch (widget.category) {
         IngredientCategory.side => 'Reis, Nudeln oder Kartoffeln',
         IngredientCategory.vegetables => 'Frisches Gemüse für euer Rezept',
+        IngredientCategory.other => 'Alle Lebensmittel außerhalb von Gemüse und Beilagen',
         IngredientCategory.favorites => 'Eure bevorzugten Lebensmittel',
       };
 
@@ -263,10 +271,6 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
   bool _matchesCategory(Food food, Map<String, String> preferences) {
     final category = food.category.trim();
     final name = FoodNameNormalizer.normalize(food.name);
-    // These catalog entries are intentionally unavailable when creating recipes.
-    if (_containsAny(name, const ['suesskartoffel'])) {
-      return false;
-    }
     // Keep these items out of the side-dish picker while leaving other beans available.
     if (widget.category == IngredientCategory.side &&
         _containsAny(name, const [
@@ -278,29 +282,39 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
     final isRice = name.contains('reis');
     final isPasta = name.contains('nudel') || name.contains('pasta');
 
+    final isVegetable = category.toLowerCase().contains('gemüse') ||
+        category.toLowerCase().contains('vegetable');
+    final isSide = _isSideFood(food);
+
     return switch (widget.category) {
-      // Include the side dishes already present in the shared food catalog.
-      IngredientCategory.side =>
-          isRice ||
-          isPasta ||
-          isPotato ||
-          (category == 'Getreide & Beilagen' &&
-              !_containsAny(name, const ['haferflocken', 'semmelbrösel'])) ||
-          category == 'Hülsenfrüchte' ||
-          _containsAny(name, const [
-            'couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette',
-            'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse',
-          ]),
-      // The catalog category is authoritative; potatoes are sides.
-      IngredientCategory.vegetables =>
-          category == 'Gemüse' && !isPotato && !name.contains('süßkartoffel'),
-      // Favorites are independent of the food category.
+      IngredientCategory.side => isSide,
+      IngredientCategory.vegetables => isVegetable && !isPotato,
+      IngredientCategory.other => !isVegetable && !isSide,
       IngredientCategory.favorites => preferences[food.id] == 'like',
     };
   }
 
   bool _containsAny(String value, List<String> terms) =>
       terms.any((term) => FoodNameNormalizer.equivalentOrContains(value, term));
+
+  bool _isSideFood(Food food) {
+    final category = food.category.trim();
+    final name = FoodNameNormalizer.normalize(food.name);
+    if (_containsAny(name, const [
+      'weisse bohne', 'kidney bohne', 'grune bohne', 'tortilla', 'toast',
+    ])) return false;
+    final isPotato = name.contains('kartoffel');
+    final isRice = name.contains('reis');
+    final isPasta = name.contains('nudel') || name.contains('pasta');
+    return isRice || isPasta || isPotato ||
+        (category == 'Getreide & Beilagen' &&
+            !_containsAny(name, const ['haferflocken', 'semmelbrösel'])) ||
+        category == 'Hülsenfrüchte' ||
+        _containsAny(name, const [
+          'couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette',
+          'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse',
+        ]);
+  }
 
   void _toggle(String id) {
     setState(() {
