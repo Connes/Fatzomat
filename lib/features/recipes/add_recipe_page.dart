@@ -1790,8 +1790,8 @@ class _IngredientRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppDesign.surfaceSoft,
         borderRadius: BorderRadius.circular(AppDesign.radiusLg),
@@ -1800,24 +1800,17 @@ class _IngredientRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: TextField(
+                child: _IngredientInput(
+                  label: 'Zutat',
                   controller: draft.name,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Zutat',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppDesign.primary, width: 1.5), borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                  ),
                 ),
               ),
               if (onRemove != null) ...[
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 IconButton(
                   tooltip: 'Zutat entfernen',
                   onPressed: onRemove,
@@ -1827,59 +1820,99 @@ class _IngredientRow extends StatelessWidget {
               ],
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: TextField(
+                child: _IngredientInput(
+                  label: 'Menge',
                   controller: draft.amount,
+                  hint: 'z. B. 250 oder 0,5',
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    labelText: 'Menge',
-                    hintText: 'z. B. 250 oder 0,5',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppDesign.primary, width: 1.5), borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                  ),
                   onChanged: (_) => onChanged(),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
-                child: TextField(
+                child: _IngredientInput(
+                  label: 'Einheit',
                   controller: draft.unit,
+                  hint: 'z. B. g, ml',
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Einheit',
-                    hintText: 'z. B. g, ml, Stück',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppDesign.primary, width: 1.5), borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-                  ),
                   onChanged: (_) => onChanged(),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          TextField(
+          const SizedBox(height: 10),
+          _IngredientInput(
+            label: 'Zutatenabschnitt (optional)',
             controller: draft.section,
+            hint: 'z. B. Teig, Füllung, Belag',
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Zutatenabschnitt (optional)',
-              hintText: 'z. B. Teig, Füllung, Belag',
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-              enabledBorder: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppDesign.primary, width: 1.5), borderRadius: BorderRadius.all(Radius.circular(AppDesign.radiusMd))),
-            ),
             onChanged: (_) => onChanged(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IngredientInput extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final String? hint;
+  final TextInputType? keyboardType;
+  final TextCapitalization textCapitalization;
+  final ValueChanged<String>? onChanged;
+
+  const _IngredientInput({
+    required this.label,
+    required this.controller,
+    this.hint,
+    this.keyboardType,
+    this.textCapitalization = TextCapitalization.none,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 9, 12, 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDesign.radiusMd),
+        border: Border.all(color: AppDesign.divider.withValues(alpha: .45)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppDesign.secondaryText,
+              fontSize: 12,
+              height: 1.2,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            textCapitalization: textCapitalization,
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              hintText: hint,
+              isDense: true,
+              filled: false,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding: const EdgeInsets.only(top: 5, bottom: 7),
+              hintStyle: const TextStyle(color: AppDesign.mutedText, fontSize: 15),
+            ),
           ),
         ],
       ),
