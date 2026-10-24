@@ -937,10 +937,29 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
         preferences: foodPreferences,
       );
       if (conflicts.isNotEmpty) {
-        _show('Dieses Rezept enthält Lebensmittel, die du nicht magst: ${conflicts.join(', ')}. Bitte lasse ChatGPT das Rezept ohne diese Zutaten neu erstellen.');
-        return;
+        final importAnyway = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Lebensmittel, die du nicht magst'),
+            content: Text(
+              'Dieses Rezept enthält Lebensmittel, die du als „Mag ich nicht“ markiert hast:\\n\\n'
+              '${conflicts.map((ingredient) => '• $ingredient').join('\\n')}'
+              '\\n\\nMöchtest du das Rezept trotzdem importieren?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(false),
+                child: const Text('Nein, abbrechen'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(dialogContext).pop(true),
+                child: const Text('Ja, trotzdem importieren'),
+              ),
+            ],
+          ),
+        );
+        if (importAnyway != true || !mounted) return;
       }
-
       final saved = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
