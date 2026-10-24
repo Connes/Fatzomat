@@ -29,6 +29,29 @@ void main() {
     expect(prompt, contains('Bevorzuge Lebensmittel aus der Liste'));
   });
 
+  test('explicitly selected disliked foods are treated as intentional in the ChatGPT prompt', () {
+    final prompt = TogetherChatGptPrompt.build(
+      mainChoice: 'Rind',
+      selectedFoods: const [
+        Food(id: 'noodles', name: 'Nudeln', category: 'Beilage'),
+        Food(id: 'quinoa', name: 'Quinoa', category: 'Beilage'),
+      ],
+      dislikedFoods: const [
+        Food(id: 'noodles', name: 'Nudeln', category: 'Beilage'),
+        Food(id: 'quinoa', name: 'Quinoa', category: 'Beilage'),
+        Food(id: 'mushrooms', name: 'Pilze', category: 'Gemüse'),
+      ],
+    );
+
+    final dislikedSection = prompt.split('Lebensmittel, die ich NICHT mag').last.split('\n\nRegeln:').first;
+    expect(prompt, contains('- Nudeln'));
+    expect(prompt, contains('- Quinoa'));
+    expect(dislikedSection, isNot(contains('Nudeln')));
+    expect(dislikedSection, isNot(contains('Quinoa')));
+    expect(dislikedSection, contains('Pilze'));
+    expect(prompt, contains('Vorrang vor einer gespeicherten „Mag ich nicht“-Präferenz'));
+  });
+
   test('guard detects disliked food by name and alias', () {
     final recipe = Recipe(
       name: 'Nudeln',
