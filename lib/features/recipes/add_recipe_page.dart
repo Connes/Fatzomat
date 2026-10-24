@@ -931,20 +931,26 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
     try {
       final recipe = await const TogetherRecipeFileService().pickRecipe();
       if (recipe == null || !mounted) return;
+      final explicitlySelectedNames = foods
+          .where((food) => selectedFoodIds.contains(food.id))
+          .map((food) => food.name.trim().toLowerCase())
+          .toSet();
       final conflicts = FoodPreferenceRecipeGuard.findDislikedIngredients(
         recipe: recipe,
         foods: foods,
         preferences: foodPreferences,
-      );
+      ).where((ingredient) =>
+          !explicitlySelectedNames.contains(ingredient.trim().toLowerCase()))
+          .toList(growable: false);
       if (conflicts.isNotEmpty) {
         final importAnyway = await showDialog<bool>(
           context: context,
           builder: (dialogContext) => AlertDialog(
             title: const Text('Lebensmittel, die du nicht magst'),
             content: Text(
-              'Dieses Rezept enthält Lebensmittel, die du als „Mag ich nicht“ markiert hast:\\n\\n'
-              '${conflicts.map((ingredient) => '• $ingredient').join('\\n')}'
-              '\\n\\nMöchtest du das Rezept trotzdem importieren?',
+              'Dieses Rezept enthält Lebensmittel, die du als „Mag ich nicht“ markiert hast:\n\n'
+              '${conflicts.map((ingredient) => '• $ingredient').join('\n')}'
+              '\n\nMöchtest du das Rezept trotzdem importieren?',
             ),
             actions: [
               TextButton(
