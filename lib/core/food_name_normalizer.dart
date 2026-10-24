@@ -21,7 +21,8 @@ class FoodNameNormalizer {
     'walnuesse': 'walnuss',
     'zuckerschoten': 'zuckerschote',
     'suesskartoffeln': 'suesskartoffel',
-    'kidney bohnen': 'kidney bohne',
+    'kidney bohnen': 'kidneybohne',
+    'kidney bohne': 'kidneybohne',
     'weisse bohnen': 'weisse bohne',
     'grune bohnen': 'grune bohne',
     'haselnuesse': 'haselnuss',
@@ -48,7 +49,7 @@ class FoodNameNormalizer {
     };
     replacements.forEach((from, to) => result = result.replaceAll(from, to));
     result = result.replaceAll(RegExp(r'[^a-z0-9]+'), ' ').trim();
-    return result.replaceAll(RegExp(r'\s+'), ' ');
+    return result.replaceAll(RegExp(r'\\s+'), ' ');
   }
 
   /// Maps known plural forms to their canonical singular form for matching.
