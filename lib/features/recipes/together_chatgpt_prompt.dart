@@ -44,7 +44,7 @@ PHASE 2 – NACH MEINER AUSWAHL:
 - Stelle die JSON-Datei zum Download bereit. Falls Dateierstellung nicht verfügbar ist, gib das vollständige gültige JSON als Chat-Antwort aus.
 - Generiere in keiner Phase ein Bild und starte keine Bildgenerierung.
 
-DATEINAME DER IMPORTDATEI: together_recipe.json
+DATEINAME: together_recipe.json
 
 Hauptauswahl / Rezeptbasis:
 $mainChoice
