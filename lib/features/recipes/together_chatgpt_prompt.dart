@@ -40,7 +40,7 @@ PHASE 1 – DREI VORSCHLÄGE:
 
 PHASE 2 – NACH MEINER AUSWAHL:
 - Sobald ich 1, 2, 3 oder den Namen eines Vorschlags auswähle, erstelle nur für dieses Gericht das vollständige Rezept.
-- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann. Stelle beide Dateien zum Download bereit, sofern möglich.
+- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann.
 - Stelle die JSON-Datei zum Download bereit. Falls Dateierstellung nicht verfügbar ist, gib das vollständige gültige JSON als Chat-Antwort aus.
 - Generiere in keiner Phase ein Bild und starte keine Bildgenerierung.
 
