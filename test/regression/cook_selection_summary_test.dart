@@ -100,8 +100,9 @@ void main() {
 
     expect(find.byType(AdditionalIngredientsPage), findsOneWidget);
     expect(find.textContaining('Huhn'), findsNothing);
-    expect(find.text('Beilage'), findsOneWidget);
+    expect(find.text('Beilagen'), findsOneWidget);
     expect(find.text('Gemüse'), findsOneWidget);
+    expect(find.text('Sonstiges'), findsOneWidget);
     expect(find.text('Favoriten'), findsNothing);
   });
 
@@ -220,6 +221,8 @@ class _FakeFoodRepository extends FoodRepository {
         const Food(id: 'pasta', name: 'Nudeln', category: 'Pasta', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'potato', name: 'Kartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
         const Food(id: 'broccoli', name: 'Brokkoli', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'sweet-potato', name: 'Süßkartoffel', category: 'Gemüse', searchTerms: [], aliases: [], defaultUnit: 'Stück', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
+        const Food(id: 'beef-spice', name: 'Paprikapulver', category: 'Gewürze', searchTerms: [], aliases: [], defaultUnit: 'g', dietaryType: 'vegan', allergens: [], proteinType: 'plant'),
       ];
 
   @override
