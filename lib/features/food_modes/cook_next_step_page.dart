@@ -132,7 +132,9 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
   Widget build(BuildContext context) {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
-      appBar: const TogetherAppBar(title: Text('Wir kochen')),
+      appBar: TogetherAppBar(
+        title: Text(widget.selectForToday ? 'Wir kochen' : 'Mit ChatGPT erstellen'),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),

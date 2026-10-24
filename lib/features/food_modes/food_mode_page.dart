@@ -234,7 +234,9 @@ class _FoodModePageState extends State<FoodModePage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(
-        title: Text(switch (widget.mode) {
+        title: Text(!widget.selectForToday && widget.mode == FoodMode.cook
+            ? 'Mit ChatGPT erstellen'
+            : switch (widget.mode) {
           FoodMode.cook => 'Wir kochen',
           FoodMode.order => 'Wir bestellen',
           FoodMode.dineOut => 'Wir gehen essen',
