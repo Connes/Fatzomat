@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fatzomat/core/food_name_normalizer.dart';
+import 'package:food_app_mvp/core/food_name_normalizer.dart';
 
 void main() {
   group('FoodNameNormalizer', () {
