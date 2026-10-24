@@ -279,9 +279,6 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
       return false;
     }
     final isPotato = name.contains('kartoffel');
-    final isRice = name.contains('reis');
-    final isPasta = name.contains('nudel') || name.contains('pasta');
-
     final isVegetable = category.toLowerCase().contains('gemüse') ||
         category.toLowerCase().contains('vegetable');
     final isSide = _isSideFood(food);
