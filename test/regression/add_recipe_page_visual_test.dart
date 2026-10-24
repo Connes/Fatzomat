@@ -125,6 +125,13 @@ test('Rezeptvorschau hält Metadaten in einer Zeile und verwendet goldene Karten
   expect(source, isNot(contains('runSpacing: 8,\n                  children: [\n                    _MetaChip')));
 });
 
+test('Manuelle Rezeptseite heißt auch beim Neuanlegen Rezept bearbeiten', () {
+  final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+  expect(source, contains("appBar: const TogetherAppBar(title: Text('Rezept bearbeiten'))"));
+  expect(source, isNot(contains("Text(editing ? 'Rezept bearbeiten' : 'Rezept manuell erstellen')")));
+});
+
 test('Manuelle Rezeptseite nutzt bestehende Speicherlogik und responsive Zutatenstruktur', () {
   final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
 
