@@ -202,4 +202,15 @@ test('ChatGPT-Rückkehr zeigt die zentrierte Auswahlzusammenfassung und den Date
   expect(source, contains('onPressed: _importRecipeFile'));
 });
 
+test('Rezeptvorschau integriert Überschriften in Karten und trennt Zutatenbereiche', () {
+  final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+  expect(source, contains("'Zutaten',"));
+  expect(source, contains("'Bearbeitungsschritte',"));
+  expect(source, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
+  expect(source, isNot(contains("_SectionTitle(title: 'Zutaten')")));
+  expect(source, isNot(contains("_SectionTitle(title: 'Zubereitung')")));
+});
+
+
 }
