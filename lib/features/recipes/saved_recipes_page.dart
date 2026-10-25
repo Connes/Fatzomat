@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/app_feedback.dart';
 import 'package:share_plus/share_plus.dart';
@@ -831,13 +832,28 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
           menuPadding: const EdgeInsets.symmetric(vertical: 8),
           itemBuilder: (_) {
-            const options = <(String, IconData)>[
-              ('Alle', Icons.grid_view_rounded),
-              ('Schwein', Icons.cruelty_free_rounded),
-              ('Rind', Icons.outdoor_grill_rounded),
-              ('Huhn', Icons.egg_alt_rounded),
-              ('Vegetarisch', Icons.eco_rounded),
-              ('Fisch', Icons.set_meal_rounded),
+            final options = <(String, Widget)>[
+              ('Alle', const Icon(Icons.grid_view_rounded)),
+              ('Schwein', SvgPicture.asset(
+                'assets/icons/pig_head.svg',
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(AppDesign.iconGold, BlendMode.srcIn),
+              )),
+              ('Rind', SvgPicture.asset(
+                'assets/icons/cow_head.svg',
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(AppDesign.iconGold, BlendMode.srcIn),
+              )),
+              ('Huhn', SvgPicture.asset(
+                'assets/icons/rooster.svg',
+                width: 24,
+                height: 24,
+                colorFilter: const ColorFilter.mode(AppDesign.iconGold, BlendMode.srcIn),
+              )),
+              ('Vegetarisch', const Icon(Icons.eco_rounded)),
+              ('Fisch', const Icon(Icons.set_meal_rounded)),
             ];
             final selected = mainIngredientFilter ?? 'Alle';
             return options.map((option) {
@@ -857,9 +873,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   child: Row(
                     children: [
                       Icon(
+                        // Animal categories use custom matching SVG icons; other filters use Material icons.
                         option.$2,
-                        size: 20,
-                        color: AppDesign.iconGold,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
