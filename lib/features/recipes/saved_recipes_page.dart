@@ -401,7 +401,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   enabled: label == null,
                   leading: Icon(
                     label == null ? Icons.calendar_today_rounded : Icons.event_busy_rounded,
-                    color: label == null ? null : Theme.of(dialogContext).disabledColor,
+                    color: label == null
+                        ? AppDesign.iconGold
+                        : Theme.of(dialogContext).disabledColor,
                   ),
                   title: Text(isToday ? 'Heute · ${_formatPlanDate(date)}' : '${weekdays[date.weekday - 1]} · ${_formatPlanDate(date)}'),
                   subtitle: label == null
