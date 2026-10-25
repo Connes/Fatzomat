@@ -357,8 +357,10 @@ class _MyChoiceCard extends StatelessWidget {
                   'Nur diese Lebensmittel verwenden',
                   maxLines: 1,
                   softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
