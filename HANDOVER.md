@@ -2,6 +2,14 @@
 
 Dieses Dokument ist der kompakte Übergabepunkt zwischen Chat-Sitzungen. Es beschreibt Arbeitsregeln und den zuletzt verifizierten Repository-Stand, nicht automatisch den Live-Zustand.
 
+## Aktueller Live-Stand (2026-10-25, nach PR #319)
+
+- `main` steht auf Commit `9bfdec19af800005feac781bb26f5333aee873da` (PR [#319](https://github.com/Connes/Fatzomat/pull/319), „Fix SVG icon color compatibility“).
+- Ursache der roten CI: `flutter_svg 1.1.6` unterstützt bei `SvgPicture.asset` kein benanntes Argument `colorFilter`. Die beiden Aufrufe verwenden nun das kompatible Argument `color`.
+- Regressionstest `test/regression/saved_recipes_menu_test.dart` wurde an die tatsächlichen SVG- und Material-Icons der Filterkategorien angepasst.
+- Beide Workflows sind für den Merge-Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40176076334) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40176076291).
+- Die PR wurde gemergt. Geräteprüfung wurde nicht durchgeführt. Vor der nächsten Aufgabe offene PRs und CI erneut live prüfen.
+
 ## Startregel für neue Chats
 
 Wenn der Nutzer „Fatzomat weiterentwickeln“ schreibt:
