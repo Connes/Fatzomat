@@ -31,9 +31,9 @@ void main() {
     expect(source, contains("onPressed: () => editRecipe(recipe)"));
     expect(source, contains("onPressed: () => deleteRecipe(recipe)"));
     expect(source, contains("onPressed: () => shareRecipe(recipe)"));
-    expect(source, contains("Icons.edit_outlined, color: AppDesign.accent"));
+    expect(source, contains("Icons.edit_outlined, color: AppDesign.iconGold"));
     expect(source, contains("Icons.delete_outline_rounded, color: AppDesign.error"));
-    expect(source, contains("Icons.share_outlined, color: AppDesign.accent"));
+    expect(source, contains("Icons.share_outlined, color: AppDesign.iconGold"));
     expect(source, isNot(contains("tooltip: 'Rezeptoptionen'")));
 
     expect(source, contains("import 'package:share_plus/share_plus.dart';"));
