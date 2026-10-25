@@ -10,6 +10,15 @@ Dieses Dokument ist der kompakte Übergabepunkt zwischen Chat-Sitzungen. Es besc
 - Beide Workflows sind für den Merge-Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40176076334) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40176076291).
 - Die PR wurde gemergt. Geräteprüfung wurde nicht durchgeführt. Vor der nächsten Aufgabe offene PRs und CI erneut live prüfen.
 
+## Aktueller Live-Stand (2026-10-25, nach PR #323)
+
+- `main` steht auf Commit `b4f72356d307d1ba5c37577ad5ff98981ec07967` (PR [#323](https://github.com/Connes/Fatzomat/pull/323), „Add strict selected-food option to ChatGPT recipe prompt“).
+- Auf der Seite „Wir kochen“ gibt es unterhalb der Auswahl eine Checkbox „Nur diese Lebensmittel verwenden“.
+- Aktiviert: Der ChatGPT-Prompt erlaubt als Lebensmittel nur Hauptauswahl und explizit ausgewählte Zutaten; Gewürze, Kräuter sowie Wasser/Salz/Pfeffer sind ausgenommen. Gilt für Vorschläge und das spätere Rezept.
+- Deaktiviert: Der Prompt erlaubt passende zusätzliche Lebensmittel. Prompt-Regressionstests decken beide Modi ab.
+- Beide Workflows auf dem Merge-Commit erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40179372235) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40179372190).
+- Keine Geräteprüfung durchgeführt. Vor der nächsten Aufgabe offene PRs und CI erneut live prüfen.
+
 ## Startregel für neue Chats
 
 Wenn der Nutzer „Fatzomat weiterentwickeln“ schreibt:
