@@ -951,7 +951,33 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                               : Center(
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 32),
-                                    child: Text('Kein passendes Rezept gefunden.', style: Theme.of(context).textTheme.bodyMedium),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 22,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppDesign.surface,
+                                        borderRadius: BorderRadius.circular(22),
+                                        border: Border.all(color: AppDesign.divider),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0x18000000),
+                                            blurRadius: 12,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        'Kein passendes Rezept gefunden.',
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 );
                         }
