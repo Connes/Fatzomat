@@ -263,7 +263,8 @@ class _MyChoiceCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: IntrinsicHeight(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
@@ -340,7 +341,7 @@ class _MyChoiceCard extends StatelessWidget {
               onTap: onAddIngredients,
             ),
             if (showOnlySelectedFoods) ...[
-              const SizedBox(height: 12),
+              const Spacer(),
               CheckboxListTile(
                 key: const Key('cook-only-selected-foods'),
                 value: onlySelectedFoods,
@@ -350,10 +351,19 @@ class _MyChoiceCard extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
                 activeColor: AppDesign.iconGold,
-                title: const Text('Nur diese Lebensmittel verwenden'),
+                dense: true,
+                visualDensity: VisualDensity.compact,
+                title: Text(
+                  'Nur diese Lebensmittel verwenden',
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.scale,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
             ],
           ],
+        ),
         ),
       ),
     );
