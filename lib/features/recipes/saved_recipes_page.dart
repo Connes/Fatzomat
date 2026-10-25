@@ -838,7 +838,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                 'assets/icons/pig_head.svg',
                 width: 24,
                 height: 24,
-                colorFilter: const ColorFilter.mode(AppDesign.iconGold, BlendMode.srcIn),
+                color: AppDesign.iconGold,
               )),
               ('Rind', SvgPicture.asset(
                 'assets/icons/cow_head.svg',
@@ -872,9 +872,10 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        // Animal categories use custom matching SVG icons; other filters use Material icons.
-                        option.$2,
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Center(child: option.$2),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
