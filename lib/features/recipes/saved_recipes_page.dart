@@ -968,91 +968,62 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                               if (mounted) load();
                             },
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
-                              child: Row(
+                              padding: const EdgeInsets.fromLTRB(14, 10, 12, 8),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _RecipeCardImage(
-                                    imageUrl: recipe.imageUrl,
-                                    imagePath: recipe.imagePath,
-                                  ),
-                                  const SizedBox(width: 14),
                                   Expanded(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                    child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        SizedBox(
-                                          height: 48,
+                                        _RecipeCardImage(
+                                          imageUrl: recipe.imageUrl,
+                                          imagePath: recipe.imagePath,
+                                        ),
+                                        const SizedBox(width: 14),
+                                        Expanded(
                                           child: Align(
                                             alignment: Alignment.topLeft,
                                             child: Text(
-                                              (recipe.name.length > 40 ? '${recipe.name.substring(0, 40).trimRight()}…' : recipe.name),
+                                              (recipe.name.length > 40
+                                                  ? '${recipe.name.substring(0, 40).trimRight()}…'
+                                                  : recipe.name),
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                               style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                           ),
                                         ),
-                                        Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: TextButton.icon(
-                                            key: Key('saved-recipe-select-today-${recipe.id}'),
-                                            onPressed: () => selectRecipeForToday(recipe),
-                                            icon: const Icon(Icons.event_available_rounded, size: 18),
-                                            label: const Text('Auswählen'),
-                                          ),
-                                        ),
                                       ],
                                     ),
                                   ),
-                                  PopupMenuButton<String>(
-                                    tooltip: 'Rezeptoptionen',
-                                    onSelected: (value) {
-                                      if (value == 'edit') editRecipe(recipe);
-                                      if (value == 'delete') deleteRecipe(recipe);
-                                      if (value == 'share') shareRecipe(recipe);
-                                    },
-                                    color: AppDesign.surfaceSoft,
-                                    surfaceTintColor: Colors.transparent,
-                                    elevation: 10,
-                                    shadowColor: Colors.black.withValues(alpha: .14),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-                                      side: const BorderSide(color: AppDesign.divider),
-                                    ),
-                                    constraints: const BoxConstraints(minWidth: 232, maxWidth: 280),
-                                    menuPadding: const EdgeInsets.symmetric(vertical: 6),
-                                    itemBuilder: (_) => [
-                                      const PopupMenuItem(
-                                        value: 'edit',
-                                        height: 48,
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                                          leading: Icon(Icons.edit_outlined, color: AppDesign.secondaryText),
-                                          title: Text('Rezept bearbeiten'),
-                                        ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      TextButton.icon(
+                                        key: Key('saved-recipe-select-today-${recipe.id}'),
+                                        onPressed: () => selectRecipeForToday(recipe),
+                                        icon: const Icon(Icons.event_available_rounded, size: 18),
+                                        label: const Text('Auswählen'),
                                       ),
-                                      const PopupMenuDivider(height: 1),
-                                      const PopupMenuItem(
-                                        value: 'delete',
-                                        height: 48,
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                                          leading: Icon(Icons.delete_outline_rounded, color: AppDesign.error),
-                                          title: Text('Rezept löschen', style: TextStyle(color: AppDesign.error)),
-                                        ),
+                                      const Spacer(),
+                                      IconButton(
+                                        tooltip: 'Rezept bearbeiten',
+                                        visualDensity: VisualDensity.compact,
+                                        onPressed: () => editRecipe(recipe),
+                                        icon: const Icon(Icons.edit_outlined, color: AppDesign.accent),
                                       ),
-                                      const PopupMenuDivider(height: 1),
-                                      const PopupMenuItem(
-                                        value: 'share',
-                                        height: 48,
-                                        child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                                          leading: Icon(Icons.share_outlined, color: AppDesign.secondaryText),
-                                          title: Text('Rezept teilen'),
-                                        ),
+                                      IconButton(
+                                        tooltip: 'Rezept löschen',
+                                        visualDensity: VisualDensity.compact,
+                                        onPressed: () => deleteRecipe(recipe),
+                                        icon: const Icon(Icons.delete_outline_rounded, color: AppDesign.error),
+                                      ),
+                                      IconButton(
+                                        tooltip: 'Rezept teilen',
+                                        visualDensity: VisualDensity.compact,
+                                        onPressed: () => shareRecipe(recipe),
+                                        icon: const Icon(Icons.share_outlined, color: AppDesign.accent),
                                       ),
                                     ],
                                   ),
