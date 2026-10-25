@@ -939,7 +939,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                         }
                         final recipe = visibleRecipes[i];
                         return SizedBox(
-                          height: 190,
+                          height: 148,
                           child: Card(
                           child: InkWell(
                             borderRadius: BorderRadius.circular(22),
@@ -964,9 +964,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                               if (mounted) load();
                             },
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                              padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _RecipeCardImage(
                                     imageUrl: recipe.imageUrl,
@@ -976,16 +976,16 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                   Expanded(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
-                                          height: 104,
+                                          height: 48,
                                           child: Align(
                                             alignment: Alignment.topLeft,
                                             child: Text(
-                                              recipe.name,
-                                              maxLines: 4,
+                                              (recipe.name.length > 40 ? '${recipe.name.substring(0, 40).trimRight()}…' : recipe.name),
+                                              maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                               style: Theme.of(context).textTheme.titleMedium,
                                             ),
