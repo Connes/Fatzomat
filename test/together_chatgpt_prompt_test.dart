@@ -32,6 +32,27 @@ void main() {
     expect(prompt, contains('höchstens 40 Zeichen enthalten'));
   });
 
+  test('strict selected-food mode allows only spices and herbs as additions', () {
+    final prompt = TogetherChatGptPrompt.build(
+      mainChoice: 'Fisch',
+      selectedFoods: const [Food(id: 'f1', name: 'Rote Bete', category: 'Gemüse', defaultUnit: 'g')],
+      onlySelectedFoods: true,
+    );
+    expect(prompt, contains('STRIKTE ZUTATENBESCHRÄNKUNG AKTIV'));
+    expect(prompt, contains('Verwende ausschließlich die Hauptauswahl und die ausdrücklich ausgewählten Lebensmittel'));
+    expect(prompt, contains('Gewürze und Kräuter dürfen zusätzlich verwendet werden'));
+    expect(prompt, isNot(contains('ERGÄNZUNGEN ERLAUBT')));
+  });
+
+  test('flexible selected-food mode allows suitable additional ingredients', () {
+    final prompt = TogetherChatGptPrompt.build(
+      mainChoice: 'Fisch',
+      selectedFoods: const [],
+    );
+    expect(prompt, contains('ERGÄNZUNGEN ERLAUBT'));
+    expect(prompt, contains('weitere Lebensmittel integrieren'));
+  });
+
   test('allows a prompt without additional ingredients', () {
     final prompt = TogetherChatGptPrompt.build(
       mainChoice: 'Vegetarisch',
