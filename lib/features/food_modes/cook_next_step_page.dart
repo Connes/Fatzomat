@@ -158,24 +158,14 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                         loadingFoods: loadingFoods,
                         loadError: foodLoadError,
                         onAddIngredients: _openAdditionalIngredients,
+                        showOnlySelectedFoods: widget.selectForToday,
+                        onlySelectedFoods: onlySelectedFoods,
+                        onOnlySelectedFoodsChanged: (value) => setState(() => onlySelectedFoods = value),
                       ),
                     ),
                   ),
                 ),
               ),
-              if (widget.selectForToday) ...[
-                CheckboxListTile(
-                  key: const Key('cook-only-selected-foods'),
-                  value: onlySelectedFoods,
-                  onChanged: (value) => setState(() => onlySelectedFoods = value ?? false),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  activeColor: AppDesign.iconGold,
-                  title: const Text('Nur diese Lebensmittel verwenden'),
-                  subtitle: const Text('Gewürze und Kräuter sind zusätzlich erlaubt.'),
-                ),
-                const SizedBox(height: 4),
-              ],
               const SizedBox(height: 12),
               if (!widget.selectForToday)
                 _RecipeActionButton(
@@ -219,6 +209,9 @@ class _MyChoiceCard extends StatelessWidget {
   final bool loadingFoods;
   final String? loadError;
   final VoidCallback onAddIngredients;
+  final bool showOnlySelectedFoods;
+  final bool onlySelectedFoods;
+  final ValueChanged<bool> onOnlySelectedFoodsChanged;
 
   const _MyChoiceCard({
     required this.mainChoice,
@@ -227,6 +220,9 @@ class _MyChoiceCard extends StatelessWidget {
     required this.loadingFoods,
     required this.loadError,
     required this.onAddIngredients,
+    required this.showOnlySelectedFoods,
+    required this.onlySelectedFoods,
+    required this.onOnlySelectedFoodsChanged,
   });
 
   List<Food> get _vegetableFoods => selectedFoods
@@ -343,6 +339,20 @@ class _MyChoiceCard extends StatelessWidget {
             _AdditionalIngredientsAction(
               onTap: onAddIngredients,
             ),
+            if (showOnlySelectedFoods) ...[
+              const SizedBox(height: 12),
+              CheckboxListTile(
+                key: const Key('cook-only-selected-foods'),
+                value: onlySelectedFoods,
+                onChanged: (value) {
+                  if (value != null) onOnlySelectedFoodsChanged(value);
+                },
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                activeColor: AppDesign.iconGold,
+                title: const Text('Nur diese Lebensmittel verwenden'),
+              ),
+            ],
           ],
         ),
       ),
