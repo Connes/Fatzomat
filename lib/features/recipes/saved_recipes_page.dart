@@ -833,9 +833,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           itemBuilder: (_) {
             const options = <(String, IconData)>[
               ('Alle', Icons.grid_view_rounded),
-              ('Schwein', Icons.restaurant_rounded),
-              ('Rind', Icons.restaurant_rounded),
-              ('Huhn', Icons.restaurant_rounded),
+              ('Schwein', Icons.cruelty_free_rounded),
+              ('Rind', Icons.outdoor_grill_rounded),
+              ('Huhn', Icons.egg_alt_rounded),
               ('Vegetarisch', Icons.eco_rounded),
               ('Fisch', Icons.set_meal_rounded),
             ];
@@ -859,9 +859,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                       Icon(
                         option.$2,
                         size: 20,
-                        color: isSelected
-                            ? AppDesign.primaryDark
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: AppDesign.iconGold,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
