@@ -13,6 +13,8 @@ void main() {
       expect(source, contains("'$field'"));
     }
     expect(source, contains('in der Nähe des folgenden Ausgangspunkts'));
+    expect(source, contains('ausschließlich den offiziellen Namen des Restaurants'));
+    expect(source, contains('Der Ort gehört ausschließlich in das Feld address'));
     expect(source, contains('AUTOMATISCH in derselben Antwort'));
     expect(source, contains('herunterladbare Datei als ChatGPT-Dateianhang'));
     expect(source, contains('Warte nicht darauf, dass ich die Datei zusätzlich anfordere'));

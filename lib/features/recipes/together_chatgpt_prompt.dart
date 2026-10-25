@@ -33,7 +33,7 @@ class TogetherChatGptPrompt {
 PHASE 1 – DREI VORSCHLÄGE:
 - Schlage genau drei deutlich unterschiedliche Gerichte vor, die zur Hauptauswahl, meinen ausgewählten Zutaten und meinen Vorlieben passen.
 - Berücksichtige in jedem Vorschlag alle ausdrücklich ausgewählten Zutaten, soweit kulinarisch sinnvoll, und verwende keine ausgeschlossenen Lebensmittel.
-- Gib pro Vorschlag einen kurzen Namen, eine knappe Beschreibung, die wichtigsten Zutaten und eine ungefähre Zubereitungszeit an.
+- Gib pro Vorschlag einen kurzen Rezeptnamen mit höchstens 40 Zeichen, eine knappe Beschreibung, die wichtigsten Zutaten und eine ungefähre Zubereitungszeit an. Begrenze den Rezeptnamen auf maximal 40 Zeichen; kürze ihn bei Bedarf sinnvoll. Diese Grenze gilt sowohl für die drei Vorschläge als auch für recipe.title in der späteren JSON-Datei.
 - Nummeriere die Vorschläge exakt mit 1, 2 und 3.
 - Frage am Ende kurz, welchen Vorschlag ich wählen möchte.
 - In dieser Phase keine JSON-Ausgabe, kein vollständiges Rezept, keine Datei und keine Bildgenerierung.
@@ -71,7 +71,7 @@ Regeln:
   "format": "together_recipe",
   "version": 1,
   "recipe": {
-    "title": "...",
+    "title": "Kurzer Rezeptname mit maximal 40 Zeichen",
     "description": "...",
     "servings": 2,
     "prep_time_minutes": 10,
@@ -98,7 +98,7 @@ Regeln:
 11. "servings", "prep_time_minutes" und "cook_time_minutes" müssen ganze Zahlen sein.
 12. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
 13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
-14. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
+14. Der Rezeptname im Feld recipe.title darf höchstens 40 Zeichen enthalten. Prüfe die Länge vor der Ausgabe und kürze ihn nötigenfalls sinnvoll auf maximal 40 Zeichen. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
 15. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle die Datei zum Download bereit. Prüfe, dass die JSON-Datei gültiges JSON im together_recipe-Format Version 1 enthält. Wenn Dateierstellung nicht verfügbar ist, gib ersatzweise das vollständige rohe JSON als Chat-Antwort aus, damit ich es als together_recipe.json speichern kann.
 16. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
 17. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.

@@ -27,6 +27,9 @@ void main() {
     expect(prompt, contains('is_user_selected'));
     expect(prompt, contains('is_additional'));
     expect(prompt, contains('ausschließlich'));
+    expect(prompt, contains('höchstens 40 Zeichen'));
+    expect(prompt, contains('recipe.title in der späteren JSON-Datei'));
+    expect(prompt, contains('maximal 40 Zeichen enthalten'));
   });
 
   test('allows a prompt without additional ingredients', () {
