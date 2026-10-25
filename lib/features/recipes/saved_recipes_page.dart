@@ -734,7 +734,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (_, i) {
             final recipe = visibleRecipes[i];
-            return Card(
+            return SizedBox(
+              height: 148,
+              child: Card(
               child: InkWell(
                 borderRadius: BorderRadius.circular(22),
                 onTap: () async {
@@ -760,6 +762,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _RecipeCardImage(
                         imageUrl: recipe.imageUrl,
@@ -791,6 +794,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                     ],
                   ),
                 ),
+              ),
               ),
             );
           },
@@ -1089,7 +1093,7 @@ class _ServingsDialogState extends State<_ServingsDialog> {
   Widget build(BuildContext context) => AlertDialog(
         title: const Text('Für wie viele Personen?'),
         content: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
               tooltip: 'Weniger',
