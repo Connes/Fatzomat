@@ -834,6 +834,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
   final String? decisionRequestId;
   final bool selectForToday;
   final bool autoOpenPrompt;
+  final bool onlySelectedFoods;
   final DateTime? planDate;
 
   const ChatGptRecipeSetupPage({
@@ -843,6 +844,7 @@ class ChatGptRecipeSetupPage extends StatefulWidget {
     this.decisionRequestId,
     this.selectForToday = false,
     this.autoOpenPrompt = false,
+    this.onlySelectedFoods = false,
     this.planDate,
   });
 
@@ -1000,6 +1002,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
       selectedFoods: selectedFoods,
       likedFoods: foods.where((food) => foodPreferences[food.id] == 'like').toList(growable: false),
       dislikedFoods: foods.where((food) => foodPreferences[food.id] == 'dislike').toList(growable: false),
+      onlySelectedFoods: widget.onlySelectedFoods,
     );
 
     await Clipboard.setData(ClipboardData(text: prompt));
