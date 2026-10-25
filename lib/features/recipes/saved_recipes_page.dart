@@ -1014,7 +1014,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 children: [
                                   Expanded(
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         _RecipeCardImage(
                                           imageUrl: recipe.imageUrl,
@@ -1023,7 +1023,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                         const SizedBox(width: 14),
                                         Expanded(
                                           child: Align(
-                                            alignment: Alignment.topLeft,
+                                            alignment: Alignment.centerLeft,
                                             child: Text(
                                               (recipe.name.length > 40
                                                   ? '${recipe.name.substring(0, 40).trimRight()}…'
