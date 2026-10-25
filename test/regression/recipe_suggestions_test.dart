@@ -22,7 +22,9 @@ void main() {
     expect(saved, contains("title: const Text('Meine Rezepte')"));
     expect(saved, isNot(contains('receivedRecipeSuggestions')));
     expect(saved, isNot(contains('respondToRecipeSuggestion')));
-    expect(saved, contains("value: 'share'"));
+    expect(saved, contains("tooltip: 'Rezept teilen'"));
+    expect(saved, contains("tooltip: 'Rezept bearbeiten'"));
+    expect(saved, contains("tooltip: 'Rezept löschen'"));
     expect(saved, contains("title: Text('Rezept teilen')"));
     expect(detail, isNot(contains("'Rezept teilen'")));
     expect(detail, contains("'Rezept bearbeiten'"));
