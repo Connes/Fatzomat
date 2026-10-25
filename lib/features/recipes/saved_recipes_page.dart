@@ -758,7 +758,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   if (mounted) load();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
                   child: Row(
                     children: [
                       _RecipeCardImage(
@@ -938,7 +938,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 );
                         }
                         final recipe = visibleRecipes[i];
-                        return Card(
+                        return SizedBox(
+                          height: 190,
+                          child: Card(
                           child: InkWell(
                             borderRadius: BorderRadius.circular(22),
                             onTap: () async {
@@ -977,11 +979,18 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          recipe.name,
-                                          style: Theme.of(context).textTheme.titleMedium,
+                                        SizedBox(
+                                          height: 104,
+                                          child: Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              recipe.name,
+                                              maxLines: 4,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ),
                                         ),
-                                        const SizedBox(height: 8),
                                         Align(
                                           alignment: Alignment.centerLeft,
                                           child: TextButton.icon(
@@ -1046,6 +1055,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 ],
                               ),
                             ),
+                          ),
                           ),
                         );
                       },
