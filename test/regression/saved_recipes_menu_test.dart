@@ -13,9 +13,9 @@ void main() {
     expect(source, contains('BorderRadius.circular(20)'));
     expect(source, contains('AppDesign.secondarySurface'));
     expect(source, contains("value == 'Alle' ? 'Alle Rezepte' : value"));
-    expect(source, contains("('Schwein', Icons."));
-    expect(source, contains("('Rind', Icons."));
-    expect(source, contains("('Huhn', Icons."));
+    expect(source, contains("('Schwein', SvgPicture.asset("));
+    expect(source, contains("('Rind', SvgPicture.asset("));
+    expect(source, contains("('Huhn', SvgPicture.asset("));
     expect(source, contains("('Vegetarisch', Icons."));
     expect(source, contains("('Fisch', Icons."));
     expect(source, contains('mainIngredientFilter'));
