@@ -8,6 +8,7 @@ class TogetherChatGptPrompt {
     required List<Food> selectedFoods,
     List<Food> likedFoods = const <Food>[],
     List<Food> dislikedFoods = const <Food>[],
+    bool onlySelectedFoods = false,
   }) {
     final ingredientLines = selectedFoods.isEmpty
         ? 'Keine zusätzlichen Zutaten ausgewählt.'
@@ -28,8 +29,21 @@ class TogetherChatGptPrompt {
         ? 'Keine weiteren ausgeschlossenen Lebensmittel.'
         : excludedDislikedFoods.map((food) => '- ${food.name}${food.aliases.isEmpty ? '' : ' (auch bekannt als: ${food.aliases.join(', ')})'}').join('\\n');
 
+    final ingredientConstraint = onlySelectedFoods
+        ? '''STRIKTE ZUTATENBESCHRÄNKUNG AKTIV:
+- Verwende ausschließlich die Hauptauswahl und die ausdrücklich ausgewählten Lebensmittel als Lebensmittelzutaten.
+- Füge keine weiteren Lebensmittel hinzu, auch dann nicht, wenn sie üblicherweise zum Gericht passen.
+- AUSNAHME: Gewürze und Kräuter dürfen zusätzlich verwendet werden, ebenso Wasser und notwendige Kochgrundlagen wie Salz und Pfeffer.
+- Diese Regel gilt für alle drei Vorschläge und das spätere vollständige Rezept. Wenn die Auswahl zu keinem sinnvollen Gericht passt, schlage nur Gerichte vor, die mit genau diesen Lebensmitteln machbar sind; verschweige keine zusätzlichen Lebensmittel in Saucen, Marinaden oder Beilagen.
+'''
+        : '''ERGÄNZUNGEN ERLAUBT:
+- Du darfst neben der Hauptauswahl und den ausgewählten Zutaten weitere Lebensmittel integrieren, wenn sie kulinarisch sinnvoll sind und das Rezept verbessern.
+- Verwende keine ausgeschlossenen Lebensmittel und beachte alle übrigen Regeln.
+''';
+
     return '''Arbeite in zwei klar getrennten Phasen. In deiner ERSTEN Antwort machst du ausschließlich drei Rezeptvorschläge. Erstelle noch KEIN vollständiges Rezept und KEINE Datei, bis ich einen Vorschlag ausgewählt habe.
 
+$ingredientConstraint
 PHASE 1 – DREI VORSCHLÄGE:
 - Schlage genau drei deutlich unterschiedliche Gerichte vor, die zur Hauptauswahl, meinen ausgewählten Zutaten und meinen Vorlieben passen.
 - Berücksichtige in jedem Vorschlag alle ausdrücklich ausgewählten Zutaten, soweit kulinarisch sinnvoll, und verwende keine ausgeschlossenen Lebensmittel.

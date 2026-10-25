@@ -44,6 +44,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
   final Set<String> selectedFoodIds = <String>{};
   List<Food> foods = <Food>[];
   bool loadingFoods = true;
+  bool onlySelectedFoods = false;
   String? foodLoadError;
 
   @override
@@ -100,6 +101,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
           decisionRequestId: widget.decisionRequestId,
           selectForToday: widget.selectForToday,
           autoOpenPrompt: true,
+          onlySelectedFoods: onlySelectedFoods,
           planDate: widget.planDate,
         ),
       ),
@@ -161,6 +163,19 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                   ),
                 ),
               ),
+              if (widget.selectForToday) ...[
+                CheckboxListTile(
+                  key: const Key('cook-only-selected-foods'),
+                  value: onlySelectedFoods,
+                  onChanged: (value) => setState(() => onlySelectedFoods = value ?? false),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  activeColor: AppDesign.iconGold,
+                  title: const Text('Nur diese Lebensmittel verwenden'),
+                  subtitle: const Text('Gewürze und Kräuter sind zusätzlich erlaubt.'),
+                ),
+                const SizedBox(height: 4),
+              ],
               const SizedBox(height: 12),
               if (!widget.selectForToday)
                 _RecipeActionButton(
