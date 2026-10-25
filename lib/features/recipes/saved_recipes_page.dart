@@ -833,7 +833,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           menuPadding: const EdgeInsets.symmetric(vertical: 8),
           itemBuilder: (_) {
             final options = <(String, Widget)>[
-              ('Alle', const Icon(Icons.grid_view_rounded)),
+              ('Alle', const Icon(Icons.grid_view_rounded, color: AppDesign.iconGold)),
               ('Schwein', SvgPicture.asset(
                 'assets/icons/pig_head.svg',
                 width: 24,
@@ -852,8 +852,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                 height: 24,
                 color: AppDesign.iconGold,
               )),
-              ('Vegetarisch', const Icon(Icons.eco_rounded)),
-              ('Fisch', const Icon(Icons.set_meal_rounded)),
+              ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
+              ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
             ];
             final selected = mainIngredientFilter ?? 'Alle';
             return options.map((option) {
