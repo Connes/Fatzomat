@@ -16,8 +16,8 @@ void main() {
     expect(source, contains("('Schwein', SvgPicture.asset("));
     expect(source, contains("('Rind', SvgPicture.asset("));
     expect(source, contains("('Huhn', SvgPicture.asset("));
-    expect(source, contains("('Vegetarisch', Icons."));
-    expect(source, contains("('Fisch', Icons."));
+    expect(source, contains("('Vegetarisch', const Icon("));
+    expect(source, contains("('Fisch', const Icon("));
     expect(source, contains('mainIngredientFilter'));
     expect(source, contains('mainChoice: mainIngredientFilter'));
   });
