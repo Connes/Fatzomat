@@ -158,6 +158,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                         loadingFoods: loadingFoods,
                         loadError: foodLoadError,
                         onAddIngredients: _openAdditionalIngredients,
+                        showOnlySelectedFoods: widget.selectForToday,
                         onlySelectedFoods: onlySelectedFoods,
                         onOnlySelectedFoodsChanged: (value) => setState(() => onlySelectedFoods = value),
                       ),
@@ -208,6 +209,7 @@ class _MyChoiceCard extends StatelessWidget {
   final bool loadingFoods;
   final String? loadError;
   final VoidCallback onAddIngredients;
+  final bool showOnlySelectedFoods;
   final bool onlySelectedFoods;
   final ValueChanged<bool> onOnlySelectedFoodsChanged;
 
@@ -218,6 +220,7 @@ class _MyChoiceCard extends StatelessWidget {
     required this.loadingFoods,
     required this.loadError,
     required this.onAddIngredients,
+    required this.showOnlySelectedFoods,
     required this.onlySelectedFoods,
     required this.onOnlySelectedFoodsChanged,
   });
@@ -336,7 +339,7 @@ class _MyChoiceCard extends StatelessWidget {
             _AdditionalIngredientsAction(
               onTap: onAddIngredients,
             ),
-            if (true) ...[
+            if (showOnlySelectedFoods) ...[
               const SizedBox(height: 12),
               CheckboxListTile(
                 key: const Key('cook-only-selected-foods'),
