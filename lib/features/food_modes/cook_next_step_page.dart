@@ -342,26 +342,35 @@ class _MyChoiceCard extends StatelessWidget {
             ),
             if (showOnlySelectedFoods) ...[
               const Spacer(),
-              CheckboxListTile(
+              Row(
                 key: const Key('cook-only-selected-foods'),
-                value: onlySelectedFoods,
-                onChanged: (value) {
-                  if (value != null) onOnlySelectedFoodsChanged(value);
-                },
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                activeColor: AppDesign.iconGold,
-                dense: true,
-                visualDensity: VisualDensity.compact,
-                title: Text(
-                  'Nur diese Lebensmittel verwenden',
-                  maxLines: 1,
-                  softWrap: false,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
+                children: [
+                  Checkbox(
+                    value: onlySelectedFoods,
+                    onChanged: (value) {
+                      if (value != null) onOnlySelectedFoodsChanged(value);
+                    },
+                    activeColor: AppDesign.iconGold,
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => onOnlySelectedFoodsChanged(!onlySelectedFoods),
+                      child: Text(
+                        'Nur diese Lebensmittel verwenden',
+                        maxLines: 1,
+                        softWrap: false,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ],
