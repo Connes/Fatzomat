@@ -359,6 +359,36 @@ class PersonalTodayRepository {
     return maps.map(TodayPlan.fromMap).toList(growable: false);
   }
 
+  /// Returns today plus every future date with a planned personal recipe.
+  /// The shopping list must not impose a fixed three-day window: users can plan
+  /// meals arbitrarily far ahead, and their ingredients still need to be visible.
+  Future<List<DateTime>> plannedShoppingDates() async {
+    final today = _dateOnly(DateTime.now());
+    final userId = client.auth.currentUser?.id;
+    if (userId == null) return [today];
+
+    final rows = await client
+        .from('personal_today_plans')
+        .select('plan_date')
+        .eq('user_id', userId)
+        .eq('decision_type', 'recipe')
+        .eq('status', 'planned')
+        .gte('plan_date', today)
+        .order('plan_date', ascending: true);
+
+    final dates = <String, DateTime>{_dateOnly(today).toIso8601String(): today};
+    for (final row in rows) {
+      final rawDate = row['plan_date']?.toString();
+      if (rawDate == null || rawDate.isEmpty) continue;
+      final parsed = DateTime.tryParse(rawDate);
+      if (parsed == null) continue;
+      final date = _dateOnly(parsed);
+      dates[date.toIso8601String()] = date;
+    }
+    final result = dates.values.toList()..sort((a, b) => a.compareTo(b));
+    return result;
+  }
+
   /// Loads persisted items for multiple selected day plans without changing
   /// their IDs or checked state. Aggregation is deliberately a presentation
   /// concern, so each source row can still be checked independently.
