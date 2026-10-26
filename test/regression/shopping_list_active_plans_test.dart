@@ -14,6 +14,14 @@ void main() {
     expect(page, contains('selectedPlanIds.contains(item.planId)'));
   });
 
+  test('planned recipe dates remain visible even if shopping rows are missing', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('Keep a planned recipe date visible even if its shopping rows'));
+    expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
+    expect(page, contains('final days = await _repo.plannedShoppingDates();'));
+  });
+
   test('ingredient search is removed and shopping content uses opaque surfaces', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
