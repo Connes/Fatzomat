@@ -43,8 +43,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   RealtimeChannel? _channel;
 
   DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
-  List<DateTime> _makeDays(DateTime today) =>
-      List.generate(3, (i) => today.add(Duration(days: i)));
+  List<DateTime> _makeDays(DateTime today) => [today];
 
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   String _dayTitle(DateTime day) {
