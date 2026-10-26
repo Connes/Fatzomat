@@ -9,7 +9,7 @@ void main() {
     expect(page, contains('List<DateTime> get _activeDays'));
     expect(page, contains('if (activeDays.isEmpty)'));
     expect(page, contains('for (final day in activeDays)'));
-    expect(page, contains('_plans[i].where((plan) => plan.isRecipe).any('));
+    expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
     expect(page, contains('_items.any((item) => item.planId == plan.id)'));
     expect(page, contains('selectedPlanIds.contains(item.planId)'));
   });
