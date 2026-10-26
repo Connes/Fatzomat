@@ -9,9 +9,17 @@ void main() {
     expect(page, contains('List<DateTime> get _activeDays'));
     expect(page, contains('if (activeDays.isEmpty)'));
     expect(page, contains('for (final day in activeDays)'));
-    expect(page, contains('_plans[i].where((plan) => plan.isRecipe).any('));
+    expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
     expect(page, contains('_items.any((item) => item.planId == plan.id)'));
     expect(page, contains('selectedPlanIds.contains(item.planId)'));
+  });
+
+  test('planned recipe dates remain visible even if shopping rows are missing', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('Keep a planned recipe date visible even if its shopping rows'));
+    expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
+    expect(page, contains('final days = await _repo.plannedShoppingDates();'));
   });
 
   test('ingredient search is removed and shopping content uses opaque surfaces', () {
@@ -51,6 +59,20 @@ void main() {
     expect(page, contains('_isDayCompleted(day)'));
     expect(page, contains("const Text('Erledigt')"));
     expect(page, isNot(contains('_repo.deleteShoppingItem(item.id)')));
+  });
+
+  test('shopping list loads every planned recipe date instead of a fixed three-day window', () {
+    final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(repository, contains('Future<List<DateTime>> plannedShoppingDates()'));
+    expect(repository, contains(".eq('decision_type', 'recipe')"));
+    expect(repository, contains(".eq('status', 'planned')"));
+    expect(repository, contains(".gte('plan_date', today)"));
+    expect(page, contains('final days = await _repo.plannedShoppingDates();'));
+    expect(page, contains('_days = days;'));
+    expect(page, isNot(contains('List.generate(3')));
+    expect(page, isNot(contains('new three-day view')));
   });
 
   test('shopping list completion requires every aggregated ingredient to be checked', () {

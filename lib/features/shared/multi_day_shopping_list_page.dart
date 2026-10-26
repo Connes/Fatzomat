@@ -43,8 +43,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   RealtimeChannel? _channel;
 
   DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
-  List<DateTime> _makeDays(DateTime today) =>
-      List.generate(3, (i) => today.add(Duration(days: i)));
+  List<DateTime> _makeDays(DateTime today) => [today];
 
   String _key(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   String _dayTitle(DateTime day) {
@@ -54,10 +53,11 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   List<DateTime> get _activeDays => [
         for (var i = 0; i < _days.length; i++)
+          // Keep a planned recipe date visible even if its shopping rows are
+          // missing. Hiding the entire day made ingredient-sync failures look
+          // like no recipe had been selected at all.
           if (i < _plans.length &&
-              _plans[i].where((plan) => plan.isRecipe).any(
-                    (plan) => _items.any((item) => item.planId == plan.id),
-                  ) &&
+              _plans[i].any((plan) => plan.isRecipe) &&
               !_isDayCompleted(_days[i]))
             _days[i],
       ];
@@ -68,18 +68,20 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     final oldTodayKey = _key(_observedToday);
     final newTodayKey = _key(today);
     setState(() {
-      _days = _makeDays(today);
-      _plans = const [];
-      _items = const [];
-      _hasInitializedExpansion = false;
-      // Carry the default selection forward with the calendar. Preserve any
-      // explicitly selected future day that remains in the new three-day view.
-      final hadOnlyTodaySelected = _selected.length == 1 && _selected.contains(oldTodayKey);
-      _selected.removeWhere((key) => !_days.any((day) => _key(day) == key));
-      if (hadOnlyTodaySelected || _selected.isEmpty) _selected.add(newTodayKey);
-      _expanded.removeWhere((key) => !_days.any((day) => _key(day) == key));
-      if (_expanded.isEmpty) _expanded.add(newTodayKey);
       _observedToday = today;
+      _hasInitializedExpansion = false;
+      // Keep all planned future dates visible across midnight. load() refreshes
+      // the list from persisted plans instead of replacing it with a 3-day window.
+      if (_selected.length == 1 && _selected.contains(oldTodayKey)) {
+        _selected
+          ..clear()
+          ..add(newTodayKey);
+      }
+      if (_expanded.length == 1 && _expanded.contains(oldTodayKey)) {
+        _expanded
+          ..clear()
+          ..add(newTodayKey);
+      }
     });
     load();
   }
@@ -131,7 +133,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       setState(() { _loading = true; _error = null; });
     }
     try {
-      final loadedPlans = await Future.wait(_days.map(_repo.plannedPlansForDate));
+      final days = await _repo.plannedShoppingDates();
+      final loadedPlans = await Future.wait(days.map(_repo.plannedPlansForDate));
       // Accepted shared recipes belong exclusively to the shared shopping list.
       // Keep the personal plan and its ingredients in storage; only exclude them
       // from this private list's presentation and aggregation.
@@ -142,6 +145,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       final items = await _repo.shoppingItemsForPlans(ids);
       if (!mounted || generation != _generation) return;
       setState(() {
+        _days = days;
         _plans = plans;
         _items = items;
         final activeDays = _activeDays;
