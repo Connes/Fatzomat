@@ -127,8 +127,12 @@ void main() {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(repository, contains("throw const AuthenticationException('Bitte melde dich erneut an, um deine Einkaufsliste zu laden.');"));
-    expect(repository, isNot(contains('if (userId == null) return [today];')));
-    expect(repository, isNot(contains('if (userId == null) return const [];')));
+    final plannedDates = repository.substring(repository.indexOf('Future<List<DateTime>> plannedShoppingDates()'));
+    final plannedPlans = repository.substring(repository.indexOf('Future<List<TodayPlan>> plannedPlansForDate(DateTime date)'));
+    expect(plannedDates, contains('if (userId == null) {'));
+    expect(plannedPlans, contains('if (userId == null) {'));
+    expect(plannedDates, isNot(contains('return [today];')));
+    expect(plannedPlans, isNot(contains('return const [];')));
     expect(page, contains('_error is AuthenticationException'));
     expect(page, contains('normalizeAppException(_error!).message'));
     expect(page, contains("Text(\n                                'Noch keine Einkaufsliste'"));
