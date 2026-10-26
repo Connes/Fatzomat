@@ -201,3 +201,13 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - In `lib/features/recipes/additional_ingredients_page.dart` wurden die Emoji-Zuordnung und das Emoji-Feld aus den auswählbaren Lebensmittelzeilen entfernt. Der Lebensmittelname beginnt jetzt links im Zeileninhalt; Checkbox und Auswahlverhalten bleiben unverändert.
 - Regressionstest in `test/regression/additional_ingredients_test.dart` prüft, dass Emoji-Zeichen nicht gerendert werden und die Namensspalte links beginnt.
 - Änderung eingereicht über Branch `fix/ingredient-picker-no-emojis`; CI/Merge-Status nach PR-Erstellung prüfen. Keine Geräteprüfung durchgeführt.
+
+
+## Rezeptprompt: Internetfunde plus eigene Ideen (Arbeitsstand 2026-10-26)
+
+- `lib/features/recipes/together_chatgpt_prompt.dart`: Phase 1 ist auf bis zu drei echte Internetrezepte plus genau zwei klar gekennzeichnete eigene Ideen ausgerichtet. Vorgesehene Websites in Reihenfolge: einfachkochen.de, chefkoch.de, emmikochteinfach.de (Emmi kocht einfach), lecker.de und essen-und-trinken.de.
+- Prompt fordert Abbruch der Websuche nach spätestens 30 Sekunden, verbietet erfundene Quellen und jede inhaltliche Änderung an Originalrezepten und weist auf die Grenzen hin, wenn ein geschützter Originaltext nicht vollständig wiedergegeben werden darf.
+- Bei weniger als drei passenden Internetfunden werden keine Treffer erfunden; es erscheinen nur tatsächlich verifizierte Funde plus zwei eigene Ideen. Dadurch kann die Vorschlagsliste 2 bis 5 Einträge enthalten.
+- Das bestehende `together_recipe`-JSON-Schema Version 1 bleibt unverändert. Bei ausgewähltem Internetrezept darf eine JSON-Datei nicht fälschlich als unverändertes Original ausgegeben werden, wenn Quelle/Angaben nicht verlässlich übernommen werden können.
+- Wichtig: Ein Prompt kann die 30-Sekunden-Grenze nur anweisen, nicht technisch garantieren. Eine harte Grenze erfordert Kontrolle durch die tatsächlich verwendete Suchumgebung. Die App übergibt den Prompt weiterhin an eine externe ChatGPT-Sitzung; die Suchfunktion hängt von dieser Sitzung ab.
+- Geräteprüfung nicht durchgeführt. PR und CI-Status nach Einreichung prüfen.

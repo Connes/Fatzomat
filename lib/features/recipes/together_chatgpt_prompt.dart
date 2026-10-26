@@ -34,27 +34,36 @@ class TogetherChatGptPrompt {
 - Verwende ausschließlich die Hauptauswahl und die ausdrücklich ausgewählten Lebensmittel als Lebensmittelzutaten.
 - Füge keine weiteren Lebensmittel hinzu, auch dann nicht, wenn sie üblicherweise zum Gericht passen.
 - AUSNAHME: Gewürze und Kräuter dürfen zusätzlich verwendet werden, ebenso Wasser und notwendige Kochgrundlagen wie Salz und Pfeffer.
-- Diese Regel gilt für alle drei Vorschläge und das spätere vollständige Rezept. Wenn die Auswahl zu keinem sinnvollen Gericht passt, schlage nur Gerichte vor, die mit genau diesen Lebensmitteln machbar sind; verschweige keine zusätzlichen Lebensmittel in Saucen, Marinaden oder Beilagen.
+- Diese Regel gilt für alle Internet- und eigenen Vorschläge. Eigene Rezeptideen müssen sie erfüllen. Internetrezepte dürfen nicht verändert werden; wähle nur passende Originalrezepte aus. Wenn die Auswahl zu keinem sinnvollen Gericht passt, schlage nur Gerichte vor, die mit genau diesen Lebensmitteln machbar sind; verschweige keine zusätzlichen Lebensmittel in Saucen, Marinaden oder Beilagen.
 '''
         : '''ERGÄNZUNGEN ERLAUBT:
 - Du darfst neben der Hauptauswahl und den ausgewählten Zutaten weitere Lebensmittel integrieren, wenn sie kulinarisch sinnvoll sind und das Rezept verbessern.
 - Verwende keine ausgeschlossenen Lebensmittel und beachte alle übrigen Regeln.
 ''';
 
-    return '''Arbeite in zwei klar getrennten Phasen. In deiner ERSTEN Antwort machst du ausschließlich drei Rezeptvorschläge. Erstelle noch KEIN vollständiges Rezept und KEINE Datei, bis ich einen Vorschlag ausgewählt habe.
+    return '''Arbeite in zwei klar getrennten Phasen. In deiner ERSTEN Antwort machst du Rezeptvorschläge. Erstelle noch KEIN vollständiges Rezept und KEINE Datei, bis ich einen Vorschlag ausgewählt habe.
 
 $ingredientConstraint
-PHASE 1 – DREI VORSCHLÄGE:
-- Schlage genau drei deutlich unterschiedliche Gerichte vor, die zur Hauptauswahl, meinen ausgewählten Zutaten und meinen Vorlieben passen.
-- Berücksichtige in jedem Vorschlag alle ausdrücklich ausgewählten Zutaten, soweit kulinarisch sinnvoll, und verwende keine ausgeschlossenen Lebensmittel.
-- Gib pro Vorschlag einen kurzen Rezeptnamen mit höchstens 40 Zeichen, eine knappe Beschreibung, die wichtigsten Zutaten und eine ungefähre Zubereitungszeit an. Begrenze den Rezeptnamen auf maximal 40 Zeichen; kürze ihn bei Bedarf sinnvoll. Diese Grenze gilt sowohl für die drei Vorschläge als auch für recipe.title in der späteren JSON-Datei.
-- Nummeriere die Vorschläge exakt mit 1, 2 und 3.
+PHASE 1 – INTERNETREZEPTE UND EIGENE IDEEN:
+- Suche zuerst nach passenden Originalrezepten auf genau diesen Webseiten, in dieser Reihenfolge: einfachkochen.de, chefkoch.de, emmikochteinfach.de (Emmi kocht einfach), lecker.de und essen-und-trinken.de.
+- Die gesamte Internetrecherche darf höchstens 30 Sekunden dauern. Beende die Suche nach spätestens 30 Sekunden und suche danach nicht weiter. Diese Vorgabe ist eine Suchzeit-Grenze für dich; falls die verwendete ChatGPT-Suchfunktion keine echte Zeitbegrenzung unterstützt, kann dieser Prompt allein keine technisch garantierte Stoppuhr erzwingen.
+- Suche nur mit der verfügbaren Websuche. Behaupte nicht, eine Webseite geprüft zu haben, wenn du sie nicht tatsächlich aufgerufen oder verifiziert hast.
+- Finde höchstens drei passende Internetrezepte. Jeder Internetfund muss ein tatsächlich vorhandenes Rezept auf einer der genannten Webseiten sein, mit überprüfbarem Titel und direktem Link zur Originalseite. Erfinde niemals Quellen, Titel, Links oder angebliche Suchtreffer.
+- Lasse jedes gefundene Originalrezept unverändert: keine Zutaten hinzufügen, entfernen oder austauschen; keine Mengen, Reihenfolge, Temperaturen, Garzeiten oder Zubereitungsschritte ändern; keine Rezepte kombinieren. Die Originalseite bleibt die maßgebliche Quelle. Zeige für jeden Internetfund Titel, Website, direkten Link sowie eine knappe Einordnung. Gib geschützte Originaltexte nicht vollständig wortwörtlich wieder, wenn das urheberrechtlich nicht zulässig ist; verlinke stattdessen die Originalseite und erfinde oder verändere keine Rezeptangaben.
+- Wenn „Nur diese Lebensmittel verwenden“ aktiv ist, berücksichtige nur Internetrezepte, deren Zutaten die strikte Zutatenbeschränkung erfüllen. Verändere kein Originalrezept, um es passend zu machen. Wenn die Checkbox nicht aktiv ist, beachte weiterhin die Hauptauswahl, ausgewählten Zutaten und ausgeschlossenen Lebensmittel.
+- Stoppe die Suche nach spätestens 30 Sekunden, auch wenn du weniger als drei passende Internetrezepte gefunden hast. Ersetze fehlende Internetfunde nicht durch erfundene Internetrezepte.
+- Erstelle zusätzlich genau zwei eigenständige Rezeptideen, die du selbst entwickelst. Kennzeichne sie klar als „Eigene Rezeptidee von ChatGPT“ und gib sie niemals als Internetfund aus.
+- Zeige zuerst die tatsächlich gefundenen Internetrezepte (0 bis 3) und danach die zwei eigenen Ideen. Die Gesamtzahl ist daher 2 bis 5 Vorschläge: 3 Internetfunde + 2 eigene Ideen, wenn alle drei gefunden werden; andernfalls nur die tatsächlich gefundenen Internetrezepte plus zwei eigene Ideen.
+- Für jeden Vorschlag gib einen kurzen Rezeptnamen mit höchstens 40 Zeichen, eine knappe Beschreibung, die wichtigsten Zutaten und eine ungefähre Zubereitungszeit an. Begrenze jeden Rezeptnamen auf maximal 40 Zeichen; kürze ihn bei Bedarf sinnvoll. Diese Grenze gilt auch für recipe.title in der späteren JSON-Datei.
+- Nummeriere alle Vorschläge fortlaufend ab 1, ohne Lücken oder doppelte Nummern.
 - Frage am Ende kurz, welchen Vorschlag ich wählen möchte.
 - In dieser Phase keine JSON-Ausgabe, kein vollständiges Rezept, keine Datei und keine Bildgenerierung.
 
 PHASE 2 – NACH MEINER AUSWAHL:
-- Sobald ich 1, 2, 3 oder den Namen eines Vorschlags auswähle, erstelle nur für dieses Gericht das vollständige Rezept.
-- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann.
+- Sobald ich die Nummer oder den Namen eines Vorschlags auswähle, erstelle nur für dieses Gericht das vollständige Rezept.
+- Wenn ich ein Internetrezept auswähle, verwende ausschließlich die verifizierte Originalquelle. Verändere keine Zutaten, Mengen oder Rezeptschritte und passe das Rezept nicht an. Verlinke die Originalseite. Wenn die vollständige Übernahme der Originalanleitung urheberrechtlich nicht zulässig ist oder nicht verlässlich geprüft werden kann, erkläre diese Grenze klar und erfinde keine fehlenden Angaben. Erstelle in diesem Fall keine Datei, die fälschlich behauptet, das vollständige Original unverändert abzubilden.
+- Wenn ich eine eigene Rezeptidee auswähle, erstelle dafür das vollständige Rezept nach den Regeln und Zutatenbeschränkungen unten.
+- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann. Das bestehende JSON-Schema Version 1 darf nicht geändert oder um neue Pflichtfelder erweitert werden.
 - Stelle die JSON-Datei zum Download bereit. Falls Dateierstellung nicht verfügbar ist, gib das vollständige gültige JSON als Chat-Antwort aus.
 - Generiere in keiner Phase ein Bild und starte keine Bildgenerierung.
 
