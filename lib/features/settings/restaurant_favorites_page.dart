@@ -534,7 +534,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                                         menuPadding: const EdgeInsets.symmetric(vertical: 6),
                                         itemBuilder: (context) => const [
                                           PopupMenuItem(value: 'edit', height: 48, child: ListTile(
-                                            leading: Icon(Icons.edit_outlined, color: AppDesign.secondaryText),
+                                            leading: Icon(Icons.edit_outlined, color: AppDesign.iconGold),
                                             title: Text('Bearbeiten'),
                                             contentPadding: EdgeInsets.symmetric(horizontal: 8),
                                           )),
@@ -547,7 +547,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                                         ],
                                         child: const Padding(
                                           padding: EdgeInsets.all(8),
-                                          child: Icon(Icons.more_vert_rounded),
+                                          child: Icon(Icons.more_vert_rounded, color: AppDesign.iconGold),
                                         ),
                                       ),
                                 onTap: widget.selectForToday

@@ -218,3 +218,10 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - Beispiele im Prompt: deutsche Küche muss als `Deutsch`, griechische Küche als `Griechisch` ausgegeben werden.
 - `test/regression/chatgpt_restaurant_import_test.dart` prüft die verbindliche Regel und Beispiele.
 - Über PR [#329](https://github.com/Connes/Fatzomat/pull/329) gemergt; Merge-Commit `d5e91a5335106f915accd3da78388d220c20bbbe`. Beide PR-CI-Workflows für den Head `8a3c4466b43a55e51c32ca6b114b8f792de2cdbf` erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40301683627) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40301683661). Post-Merge-CI konnte über die verfügbare Abfrage noch nicht bestätigt werden; keine Geräteprüfung durchgeführt.
+
+## Lieblingsrestaurants: Menü-Icons in Gold (2026-10-26)
+
+- In `lib/features/settings/restaurant_favorites_page.dart` nutzen die drei Punkte auf jeder Restaurantkarte und ausschließlich das Bearbeiten-Icon im Popup-Menü `AppDesign.iconGold`.
+- Die Texte bleiben unverändert; insbesondere wird „Bearbeiten“ nicht gold eingefärbt. Das Löschen-Icon und der Löschtext behalten die Fehlerfarbe.
+- Regressionstest: `test/regression/restaurant_favorites_gold_menu_test.dart`.
+- Branch `ui/gold-restaurant-menu-icons`; PR/CI/Merge und Geräteprüfung stehen noch aus.
