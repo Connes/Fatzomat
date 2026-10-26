@@ -122,15 +122,16 @@ void main() {
     expect(result.singleWhere((item) => item.name == 'Kartoffeln').showQuantity, isTrue);
   });
 
-  test('single-recipe shopping list shows date and recipe name with a simple ingredients heading', () {
+  test('shopping list always uses expandable date selection and hides list when no day is selected', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
-    expect(page, contains('final isSingleRecipeShoppingList ='));
-    expect(page, contains('selectedDays.length == 1 && selectedRecipePlans.length == 1'));
-    expect(page, contains("_dayTitle(selectedDays.single)"));
-    expect(page, contains('selectedRecipePlans.single.displayTitle'));
+    expect(page, contains('for (final day in activeDays)'));
+    expect(page, contains('title: Text(\n                                  _dayTitle(day)'));
+    expect(page, contains('value: !_isDayCompleted(day) && _selected.contains(_key(day))'));
+    expect(page, contains('final shouldShowAggregatedList = selectedDays.isNotEmpty'));
+    expect(page, contains("'Keine Einkaufsliste ausgewählt. Wähle oben einen Tag aus"));
     expect(page, contains("'Zusammengefasste Zutaten'"));
-    expect(page, contains("isSingleRecipeShoppingList ? 'Zutaten' : category"));
+    expect(page, isNot(contains('isSingleRecipeShoppingList')));
   });
 
   test('multi-day shopping list distinguishes missing session from a truly empty list', () {
