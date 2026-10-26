@@ -14,6 +14,12 @@ void main() {
     }
     expect(source, contains('in der Nähe des folgenden Ausgangspunkts'));
     expect(source, contains('ausschließlich den offiziellen Namen des Restaurants'));
+    expect(source, contains('WICHTIG für das Feld restaurant.cuisine'));
+    expect(source, contains('Verwende ausschließlich die vom Nutzer vorgegebene Küchenbezeichnung'));
+    expect(source, contains('cuisine exakt „Deutsch“ lauten'));
+    expect(source, contains('exakt „Griechisch“'));
+    expect(source, contains('regional und saisonal'));
+    expect(source, contains('authentisch'));
     expect(source, contains('Der Ort gehört ausschließlich in das Feld address'));
     expect(source, contains('AUTOMATISCH in derselben Antwort'));
     expect(source, contains('herunterladbare Datei als ChatGPT-Dateianhang'));

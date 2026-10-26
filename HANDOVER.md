@@ -211,3 +211,10 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - Das bestehende `together_recipe`-JSON-Schema Version 1 bleibt unverändert. Bei ausgewähltem Internetrezept darf eine JSON-Datei nicht fälschlich als unverändertes Original ausgegeben werden, wenn Quelle/Angaben nicht verlässlich übernommen werden können.
 - Wichtig: Ein Prompt kann die 30-Sekunden-Grenze nur anweisen, nicht technisch garantieren. Eine harte Grenze erfordert Kontrolle durch die tatsächlich verwendete Suchumgebung. Die App übergibt den Prompt weiterhin an eine externe ChatGPT-Sitzung; die Suchfunktion hängt von dieser Sitzung ab.
 - Geräteprüfung nicht durchgeführt. PR und CI-Status nach Einreichung prüfen.
+
+## Restaurant-Suchprompt: Küchenbezeichnung strikt begrenzen (2026-10-26)
+
+- `lib/features/food_modes/chatgpt_restaurant_page.dart`: Der Prompt verlangt jetzt für `restaurant.cuisine` exakt die vom Nutzer angefragte Küchenbezeichnung. Zusätze und Werbetexte wie „gutbürgerlich“, „regional und saisonal“, „authentisch“ oder „mediterran“ sind ausdrücklich verboten.
+- Beispiele im Prompt: deutsche Küche muss als `Deutsch`, griechische Küche als `Griechisch` ausgegeben werden.
+- `test/regression/chatgpt_restaurant_import_test.dart` prüft die verbindliche Regel und Beispiele.
+- Branch: `fix/restaurant-cuisine-label-prompt`. PR/CI/Merge sind noch nicht verifiziert; keine Geräteprüfung durchgeführt.
