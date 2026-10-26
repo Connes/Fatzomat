@@ -225,3 +225,12 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - Die Texte bleiben unverändert; insbesondere wird „Bearbeiten“ nicht gold eingefärbt. Das Löschen-Icon und der Löschtext behalten die Fehlerfarbe.
 - Regressionstest: `test/regression/restaurant_favorites_gold_menu_test.dart`.
 - Über PR [#330](https://github.com/Connes/Fatzomat/pull/330) gemergt; Merge-Commit `3c6faf37e6f128881d8d88ce45e366fc33acb5ce`. Beide PR-CI-Workflows für den Head `b8bd0aebd4f54ccfb80aada565d15a08ebff3f91` erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40303638086) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40303638154). Post-Merge-CI über die verfügbare Abfrage noch nicht bestätigt; keine Geräteprüfung durchgeführt.
+
+## Einkaufsliste: alle geplanten Tage und fehlende Zutaten sichtbar machen (2026-10-26)
+
+- `PersonalTodayRepository.plannedShoppingDates()` liefert heute plus alle zukünftigen Datumswerte mit persönlichen Rezeptplänen im Status `planned`; die Einkaufsliste hängt nicht länger an einem Dreitagesfenster.
+- `MultiDayShoppingListPage` lädt Pläne für diese Datumswerte dynamisch. Beim Tageswechsel wird die Liste aktualisiert, ohne geplante Zukunftstage aus einer festen Dreitagesliste zu entfernen.
+- Fehlerquelle in der bisherigen Darstellung: `_activeDays` blendete einen Tag komplett aus, wenn zu einem gespeicherten Rezeptplan keine Einkaufszeilen vorhanden waren. Dadurch sah es so aus, als wäre das Rezept nicht übernommen worden. Solche geplanten Rezepttage bleiben jetzt sichtbar, sodass der fehlende Zutatenbestand nicht mehr stillschweigend den ganzen Tag versteckt.
+- Regressionstests ergänzt für unbegrenzte geplante Datumswerte und sichtbare Rezepttage ohne Einkaufszeilen.
+- Diese Änderung stellt die Anzeige aller geplanten Tage sicher. Sie beweist noch nicht, dass fehlende Zutatenzeilen in der Datenbank automatisch repariert werden; die konkrete Synchronisation beim Speichern/Import des Rezepts muss anhand von Live-Daten und Datenbanktriggern weiter geprüft werden.
+- Branch: `fix/shopping-list-all-planned-days`; PR/CI/Merge noch ausstehend. Keine Geräteprüfung durchgeführt.
