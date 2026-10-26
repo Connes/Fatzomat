@@ -234,3 +234,10 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - Regressionstests ergänzt für unbegrenzte geplante Datumswerte und sichtbare Rezepttage ohne Einkaufszeilen.
 - Diese Änderung stellt die Anzeige aller geplanten Tage sicher. Sie beweist noch nicht, dass fehlende Zutatenzeilen in der Datenbank automatisch repariert werden; die konkrete Synchronisation beim Speichern/Import des Rezepts muss anhand von Live-Daten und Datenbanktriggern weiter geprüft werden.
 - Über PR [#331](https://github.com/Connes/Fatzomat/pull/331) gemergt; Merge-Commit `ab80c19be1edaf21fbc41eeac578cae53ebec334`. Beide CI-Workflows erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40313211551) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40313211889). Keine Geräteprüfung durchgeführt.
+
+
+## Einkaufsliste: nach App-Rückkehr neu laden (2026-10-26)
+
+- `MultiDayShoppingListPage.didChangeAppLifecycleState()` lädt die gespeicherten Pläne und Einkaufsartikel beim Wechsel zurück in den Vordergrund erneut, auch wenn sich das Datum nicht geändert hat. Die Seite kann in der Tab-Navigation gemountet bleiben; ein App-Resume darf daher nicht allein auf den Tageswechsel oder Realtime-Ereignisse vertrauen.
+- Ziel ist, einen veralteten UI-Zustand nach Hintergrundbetrieb zu vermeiden. Das ist eine defensive Verbesserung, keine bestätigte Erklärung des zuvor beobachteten Fehlers; der Fehler war nicht reproduzierbar.
+- Änderung auf Branch `fix/shopping-list-refresh-resume`, PR/CI noch ausstehend. Keine Geräteprüfung durchgeführt.
