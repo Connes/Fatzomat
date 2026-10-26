@@ -53,10 +53,11 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   List<DateTime> get _activeDays => [
         for (var i = 0; i < _days.length; i++)
+          // Keep a planned recipe date visible even if its shopping rows are
+          // missing. Hiding the entire day made ingredient-sync failures look
+          // like no recipe had been selected at all.
           if (i < _plans.length &&
-              _plans[i].where((plan) => plan.isRecipe).any(
-                    (plan) => _items.any((item) => item.planId == plan.id),
-                  ) &&
+              _plans[i].any((plan) => plan.isRecipe) &&
               !_isDayCompleted(_days[i]))
             _days[i],
       ];
