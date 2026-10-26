@@ -256,3 +256,14 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - Der kontextabhängige Funktionsumfang bleibt getrennt: Bearbeiten, Teilen und Löschen bleiben ausschließlich in „Meine Rezepte“ verfügbar. Die Kochsuche bietet weiterhin nur „Für heute auswählen“ bzw. „Für diesen Tag auswählen“.
 - Regressionstest ergänzt in `test/regression/saved_recipes_today_selection_test.dart`, um Layout und Trennung der Aktionen abzusichern.
 - PR/CI und Gerätetest sind für diesen Arbeitsstand noch nicht verifiziert.
+
+## Einkaufsliste: Einzelrezept-Kopfzeile (Arbeitsstand 2026-10-26)
+
+- Branch `feat/single-recipe-shopping-list-heading`: Wenn genau ein Rezept für genau einen ausgewählten Tag in der persönlichen Einkaufsliste angezeigt wird, ersetzt das zentrierte Datum und der darunter zentrierte Rezeptname die Überschrift „Zusammengefasste Zutaten“.
+- Bei einer einzelnen Rezept-Einkaufsliste heißt die Zutatenkategorie „Zutaten“ statt „Weitere Zutaten“. Bei mehreren Rezepten bleibt die bisherige zusammengefasste Darstellung mit Kategorien erhalten.
+- Regressionstest in `test/regression/shopping_list_test.dart` ergänzt. PR/CI und Gerätetest noch ausstehend.
+
+
+### Anforderungsänderung: einheitliche Tageskarte (2026-10-26)
+
+Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einkaufsliste soll für einen oder mehrere Tage denselben Aufbau verwenden: immer eine ausklappbare Tageskarte mit Datum und Auswahl-Checkbox; beim Aufklappen stehen Rezeptname und Personenzahl. Nur ausgewählte Tage speisen die Zutatenliste. Ist kein Tag ausgewählt, wird statt der Zutaten der Hinweis „Keine Einkaufsliste ausgewählt …“ angezeigt. Die Überschrift „Zusammengefasste Zutaten“ und die bisherigen Kategorien bleiben einheitlich.

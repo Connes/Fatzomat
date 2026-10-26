@@ -389,7 +389,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     // The aggregate list is independent of the day ExpansionTiles. Hide it
     // when every selected day is completed and collapsed; reopening a completed
     // day header makes the saved ingredients visible again.
-    final shouldShowAggregatedList = selectedDays.isEmpty || selectedDays.any(
+    final shouldShowAggregatedList = selectedDays.isNotEmpty && selectedDays.any(
       (day) => !_isDayCompleted(day) || _expanded.contains(_key(day)),
     );
     final visibleItems = _items
@@ -515,9 +515,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                             ],
                           ),
                         ),
-                        if (activeDays.length > 1) const SizedBox(height: 10),
-                        if (activeDays.length > 1)
-                          for (final day in activeDays)
+                        const SizedBox(height: 10),
+                        for (final day in activeDays)
                             Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Card(
@@ -595,6 +594,19 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                               ),
                             ),
                           ),
+                        if (selectedDays.isEmpty)
+                          AppSurface(
+                            color: AppDesign.surface,
+                            bordered: false,
+                            padding: const EdgeInsets.all(20),
+                            child: Text(
+                              'Keine Einkaufsliste ausgewählt. Wähle oben einen Tag aus, um die Einkaufsliste anzuzeigen.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppDesign.secondaryText,
+                                  ),
+                            ),
+                          ),
                         if (shouldShowAggregatedList) ...[
                           const SizedBox(height: 6),
                           AppSurface(
@@ -609,11 +621,11 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 Text(
                                   'Zusammengefasste Zutaten',
                                   textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      color: AppDesign.text,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                              ),
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                        color: AppDesign.text,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
                               const SizedBox(height: 10),
                               if (aggregated.isNotEmpty) ...[
                                 Row(
