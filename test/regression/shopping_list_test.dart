@@ -73,8 +73,9 @@ void main() {
   test('multi-day shopping list polish and checked-row visibility delay', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
-    expect(page, contains('if (activeDays.length > 1) AppSurface('));
-    expect(page, contains('if (activeDays.length > 1)\n                          for (final day in activeDays)'));
+    expect(page, contains('AppSurface(\n                          color: AppDesign.surface'));
+    expect(page, contains('for (final day in activeDays)'));
+    expect(page, contains('title: Text(\n                                  _dayTitle(day)'));
     expect(page, contains("'Zusammengefasste Zutaten',\n                                  textAlign: TextAlign.center"));
     expect(page, contains("label: const Text('Einkaufsliste erledigen')"));
     expect(page, contains('_temporarilyVisibleChecked.contains(item.key)'));
