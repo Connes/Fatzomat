@@ -363,7 +363,8 @@ class PersonalTodayRepository {
   /// The shopping list must not impose a fixed three-day window: users can plan
   /// meals arbitrarily far ahead, and their ingredients still need to be visible.
   Future<List<DateTime>> plannedShoppingDates() async {
-    final today = _dateOnly(DateTime.now());
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final userId = client.auth.currentUser?.id;
     if (userId == null) return [today];
 
@@ -373,17 +374,17 @@ class PersonalTodayRepository {
         .eq('user_id', userId)
         .eq('decision_type', 'recipe')
         .eq('status', 'planned')
-        .gte('plan_date', today)
+        .gte('plan_date', _dateOnly(today))
         .order('plan_date', ascending: true);
 
-    final dates = <String, DateTime>{_dateOnly(today).toIso8601String(): today};
+    final dates = <String, DateTime>{_dateOnly(today): today};
     for (final row in rows) {
       final rawDate = row['plan_date']?.toString();
       if (rawDate == null || rawDate.isEmpty) continue;
       final parsed = DateTime.tryParse(rawDate);
       if (parsed == null) continue;
-      final date = _dateOnly(parsed);
-      dates[date.toIso8601String()] = date;
+      final date = DateTime(parsed.year, parsed.month, parsed.day);
+      dates[_dateOnly(date)] = date;
     }
     final result = dates.values.toList()..sort((a, b) => a.compareTo(b));
     return result;
