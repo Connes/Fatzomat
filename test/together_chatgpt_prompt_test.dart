@@ -71,10 +71,15 @@ void main() {
     );
 
     expect(prompt, contains('DATEINAME: together_recipe.json'));
-    expect(prompt, contains('PHASE 1 – DREI VORSCHLÄGE'));
-    expect(prompt, contains('genau drei deutlich unterschiedliche Gerichte'));
+    expect(prompt, contains('PHASE 1 – INTERNETREZEPTE UND EIGENE IDEEN'));
+    expect(prompt, contains('höchstens 30 Sekunden dauern'));
+    expect(prompt, contains('einfachkochen.de, chefkoch.de, emmikochteinfach.de (Emmi kocht einfach), lecker.de und essen-und-trinken.de'));
+    expect(prompt, contains('genau zwei eigenständige Rezeptideen'));
+    expect(prompt, contains('keine Zutaten hinzufügen, entfernen oder austauschen'));
+    expect(prompt, contains('2 bis 5 Vorschläge'));
     expect(prompt, contains('PHASE 2 – NACH MEINER AUSWAHL'));
     expect(prompt, contains('keine JSON-Ausgabe, kein vollständiges Rezept, keine Datei'));
+    expect(prompt, contains('Das bestehende JSON-Schema Version 1 darf nicht geändert'));
     expect(prompt, contains('Erst nach meiner Auswahl'));
     expect(prompt, contains('Erst nach meiner Auswahl: Erzeuge „together_recipe.json“'));
     expect(prompt, contains('recipe.title'));
