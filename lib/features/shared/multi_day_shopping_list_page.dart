@@ -88,7 +88,14 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _checkDayBoundary();
+    if (state == AppLifecycleState.resumed) {
+      _checkDayBoundary();
+      // This page can remain mounted while the app is backgrounded. Realtime
+      // events are not a reliable substitute for a refresh after resume, so
+      // reload persisted plans and shopping items even when the calendar day
+      // did not change.
+      load(showLoading: false);
+    }
   }
 
   @override
