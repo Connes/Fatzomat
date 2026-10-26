@@ -122,6 +122,17 @@ void main() {
     expect(result.singleWhere((item) => item.name == 'Kartoffeln').showQuantity, isTrue);
   });
 
+  test('single-recipe shopping list shows date and recipe name with a simple ingredients heading', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('final isSingleRecipeShoppingList ='));
+    expect(page, contains('selectedDays.length == 1 && selectedRecipePlans.length == 1'));
+    expect(page, contains("_dayTitle(selectedDays.single)"));
+    expect(page, contains('selectedRecipePlans.single.displayTitle'));
+    expect(page, contains("'Zusammengefasste Zutaten'"));
+    expect(page, contains("isSingleRecipeShoppingList ? 'Zutaten' : category"));
+  });
+
   test('multi-day shopping list distinguishes missing session from a truly empty list', () {
     final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
