@@ -249,3 +249,10 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 - `MultiDayShoppingListPage` zeigt bei fehlender Sitzung eine passende Anmeldeaufforderung. Andere Abruffehler zeigen die normalisierte Fehlerursache und behalten die Schaltfläche „Erneut versuchen“. Die Meldung „Noch keine Einkaufsliste“ bleibt dem erfolgreich geladenen leeren Zustand vorbehalten.
 - Regressionstest ergänzt, der die Trennung zwischen fehlender Sitzung, Abruffehler und echtem Leerzustand absichert.
 - Änderung auf Branch `fix/shopping-list-empty-vs-error`; PR/CI noch ausstehend. Geräteprüfung nicht durchgeführt.
+
+## Rezeptkarten im Kochablauf (Arbeitsstand 2026-10-26)
+
+- Branch `fix/cook-filtered-recipe-card-layout`: Die gefilterte Rezeptliste unter „Wir kochen“ → „Aus meinen Rezepten suchen“ verwendet jetzt die Kartenanordnung der regulären Rezeptbibliothek: Bild und Name nebeneinander, Auswahlaktion darunter, gleiche Innenabstände und zweizeilige Namensbegrenzung.
+- Der kontextabhängige Funktionsumfang bleibt getrennt: Bearbeiten, Teilen und Löschen bleiben ausschließlich in „Meine Rezepte“ verfügbar. Die Kochsuche bietet weiterhin nur „Für heute auswählen“ bzw. „Für diesen Tag auswählen“.
+- Regressionstest ergänzt in `test/regression/saved_recipes_today_selection_test.dart`, um Layout und Trennung der Aktionen abzusichern.
+- PR/CI und Gerätetest sind für diesen Arbeitsstand noch nicht verifiziert.

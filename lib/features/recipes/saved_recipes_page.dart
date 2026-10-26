@@ -763,36 +763,49 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   if (mounted) load();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-                  child: Row(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 12, 8),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _RecipeCardImage(
-                        imageUrl: recipe.imageUrl,
-                        imagePath: recipe.imagePath,
-                      ),
-                      const SizedBox(width: 14),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(recipe.name, style: Theme.of(context).textTheme.titleMedium),
-                            const SizedBox(height: 12),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextButton.icon(
-                                key: Key('cook-search-select-recipe-${recipe.id}'),
-                                onPressed: () => selectRecipeForToday(recipe),
-                                icon: const Icon(Icons.event_available_rounded, size: 18),
-                                label: Text(
-                                  widget.planDate == null || _isSelectedDateToday
-                                      ? 'Für heute auswählen'
-                                      : 'Für diesen Tag auswählen',
+                            _RecipeCardImage(
+                              imageUrl: recipe.imageUrl,
+                              imagePath: recipe.imagePath,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  recipe.name.length > 40
+                                      ? '${recipe.name.substring(0, 40).trimRight()}…'
+                                      : recipe.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.titleMedium,
                                 ),
                               ),
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            key: Key('cook-search-select-recipe-${recipe.id}'),
+                            onPressed: () => selectRecipeForToday(recipe),
+                            icon: const Icon(Icons.event_available_rounded, size: 18),
+                            label: Text(
+                              widget.planDate == null || _isSelectedDateToday
+                                  ? 'Für heute auswählen'
+                                  : 'Für diesen Tag auswählen',
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
