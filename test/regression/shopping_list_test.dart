@@ -131,8 +131,8 @@ void main() {
     final plannedPlans = repository.substring(repository.indexOf('Future<List<TodayPlan>> plannedPlansForDate(DateTime date)'));
     expect(plannedDates, contains('if (userId == null) {'));
     expect(plannedPlans, contains('if (userId == null) {'));
-    expect(plannedDates, isNot(contains('return [today];')));
-    expect(plannedPlans, isNot(contains('return const [];')));
+    expect(plannedDates, contains('throw const AuthenticationException'));
+    expect(plannedPlans, contains('throw const AuthenticationException'));
     expect(page, contains('_error is AuthenticationException'));
     expect(page, contains('normalizeAppException(_error!).message'));
     expect(page, contains("Text(\n                                'Noch keine Einkaufsliste'"));
