@@ -240,4 +240,12 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 
 - `MultiDayShoppingListPage.didChangeAppLifecycleState()` lädt die gespeicherten Pläne und Einkaufsartikel beim Wechsel zurück in den Vordergrund erneut, auch wenn sich das Datum nicht geändert hat. Die Seite kann in der Tab-Navigation gemountet bleiben; ein App-Resume darf daher nicht allein auf den Tageswechsel oder Realtime-Ereignisse vertrauen.
 - Ziel ist, einen veralteten UI-Zustand nach Hintergrundbetrieb zu vermeiden. Das ist eine defensive Verbesserung, keine bestätigte Erklärung des zuvor beobachteten Fehlers; der Fehler war nicht reproduzierbar.
-- Änderung auf Branch `fix/shopping-list-refresh-resume`, PR/CI noch ausstehend. Keine Geräteprüfung durchgeführt.
+- Über PR [#332](https://github.com/Connes/Fatzomat/pull/332) gemergt; Merge-Commit `1ad48e585e27f081ce1ed013350783667102cb7d`. Beide PR-CI-Workflows auf dem Head waren erfolgreich: `Quality Gate` und `Flutter quality gate`. Post-Merge-CI und Geräteprüfung separat verifizieren.
+
+
+## Einkaufsliste: leerer Zustand vs. fehlgeschlagener Abruf (2026-10-26)
+
+- `PersonalTodayRepository.plannedShoppingDates()` und `plannedPlansForDate()` werfen jetzt `AuthenticationException`, wenn keine angemeldete Sitzung vorhanden ist, statt eine leere Datums-/Planliste zurückzugeben. Eine abgelaufene Sitzung kann dadurch nicht mehr wie eine wirklich leere Einkaufsliste aussehen.
+- `MultiDayShoppingListPage` zeigt bei fehlender Sitzung eine passende Anmeldeaufforderung. Andere Abruffehler zeigen die normalisierte Fehlerursache und behalten die Schaltfläche „Erneut versuchen“. Die Meldung „Noch keine Einkaufsliste“ bleibt dem erfolgreich geladenen leeren Zustand vorbehalten.
+- Regressionstest ergänzt, der die Trennung zwischen fehlender Sitzung, Abruffehler und echtem Leerzustand absichert.
+- Änderung auf Branch `fix/shopping-list-empty-vs-error`; PR/CI noch ausstehend. Geräteprüfung nicht durchgeführt.

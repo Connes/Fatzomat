@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/app_exception.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/app_design.dart';
@@ -417,7 +418,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Einkaufsliste konnte nicht geladen werden.'),
+                        Text(
+                          _error is AuthenticationException
+                              ? 'Bitte melde dich erneut an, um deine Einkaufsliste zu laden.'
+                              : 'Einkaufsliste konnte nicht geladen werden: ${normalizeAppException(_error!).message}',
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 12),
                         FilledButton(
                           onPressed: load,

@@ -122,4 +122,20 @@ void main() {
     expect(result.singleWhere((item) => item.name == 'Kartoffeln').showQuantity, isTrue);
   });
 
+  test('multi-day shopping list distinguishes missing session from a truly empty list', () {
+    final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(repository, contains("throw const AuthenticationException('Bitte melde dich erneut an, um deine Einkaufsliste zu laden.');"));
+    final plannedDates = repository.substring(repository.indexOf('Future<List<DateTime>> plannedShoppingDates()'));
+    final plannedPlans = repository.substring(repository.indexOf('Future<List<TodayPlan>> plannedPlansForDate(DateTime date)'));
+    expect(plannedDates, contains('if (userId == null) {'));
+    expect(plannedPlans, contains('if (userId == null) {'));
+    expect(plannedDates, contains('throw const AuthenticationException'));
+    expect(plannedPlans, contains('throw const AuthenticationException'));
+    expect(page, contains('_error is AuthenticationException'));
+    expect(page, contains('normalizeAppException(_error!).message'));
+    expect(page, contains("Text(\n                                'Noch keine Einkaufsliste'"));
+  });
+
 }
