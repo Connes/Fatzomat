@@ -333,7 +333,9 @@ class PersonalTodayRepository {
   /// decisions for a date and shopping must include every planned recipe.
   Future<List<TodayPlan>> plannedPlansForDate(DateTime date) async {
     final userId = client.auth.currentUser?.id;
-    if (userId == null) return const [];
+    if (userId == null) {
+      throw const AuthenticationException('Bitte melde dich erneut an, um deine Einkaufsliste zu laden.');
+    }
     final rows = await client
         .from('personal_today_plans')
         .select('id,recipe_id,decision_type,decision_value,plan_date,status,servings,shopping_list_completed_at,created_at,recipes(name,description,servings,image_url,image_path)')
@@ -366,7 +368,9 @@ class PersonalTodayRepository {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final userId = client.auth.currentUser?.id;
-    if (userId == null) return [today];
+    if (userId == null) {
+      throw const AuthenticationException('Bitte melde dich erneut an, um deine Einkaufsliste zu laden.');
+    }
 
     final rows = await client
         .from('personal_today_plans')
