@@ -382,10 +382,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     final selectedDays = activeDays
         .where((day) => _selected.contains(_key(day)) && !_isDayCompleted(day))
         .toList(growable: false);
-    final selectedPlanIds = <String>{
+    final selectedRecipePlans = <TodayPlan>[
       for (final day in selectedDays)
-        ..._plansFor(day).where((plan) => plan.isRecipe).map((plan) => plan.id),
-    };
+        ..._plansFor(day).where((plan) => plan.isRecipe),
+    ];
+    final isSingleRecipeShoppingList =
+        selectedDays.length == 1 && selectedRecipePlans.length == 1;
+    final selectedPlanIds = selectedRecipePlans.map((plan) => plan.id).toSet();
     // The aggregate list is independent of the day ExpansionTiles. Hide it
     // when every selected day is completed and collapsed; reopening a completed
     // day header makes the saved ingredients visible again.
@@ -606,14 +609,37 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Zusammengefasste Zutaten',
-                                  textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      color: AppDesign.text,
-                                      fontWeight: FontWeight.w700,
+                                if (isSingleRecipeShoppingList) ...[
+                                  Center(
+                                    child: Text(
+                                      _dayTitle(selectedDays.single),
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: AppDesign.text,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                     ),
-                              ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Center(
+                                    child: Text(
+                                      selectedRecipePlans.single.displayTitle,
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            color: AppDesign.text,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ),
+                                ] else
+                                  Text(
+                                    'Zusammengefasste Zutaten',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          color: AppDesign.text,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
                               const SizedBox(height: 10),
                               if (aggregated.isNotEmpty) ...[
                                 Row(
@@ -724,7 +750,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                   Padding(
                                     padding: const EdgeInsets.only(top: 14, bottom: 4),
                                     child: Text(
-                                      category,
+                                      isSingleRecipeShoppingList ? 'Zutaten' : category,
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                             color: AppDesign.text,
                                             fontWeight: FontWeight.w700,
