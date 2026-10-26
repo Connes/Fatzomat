@@ -53,6 +53,20 @@ void main() {
     expect(page, isNot(contains('_repo.deleteShoppingItem(item.id)')));
   });
 
+  test('shopping list loads every planned recipe date instead of a fixed three-day window', () {
+    final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(repository, contains('Future<List<DateTime>> plannedShoppingDates()'));
+    expect(repository, contains(".eq('decision_type', 'recipe')"));
+    expect(repository, contains(".eq('status', 'planned')"));
+    expect(repository, contains(".gte('plan_date', today)"));
+    expect(page, contains('final days = await _repo.plannedShoppingDates();'));
+    expect(page, contains('_days = days;'));
+    expect(page, isNot(contains('List.generate(3')));
+    expect(page, isNot(contains('new three-day view')));
+  });
+
   test('shopping list completion requires every aggregated ingredient to be checked', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
