@@ -455,7 +455,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: _saveAsFavorite,
-                  icon: const Icon(Icons.favorite_border_rounded, color: AppDesign.gold),
+                  icon: const Icon(Icons.favorite_border_rounded, color: AppDesign.iconGold),
                   label: const Text('Als Lieblingsrestaurant speichern'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppDesign.text,
