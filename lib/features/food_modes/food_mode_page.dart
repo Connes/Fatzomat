@@ -158,16 +158,19 @@ class _FoodModePageState extends State<FoodModePage> {
     }
   }
 
-  Widget _choiceGrid(List<_ModeOption> options) {
+  Widget _choiceGrid(
+    List<_ModeOption> options, {
+    double childAspectRatio = 0.78,
+  }) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
-        childAspectRatio: 0.78,
+        childAspectRatio: childAspectRatio,
       ),
       itemCount: options.length,
       itemBuilder: (context, index) {
@@ -243,31 +246,48 @@ class _FoodModePageState extends State<FoodModePage> {
         }),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (widget.mode == FoodMode.dineOut) ...[
-                Card(
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFFFF4D6),
-                      child: Icon(
-                        Icons.favorite_rounded,
-                        color: Color(0xFFD4AF37),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Cooking has exactly five choices. Keep all three grid rows on
+            // screen and reserve a little room for system insets and spacing.
+            final compactCookingGrid = widget.mode == FoodMode.cook;
+            final cardHeight = compactCookingGrid
+                ? ((constraints.maxHeight - 32) / 3.4)
+                    .clamp(105.0, 165.0)
+                    .toDouble()
+                : 0.0;
+            final cardWidth = (constraints.maxWidth - 32 - 10) / 2;
+            final aspectRatio = compactCookingGrid
+                ? cardWidth / cardHeight
+                : 0.78;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.mode == FoodMode.dineOut) ...[
+                    Card(
+                      child: ListTile(
+                        leading: const CircleAvatar(
+                          backgroundColor: Color(0xFFFFF4D6),
+                          child: Icon(
+                            Icons.favorite_rounded,
+                            color: Color(0xFFD4AF37),
+                          ),
+                        ),
+                        title: const Text('Meine Lieblingsrestaurants'),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        onTap: () => _openRestaurantFavorites(context),
                       ),
                     ),
-                    title: const Text('Meine Lieblingsrestaurants'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _openRestaurantFavorites(context),
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-              _choiceGrid(options),
-            ],
-          ),
+                    const SizedBox(height: 10),
+                  ],
+                  _choiceGrid(options, childAspectRatio: aspectRatio),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -309,7 +329,8 @@ class _OptionCard extends StatelessWidget {
 
       return Image.asset(
         assetPath,
-        fit: BoxFit.cover,
+        // Show the complete food photo instead of cropping its edges.
+        fit: mode == FoodMode.cook ? BoxFit.contain : BoxFit.cover,
         alignment: Alignment.center,
         filterQuality: FilterQuality.high,
         excludeFromSemantics: true,
