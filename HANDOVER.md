@@ -274,3 +274,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Wenn ein gespeichertes Rezept aus dem Kochablauf über „Aus meinen Rezepten suchen“ geöffnet wird, zeigt die Rezeptdetailseite weiterhin die zentrierte Überschrift „Rezept“, aber keine Verwaltungsaktionen für Export, Bild, Bearbeiten oder Löschen.
 - Die Verwaltungsaktionen bleiben in der normalen Rezeptbibliothek „Meine Rezepte“ verfügbar. Die Unterscheidung erfolgt über `showManagementActions`, getrennt von `viewingTodaySelection`, damit bestehende Kochschritt-Funktionen nicht unbeabsichtigt verändert werden.
 - Regressionstest in `test/regression/recipe_detail_compact_test.dart` ergänzt. PR/CI und Gerätetest stehen noch aus.
+
+
+## Internetrezepte aus ChatGPT zuverlässig importieren (2026-10-28)
+
+- Ursache des beobachteten Verhaltens: Der Prompt in `lib/features/recipes/together_chatgpt_prompt.dart` verlangte einerseits ein unverändertes Originalrezept, untersagte zugleich aber eine vollständige Übernahme und wies ChatGPT ausdrücklich an, in diesem Fall keine `together_recipe.json` zu erstellen. Das war widersprüchlich und führte zu der Ablehnung im Screenshot.
+- Prompt angepasst: ChatGPT soll die Originalseite tatsächlich öffnen und Zutaten/Mengen prüfen, die Zubereitung in eigenen Worten formulieren, die Quelle mit vollständiger URL in der Beschreibung erhalten und danach eine gültige `together_recipe.json` erzeugen.
+- Wenn die Seite technisch nicht erreichbar oder wichtige Angaben nicht sichtbar sind, soll ChatGPT offen nach dem Rezepttext oder Screenshots fragen, statt zu raten oder pauschal abzulehnen.
+- Regressionstests in `test/together_chatgpt_prompt_test.dart` prüfen diese Regeln.
+- Wichtig: Der Prompt kann keine Browser-/Webzugriffsrechte erzwingen. Die tatsächliche Extraktion hängt davon ab, ob die verwendete ChatGPT-Sitzung Websuche/Browsing nutzen kann und die Quellseite erreichbar ist. CI und Gerätetest stehen noch aus.
