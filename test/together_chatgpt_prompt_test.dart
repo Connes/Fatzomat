@@ -77,7 +77,10 @@ void main() {
     expect(prompt, contains('genau zwei eigenständige Rezeptideen'));
     expect(prompt, contains('Öffne den direkten Rezeptlink und lies die Rezeptseite tatsächlich aus'));
     expect(prompt, contains('formuliere die Zubereitungsschritte in eigenen Worten'));
-    expect(prompt, contains('Quelle: <vollständige URL>'));
+    expect(prompt, contains('recipe.source_url'));
+    expect(prompt, contains('recipe.description ist ausschließlich eine kurze, natürliche Beschreibung'));
+    expect(prompt, contains('amount: null, unit: "", is_qualitative: true'));
+    expect(prompt, contains('kennzeichne eine Umrechnung nicht in der Beschreibung'));
     expect(prompt, contains('Verweigere die Datei nicht allein deshalb, weil die ursprüngliche Quelle ein Internetrezept ist'));
     expect(prompt, contains('Führe einen begrenzten Fallback aus'));
     expect(prompt, contains('suche nach dem exakten Rezepttitel in der Websuche'));
