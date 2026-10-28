@@ -91,7 +91,7 @@ void main() {
 
     final expectedInteractiveCards = labels.length + (mode == FoodMode.dineOut ? 1 : 0);
     expect(find.byType(InkWell), findsNWidgets(expectedInteractiveCards));
-    expect(_fullBleedSelectionImageFinder(), findsNWidgets(imageLabels.length));
+    expect(_selectionImageFinder(), findsNWidgets(imageLabels.length));
     expect(find.byType(Scrollable), findsNWidgets(2));
 
     for (final label in imageLabels) {
