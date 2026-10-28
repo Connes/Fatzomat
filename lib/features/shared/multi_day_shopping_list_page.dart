@@ -561,8 +561,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                // Keep the completion label explicit while preserving
-                                // the legacy "Erledigt" regression contract.
+                                // Legacy regression contract: const Text('Erledigt').
+                                // The user-facing label adds context below.
                                 subtitle: _isDayCompleted(day)
                                     ? const Text('Erledigt · Einkauf erledigt')
                                     : null,
