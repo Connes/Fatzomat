@@ -158,7 +158,7 @@ class _CookNextStepPageState extends State<CookNextStepPage> {
                         loadingFoods: loadingFoods,
                         loadError: foodLoadError,
                         onAddIngredients: _openAdditionalIngredients,
-                        showOnlySelectedFoods: widget.selectForToday,
+                        showOnlySelectedFoods: true,
                         onlySelectedFoods: onlySelectedFoods,
                         onOnlySelectedFoodsChanged: (value) => setState(() => onlySelectedFoods = value),
                       ),
