@@ -78,7 +78,7 @@ void main() {
     expect(prompt, contains('Öffne den direkten Rezeptlink und lies die Rezeptseite tatsächlich aus'));
     expect(prompt, contains('formuliere die Zubereitungsschritte in eigenen Worten'));
     expect(prompt, contains('Quelle: <vollständige URL>'));
-    expect(prompt, contains('Verweigere die Datei nicht allein deshalb, weil die Quelle ein Internetrezept ist'));
+    expect(prompt, contains('Verweigere die Datei nicht allein deshalb, weil die ursprüngliche Quelle ein Internetrezept ist'));
     expect(prompt, contains('Führe einen begrenzten Fallback aus'));
     expect(prompt, contains('suche nach dem exakten Rezepttitel in der Websuche'));
     expect(prompt, contains('eine andere zugängliche Seite dasselbe Rezept'));
