@@ -283,3 +283,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Wenn die Seite technisch nicht erreichbar oder wichtige Angaben nicht sichtbar sind, soll ChatGPT offen nach dem Rezepttext oder Screenshots fragen, statt zu raten oder pauschal abzulehnen.
 - Regressionstests in `test/together_chatgpt_prompt_test.dart` prüfen diese Regeln.
 - Wichtig: Der Prompt kann keine Browser-/Webzugriffsrechte erzwingen. Die tatsächliche Extraktion hängt davon ab, ob die verwendete ChatGPT-Sitzung Websuche/Browsing nutzen kann und die Quellseite erreichbar ist. CI und Gerätetest stehen noch aus.
+
+
+## Fallback für nicht erreichbare Rezept-Webseiten (2026-10-28)
+
+- Folgeanalyse des Chefkoch-Screenshots: Die bisherige Prompt-Korrektur forderte zwar, die Originalseite erneut zu öffnen, gab aber keinen konkreten Wiederherstellungsweg vor, wenn Chefkoch den Zugriff blockiert. Dadurch blieb ChatGPT beim Fehler stehen und bat sofort um manuelle Screenshots.
+- Prompt jetzt mit begrenztem Fallback: exakten Rezepttitel suchen, eine alternative zugängliche Quelle mit Zutaten/Mengen prüfen und die tatsächlich verwendete URL angeben. Die blockierte Originalseite darf nicht als gelesen dargestellt werden.
+- Wenn Angaben nicht ausreichend verifizierbar sind, soll ChatGPT nur gezielt fehlende Angaben anfordern, statt Mengen zu erfinden oder Vollständigkeit vorzutäuschen.
+- Regressionstests prüfen die Fallback-Anweisungen.
+- Technische Grenze bleibt: Der App-Prompt selbst kann keinen Webzugriff bereitstellen und eine Webseite nicht aus der App heraus entsperren. Der Fallback verbessert das Verhalten nur, wenn ChatGPT-Websuche eine andere zugängliche Quelle findet. CI und echter ChatGPT-Gerätetest stehen noch aus.
