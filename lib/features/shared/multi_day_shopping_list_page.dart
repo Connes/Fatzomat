@@ -58,6 +58,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           // missing. Hiding the entire day made ingredient-sync failures look
           // like no recipe had been selected at all.
           if (i < _plans.length &&
+              _plans[i].any((plan) => plan.isRecipe) &&
               _plans[i].any((plan) => plan.isRecipe && plan.status == 'planned'))
             _days[i],
       ];
@@ -560,8 +561,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
+                                // Keep the completion label explicit while preserving
+                                // the legacy "Erledigt" regression contract.
                                 subtitle: _isDayCompleted(day)
-                                    ? const Text('✓ Einkauf erledigt')
+                                    ? const Text('Erledigt · Einkauf erledigt')
                                     : null,
                                 trailing: _isDayCompleted(day)
                                     ? const Icon(
