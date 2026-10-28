@@ -25,6 +25,7 @@ class RecipeDetailPage extends StatefulWidget {
   final VoidCallback? onNavigateToShoppingList;
   final bool canMarkCooked;
   final bool viewingTodaySelection;
+  final bool showManagementActions;
   final DateTime? planDate;
   const RecipeDetailPage({
     super.key,
@@ -34,6 +35,7 @@ class RecipeDetailPage extends StatefulWidget {
     this.onNavigateToShoppingList,
     this.canMarkCooked = false,
     this.viewingTodaySelection = false,
+    this.showManagementActions = true,
     this.planDate,
   });
   @override State<RecipeDetailPage> createState() => _RecipeDetailPageState();
@@ -317,7 +319,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         title: const Text('Rezept'),
         backgroundColor: const Color(0xF7FFFBF7),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        actions: widget.viewingTodaySelection ? null : [
+        actions: !widget.showManagementActions ? null : [
           IconButton(
             tooltip: 'Rezeptdatei speichern',
             onPressed: working ? null : exportRecipe,
