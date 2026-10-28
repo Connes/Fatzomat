@@ -748,6 +748,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                     MaterialPageRoute(
                       builder: (_) => RecipeDetailPage(
                         recipeId: recipe.id!,
+                        showManagementActions: widget.mainChoice == null,
                         planDate: widget.planDate,
                         onTodayPlanChanged: load,
                         onNavigateToToday: widget.onNavigateToToday ??
@@ -1008,6 +1009,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                 MaterialPageRoute(
                                   builder: (_) => RecipeDetailPage(
                                     recipeId: recipe.id!,
+                        showManagementActions: widget.mainChoice == null,
                                     planDate: widget.planDate,
                                     onTodayPlanChanged: load,
                                     onNavigateToToday: widget.onNavigateToToday ??

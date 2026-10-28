@@ -267,3 +267,10 @@ Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5
 ### Anforderungsänderung: einheitliche Tageskarte (2026-10-26)
 
 Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einkaufsliste soll für einen oder mehrere Tage denselben Aufbau verwenden: immer eine ausklappbare Tageskarte mit Datum und Auswahl-Checkbox; beim Aufklappen stehen Rezeptname und Personenzahl. Nur ausgewählte Tage speisen die Zutatenliste. Ist kein Tag ausgewählt, wird statt der Zutaten der Hinweis „Keine Einkaufsliste ausgewählt …“ angezeigt. Die Überschrift „Zusammengefasste Zutaten“ und die bisherigen Kategorien bleiben einheitlich.
+
+
+## Rezeptdetail aus „Wir kochen“ schreibgeschützt (2026-10-28)
+
+- Wenn ein gespeichertes Rezept aus dem Kochablauf über „Aus meinen Rezepten suchen“ geöffnet wird, zeigt die Rezeptdetailseite weiterhin die zentrierte Überschrift „Rezept“, aber keine Verwaltungsaktionen für Export, Bild, Bearbeiten oder Löschen.
+- Die Verwaltungsaktionen bleiben in der normalen Rezeptbibliothek „Meine Rezepte“ verfügbar. Die Unterscheidung erfolgt über `showManagementActions`, getrennt von `viewingTodaySelection`, damit bestehende Kochschritt-Funktionen nicht unbeabsichtigt verändert werden.
+- Regressionstest in `test/regression/recipe_detail_compact_test.dart` ergänzt. PR/CI und Gerätetest stehen noch aus.
