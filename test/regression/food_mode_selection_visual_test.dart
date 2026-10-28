@@ -14,9 +14,11 @@ Finder _assetImageFinder(String assetName) => find.byWidgetPredicate(
           (widget.image as AssetImage).assetName == assetName,
     );
 
-Finder _fullBleedSelectionImageFinder() => find.byWidgetPredicate(
+Finder _selectionImageFinder() => find.byWidgetPredicate(
       (widget) {
-        if (widget is! Image || widget.fit != BoxFit.cover || widget.image is! AssetImage) {
+        if (widget is! Image ||
+            (widget.fit != BoxFit.cover && widget.fit != BoxFit.contain) ||
+            widget.image is! AssetImage) {
           return false;
         }
         final asset = (widget.image as AssetImage).assetName;
