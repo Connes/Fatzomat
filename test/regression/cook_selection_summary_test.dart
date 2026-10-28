@@ -13,6 +13,17 @@ import '../test_shared_preferences.dart';
 void main() {
   initTestSharedPreferences();
 
+  testWidgets('Checkbox erscheint auch bei ChatGPT-Erstellung', (tester) async {
+    await tester.pumpWidget(MaterialApp(home: CookNextStepPage(
+      mainChoice: 'Rind',
+      selectForToday: false,
+      repository: _FakeFoodRepository(),
+    )));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('cook-only-selected-foods')), findsOneWidget);
+    expect(find.text('Nur diese Lebensmittel verwenden'), findsOneWidget);
+  });
+
   testWidgets('V94 zeigt die Hauptauswahl in Meine Wahl ohne redundante Überschrift', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
