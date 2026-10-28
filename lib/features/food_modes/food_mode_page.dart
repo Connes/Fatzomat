@@ -257,9 +257,9 @@ class _FoodModePageState extends State<FoodModePage> {
                     .toDouble()
                 : 0.0;
             final cardWidth = (constraints.maxWidth - 32 - 10) / 2;
-            final aspectRatio = compactCookingGrid
-                ? cardWidth / cardHeight
-                : 0.78;
+            // Use the same card dimensions for cooking and dine-out categories.
+            // Dine-out can scroll, but its cards should match the cooking cards.
+            final aspectRatio = cardWidth / cardHeight;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -330,7 +330,9 @@ class _OptionCard extends StatelessWidget {
       return Image.asset(
         assetPath,
         // Show the complete food photo instead of cropping its edges.
-        fit: mode == FoodMode.cook ? BoxFit.contain : BoxFit.cover,
+        fit: mode == FoodMode.cook || mode == FoodMode.dineOut
+            ? BoxFit.contain
+            : BoxFit.cover,
         alignment: Alignment.center,
         filterQuality: FilterQuality.high,
         excludeFromSemantics: true,
