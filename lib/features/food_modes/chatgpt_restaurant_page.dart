@@ -401,15 +401,23 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
             padding: const EdgeInsets.all(18),
             color: AppDesign.surface.withValues(alpha: .97),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text('Restaurant-JSON importieren', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              FilledButton.icon(
-                onPressed: _importing ? null : _pickJson,
+              Center(
+                child: Text(
+                  _restaurant == null ? 'Restaurant importieren' : 'Import',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              if (_restaurant == null) ...[
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  onPressed: _importing ? null : _pickJson,
                 icon: _importing
                     ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.file_upload_outlined),
-                label: const Text('JSON-Datei auswählen'),
-              ),
+                  label: const Text('JSON-Datei auswählen'),
+                ),
+              ],
               if (_error != null) ...[
                 const SizedBox(height: 10),
                 Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
@@ -447,8 +455,11 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: _saveAsFavorite,
-                  icon: const Icon(Icons.favorite_border_rounded),
-                  label: const Text('In Restaurantfavoriten speichern'),
+                  icon: const Icon(Icons.favorite_border_rounded, color: AppDesign.gold),
+                  label: const Text('Als Lieblingsrestaurant speichern'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppDesign.text,
+                  ),
                 ),
               ],
             ]),
