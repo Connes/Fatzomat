@@ -79,6 +79,9 @@ void main() {
     expect(prompt, contains('formuliere die Zubereitungsschritte in eigenen Worten'));
     expect(prompt, contains('recipe.source_url'));
     expect(prompt, contains('recipe.description ist ausschließlich eine kurze, natürliche Beschreibung'));
+    expect(prompt, contains('Quell-URL ausschließlich in recipe.source_url'));
+    expect(prompt, isNot(contains('Quell-URL am Ende von recipe.description')));
+    expect(prompt, isNot(contains('Füge die vollständige Quell-URL am Ende von recipe.description')));
     expect(prompt, contains('amount: null, unit: "", is_qualitative: true'));
     expect(prompt, contains('kennzeichne eine Umrechnung nicht in der Beschreibung'));
     expect(prompt, contains('Verweigere die Datei nicht allein deshalb, weil die ursprüngliche Quelle ein Internetrezept ist'));
