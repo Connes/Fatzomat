@@ -75,7 +75,12 @@ void main() {
     expect(prompt, contains('höchstens 30 Sekunden dauern'));
     expect(prompt, contains('einfachkochen.de, chefkoch.de, emmikochteinfach.de (Emmi kocht einfach), lecker.de und essen-und-trinken.de'));
     expect(prompt, contains('genau zwei eigenständige Rezeptideen'));
-    expect(prompt, contains('keine Zutaten hinzufügen, entfernen oder austauschen'));
+    expect(prompt, contains('Öffne den direkten Rezeptlink und lies die Rezeptseite tatsächlich aus'));
+    expect(prompt, contains('formuliere die Zubereitungsschritte in eigenen Worten'));
+    expect(prompt, contains('Quelle: <vollständige URL>'));
+    expect(prompt, contains('Verweigere die Datei nicht allein deshalb, weil die Quelle ein Internetrezept ist'));
+    expect(prompt, contains('Bitte mich stattdessen, den Rezepttext oder Screenshots'));
+    expect(prompt, isNot(contains('Erstelle in diesem Fall keine Datei, die fälschlich behauptet')));
     expect(prompt, contains('2 bis 5 Vorschläge'));
     expect(prompt, contains('PHASE 2 – NACH MEINER AUSWAHL'));
     expect(prompt, contains('keine JSON-Ausgabe, kein vollständiges Rezept, keine Datei'));
