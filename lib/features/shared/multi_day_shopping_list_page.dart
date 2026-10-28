@@ -58,8 +58,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
           // missing. Hiding the entire day made ingredient-sync failures look
           // like no recipe had been selected at all.
           if (i < _plans.length &&
-              _plans[i].any((plan) => plan.isRecipe) &&
-              !_isDayCompleted(_days[i]))
+              _plans[i].any((plan) => plan.isRecipe && plan.status == 'planned'))
             _days[i],
       ];
 
@@ -520,12 +519,19 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                             Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Card(
-                              color: AppDesign.surface,
+                              color: _isDayCompleted(day)
+                                  ? AppDesign.surfaceMuted
+                                  : AppDesign.surface,
                               surfaceTintColor: Colors.transparent,
                               child: ExpansionTile(
                                 key: PageStorageKey(_key(day)),
-                                initiallyExpanded: _expanded.contains(_key(day)),
+                                initiallyExpanded: !_isDayCompleted(day) &&
+                                    _expanded.contains(_key(day)),
                                 onExpansionChanged: (open) => setState(() {
+                                  if (_isDayCompleted(day)) {
+                                    _expanded.remove(_key(day));
+                                    return;
+                                  }
                                   if (open) {
                                     _expanded.add(_key(day));
                                   } else {
@@ -547,16 +553,26 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 ),
                                 title: Text(
                                   _dayTitle(day),
-                                  style: const TextStyle(
-                                    color: AppDesign.text,
+                                  style: TextStyle(
+                                    color: _isDayCompleted(day)
+                                        ? AppDesign.secondaryText
+                                        : AppDesign.text,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 subtitle: _isDayCompleted(day)
-                                    ? const Text('Erledigt')
+                                    ? const Text('✓ Einkauf erledigt')
                                     : null,
-                                children: _plansFor(day)
-                                    .where((plan) => plan.isRecipe)
+                                trailing: _isDayCompleted(day)
+                                    ? const Icon(
+                                        Icons.check_circle_rounded,
+                                        color: AppDesign.secondaryText,
+                                      )
+                                    : null,
+                                children: _isDayCompleted(day)
+                                    ? const <Widget>[]
+                                    : _plansFor(day)
+                                    .where((plan) => plan.isRecipe && plan.status == 'planned')
                                     .map((plan) => ListTile(
                                           leading: const Icon(
                                             Icons.restaurant_menu_rounded,
