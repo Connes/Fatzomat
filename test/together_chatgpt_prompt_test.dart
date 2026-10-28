@@ -79,7 +79,11 @@ void main() {
     expect(prompt, contains('formuliere die Zubereitungsschritte in eigenen Worten'));
     expect(prompt, contains('Quelle: <vollständige URL>'));
     expect(prompt, contains('Verweigere die Datei nicht allein deshalb, weil die Quelle ein Internetrezept ist'));
-    expect(prompt, contains('Bitte mich stattdessen, den Rezepttext oder Screenshots'));
+    expect(prompt, contains('Führe einen begrenzten Fallback aus'));
+    expect(prompt, contains('suche nach dem exakten Rezepttitel in der Websuche'));
+    expect(prompt, contains('eine andere zugängliche Seite dasselbe Rezept'));
+    expect(prompt, contains('Behaupte niemals, die blockierte Originalseite selbst gelesen zu haben'));
+    expect(prompt, contains('bitte mich gezielt um Screenshots/Text der fehlenden Zutatenliste oder Zubereitung'));
     expect(prompt, isNot(contains('Erstelle in diesem Fall keine Datei, die fälschlich behauptet')));
     expect(prompt, contains('2 bis 5 Vorschläge'));
     expect(prompt, contains('PHASE 2 – NACH MEINER AUSWAHL'));
