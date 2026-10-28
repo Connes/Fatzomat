@@ -6,6 +6,10 @@ void main() {
   test('Rezeptansicht zeigt Zutaten und Zubereitung kompakt und schaltet Schritte nur der Reihe nach', () {
     final source = File('lib/features/recipes/recipe_detail_page.dart').readAsStringSync();
 
+    expect(source, contains('final bool showManagementActions;'));
+    expect(source, contains('actions: !widget.showManagementActions ? null : ['));
+    final savedRecipes = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+    expect(savedRecipes, contains('showManagementActions: widget.mainChoice == null,'));
     expect(source, contains('bool ingredientsExpanded = false;'));
     expect(source, contains('bool preparationExpanded = false;'));
     expect(source, contains(r"MetaPill(icon: Icons.people_alt_outlined, label: '$servings Personen')"));
