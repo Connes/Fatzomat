@@ -250,12 +250,9 @@ class _FoodModePageState extends State<FoodModePage> {
           builder: (context, constraints) {
             // Cooking has exactly five choices. Keep all three grid rows on
             // screen and reserve a little room for system insets and spacing.
-            final compactCookingGrid = widget.mode == FoodMode.cook;
-            final cardHeight = compactCookingGrid
-                ? ((constraints.maxHeight - 32) / 3.4)
-                    .clamp(105.0, 165.0)
-                    .toDouble()
-                : 0.0;
+            final cardHeight = ((constraints.maxHeight - 32) / 3.4)
+                .clamp(105.0, 165.0)
+                .toDouble();
             final cardWidth = (constraints.maxWidth - 32 - 10) / 2;
             // Use the same card dimensions for cooking and dine-out categories.
             // Dine-out can scroll, but its cards should match the cooking cards.
