@@ -117,8 +117,7 @@ class RestaurantFavoritesRepository {
 
     final rows = await client
         .from('restaurant_favorites')
-        .select('name,address')
-        ;
+        .select('name,address');
     final existing = (rows as List)
         .whereType<Map>()
         .map((row) => _identity(Map<String, dynamic>.from(row)))
