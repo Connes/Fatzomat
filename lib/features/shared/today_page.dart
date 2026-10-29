@@ -931,7 +931,17 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     if (raw == null || raw.isEmpty) return null;
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      if (decoded is! Map) return null;
+      final payload = Map<String, dynamic>.from(decoded);
+      // Some dine-out decisions are stored in an import envelope with the
+      // actual restaurant nested under "restaurant". Unwrap it just like
+      // TodayPlan.restaurantData does, so the receiving card gets the same
+      // name and cuisine as the sender's card.
+      final nestedRestaurant = payload['restaurant'];
+      if (nestedRestaurant is Map) {
+        return Map<String, dynamic>.from(nestedRestaurant);
+      }
+      return payload;
     } catch (_) {
       // Older shares may store only the restaurant name.
     }
@@ -944,11 +954,22 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     if (name != null && name.isNotEmpty) return name;
     final raw = share.decisionValue?.trim();
     if (raw != null && raw.isNotEmpty && !raw.startsWith('{')) return raw;
+    final sharedTitle = share.decisionName?.trim();
+    if (sharedTitle != null && sharedTitle.isNotEmpty) {
+      final separator = sharedTitle.indexOf('·');
+      if (separator >= 0 && separator + 1 < sharedTitle.length) {
+        final titleName = sharedTitle.substring(separator + 1).trim();
+        if (titleName.isNotEmpty) return titleName;
+      }
+    }
     return null;
   }
 
   String? get _cuisine {
-    final cuisine = _restaurantData?['cuisine']?.toString().trim();
+    final data = _restaurantData;
+    final cuisine = (data?['cuisine'] ?? data?['category'] ?? data?['cuisine_type'])
+        ?.toString()
+        .trim();
     return cuisine == null || cuisine.isEmpty ? null : cuisine;
   }
 
