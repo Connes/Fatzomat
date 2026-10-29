@@ -1681,6 +1681,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
   List<ShoppingItem> items = [];
   int _shoppingLoadGeneration = 0;
   bool loading = true;
+  bool _showOnlyOpen = true;
   Object? loadError;
   RealtimeChannel? channel;
   @override
