@@ -65,8 +65,9 @@ revoke all on table public.restaurant_favorites from public, anon, authenticated
 grant select, insert, update, delete on table public.restaurant_favorites to authenticated;
 
 
--- Notify the other member of the current user's connection whenever a shared
--- restaurant is changed or deleted. app_notifications inserts trigger push delivery.
+-- Restaurant edits should stay silent; only deletions notify the connected person.
+drop trigger if exists restaurant_favorites_notify_update on public.restaurant_favorites;
+
 create or replace function public.notify_connection_restaurant_change()
 returns trigger
 language plpgsql
@@ -77,10 +78,9 @@ declare
   actor uuid := auth.uid();
   recipient uuid;
   actor_name text;
-  action_label text;
   restaurant_name text;
 begin
-  if actor is null then
+  if tg_op <> 'DELETE' or actor is null then
     return coalesce(new, old);
   end if;
 
@@ -93,37 +93,26 @@ begin
   limit 1;
 
   if recipient is null then
-    return coalesce(new, old);
+    return old;
   end if;
 
   select nullif(btrim(display_name), '') into actor_name
   from public.profiles where id = actor;
 
-  if tg_op = 'DELETE' then
-    action_label := 'gelöscht';
-    restaurant_name := old.name;
-  else
-    action_label := 'bearbeitet';
-    restaurant_name := new.name;
-  end if;
+  restaurant_name := old.name;
 
   insert into public.app_notifications(user_id, type, title, body)
   values (
     recipient,
-    'restaurant_favorite_changed',
-    'Lieblingsrestaurant ' || action_label,
+    'restaurant_favorite_deleted',
+    'Lieblingsrestaurant gelöscht',
     coalesce(actor_name, 'Deine verbundene Person') || ' hat das Restaurant „' ||
-      coalesce(restaurant_name, 'Unbekannt') || '“ ' || action_label || '.'
+      coalesce(restaurant_name, 'Unbekannt') || '“ gelöscht.'
   );
 
-  return coalesce(new, old);
+  return old;
 end;
 $$;
-
-drop trigger if exists restaurant_favorites_notify_update on public.restaurant_favorites;
-create trigger restaurant_favorites_notify_update
-after update on public.restaurant_favorites
-for each row execute function public.notify_connection_restaurant_change();
 
 drop trigger if exists restaurant_favorites_notify_delete on public.restaurant_favorites;
 create trigger restaurant_favorites_notify_delete
