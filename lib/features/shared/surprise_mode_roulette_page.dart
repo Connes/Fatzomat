@@ -145,16 +145,13 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
     _winnerPulse.stop();
     _winnerPulse.reset();
     // Start the gold rain with the winner's entrance, not after the pulse.
-    _celebration.forward(from: 0);
-    _winnerEntrance.forward(from: 0).whenCompleteOrCancel(() async {
-      if (!mounted || !_finished) return;
-      _winnerPulse.repeat(reverse: true);
-      await Future<void>.delayed(const Duration(milliseconds: 2400));
-      if (!mounted || !_finished) return;
-      _winnerPulse.stop();
-      await Future<void>.delayed(const Duration(milliseconds: 2400));
+    _celebration.forward(from: 0).whenCompleteOrCancel(() {
       if (!mounted || !_finished) return;
       setState(() => _showActions = true);
+    });
+    _winnerEntrance.forward(from: 0).whenCompleteOrCancel(() {
+      if (!mounted || !_finished) return;
+      _winnerPulse.repeat(reverse: true);
     });
   }
 
