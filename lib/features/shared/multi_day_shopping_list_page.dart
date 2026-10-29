@@ -161,12 +161,14 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       };
       final sharedPlanIds = <String>{};
       try {
-        final connection = await _collaboration.connectionInfo();
-        if (connection?.isConnected == true) {
-          final sharedPlans = await _collaboration.sharedRecipePlans(
-            fromDate: _dateOnly(DateTime.now()),
-          );
-          for (final shared in sharedPlans) {
+        // Do not gate shared-plan loading on the separate connection-info
+        // request. If that request is stale or temporarily fails, the shared
+        // recipe and its shopping rows still exist and must remain visible.
+        // Supabase RLS on shared_recipe_plans is the authoritative access check.
+        final sharedPlans = await _collaboration.sharedRecipePlans(
+          fromDate: _dateOnly(DateTime.now()),
+        );
+        for (final shared in sharedPlans) {
             final sharedDate = DateTime.tryParse(shared['plan_date']?.toString() ?? '');
             if (sharedDate == null) continue;
             final dateOnly = _dateOnly(sharedDate);
@@ -207,10 +209,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                 servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
               );
             }
-          }
         }
-      } catch (_) {
-        // A connection lookup must not prevent the personal list from loading.
+      } catch (error, stackTrace) {
+        // Keep the personal list usable, but make the shared-load failure
+        // visible in debug logs instead of silently disguising it as no items.
+        debugPrint('Shared shopping list load failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
       }
       final sortedKeys = dayByKey.keys.toList()..sort();
       final days = sortedKeys.map((key) => dayByKey[key]!).toList(growable: true);
