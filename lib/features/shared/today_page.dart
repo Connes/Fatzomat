@@ -1364,6 +1364,12 @@ class _TodayResultCard extends StatelessWidget {
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+          side: plan.isShared
+              ? const BorderSide(color: Color(0xFFD4B342), width: 1.2)
+              : BorderSide.none,
+        ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             width >= 700 ? 28 : 18,
@@ -1376,6 +1382,7 @@ class _TodayResultCard extends StatelessWidget {
               _TodayDecisionCardHeader(
                 modeLabel: modeLabel,
                 image: image,
+                isShared: plan.isShared,
               ),
               Expanded(
                 child: _TodayDecisionCardContent(
@@ -1402,10 +1409,12 @@ class _TodayResultCard extends StatelessWidget {
 class _TodayDecisionCardHeader extends StatelessWidget {
   final String modeLabel;
   final Widget image;
+  final bool isShared;
 
   const _TodayDecisionCardHeader({
     required this.modeLabel,
     required this.image,
+    required this.isShared,
   });
 
   @override
@@ -1415,21 +1424,43 @@ class _TodayDecisionCardHeader extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-              Text(
-                modeLabel,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppDesign.secondaryText,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.3,
+          SizedBox(
+            height: 28,
+            width: double.infinity,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Text(
+                  modeLabel,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: AppDesign.secondaryText,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.3,
+                      ),
+                ),
+                if (isShared)
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 4),
+                      child: Icon(
+                        Icons.people_alt_rounded,
+                        color: Color(0xFFD4B342),
+                        size: 22,
+                        semanticLabel: 'Gemeinsame Tagesentscheidung',
+                      ),
                     ),
-              ),
-              const SizedBox(height: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: image,
-              ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: image,
+          ),
         ],
       ),
     );
