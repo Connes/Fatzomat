@@ -29,9 +29,8 @@ void main() {
     expect(source, contains('widget.recipeName'));
     expect(source, isNot(contains('Rezeptmengen werden bei einer Änderung der Personenzahl automatisch aktualisiert.')));
     expect(source, isNot(contains('widget.recipeName,\n                          style: theme.textTheme.headlineSmall')));
-    expect(entry, contains('ShoppingPage('));
-    expect(entry, contains('shared: false'));
-    expect(entry, contains("personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal"));
+    expect(entry, contains('MultiDayShoppingListPage'));
+    expect(entry, isNot(contains('ShoppingPage(')));
     expect(source, contains('controller.dispose();'));
     expect(source, isNot(contains('controller.removeListener(_syncController)')));
   });
@@ -62,7 +61,7 @@ void main() {
     final todayPlan = File('lib/data/models/today_plan.dart').readAsStringSync();
     final migration = File('supabase/migrations/20261008190000_recipe_only_personal_shopping.sql').readAsStringSync();
 
-    expect(entry, contains("personal?.status == 'cooked' || personal?.isRecipe != true ? null : personal"));
+    expect(entry, contains('MultiDayShoppingListPage'));
     expect(todayPlan, contains("bool get isRecipe => decisionType == 'recipe' && recipeId != null;"));
     expect(migration, contains("p.decision_type = 'recipe'"));
     expect(migration, contains("p.recipe_id is not null"));
