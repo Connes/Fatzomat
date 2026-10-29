@@ -144,51 +144,60 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       setState(() { _loading = true; _error = null; });
     }
     try {
-      final days = await _repo.plannedShoppingDates();
-      final loadedPlans = await Future.wait(days.map(_repo.plannedPlansForDate));
-      // Personal plans remain in their normal date groups. Accepted shares are
-      // represented by the shared plan row instead, so they appear once and
-      // can be marked with the gold connection icon.
-      final plans = loadedPlans
-          .map((day) => day.where((plan) => !plan.isSharedAccepted).toList(growable: true))
-          .toList(growable: true);
+      final personalDays = await _repo.plannedShoppingDates();
+      final loadedPlans = await Future.wait(personalDays.map(_repo.plannedPlansForDate));
+      // Keep personal plans in their normal date groups and represent accepted
+      // shares through their shared plan, so each shared recipe appears once.
+      final groupedPlans = <String, List<TodayPlan>>{
+        for (var i = 0; i < personalDays.length; i++)
+          _key(personalDays[i]): loadedPlans[i]
+              .where((plan) => !plan.isSharedAccepted)
+              .toList(growable: true),
+      };
+      final dayByKey = <String, DateTime>{
+        for (final day in personalDays) _key(day): _dateOnly(day),
+      };
       final sharedPlanIds = <String>{};
       try {
         final connection = await _collaboration.connectionInfo();
         if (connection?.isConnected == true) {
-          final shared = await _collaboration.currentSharedRecipePlan();
-          if (shared != null) {
+          final sharedPlans = await _collaboration.sharedRecipePlans(
+            fromDate: _dateOnly(DateTime.now()),
+          );
+          for (final shared in sharedPlans) {
             final sharedDate = DateTime.tryParse(shared['plan_date']?.toString() ?? '');
-            if (sharedDate != null) {
-              final dateOnly = _dateOnly(sharedDate);
-              var dayIndex = days.indexWhere((day) => _key(day) == _key(dateOnly));
-              if (dayIndex < 0) {
-                days.add(dateOnly);
-                plans.add(<TodayPlan>[]);
-                dayIndex = days.length - 1;
-              }
-              final recipe = shared['recipes'] is Map
-                  ? Map<String, dynamic>.from(shared['recipes'] as Map)
-                  : <String, dynamic>{};
-              final sharedPlan = TodayPlan(
-                id: shared['id'].toString(),
-                recipeId: shared['recipe_id']?.toString(),
-                status: shared['status']?.toString() ?? 'planned',
-                servings: (shared['servings'] as num?)?.toInt() ?? 2,
-                name: recipe['name']?.toString() ?? 'Gemeinsames Rezept',
-                description: recipe['description']?.toString(),
-                imageUrl: recipe['image_url']?.toString(),
-                imagePath: recipe['image_path']?.toString(),
-                isShared: true,
-              );
-              plans[dayIndex].add(sharedPlan);
-              sharedPlanIds.add(sharedPlan.id);
+            if (sharedDate == null) continue;
+            final dateOnly = _dateOnly(sharedDate);
+            final key = _key(dateOnly);
+            dayByKey.putIfAbsent(key, () => dateOnly);
+            final dayPlans = groupedPlans.putIfAbsent(key, () => <TodayPlan>[]);
+            final recipe = shared['recipes'] is Map
+                ? Map<String, dynamic>.from(shared['recipes'] as Map)
+                : <String, dynamic>{};
+            final id = shared['id']?.toString();
+            if (id == null || id.isEmpty || dayPlans.any((plan) => plan.id == id)) continue;
+            dayPlans.add(TodayPlan(
+              id: id,
+              recipeId: shared['recipe_id']?.toString(),
+              status: shared['status']?.toString() ?? 'planned',
+              servings: (shared['servings'] as num?)?.toInt() ?? 2,
+              name: recipe['name']?.toString() ?? 'Gemeinsames Rezept',
+              description: recipe['description']?.toString(),
+              imageUrl: recipe['image_url']?.toString(),
+              imagePath: recipe['image_path']?.toString(),
+              isShared: true,
+            ));
+            if ((shared['status']?.toString() ?? 'planned') == 'planned') {
+              sharedPlanIds.add(id);
             }
           }
         }
       } catch (_) {
         // A connection lookup must not prevent the personal list from loading.
       }
+      final sortedKeys = dayByKey.keys.toList()..sort();
+      final days = sortedKeys.map((key) => dayByKey[key]!).toList(growable: true);
+      final plans = sortedKeys.map((key) => groupedPlans[key] ?? <TodayPlan>[]).toList(growable: true);
       final ids = plans.expand((day) => day).where((p) => p.isRecipe).map((p) => p.id).toSet();
       final personalItems = await _repo.shoppingItemsForPlans(
         ids.difference(sharedPlanIds),
