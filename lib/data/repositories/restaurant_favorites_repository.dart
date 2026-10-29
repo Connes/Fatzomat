@@ -30,8 +30,7 @@ class RestaurantFavoritesRepository {
         .toList(growable: false);
   }
 
-  bool canManage(Map<String, dynamic> restaurant) =>
-      restaurant['user_id']?.toString() == _userId;
+  bool canManage(Map<String, dynamic> restaurant) => true;
 
   Future<bool> contains(Map<String, dynamic> restaurant) async {
     final key = _identity(restaurant);
@@ -67,17 +66,27 @@ class RestaurantFavoritesRepository {
     }
   }
 
+  Future<void> update(Map<String, dynamic> original, Map<String, dynamic> edited) async {
+    final id = original['id']?.toString();
+    final name = edited['name']?.toString().trim() ?? '';
+    if (id == null || id.isEmpty || name.isEmpty) {
+      throw ArgumentError('Restaurant-ID und Name sind erforderlich.');
+    }
+    await client.from('restaurant_favorites').update({
+      'name': name,
+      'cuisine': _nullable(edited['cuisine']),
+      'address': _nullable(edited['address']),
+      'phone': _nullable(edited['phone']),
+      'website': _nullable(edited['website']),
+      'opening_hours': _nullable(edited['opening_hours']),
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('id', id);
+  }
+
   Future<void> remove(Map<String, dynamic> restaurant) async {
-    final key = _identity(restaurant);
-    if (key.isEmpty) return;
-    final favorites = await all();
-    final match = favorites.where((item) => _identity(item) == key);
-    if (match.isEmpty || match.first['user_id']?.toString() != _userId) return;
-    await client
-        .from('restaurant_favorites')
-        .delete()
-        .eq('user_id', _userId)
-        .eq('id', match.first['id'].toString());
+    final id = restaurant['id']?.toString();
+    if (id == null || id.isEmpty) return;
+    await client.from('restaurant_favorites').delete().eq('id', id);
   }
 
   Future<void> _migrateLegacyFavorites() async {
