@@ -189,7 +189,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               id: id,
               recipeId: shared['recipe_id']?.toString(),
               status: shared['status']?.toString() ?? 'planned',
-              servings: (shared['servings'] as num?)?.toInt() ?? 2,
+              servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
               name: recipe['name']?.toString() ?? 'Gemeinsames Rezept',
               description: recipe['description']?.toString(),
               imageUrl: recipe['image_url']?.toString(),
@@ -204,7 +204,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               await _collaboration.ensureSharedRecipeShoppingItems(
                 planId: id,
                 recipeId: recipeId,
-                servings: (shared['servings'] as num?)?.toInt() ?? 2,
+                servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
               );
             }
           }
