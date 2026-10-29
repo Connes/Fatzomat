@@ -22,8 +22,7 @@ class RestaurantFavoritesRepository {
     await _migrateLegacyFavorites();
     final rows = await client
         .from('restaurant_favorites')
-        .select('id,name,cuisine,address,phone,website,opening_hours')
-        .eq('user_id', _userId)
+        .select('id,user_id,name,cuisine,address,phone,website,opening_hours')
         .order('name');
     return (rows as List)
         .whereType<Map>()
@@ -70,7 +69,7 @@ class RestaurantFavoritesRepository {
     if (key.isEmpty) return;
     final favorites = await all();
     final match = favorites.where((item) => _identity(item) == key);
-    if (match.isEmpty) return;
+    if (match.isEmpty || match.first['user_id']?.toString() != _userId) return;
     await client
         .from('restaurant_favorites')
         .delete()
@@ -107,7 +106,7 @@ class RestaurantFavoritesRepository {
     final rows = await client
         .from('restaurant_favorites')
         .select('name,address')
-        .eq('user_id', userId);
+        ;
     final existing = (rows as List)
         .whereType<Map>()
         .map((row) => _identity(Map<String, dynamic>.from(row)))
