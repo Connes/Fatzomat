@@ -19,7 +19,7 @@ void main() {
 
     expect(page, contains('Keep a planned recipe date visible even if its shopping rows'));
     expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
-    expect(page, contains('final days = await _repo.plannedShoppingDates();'));
+    expect(page, contains('final personalDays = await _repo.plannedShoppingDates();'));
   });
 
   test('ingredient search is removed and shopping content uses opaque surfaces', () {
@@ -69,7 +69,7 @@ void main() {
     expect(repository, contains(".eq('decision_type', 'recipe')"));
     expect(repository, contains(".eq('status', 'planned')"));
     expect(repository, contains(".gte('plan_date', today)"));
-    expect(page, contains('final days = await _repo.plannedShoppingDates();'));
+    expect(page, contains('final personalDays = await _repo.plannedShoppingDates();'));
     expect(page, contains('_days = days;'));
     expect(page, isNot(contains('List.generate(3')));
     expect(page, isNot(contains('new three-day view')));
@@ -101,7 +101,10 @@ void main() {
     expect(repository, contains("from('decision_shares')"));
     expect(repository, contains("map['is_shared_accepted'] = activeShares.any"));
     expect(page, contains('day.where((plan) => !plan.isSharedAccepted)'));
-    expect(page, contains('currentSharedRecipePlan()'));
+    expect(repository, contains('Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate})'));
+    expect(page, contains('_collaboration.sharedRecipePlans('));
+    expect(page, contains('recipe[\'image_url\']?.toString()'));
+    expect(page, contains('sharedPlanIds.add(id)'));
     expect(page, contains('final sharedPlanIds = <String>{}'));
     expect(page, contains('Icons.people_alt_rounded'));
   });
