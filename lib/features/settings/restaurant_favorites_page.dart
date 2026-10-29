@@ -513,7 +513,8 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                                 subtitle: details.isEmpty ? null : Text(details, style: const TextStyle(color: AppDesign.text)),
                                 trailing: widget.selectForToday
                                     ? const Icon(Icons.chevron_right_rounded)
-                                    : PopupMenuButton<String>(
+                                    : _repository.canManage(restaurant)
+                                        ? PopupMenuButton<String>(
                                         tooltip: 'Optionen für $name',
                                         onSelected: (action) async {
                                           if (action == 'edit') {
@@ -549,7 +550,8 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
                                           padding: EdgeInsets.all(8),
                                           child: Icon(Icons.more_vert_rounded, color: AppDesign.iconGold),
                                         ),
-                                      ),
+                                      )
+                                        : null,
                                 onTap: widget.selectForToday
                                     ? () => Navigator.pop(context, restaurant)
                                     : () => _showRestaurantDetails(restaurant),
