@@ -465,7 +465,7 @@ class PersonalTodayRepository {
       'name': name.trim(),
       'quantity': quantity,
       'unit': unit.trim(),
-    }).eq('id', itemId).select('id,name,quantity,unit,checked,checked_by,food_id,source').single();
+    }).eq('id', itemId).select('id,name,quantity,unit,checked,checked_by,food_id').single();
     return ShoppingItem.fromMap(Map<String, dynamic>.from(row));
   }
 
