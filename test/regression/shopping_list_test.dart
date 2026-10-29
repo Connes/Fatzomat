@@ -37,7 +37,7 @@ void main() {
   });
 
 
-  test('V85 exposes a dedicated shopping entry point for single and connected modes', () {
+  test('V85 uses one unified shopping entry point for connected and standalone modes', () {
     final shell = File('lib/core/app_shell.dart').readAsStringSync();
     final entry = File('lib/features/shared/shopping_list_page.dart').readAsStringSync();
     final today = File('lib/features/shared/today_page.dart').readAsStringSync();
@@ -46,10 +46,9 @@ void main() {
 
     expect(shell, contains("label: 'Einkauf'"));
     expect(shell, contains('ShoppingListPage'));
-    expect(entry, contains('connection?.isConnected == true'));
-    expect(entry, contains('currentSharedRecipePlan()'));
-    expect(entry, contains('shared: true'));
-    expect(entry, contains('shared: false'));
+    expect(entry, contains('MultiDayShoppingListPage'));
+    expect(entry, isNot(contains('shared: true')));
+    expect(entry, isNot(contains('Noch keine gemeinsame Einkaufsliste')));
     expect(today, contains('widget.shared'));
     expect(today, contains('collaborationRepo.shoppingItems(widget.planId)'));
     expect(today, contains("column: widget.shared ? 'shared_recipe_plan_id' : 'personal_today_plan_id'"));
@@ -75,7 +74,7 @@ void main() {
 
     expect(page, contains('AppSurface(\n                          color: AppDesign.surface'));
     expect(page, contains('for (final day in activeDays)'));
-    expect(page, contains('title: Text(\n                                  _dayTitle(day)'));
+    expect(page, contains('title: Row(\n                                  children: ['));
     expect(page, contains("'Zusammengefasste Zutaten',\n                                  textAlign: TextAlign.center"));
     expect(page, contains("label: const Text('Einkaufsliste erledigen')"));
     expect(page, contains('_temporarilyVisibleChecked.contains(item.key)'));
@@ -127,7 +126,7 @@ void main() {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(page, contains('for (final day in activeDays)'));
-    expect(page, contains('title: Text(\n                                  _dayTitle(day)'));
+    expect(page, contains('title: Row(\n                                  children: ['));
     expect(page, contains('value: !_isDayCompleted(day) && _selected.contains(_key(day))'));
     expect(page, contains('final shouldShowAggregatedList = selectedDays.isNotEmpty'));
     expect(page, contains("'Keine Einkaufsliste ausgewählt. Wähle oben einen Tag aus"));
