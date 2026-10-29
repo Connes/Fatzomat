@@ -141,11 +141,19 @@ class _LaunchArtwork extends StatelessWidget {
           right: 0,
           bottom: 0,
           height: bottomImageHeight,
-          child: Image.asset(
-            'assets/branding/launch_vegetables.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
-            filterQuality: FilterQuality.high,
+          child: ClipRect(
+            child: Transform.scale(
+              // Crop a few pixels from the source artwork's sides so its
+              // embedded edge/border cannot appear as a seam on the screen.
+              scaleX: 1.04,
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/branding/launch_vegetables.png',
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+                filterQuality: FilterQuality.high,
+              ),
+            ),
           ),
         ),
         SafeArea(
