@@ -101,7 +101,7 @@ void main() {
 
     expect(repository, contains("from('decision_shares')"));
     expect(repository, contains("map['is_shared_accepted'] = activeShares.any"));
-    expect(page, contains('.where((plan) => !plan.isSharedAccepted)'));
+    expect(page, contains('Keep accepted shared-decision plans as a fallback'));
     expect(collaboration, contains('Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate})'));
     expect(page, contains('_collaboration.sharedRecipePlans('));
     expect(page, contains('recipe[\'image_url\']?.toString()'));
