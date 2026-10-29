@@ -11,7 +11,7 @@ void main() {
     expect(source, contains('preferences.remove(_legacyStorageKey)'));
     expect(source, contains('_legacyCorruptBackupPrefix'));
     expect(source, contains('preferences.setString(backupKey, raw)'));
-    expect(source, contains('preferences.setString(_legacyStorageKey'), isFalse);
+    expect(source, isNot(contains('preferences.setString(_legacyStorageKey')));
   });
 
   test('restaurant favorites are globally readable and manageable by authenticated users', () {
