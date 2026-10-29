@@ -258,7 +258,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   Future<void> _updatePlanServings(TodayPlan plan, int servings) async {
     if (servings < 1 || servings > 12) return;
     try {
-      final updated = await _repo.updateServings(plan.id, servings);
+      final updated = _sharedPlanIds.contains(plan.id)
+          ? (await _collaboration.replaceSharedRecipePlan(plan.id, plan.recipeId!, servings: servings)).isNotEmpty
+          : await _repo.updateServings(plan.id, servings);
       if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
       await load(showLoading: false);
       if (mounted) {
@@ -605,14 +607,28 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                             }
                                           }),
                                 ),
-                                title: Text(
-                                  _dayTitle(day),
-                                  style: TextStyle(
-                                    color: _isDayCompleted(day)
-                                        ? AppDesign.secondaryText
-                                        : AppDesign.text,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                title: Row(
+                                  children: [
+                                    if (_plansFor(day).any((plan) => _sharedPlanIds.contains(plan.id))) ...[
+                                      const Icon(
+                                        Icons.people_alt_rounded,
+                                        size: 19,
+                                        color: AppDesign.iconGold,
+                                      ),
+                                      const SizedBox(width: 7),
+                                    ],
+                                    Expanded(
+                                      child: Text(
+                                        _dayTitle(day),
+                                        style: TextStyle(
+                                          color: _isDayCompleted(day)
+                                              ? AppDesign.secondaryText
+                                              : AppDesign.text,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 // Legacy regression contract: const Text('Erledigt').
                                 // The user-facing label adds context below.
