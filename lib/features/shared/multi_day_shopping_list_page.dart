@@ -17,7 +17,9 @@ import '../../data/services/shopping_list_aggregator.dart';
 
 /// Personal shopping list aggregated across the next three calendar days.
 class MultiDayShoppingListPage extends StatefulWidget {
-  const MultiDayShoppingListPage({super.key});
+  final ValueListenable<int>? refreshSignal;
+
+  const MultiDayShoppingListPage({super.key, this.refreshSignal});
 
   @override
   State<MultiDayShoppingListPage> createState() => _MultiDayShoppingListPageState();
@@ -90,6 +92,19 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     load();
   }
 
+  void _onRefreshRequested() {
+    if (mounted) load(showLoading: false);
+  }
+
+  @override
+  void didUpdateWidget(covariant MultiDayShoppingListPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshSignal != widget.refreshSignal) {
+      oldWidget.refreshSignal?.removeListener(_onRefreshRequested);
+      widget.refreshSignal?.addListener(_onRefreshRequested);
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -105,6 +120,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   @override
   void initState() {
     super.initState();
+    widget.refreshSignal?.addListener(_onRefreshRequested);
     WidgetsBinding.instance.addObserver(this);
     _observedToday = _dateOnly(DateTime.now());
     _days = _makeDays(_observedToday);
@@ -467,6 +483,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   @override
   void dispose() {
+    widget.refreshSignal?.removeListener(_onRefreshRequested);
     _dayBoundaryTimer?.cancel();
     for (final timer in _checkedVisibilityTimers.values) {
       timer.cancel();

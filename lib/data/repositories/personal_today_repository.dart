@@ -142,9 +142,11 @@ class PersonalTodayRepository {
     });
     final id = result?.toString() ?? '';
     if (id.isEmpty) throw StateError('Der persönliche Tagesplan konnte nicht gespeichert werden.');
-    // Any route can create the personal Today plan. Notify the persistent
-    // "Meine Rezepte" tab immediately so it refreshes its "Für dich heute"
-    // state without relying on a Realtime round-trip.
+    // Ensure ingredients exist before the caller considers recipe selection
+    // complete. The RPC is idempotent and preserves checked/manual edits.
+    await ensurePersonalRecipeShoppingItems(id);
+    // Notify persistent tabs immediately instead of depending on a realtime
+    // round-trip to update their view of this decision.
     RecipeCollectionEvents.notifyChanged();
     return id;
   }
