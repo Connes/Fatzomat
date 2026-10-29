@@ -412,10 +412,10 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       animation: Listenable.merge([_winnerEntrance, _winnerPulse]),
       builder: (context, child) {
         final entrance = Curves.easeOutBack.transform(_winnerEntrance.value)
-            .clamp(0.0, 1.08);
+            .clamp(0.0, 1.08).toDouble();
         final pulse = 1 + (_winnerPulse.value * .028);
         return Opacity(
-          opacity: _winnerEntrance.value.clamp(0.0, 1.0),
+          opacity: _winnerEntrance.value.clamp(0.0, 1.0).toDouble(),
           child: Transform.scale(
             scale: entrance * pulse,
             child: child,
