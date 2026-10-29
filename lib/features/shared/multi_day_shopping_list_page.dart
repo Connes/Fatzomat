@@ -12,6 +12,7 @@ import '../../core/widgets/together_scaffold.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
 import '../../data/repositories/personal_today_repository.dart';
+import '../../data/repositories/collaboration_repository.dart';
 import '../../data/services/shopping_list_aggregator.dart';
 
 /// Personal shopping list aggregated across the next three calendar days.
@@ -24,6 +25,8 @@ class MultiDayShoppingListPage extends StatefulWidget {
 
 class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> with WidgetsBindingObserver {
   final _repo = PersonalTodayRepository();
+  final _collaboration = CollaborationRepository();
+  final Set<String> _sharedPlanIds = <String>{};
   final _aggregator = const ShoppingListAggregator();
   late List<DateTime> _days;
   DateTime _observedToday = DateTime.now();
@@ -143,14 +146,58 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     try {
       final days = await _repo.plannedShoppingDates();
       final loadedPlans = await Future.wait(days.map(_repo.plannedPlansForDate));
-      // Accepted shared recipes belong exclusively to the shared shopping list.
-      // Keep the personal plan and its ingredients in storage; only exclude them
-      // from this private list's presentation and aggregation.
+      // Personal plans remain in their normal date groups. Accepted shares are
+      // represented by the shared plan row instead, so they appear once and
+      // can be marked with the gold connection icon.
       final plans = loadedPlans
-          .map((day) => day.where((plan) => !plan.isSharedAccepted).toList(growable: false))
-          .toList(growable: false);
+          .map((day) => day.where((plan) => !plan.isSharedAccepted).toList(growable: true))
+          .toList(growable: true);
+      final sharedPlanIds = <String>{};
+      try {
+        final connection = await _collaboration.connectionInfo();
+        if (connection?.isConnected == true) {
+          final shared = await _collaboration.currentSharedRecipePlan();
+          if (shared != null) {
+            final sharedDate = DateTime.tryParse(shared['plan_date']?.toString() ?? '');
+            if (sharedDate != null) {
+              final dateOnly = _dateOnly(sharedDate);
+              var dayIndex = days.indexWhere((day) => _key(day) == _key(dateOnly));
+              if (dayIndex < 0) {
+                days.add(dateOnly);
+                plans.add(<TodayPlan>[]);
+                dayIndex = days.length - 1;
+              }
+              final recipe = shared['recipes'] is Map
+                  ? Map<String, dynamic>.from(shared['recipes'] as Map)
+                  : <String, dynamic>{};
+              final sharedPlan = TodayPlan(
+                id: shared['id'].toString(),
+                recipeId: shared['recipe_id']?.toString(),
+                status: shared['status']?.toString() ?? 'planned',
+                servings: (shared['servings'] as num?)?.toInt() ?? 2,
+                name: recipe['name']?.toString() ?? 'Gemeinsames Rezept',
+                description: recipe['description']?.toString(),
+                imageUrl: recipe['image_url']?.toString(),
+                imagePath: recipe['image_path']?.toString(),
+                isShared: true,
+              );
+              plans[dayIndex].add(sharedPlan);
+              sharedPlanIds.add(sharedPlan.id);
+            }
+          }
+        }
+      } catch (_) {
+        // A connection lookup must not prevent the personal list from loading.
+      }
       final ids = plans.expand((day) => day).where((p) => p.isRecipe).map((p) => p.id).toSet();
-      final items = await _repo.shoppingItemsForPlans(ids);
+      final personalItems = await _repo.shoppingItemsForPlans(
+        ids.difference(sharedPlanIds),
+      );
+      final sharedItems = <ShoppingItem>[];
+      for (final id in sharedPlanIds) {
+        sharedItems.addAll(await _collaboration.shoppingItems(id));
+      }
+      final items = <ShoppingItem>[...personalItems, ...sharedItems];
       if (!mounted || generation != _generation) return;
       setState(() {
         _days = days;
@@ -269,7 +316,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     try {
       await Future.wait(item.sources
           .where((source) => source.checked != checked)
-          .map((source) => _repo.setShoppingChecked(source.id, checked)));
+          .map((source) => _sharedPlanIds.contains(source.planId)
+              ? _collaboration.setShoppingChecked(source.id, checked)
+              : _repo.setShoppingChecked(source.id, checked)));
       await load(showLoading: false);
     } catch (e) {
       // Some requests may already have reached the server when another fails.
@@ -297,7 +346,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     final planIds = items.expand((item) => item.sources).map((item) => item.planId).whereType<String>().toSet();
     setState(() => _completingList = true);
     try {
-      await Future.wait(planIds.map(_repo.completeShoppingList));
+      await Future.wait(planIds.map((id) => _sharedPlanIds.contains(id)
+          ? _collaboration.updateSharedRecipeStatus(id, 'cooked')
+          : _repo.completeShoppingList(id)));
       setState(() {
         for (final day in _activeDays) {
           final ids = _plansFor(day).where((plan) => plan.isRecipe).map((plan) => plan.id).toSet();
@@ -334,7 +385,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     try {
       await Future.wait(pending.expand((item) => item.sources)
           .where((source) => source.checked != checked)
-          .map((source) => _repo.setShoppingChecked(source.id, checked)));
+          .map((source) => _sharedPlanIds.contains(source.planId)
+              ? _collaboration.setShoppingChecked(source.id, checked)
+              : _repo.setShoppingChecked(source.id, checked)));
       await load(showLoading: false);
     } catch (e) {
       // Some writes may have succeeded before another failed. Reload persisted
