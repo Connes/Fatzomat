@@ -12,13 +12,13 @@ void main() {
     expect(page, contains('await _importFavoriteJson();'));
   });
 
-  test('imported restaurants are saved through the account-scoped Supabase repository', () {
+  test('imported restaurants are saved through the global Supabase repository', () {
     final page = File('lib/features/settings/restaurant_favorites_page.dart').readAsStringSync();
     final repository = File('lib/data/repositories/restaurant_favorites_repository.dart').readAsStringSync();
-    final migration = File('supabase/migrations/20261018045840_cloud_restaurant_favorites.sql').readAsStringSync();
+    final migration = File('supabase/migrations/20261029120000_global_restaurant_favorites.sql').readAsStringSync();
     expect(page, contains('await _repository.add(normalized)'));
     expect(repository, contains("from('restaurant_favorites')"));
-    expect(repository, contains(".eq('user_id', _userId)"));
-    expect(migration, contains('alter table public.restaurant_favorites enable row level security'));
+    expect(repository, isNot(contains(".eq('user_id', _userId)")));
+    expect(migration, contains('for select to authenticated'));
   });
 }
