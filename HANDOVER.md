@@ -292,3 +292,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Wenn Angaben nicht ausreichend verifizierbar sind, soll ChatGPT nur gezielt fehlende Angaben anfordern, statt Mengen zu erfinden oder Vollständigkeit vorzutäuschen.
 - Regressionstests prüfen die Fallback-Anweisungen.
 - Technische Grenze bleibt: Der App-Prompt selbst kann keinen Webzugriff bereitstellen und eine Webseite nicht aus der App heraus entsperren. Der Fallback verbessert das Verhalten nur, wenn ChatGPT-Websuche eine andere zugängliche Quelle findet. CI und echter ChatGPT-Gerätetest stehen noch aus.
+
+
+## Launch-Artwork: seitliche Bildkante abgesichert (2026-10-29)
+
+- Nach PR #346 liegt die Gemüseillustration auf dem Launchscreen in einem `ClipRect` und wird horizontal mit `scaleX: 1.04` vergrößert, damit eingebettete Randlinien nicht als sichtbare Naht am Bildschirmrand erscheinen.
+- Regressionstest `test/regression/launch_artwork_test.dart` sichert den Clip, den horizontalen Zuschnitt und die unveränderte Bildausrichtung ab.
+- Der Test ist ein Quelltext-Vertragstest und ersetzt keine visuelle Geräteprüfung.
+- CI und Merge für diesen Folge-PR sind noch ausstehend; Geräteprüfung nicht durchgeführt.
