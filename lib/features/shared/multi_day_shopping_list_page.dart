@@ -483,6 +483,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   @override
   void dispose() {
+    widget.refreshSignal?.removeListener(_onRefreshRequested);
     _dayBoundaryTimer?.cancel();
     for (final timer in _checkedVisibilityTimers.values) {
       timer.cancel();
