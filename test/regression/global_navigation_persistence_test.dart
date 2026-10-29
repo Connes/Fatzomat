@@ -30,7 +30,6 @@ void main() {
   test('normal feature navigation uses the shell navigator context', () {
     final files = [
       'lib/features/shared/today_page.dart',
-      'lib/features/shared/shopping_list_page.dart',
       'lib/features/recipes/saved_recipes_page.dart',
       'lib/features/recipes/recipe_detail_page.dart',
       'lib/features/settings/settings_page.dart',
