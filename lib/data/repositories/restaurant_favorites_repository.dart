@@ -30,6 +30,9 @@ class RestaurantFavoritesRepository {
         .toList(growable: false);
   }
 
+  bool canManage(Map<String, dynamic> restaurant) =>
+      restaurant['user_id']?.toString() == _userId;
+
   Future<bool> contains(Map<String, dynamic> restaurant) async {
     final key = _identity(restaurant);
     if (key.isEmpty) return false;
