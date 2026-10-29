@@ -308,4 +308,4 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Nach dem Einblenden pulsiert die Gewinnerkarte dezent weiter. Die Buttons „NOCHMAL DREHEN“ und „WEITER MIT …“ bleiben darunter erhalten.
 - „NOCHMAL DREHEN“ setzt Einblend- und Pulsanimation zurück und startet die Walzen neu; die nächste Gewinneranzeige beginnt damit wieder von vorn.
 - Regressionstest: `test/regression/surprise_winner_focus_animation_test.dart`.
-- Branch `ux/surprise-winner-focus-animation`; PR, CI, Merge und Geräteprüfung stehen noch aus.
+- Über PR [#348](https://github.com/Connes/Fatzomat/pull/348) gemergt; Merge-Commit `b63ca808b46a91918b706da1069725528538d449`. Beide PR-Workflows waren für den Head `9ea8dde4fbc19dc7d8822793321834b9af9d1b17` erfolgreich. Post-Merge-CI wird separat geprüft; visuelle Geräteprüfung nicht durchgeführt.
