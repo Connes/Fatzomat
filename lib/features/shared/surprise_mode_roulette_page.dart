@@ -144,13 +144,14 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
     _showActions = false;
     _winnerPulse.stop();
     _winnerPulse.reset();
+    // Start the gold rain with the winner's entrance, not after the pulse.
+    _celebration.forward(from: 0);
     _winnerEntrance.forward(from: 0).whenCompleteOrCancel(() async {
       if (!mounted || !_finished) return;
       _winnerPulse.repeat(reverse: true);
       await Future<void>.delayed(const Duration(milliseconds: 2400));
       if (!mounted || !_finished) return;
       _winnerPulse.stop();
-      _celebration.forward(from: 0);
       await Future<void>.delayed(const Duration(milliseconds: 2400));
       if (!mounted || !_finished) return;
       setState(() => _showActions = true);
@@ -558,23 +559,23 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
             ),
           ),
           const Positioned(
-            top: -12,
-            left: 12,
+            top: -20,
+            left: -12,
             child: Icon(Icons.auto_awesome, color: _gold, size: 28),
           ),
           const Positioned(
-            top: 4,
-            right: 8,
+            top: -16,
+            right: -12,
             child: Icon(Icons.star_rounded, color: _gold, size: 26),
           ),
           const Positioned(
-            bottom: -8,
-            left: 28,
+            bottom: -16,
+            left: -10,
             child: Icon(Icons.star_rounded, color: _gold, size: 22),
           ),
           const Positioned(
-            bottom: 0,
-            right: 20,
+            bottom: -18,
+            right: -10,
             child: Icon(Icons.auto_awesome, color: _gold, size: 24),
           ),
         ],
