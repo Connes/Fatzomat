@@ -352,8 +352,7 @@ Keine zusätzlichen Felder. website muss eine vollständige HTTP(S)-URL sein. op
       controller.dispose();
     }
     if (edited == null || !mounted) return;
-    await _repository.remove(restaurant);
-    await _repository.add(edited);
+    await _repository.update(restaurant, edited);
     await _load();
   }
 
