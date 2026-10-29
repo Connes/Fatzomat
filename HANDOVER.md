@@ -309,3 +309,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - „NOCHMAL DREHEN“ setzt Einblend- und Pulsanimation zurück und startet die Walzen neu; die nächste Gewinneranzeige beginnt damit wieder von vorn.
 - Regressionstest: `test/regression/surprise_winner_focus_animation_test.dart`.
 - Über PR [#348](https://github.com/Connes/Fatzomat/pull/348) gemergt; Merge-Commit `b63ca808b46a91918b706da1069725528538d449`. Beide PR-Workflows waren für den Head `9ea8dde4fbc19dc7d8822793321834b9af9d1b17` erfolgreich. Post-Merge-CI wird separat geprüft; visuelle Geräteprüfung nicht durchgeführt.
+
+
+## Überrasch-mich: Aktionen nach Gewinner und Konfetti (2026-10-29)
+
+- Die Gewinnerkarte bekommt nach dem Einblenden zuerst ihren eigenen Auftritt und pulsiert 2,4 Sekunden.
+- Danach läuft die bestehende Konfetti-/Jackpot-Animation für 2,4 Sekunden.
+- Erst nach dem Konfettiregen erscheinen „NOCHMAL DREHEN“ und „WEITER MIT …“. Ein erneuter Dreh setzt die Sequenz zurück.
+- Geräteprüfung und CI für diese Änderung stehen noch aus.

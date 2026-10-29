@@ -48,6 +48,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   bool _spinning = true;
   bool _stopping = false;
   bool _finished = false;
+  bool _showActions = false;
   int _stoppedReels = 0;
   int? _resultIndex;
 
@@ -140,11 +141,19 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       _stopping = false;
       _finished = true;
     });
-    _celebration.forward(from: 0);
+    _showActions = false;
     _winnerPulse.stop();
     _winnerPulse.reset();
-    _winnerEntrance.forward(from: 0).whenCompleteOrCancel(() {
-      if (mounted && _finished) _winnerPulse.repeat(reverse: true);
+    _winnerEntrance.forward(from: 0).whenCompleteOrCancel(() async {
+      if (!mounted || !_finished) return;
+      _winnerPulse.repeat(reverse: true);
+      await Future<void>.delayed(const Duration(milliseconds: 2400));
+      if (!mounted || !_finished) return;
+      _winnerPulse.stop();
+      _celebration.forward(from: 0);
+      await Future<void>.delayed(const Duration(milliseconds: 2400));
+      if (!mounted || !_finished) return;
+      setState(() => _showActions = true);
     });
   }
 
@@ -159,6 +168,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       _spinning = true;
       _stopping = false;
       _finished = false;
+      _showActions = false;
       _stoppedReels = 0;
       _resultIndex = null;
     });
@@ -212,7 +222,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
             if (_finished && result != null)
               _buildWinner(context, result),
             const SizedBox(height: 18),
-            if (_finished && result != null) ...[
+            if (_finished && _showActions && result != null) ...[
               FilledButton.icon(
                 onPressed: _spinAgain,
                 icon: const Icon(Icons.refresh_rounded),
