@@ -131,6 +131,21 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             table: 'shopping_items',
             callback: (_) => load(showLoading: false),
           )
+          // Shared decisions have their own lifecycle. Refresh when a partner
+          // accepts, cancels, or completes a shared plan, even if no shopping
+          // item row changes (for example, when the list is completed).
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'shared_recipe_plans',
+            callback: (_) => load(showLoading: false),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'decision_shares',
+            callback: (_) => load(showLoading: false),
+          )
           .subscribe();
     } on AssertionError {
       // Widget tests/previews may mount before Supabase is initialized.
