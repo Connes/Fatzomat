@@ -34,6 +34,6 @@ class ShoppingItem {
             ? (map['foods']['category']?.toString() ?? 'Weitere Zutaten')
             : (map['category']?.toString() ?? 'Weitere Zutaten'),
         source: map['source']?.toString() ?? 'recipe',
-        planId: map['personal_today_plan_id']?.toString(),
+        planId: (map['personal_today_plan_id'] ?? map['shared_recipe_plan_id'])?.toString(),
       );
 }
