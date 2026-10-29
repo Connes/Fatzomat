@@ -402,7 +402,7 @@ class PersonalTodayRepository {
     if (ids.isEmpty) return const [];
     final rows = await client
         .from('shopping_items')
-        .select('id,name,quantity,unit,checked,checked_by,food_id,source,personal_today_plan_id,foods(category)')
+        .select('id,name,quantity,unit,checked,checked_by,food_id,personal_today_plan_id,foods(category)')
         .inFilter('personal_today_plan_id', ids)
         .order('name');
     return rows.map((row) => ShoppingItem.fromMap(Map<String, dynamic>.from(row))).toList(growable: false);
@@ -427,7 +427,7 @@ class PersonalTodayRepository {
   Future<List<ShoppingItem>> shoppingItems(String planId) async {
     final rows = await client
         .from('shopping_items')
-        .select('id,name,quantity,unit,checked,checked_by,food_id,source,foods(category)')
+        .select('id,name,quantity,unit,checked,checked_by,food_id,foods(category)')
         .eq('personal_today_plan_id', planId)
         .order('name');
     return rows.map((row) => ShoppingItem.fromMap(Map<String, dynamic>.from(row))).toList();
@@ -451,8 +451,7 @@ class PersonalTodayRepository {
       'name': name.trim(),
       'quantity': quantity,
       'unit': unit.trim(),
-      'source': 'manual',
-    }).select('id,name,quantity,unit,checked,checked_by,food_id,source').single();
+    }).select('id,name,quantity,unit,checked,checked_by,food_id').single();
     return ShoppingItem.fromMap(Map<String, dynamic>.from(row));
   }
 
