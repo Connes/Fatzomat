@@ -148,11 +148,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       final loadedPlans = await Future.wait(personalDays.map(_repo.plannedPlansForDate));
       // Keep personal plans in their normal date groups and represent accepted
       // shares through their shared plan, so each shared recipe appears once.
+      // Keep accepted shared-decision plans as a fallback until the canonical
+      // shared_recipe_plans row has actually loaded. Filtering them out here
+      // made the day appear, but dropped its shopping items when the shared
+      // plan lookup failed or the row had not been created on this backend.
       final groupedPlans = <String, List<TodayPlan>>{
         for (var i = 0; i < personalDays.length; i++)
-          _key(personalDays[i]): loadedPlans[i]
-              .where((plan) => !plan.isSharedAccepted)
-              .toList(growable: true),
+          _key(personalDays[i]): List<TodayPlan>.from(loadedPlans[i]),
       };
       final dayByKey = <String, DateTime>{
         for (final day in personalDays) _key(day): _dateOnly(day),
@@ -171,6 +173,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             final key = _key(dateOnly);
             dayByKey.putIfAbsent(key, () => dateOnly);
             final dayPlans = groupedPlans.putIfAbsent(key, () => <TodayPlan>[]);
+            final sharedRecipeId = shared['recipe_id']?.toString();
+            // Once the canonical shared plan is available, replace the accepted
+            // personal mirror for the same recipe/date to avoid duplicates.
+            dayPlans.removeWhere((plan) =>
+                plan.isSharedAccepted &&
+                sharedRecipeId != null &&
+                plan.recipeId == sharedRecipeId);
             final recipe = shared['recipes'] is Map
                 ? Map<String, dynamic>.from(shared['recipes'] as Map)
                 : <String, dynamic>{};
