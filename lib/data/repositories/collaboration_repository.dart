@@ -367,8 +367,7 @@ class CollaborationRepository {
       'name': name.trim(),
       'quantity': quantity,
       'unit': unit.trim(),
-      'source': 'manual',
-    }).select('id,name,quantity,unit,checked,checked_by,food_id,source').single();
+    }).select('id,name,quantity,unit,checked,checked_by,food_id').single();
     return ShoppingItem.fromMap(Map<String, dynamic>.from(row));
   }
 
