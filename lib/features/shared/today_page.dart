@@ -973,6 +973,21 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     return cuisine == null || cuisine.isEmpty ? null : cuisine;
   }
 
+  String? get _sharedRecipeName {
+    if (share.decisionType == 'dine_out') return null;
+    final title = share.decisionName?.trim();
+    if (title != null && title.isNotEmpty) {
+      // Older clients sometimes send the full decision title rather than the
+      // bare recipe name. Keep only the recipe part in that case.
+      final separator = title.indexOf('·');
+      final name = separator >= 0 ? title.substring(separator + 1).trim() : title;
+      if (name.isNotEmpty && name.toLowerCase() != 'wir kochen') return name;
+    }
+    final value = share.decisionValue?.trim();
+    if (value != null && value.isNotEmpty && !value.startsWith('{')) return value;
+    return null;
+  }
+
   String _planDateLabel() {
     const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
     return '${share.planDate.day}. ${months[share.planDate.month - 1]}';
@@ -981,8 +996,12 @@ class _IncomingDecisionShareCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDineOut = share.decisionType == 'dine_out';
+    final isRecipe = share.decisionType == 'cook' ||
+        share.decisionType == 'recipe' ||
+        (share.recipeId?.trim().isNotEmpty == true);
     final restaurantName = _restaurantName;
     final cuisine = _cuisine;
+    final sharedRecipeName = _sharedRecipeName;
 
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.98),
@@ -1068,11 +1087,29 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(18),
                   child: Image.network(
                     share.imageUrl!,
-                    height: 150,
+                    height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                   ),
+                ),
+              ],
+              if (isRecipe && sharedRecipeName != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  'Rezept',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: AppDesign.primaryDark,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  sharedRecipeName,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppDesign.text,
+                        fontWeight: FontWeight.w700,
+                      ),
                 ),
               ],
             ],
