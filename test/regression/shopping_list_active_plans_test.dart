@@ -96,12 +96,13 @@ void main() {
   });
   test('accepted shared recipes are represented in the unified shopping list', () {
     final repository = File('lib/data/repositories/personal_today_repository.dart').readAsStringSync();
+    final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(repository, contains("from('decision_shares')"));
     expect(repository, contains("map['is_shared_accepted'] = activeShares.any"));
     expect(page, contains('.where((plan) => !plan.isSharedAccepted)'));
-    expect(repository, contains('Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate})'));
+    expect(collaboration, contains('Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate})'));
     expect(page, contains('_collaboration.sharedRecipePlans('));
     expect(page, contains('recipe[\'image_url\']?.toString()'));
     expect(page, contains('sharedPlanIds.add(id)'));
