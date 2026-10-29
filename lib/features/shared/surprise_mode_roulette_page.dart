@@ -43,6 +43,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
 
   late final List<AnimationController> _reels;
   late final AnimationController _celebration;
+  late final AnimationController _winnerEntrance;
+  late final AnimationController _winnerPulse;
   bool _spinning = true;
   bool _stopping = false;
   bool _finished = false;
@@ -56,6 +58,16 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   void initState() {
     super.initState();
     _celebration = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400));
+    _winnerEntrance = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1050),
+    );
+    _winnerPulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1250),
+      lowerBound: 0,
+      upperBound: 1,
+    );
     _reels = List<AnimationController>.generate(
       3,
       (index) => AnimationController.unbounded(
@@ -129,11 +141,20 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       _finished = true;
     });
     _celebration.forward(from: 0);
+    _winnerPulse.stop();
+    _winnerPulse.reset();
+    _winnerEntrance.forward(from: 0).whenCompleteOrCancel(() {
+      if (mounted && _finished) _winnerPulse.repeat(reverse: true);
+    });
   }
 
   void _spinAgain() {
     _celebration.stop();
     _celebration.reset();
+    _winnerEntrance.stop();
+    _winnerEntrance.reset();
+    _winnerPulse.stop();
+    _winnerPulse.reset();
     setState(() {
       _spinning = true;
       _stopping = false;
@@ -147,6 +168,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   @override
   void dispose() {
     _celebration.dispose();
+    _winnerEntrance.dispose();
+    _winnerPulse.dispose();
     for (final reel in _reels) {
       reel.dispose();
     }
@@ -166,7 +189,25 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
           padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
           children: [
             const SizedBox(height: 4),
-            _buildSlotMachine(context),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 520),
+              reverseDuration: const Duration(milliseconds: 320),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: .94, end: 1).animate(animation),
+                  child: child,
+                ),
+              ),
+              child: _finished
+                  ? const SizedBox.shrink(key: ValueKey('roulette-hidden'))
+                  : KeyedSubtree(
+                      key: const ValueKey('roulette-visible'),
+                      child: _buildSlotMachine(context),
+                    ),
+            ),
             const SizedBox(height: 22),
             if (_finished && result != null)
               _buildWinner(context, result),
@@ -367,14 +408,20 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
 
   Widget _buildWinner(BuildContext context, FoodMode mode) {
     final index = _modes.indexOf(mode);
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: .72, end: 1),
-      duration: const Duration(milliseconds: 750),
-      curve: Curves.elasticOut,
-      builder: (context, scale, child) => Transform.scale(
-        scale: scale,
-        child: child,
-      ),
+    return AnimatedBuilder(
+      animation: Listenable.merge([_winnerEntrance, _winnerPulse]),
+      builder: (context, child) {
+        final entrance = Curves.easeOutBack.transform(_winnerEntrance.value)
+            .clamp(0.0, 1.08);
+        final pulse = 1 + (_winnerPulse.value * .028);
+        return Opacity(
+          opacity: _winnerEntrance.value.clamp(0.0, 1.0),
+          child: Transform.scale(
+            scale: entrance * pulse,
+            child: child,
+          ),
+        );
+      },
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
