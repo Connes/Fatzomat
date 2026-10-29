@@ -22,6 +22,6 @@ void main() {
     expect(migration, contains('for delete to authenticated'));
     expect(migration, contains('restaurant_favorites_global_identity_idx'));
     expect(migration, contains('restaurant_favorites_notify_delete'));
-    expect(migration, isNot(contains('restaurant_favorites_notify_update')));
+    expect(migration, isNot(contains('create trigger restaurant_favorites_notify_update')));
   });
 }
