@@ -349,7 +349,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     }
   }
 
-  Widget _editableDetail(String label, String key) {
+  Widget _detail(String label, String key) {
     final value = _restaurant?[key] as String? ?? '';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -427,7 +427,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
               Text('Vorschau', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 6),
               Expanded(child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, child: Column(children: [
-                _editableDetail('Name', 'name'),
+                _detail('Name', 'name'),
                 _editableDetail('Küche', 'cuisine'),
                 _editableDetail('Adresse', 'address'),
                 _editableDetail('Telefon', 'phone'),
