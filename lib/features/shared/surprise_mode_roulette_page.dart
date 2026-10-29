@@ -206,6 +206,8 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                   style: FilledButton.styleFrom(
                     backgroundColor: _deepRed,
                     foregroundColor: _gold,
+                    disabledBackgroundColor: _deepRed,
+                    disabledForegroundColor: _gold,
                     minimumSize: const Size.fromHeight(54),
                     textStyle: const TextStyle(
                       fontWeight: FontWeight.w900,
