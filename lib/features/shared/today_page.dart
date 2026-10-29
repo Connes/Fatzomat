@@ -1425,7 +1425,7 @@ class _TodayResultCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
-          side: plan.isShared
+          side: plan.isSharedAccepted
               ? const BorderSide(color: Color(0xFFD4B342), width: 1.2)
               : BorderSide.none,
         ),
@@ -1441,7 +1441,7 @@ class _TodayResultCard extends StatelessWidget {
               _TodayDecisionCardHeader(
                 modeLabel: modeLabel,
                 image: image,
-                isShared: plan.isShared,
+                isShared: plan.isSharedAccepted,
               ),
               Expanded(
                 child: _TodayDecisionCardContent(
