@@ -187,9 +187,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               imagePath: recipe['image_path']?.toString(),
               isShared: true,
             ));
-            if ((shared['status']?.toString() ?? 'planned') == 'planned') {
-              sharedPlanIds.add(id);
-            }
+            sharedPlanIds.add(id);
           }
         }
       } catch (_) {
