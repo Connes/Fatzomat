@@ -349,13 +349,20 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     }
   }
 
-  Widget _detail(String label, String? value) {
-    if (value == null || value.trim().isEmpty) return const SizedBox.shrink();
+  Widget _editableDetail(String label, String key) {
+    final value = _restaurant?[key] as String? ?? '';
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(width: 112, child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
-        Expanded(child: SelectableText(value)),
+        SizedBox(width: 112, child: Padding(padding: const EdgeInsets.only(top: 12), child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)))),
+        Expanded(child: TextFormField(
+          initialValue: value,
+          onChanged: (updated) { _restaurant?[key] = updated.trim().isEmpty ? null : updated.trim(); },
+          keyboardType: key == 'phone' ? TextInputType.phone : TextInputType.text,
+          textCapitalization: key == 'name' || key == 'address' ? TextCapitalization.words : TextCapitalization.sentences,
+          maxLines: key == 'opening_hours' || key == 'website' || key == 'address' ? 2 : 1,
+          decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10), border: OutlineInputBorder()),
+        )),
       ]),
     );
   }
@@ -394,77 +401,46 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(title: const Text('Mit ChatGPT suchen')),
-      body: ListView(
+      body: Padding(
         padding: const EdgeInsets.all(16),
-        children: [
-          AppSurface(
-            padding: const EdgeInsets.all(18),
-            color: AppDesign.surface.withValues(alpha: .97),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Center(
-                child: Text(
-                  _restaurant == null ? 'Restaurant importieren' : 'Import',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              if (_restaurant == null) ...[
-                const SizedBox(height: 8),
-                FilledButton.icon(
-                  onPressed: _importing ? null : _pickJson,
-                icon: _importing
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(Icons.file_upload_outlined),
-                  label: const Text('JSON-Datei auswählen'),
-                ),
-              ],
-              if (_error != null) ...[
-                const SizedBox(height: 10),
-                Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                if (_waitingForLocationSettings) ...[
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: _openLocationSettings,
-                    icon: const Icon(Icons.settings_rounded),
-                    label: const Text('Systemeinstellungen öffnen'),
-                  ),
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: _locating ? null : _retryLocationAndContinue,
-                    icon: const Icon(Icons.check_circle_outline_rounded),
-                    label: const Text('Berechtigung prüfen und fortfahren'),
-                  ),
-                ],
-              ],
-              if (_restaurant != null) ...[
-                const SizedBox(height: 14),
-                Text('Vorschau', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                _detail('Name', _restaurant!['name'] as String?),
-                _detail('Küche', _restaurant!['cuisine'] as String?),
-                _detail('Adresse', _restaurant!['address'] as String?),
-                _detail('Telefon', _restaurant!['phone'] as String?),
-                _detail('Webseite', _restaurant!['website'] as String?),
-                _detail('Öffnungszeiten', _restaurant!['opening_hours'] as String?),
+        child: AppSurface(
+          padding: const EdgeInsets.all(18),
+          color: AppDesign.surface.withValues(alpha: .97),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Center(child: Text(_restaurant == null ? 'Restaurant importieren' : 'Import', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge)),
+            if (_restaurant == null) ...[
+              const SizedBox(height: 8),
+              FilledButton.icon(onPressed: _importing ? null : _pickJson, icon: _importing ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.file_upload_outlined), label: const Text('JSON-Datei auswählen')),
+            ],
+            if (_error != null) ...[
+              const SizedBox(height: 10),
+              Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              if (_waitingForLocationSettings) ...[
                 const SizedBox(height: 12),
-                FilledButton.icon(
-                  onPressed: _useRestaurant,
-                  icon: const Icon(Icons.check_circle_outline_rounded),
-                  label: const Text('Als heutigen Vorschlag übernehmen'),
-                ),
+                FilledButton.icon(onPressed: _openLocationSettings, icon: const Icon(Icons.settings_rounded), label: const Text('Systemeinstellungen öffnen')),
                 const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: _saveAsFavorite,
-                  icon: const Icon(Icons.favorite_border_rounded, color: AppDesign.iconGold),
-                  label: const Text('Als Lieblingsrestaurant speichern'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppDesign.text,
-                  ),
-                ),
+                OutlinedButton.icon(onPressed: _locating ? null : _retryLocationAndContinue, icon: const Icon(Icons.check_circle_outline_rounded), label: const Text('Berechtigung prüfen und fortfahren')),
               ],
-            ]),
-          ),
-        ],
+            ],
+            if (_restaurant != null) ...[
+              const SizedBox(height: 14),
+              Text('Vorschau', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 6),
+              Expanded(child: SingleChildScrollView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, child: Column(children: [
+                _editableDetail('Name', 'name'),
+                _editableDetail('Küche', 'cuisine'),
+                _editableDetail('Adresse', 'address'),
+                _editableDetail('Telefon', 'phone'),
+                _editableDetail('Webseite', 'website'),
+                _editableDetail('Öffnungszeiten', 'opening_hours'),
+              ]))),
+              const SizedBox(height: 12),
+              FilledButton.icon(onPressed: _useRestaurant, icon: const Icon(Icons.check_circle_outline_rounded), label: const Text('Als heutigen Vorschlag übernehmen')),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(onPressed: _saveAsFavorite, icon: const Icon(Icons.favorite_border_rounded, color: AppDesign.iconGold), label: const Text('Als Lieblingsrestaurant speichern'), style: OutlinedButton.styleFrom(foregroundColor: AppDesign.text)),
+            ],
+          ]),
+        ),
       ),
     );
   }
