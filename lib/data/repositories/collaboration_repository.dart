@@ -245,6 +245,36 @@ class CollaborationRepository {
   }
 
 
+  /// Loads active shared recipe plans for the connected household.
+  /// Unlike currentSharedRecipePlan(), this includes every planned date so
+  /// multi-day shopping lists can show shared recipes and their ingredients.
+  Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate}) async {
+    var query = client
+        .from('shared_recipe_plans')
+        .select('id,recipe_id,status,servings,plan_date,recipes(name,description,image_url,image_path)')
+        .neq('status', 'cancelled');
+    final start = fromDate ?? DateTime.now();
+    final date = '${start.year.toString().padLeft(4, '0')}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}';
+    query = query.gte('plan_date', date);
+    final rows = await query.order('plan_date').order('created_at', ascending: false);
+    final result = <Map<String, dynamic>>[];
+    for (final row in rows) {
+      final plan = Map<String, dynamic>.from(row as Map);
+      final recipe = plan['recipes'];
+      if (recipe is Map) {
+        final nested = Map<String, dynamic>.from(recipe);
+        final imagePath = nested['image_path']?.toString().trim() ?? '';
+        if (imagePath.isNotEmpty) {
+          final signedUrl = await RecipeImageService(client: client).resolveSignedUrl(imagePath);
+          if (signedUrl != null && signedUrl.isNotEmpty) nested['image_url'] = signedUrl;
+        }
+        plan['recipes'] = nested;
+      }
+      result.add(plan);
+    }
+    return result;
+  }
+
   Future<Map<String, dynamic>?> currentSharedRecipePlan() async {
     final rows = await client
         .from('shared_recipe_plans')
