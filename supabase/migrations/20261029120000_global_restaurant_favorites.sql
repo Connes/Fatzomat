@@ -1,6 +1,5 @@
 -- Make the restaurant collection global like the recipe library.
--- Every authenticated user can browse the same collection. Users may add,
--- edit, and remove only the entries they created.
+-- Every authenticated user can browse, edit, and remove the shared collection.
 alter table public.restaurant_favorites
   alter column user_id drop not null;
 
@@ -38,6 +37,8 @@ drop policy if exists "restaurant favorites global read" on public.restaurant_fa
 drop policy if exists "restaurant favorites own insert" on public.restaurant_favorites;
 drop policy if exists "restaurant favorites own update" on public.restaurant_favorites;
 drop policy if exists "restaurant favorites own delete" on public.restaurant_favorites;
+drop policy if exists "restaurant favorites global update" on public.restaurant_favorites;
+drop policy if exists "restaurant favorites global delete" on public.restaurant_favorites;
 
 create policy "restaurant favorites global read"
 on public.restaurant_favorites
@@ -49,16 +50,84 @@ on public.restaurant_favorites
 for insert to authenticated
 with check (user_id = (select auth.uid()));
 
-create policy "restaurant favorites own update"
+create policy "restaurant favorites global update"
 on public.restaurant_favorites
 for update to authenticated
-using (user_id = (select auth.uid()))
-with check (user_id = (select auth.uid()));
+using (true)
+with check (true);
 
-create policy "restaurant favorites own delete"
+create policy "restaurant favorites global delete"
 on public.restaurant_favorites
 for delete to authenticated
-using (user_id = (select auth.uid()));
+using (true);
 
 revoke all on table public.restaurant_favorites from public, anon, authenticated;
 grant select, insert, update, delete on table public.restaurant_favorites to authenticated;
+
+
+-- Notify the other member of the current user's connection whenever a shared
+-- restaurant is changed or deleted. app_notifications inserts trigger push delivery.
+create or replace function public.notify_connection_restaurant_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  actor uuid := auth.uid();
+  recipient uuid;
+  actor_name text;
+  action_label text;
+  restaurant_name text;
+begin
+  if actor is null then
+    return coalesce(new, old);
+  end if;
+
+  select cm.user_id into recipient
+  from public.connection_members cm
+  join public.connection_members actor_member
+    on actor_member.connection_id = cm.connection_id
+  where actor_member.user_id = actor
+    and cm.user_id <> actor
+  limit 1;
+
+  if recipient is null then
+    return coalesce(new, old);
+  end if;
+
+  select nullif(btrim(display_name), '') into actor_name
+  from public.profiles where id = actor;
+
+  if tg_op = 'DELETE' then
+    action_label := 'gelöscht';
+    restaurant_name := old.name;
+  else
+    action_label := 'bearbeitet';
+    restaurant_name := new.name;
+  end if;
+
+  insert into public.app_notifications(user_id, type, title, body)
+  values (
+    recipient,
+    'restaurant_favorite_changed',
+    'Lieblingsrestaurant ' || action_label,
+    coalesce(actor_name, 'Deine verbundene Person') || ' hat das Restaurant „' ||
+      coalesce(restaurant_name, 'Unbekannt') || '“ ' || action_label || '.'
+  );
+
+  return coalesce(new, old);
+end;
+$$;
+
+drop trigger if exists restaurant_favorites_notify_update on public.restaurant_favorites;
+create trigger restaurant_favorites_notify_update
+after update on public.restaurant_favorites
+for each row execute function public.notify_connection_restaurant_change();
+
+drop trigger if exists restaurant_favorites_notify_delete on public.restaurant_favorites;
+create trigger restaurant_favorites_notify_delete
+after delete on public.restaurant_favorites
+for each row execute function public.notify_connection_restaurant_change();
+
+revoke all on function public.notify_connection_restaurant_change() from public, anon, authenticated;
