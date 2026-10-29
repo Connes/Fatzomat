@@ -26,6 +26,7 @@ class _AppShellState extends State<AppShell> {
   final GlobalKey<NavigatorState> _contentNavigatorKey = GlobalKey<NavigatorState>();
   final ValueNotifier<int> _contentIndex = ValueNotifier<int>(0);
   final ValueNotifier<int> _todayResetSignal = ValueNotifier<int>(0);
+  final ValueNotifier<int> _shoppingRefreshSignal = ValueNotifier<int>(0);
 
   @override
   void initState() {
@@ -47,6 +48,11 @@ class _AppShellState extends State<AppShell> {
 
   void _selectTab(int value) {
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    if (value == 2) {
+      // The shopping tab is kept alive in the IndexedStack, so initState and
+      // realtime events alone do not guarantee fresh data when returning to it.
+      _shoppingRefreshSignal.value++;
+    }
     if (value == 0) {
       // Tapping Heute is an explicit request to return to the real current day,
       // even when the Heute tab is already selected.
@@ -65,6 +71,7 @@ class _AppShellState extends State<AppShell> {
     _network.dispose();
     _contentIndex.dispose();
     _todayResetSignal.dispose();
+    _shoppingRefreshSignal.dispose();
     super.dispose();
   }
 
@@ -107,7 +114,7 @@ class _AppShellState extends State<AppShell> {
         resetToTodaySignal: _todayResetSignal,
       ),
       SavedRecipesPage(onNavigateToTab: _selectTab),
-      const ShoppingListPage(),
+      ShoppingListPage(refreshSignal: _shoppingRefreshSignal),
       const SettingsPage(),
     ];
 
