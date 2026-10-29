@@ -234,6 +234,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
       final sortedKeys = dayByKey.keys.toList()..sort();
       final days = sortedKeys.map((key) => dayByKey[key]!).toList(growable: true);
       final plans = sortedKeys.map((key) => groupedPlans[key] ?? <TodayPlan>[]).toList(growable: true);
+      // A saved recipe can be selected successfully even if an earlier backend
+      // path failed to create its shopping rows. Reconcile personal recipe plans
+      // before reading their items so the list repairs itself on open/refresh.
+      final personalRecipePlans = plans
+          .expand((day) => day)
+          .where((p) => p.isRecipe && p.status == 'planned' && !sharedPlanIds.contains(p.id))
+          .toList(growable: false);
+      for (final plan in personalRecipePlans) {
+        await _repo.ensurePersonalRecipeShoppingItems(plan.id);
+      }
+
       final ids = plans.expand((day) => day).where((p) => p.isRecipe).map((p) => p.id).toSet();
       final personalItems = await _repo.shoppingItemsForPlans(
         ids.difference(sharedPlanIds),

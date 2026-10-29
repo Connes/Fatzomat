@@ -361,6 +361,16 @@ class PersonalTodayRepository {
     return maps.map(TodayPlan.fromMap).toList(growable: false);
   }
 
+  /// Repairs missing ingredient rows for a selected personal recipe plan.
+  ///
+  /// The database RPC is idempotent and only inserts ingredients that are
+  /// missing. Existing checked items and user edits are deliberately preserved.
+  Future<void> ensurePersonalRecipeShoppingItems(String planId) async {
+    await client.rpc('ensure_personal_recipe_shopping_items', params: {
+      'p_plan_id': planId,
+    });
+  }
+
   /// Returns today plus every future date with a planned personal recipe.
   /// The shopping list must not impose a fixed three-day window: users can plan
   /// meals arbitrarily far ahead, and their ingredients still need to be visible.
