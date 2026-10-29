@@ -195,95 +195,156 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
       body: Stack(
         children: [
           SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
-          children: [
-            const SizedBox(height: 4),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 520),
-              reverseDuration: const Duration(milliseconds: 320),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, animation) => FadeTransition(
-                opacity: animation,
-                child: ScaleTransition(
-                  scale: Tween<double>(begin: .94, end: 1).animate(animation),
-                  child: child,
-                ),
-              ),
-              child: _finished
-                  ? const SizedBox.shrink(key: ValueKey('roulette-hidden'))
-                  : KeyedSubtree(
-                      key: const ValueKey('roulette-visible'),
-                      child: _buildSlotMachine(context),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 30),
+              children: [
+                const SizedBox(height: 4),
+                _buildSlotMachine(context),
+                const SizedBox(height: 22),
+                FilledButton.icon(
+                  onPressed: _spinning && !_stopping ? _stopRoulette : null,
+                  icon: const Icon(Icons.stop_circle_rounded),
+                  label: const Text('STOPP'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _deepRed,
+                    foregroundColor: _gold,
+                    minimumSize: const Size.fromHeight(54),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.4,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: const BorderSide(color: _gold, width: 1.5),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 22),
-            if (_finished && result != null)
-              _buildWinner(context, result),
-            const SizedBox(height: 18),
-            if (_finished && _showActions && result != null) ...[
-              FilledButton.icon(
-                onPressed: _spinAgain,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('NOCHMAL DREHEN'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFFCF5),
-                  foregroundColor: AppDesign.primaryDark,
-                  minimumSize: const Size.fromHeight(54),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              FilledButton.icon(
-                onPressed: () => Navigator.pop(context, result),
-                icon: const Icon(Icons.arrow_forward_rounded),
-                label: Text('WEITER MIT „${_labels[result]}“'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFFCF5),
-                  foregroundColor: AppDesign.primaryDark,
-                  minimumSize: const Size.fromHeight(54),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
-                  ),
-                ),
-              ),
-            ] else
-              FilledButton.icon(
-                // Keep the button's appearance unchanged while the reels stop.
-                // _stopRoulette ignores additional taps while _stopping is true.
-                onPressed: _spinning ? _stopRoulette : null,
-                icon: const Icon(Icons.stop_circle_rounded),
-                label: const Text('STOPP'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: _deepRed,
-                  foregroundColor: _gold,
-                  minimumSize: const Size.fromHeight(54),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.4,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: const BorderSide(color: _gold, width: 1.5),
-                  ),
-                ),
-              ),
-          ],
-        ),
           ),
+          if (_finished && result != null)
+            Positioned.fill(
+              child: ColoredBox(
+                color: Colors.black.withValues(alpha: .48),
+                child: SafeArea(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final popupHeight = constraints.maxHeight * .68;
+                          return ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: 520,
+                              maxHeight: popupHeight,
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFFFFFCF5),
+                                    Color(0xFFF7F2E8),
+                                    Color(0xFFEFE5D2),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: _gold, width: 3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: .3),
+                                    blurRadius: 34,
+                                    offset: const Offset(0, 16),
+                                  ),
+                                  BoxShadow(
+                                    color: _gold.withValues(alpha: .28),
+                                    blurRadius: 24,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Center(
+                                      child: SingleChildScrollView(
+                                        child: _buildWinner(context, result),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  AnimatedOpacity(
+                                    opacity: _showActions ? 1 : 0,
+                                    duration: const Duration(milliseconds: 350),
+                                    child: IgnorePointer(
+                                      ignoring: !_showActions,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: FilledButton.icon(
+                                              onPressed: _spinAgain,
+                                              icon: const Icon(Icons.refresh_rounded),
+                                              label: const Text('NOCHMAL DREHEN'),
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: const Color(0xFFFFFCF5),
+                                                foregroundColor: AppDesign.primaryDark,
+                                                minimumSize: const Size.fromHeight(50),
+                                                textStyle: const TextStyle(
+                                                  fontWeight: FontWeight.w900,
+                                                  letterSpacing: 1.0,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  side: const BorderSide(color: _gold, width: 1.5),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 9),
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: FilledButton.icon(
+                                              onPressed: () => Navigator.pop(context, result),
+                                              icon: const Icon(Icons.arrow_forward_rounded),
+                                              label: Text('WEITER MIT „${_labels[result]}“'),
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: const Color(0xFFFFFCF5),
+                                                foregroundColor: AppDesign.primaryDark,
+                                                minimumSize: const Size.fromHeight(50),
+                                                textStyle: const TextStyle(
+                                                  fontWeight: FontWeight.w900,
+                                                  letterSpacing: .8,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(16),
+                                                  side: const BorderSide(color: _gold, width: 1.5),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           if (_finished)
             Positioned.fill(
               child: IgnorePointer(child: _buildJackpotCelebration()),
