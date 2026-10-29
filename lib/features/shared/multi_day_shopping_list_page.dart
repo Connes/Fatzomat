@@ -188,6 +188,16 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               isShared: true,
             ));
             sharedPlanIds.add(id);
+            final recipeId = shared['recipe_id']?.toString() ?? '';
+            if (recipeId.isNotEmpty) {
+              // Older shared plans can exist without generated shopping rows.
+              // Backfill them from the recipe before loading the shared list.
+              await _collaboration.ensureSharedRecipeShoppingItems(
+                planId: id,
+                recipeId: recipeId,
+                servings: (shared['servings'] as num?)?.toInt() ?? 2,
+              );
+            }
           }
         }
       } catch (_) {

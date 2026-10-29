@@ -298,6 +298,49 @@ class CollaborationRepository {
     return result;
   }
 
+  /// Repairs legacy shared plans whose shopping rows were never generated.
+  /// Existing rows (including manually edited lists) are always preserved.
+  Future<void> ensureSharedRecipeShoppingItems({
+    required String planId,
+    required String recipeId,
+    required int servings,
+  }) async {
+    final existing = await client
+        .from('shopping_items')
+        .select('id')
+        .eq('shared_recipe_plan_id', planId)
+        .limit(1);
+    if (existing.isNotEmpty) return;
+
+    final recipe = await client
+        .from('recipes')
+        .select('servings,recipe_ingredients(food_id,name,quantity,unit)')
+        .eq('id', recipeId)
+        .maybeSingle();
+    if (recipe == null || recipe['recipe_ingredients'] is! List) return;
+    final ingredients = (recipe['recipe_ingredients'] as List)
+        .whereType<Map>()
+        .map((row) => Map<String, dynamic>.from(row))
+        .where((row) => (row['name']?.toString().trim() ?? '').isNotEmpty)
+        .toList(growable: false);
+    if (ingredients.isEmpty) return;
+
+    final baseServings = (recipe['servings'] as num?)?.toInt() ?? 2;
+    final factor = baseServings > 0 ? servings / baseServings : 1.0;
+    await client.from('shopping_items').insert(ingredients.map((ingredient) {
+      final rawQuantity = ingredient['quantity'];
+      final quantity = rawQuantity is num ? rawQuantity * factor : 1;
+      return <String, dynamic>{
+        'shared_recipe_plan_id': planId,
+        'food_id': ingredient['food_id'],
+        'name': ingredient['name'].toString().trim(),
+        'quantity': quantity > 0 ? quantity : 1,
+        'unit': ingredient['unit']?.toString() ?? '',
+        'source': 'recipe',
+      };
+    }).toList(growable: false));
+  }
+
   Future<List<ShoppingItem>> shoppingItems(String planId) async {
     final rows = await client
         .from('shopping_items')
