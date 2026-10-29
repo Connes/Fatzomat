@@ -45,5 +45,34 @@ jobs:
       - name: Test
         run: flutter test
 
+      # CI only needs to validate compilation. Real Firebase configuration is
+      # intentionally not committed to the repository.
+      - name: Prepare placeholder Firebase config for debug build
+        run: |
+          cat > android/app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "000000000000",
+              "project_id": "fatzomat-ci",
+              "storage_bucket": "fatzomat-ci.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "com.example.food_app_mvp"
+                  }
+                },
+                "api_key": [
+                  { "current_key": "ci-placeholder-not-for-runtime" }
+                ],
+                "services": {}
+              }
+            ],
+            "configuration_version": "1"
+          }
+          JSON
+
       - name: Build Android debug APK
         run: flutter build apk --debug
