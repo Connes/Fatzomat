@@ -17,6 +17,7 @@ import '../../core/app_design.dart';
 import '../../core/recipe_collection_events.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
+import '../../data/services/shopping_list_aggregator.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import 'controllers/today_controller.dart';
 import '../recipes/recipe_detail_page.dart';
@@ -1743,7 +1744,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
     setState(() {
       final index = items.indexWhere((i) => i.id == item.id);
       if (index != -1) {
-        items[index] = ShoppingItem(id: item.id, name: item.name, quantity: item.quantity, unit: item.unit, checked: checked, foodId: item.foodId, category: item.category, source: item.source);
+        items[index] = ShoppingItem(id: item.id, name: item.name, quantity: item.quantity, unit: item.unit, checked: checked, foodId: item.foodId, category: item.category, source: item.source, planId: item.planId);
       }
     });
     try {
@@ -1756,7 +1757,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
       if (!mounted) return;
       setState(() {
         final index = items.indexWhere((i) => i.id == item.id);
-        if (index != -1) items[index] = ShoppingItem(id: item.id, name: item.name, quantity: item.quantity, unit: item.unit, checked: old, foodId: item.foodId, category: item.category, source: item.source);
+        if (index != -1) items[index] = ShoppingItem(id: item.id, name: item.name, quantity: item.quantity, unit: item.unit, checked: old, foodId: item.foodId, category: item.category, source: item.source, planId: item.planId);
       });
       showAppError(context, e);
     }
@@ -1858,8 +1859,236 @@ class _ShoppingPageState extends State<ShoppingPage> {
     return '$quantity${hasUnit ? ' ${item.unit}' : ''} ${item.name}';
   }
 
+  Widget _buildSharedPersonalStyle() {
+    final aggregated = const ShoppingListAggregator().aggregate(items);
+    final checkedCount = aggregated.where((item) => item.checked).length;
+    final progress = aggregated.isEmpty ? 0.0 : checkedCount / aggregated.length;
+    final visible = _showOnlyOpen
+        ? aggregated.where((item) => !item.checked).toList()
+        : aggregated;
+    final categories = visible.map((item) => item.category.trim().isEmpty
+        ? 'Weitere Zutaten'
+        : item.category.trim()).toSet().toList()
+      ..sort((a, b) {
+        if (a == 'Weitere Zutaten') return 1;
+        if (b == 'Weitere Zutaten') return -1;
+        return a.toLowerCase().compareTo(b.toLowerCase());
+      });
+    final canComplete = aggregated.isNotEmpty && aggregated.every((item) => item.checked);
+    final theme = Theme.of(context);
+
+    return TogetherScaffold(
+      backgroundType: TogetherBackgroundType.today,
+      appBar: TogetherAppBar(
+        title: const Text('Einkaufsliste'),
+        actions: [
+          AppBadge(
+            label: 'Gemeinsam',
+            icon: Icons.people_alt_rounded,
+            backgroundColor: AppDesign.accentSoft,
+            foregroundColor: AppDesign.accentDark,
+          ),
+        ],
+      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: load,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 36),
+                children: [
+                  AppSurface(
+                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+                    bordered: false,
+                    color: AppDesign.surface,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.recipeName,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: AppDesign.text,
+                              fontWeight: FontWeight.w700,
+                            )),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text('$checkedCount von ${aggregated.length} Zutaten erledigt',
+                                  style: const TextStyle(color: AppDesign.text)),
+                            ),
+                            Text('${(progress * 100).round()}%',
+                                style: const TextStyle(
+                                  color: AppDesign.primaryDark,
+                                  fontWeight: FontWeight.w700,
+                                )),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(AppDesign.radiusPill),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 7,
+                            backgroundColor: AppDesign.surfaceSoft,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 0,
+                          children: [
+                            if (aggregated.any((item) => !item.checked))
+                              TextButton.icon(
+                                onPressed: () async {
+                                  for (final item in aggregated.where((item) => !item.checked)) {
+                                    for (final source in item.sources.where((source) => !source.checked)) {
+                                      await toggleItem(source, true);
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.done_all_rounded),
+                                label: const Text('Alle abhaken'),
+                              ),
+                            if (aggregated.any((item) => item.checked))
+                              TextButton.icon(
+                                onPressed: () async {
+                                  for (final item in aggregated.where((item) => item.checked)) {
+                                    for (final source in item.sources.where((source) => source.checked)) {
+                                      await toggleItem(source, false);
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.restart_alt_rounded),
+                                label: const Text('Alle zurücksetzen'),
+                              ),
+                          ],
+                        ),
+                        FilterChip(
+                          label: const Text('Nur offene Zutaten'),
+                          selected: _showOnlyOpen,
+                          showCheckmark: false,
+                          selectedColor: AppDesign.primarySoft,
+                          avatar: const Icon(Icons.checklist_rounded),
+                          onSelected: (selected) => setState(() => _showOnlyOpen = selected),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: canComplete ? clearCompleted : null,
+                            icon: const Icon(Icons.check_circle_outline_rounded),
+                            label: const Text('Einkaufsliste erledigen'),
+                          ),
+                        ),
+                        if (!canComplete) ...[
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Hake zuerst alle Zutaten ab, um die Einkaufsliste abzuschließen.',
+                            style: TextStyle(color: AppDesign.secondaryText),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (aggregated.isEmpty)
+                    AppSurface(
+                      color: AppDesign.surface,
+                      bordered: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Text('Für diese Einkaufsliste sind keine Zutaten vorhanden.',
+                            style: theme.textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText)),
+                      ),
+                    )
+                  else if (visible.isEmpty)
+                    AppSurface(
+                      color: AppDesign.surface,
+                      bordered: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Text('Alle Zutaten sind bereits erledigt.',
+                            style: theme.textTheme.bodyMedium?.copyWith(color: AppDesign.secondaryText)),
+                      ),
+                    )
+                  else
+                    AppSurface(
+                      color: AppDesign.surface,
+                      bordered: false,
+                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Zutaten',
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                color: AppDesign.text,
+                                fontWeight: FontWeight.w700,
+                              )),
+                          for (final category in categories) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 14, bottom: 4),
+                              child: Text(category,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: AppDesign.text,
+                                    fontWeight: FontWeight.w700,
+                                  )),
+                            ),
+                            ...visible.where((item) =>
+                                (item.category.trim().isEmpty ? 'Weitere Zutaten' : item.category.trim()) == category)
+                                .map((item) => Column(
+                                  children: [
+                                    CheckboxListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      value: item.checked,
+                                      onChanged: (value) async {
+                                        for (final source in item.sources) {
+                                          if (source.checked != (value == true)) {
+                                            await toggleItem(source, value == true);
+                                          }
+                                        }
+                                      },
+                                      title: Text(item.name,
+                                        style: TextStyle(
+                                          color: item.checked ? AppDesign.secondaryText : AppDesign.text,
+                                          decoration: item.checked ? TextDecoration.lineThrough : TextDecoration.none,
+                                          decorationColor: AppDesign.secondaryText,
+                                        )),
+                                      subtitle: item.showQuantity
+                                          ? Text('${item.quantity} ${item.unit.trim().isEmpty ? 'Stück' : item.unit}'.trim(),
+                                              style: TextStyle(
+                                                color: AppDesign.secondaryText,
+                                                decoration: item.checked ? TextDecoration.lineThrough : TextDecoration.none,
+                                              ))
+                                          : null,
+                                      secondary: const Icon(Icons.favorite_rounded, size: 18, color: AppDesign.error),
+                                    ),
+                                    const Divider(height: 1, thickness: 1, color: AppDesign.surfaceMuted),
+                                  ],
+                                )),
+                          ],
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.shared) {
+      if (loadError != null) {
+        return TogetherScaffold(
+          backgroundType: TogetherBackgroundType.today,
+          appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
+          body: AppErrorView(error: loadError!, onRetry: load),
+        );
+      }
+      return _buildSharedPersonalStyle();
+    }
+
     final checked = items.where((item) => item.checked).length;
     final openItems = items.where((item) => !item.checked).toList();
     final completedItems = items.where((item) => item.checked).toList();
