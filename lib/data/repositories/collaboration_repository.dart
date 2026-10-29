@@ -278,7 +278,7 @@ class CollaborationRepository {
   Future<Map<String, dynamic>?> currentSharedRecipePlan() async {
     final rows = await client
         .from('shared_recipe_plans')
-        .select('id,recipe_id,status,servings,plan_date,recipes(name,description,image_url,image_path)')
+        .select('id,recipe_id,status,plan_date,recipes(name,description,servings,image_url,image_path)')
         .eq('plan_date', DateTime.now().toIso8601String().substring(0, 10))
         .neq('status', 'cancelled')
         .order('created_at', ascending: false)
@@ -336,7 +336,6 @@ class CollaborationRepository {
         'name': ingredient['name'].toString().trim(),
         'quantity': quantity > 0 ? quantity : 1,
         'unit': ingredient['unit']?.toString() ?? '',
-        'source': 'recipe',
       };
     }).toList(growable: false));
   }
@@ -344,7 +343,7 @@ class CollaborationRepository {
   Future<List<ShoppingItem>> shoppingItems(String planId) async {
     final rows = await client
         .from('shopping_items')
-        .select('id,name,quantity,unit,checked,checked_by,food_id,source,foods(category)')
+        .select('id,name,quantity,unit,checked,checked_by,food_id,foods(category)')
         .eq('shared_recipe_plan_id', planId)
         .order('name');
     return rows.map((row) => ShoppingItem.fromMap(Map<String, dynamic>.from(row))).toList();
