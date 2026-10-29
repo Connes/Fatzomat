@@ -155,59 +155,8 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
       );
     }
 
-    if (connected) {
-      if (sharedPlan != null) {
-        final plan = sharedPlan!;
-        final recipe = plan['recipes'] is Map
-            ? Map<String, dynamic>.from(plan['recipes'] as Map)
-            : const <String, dynamic>{};
-        return TogetherScaffold(
-          backgroundType: TogetherBackgroundType.today,
-          appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
-          body: _EntryCard(
-            icon: Icons.people_outline_rounded,
-            title: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
-            text: 'Die gemeinsame Einkaufsliste ist bereit. Du kannst sie öffnen oder zur persönlichen Mehrtagesplanung wechseln.',
-            actionLabel: 'Gemeinsame Einkaufsliste öffnen',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ShoppingPage(
-                  planId: plan['id'].toString(),
-                  recipeName: recipe['name']?.toString() ?? 'Gemeinsame Einkaufsliste',
-                  servings: (plan['servings'] as num?)?.toInt() ?? 2,
-                  shared: true,
-                  onCompleted: () {
-                    if (!mounted) return;
-                    Navigator.pop(context);
-                    load();
-                  },
-                ),
-              ),
-            ),
-            secondaryLabel: 'Persönliche Mehrtagesliste öffnen',
-            onSecondaryPressed: _openPersonal,
-          ),
-        );
-      }
-
-      return TogetherScaffold(
-        backgroundType: TogetherBackgroundType.today,
-        appBar: const TogetherAppBar(title: Text('Einkaufsliste')),
-        body: _EntryCard(
-          icon: Icons.people_outline_rounded,
-          title: 'Noch keine gemeinsame Einkaufsliste',
-          text: 'Wählt zuerst ein gemeinsames Rezept für heute. Danach steht dieselbe Einkaufsliste beiden verbundenen Personen zur Verfügung.',
-          actionLabel: 'Gemeinsames Rezept auswählen',
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedRecipesPage())),
-          secondaryLabel: personalPlanId != null ? 'Persönliche Liste für heute öffnen' : 'Persönliche Mehrtagesliste öffnen',
-          onSecondaryPressed: personalPlanId != null ? _openPersonalSingleDay : _openPersonal,
-        ),
-      );
-    }
-
-    // Show the multi-day personal list even when Today has no recipe but a
-    // recipe is planned for tomorrow or the day after.
+    // Connections do not get a separate shopping-list entry screen. Personal
+    // and shared recipe decisions are shown together in the same list.
     return const MultiDayShoppingListPage();
 
   }
