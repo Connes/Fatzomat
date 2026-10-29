@@ -235,9 +235,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                       ),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          final popupHeight = (constraints.maxHeight * .68)
-                              .clamp(390.0, constraints.maxHeight)
-                              .toDouble();
+                          final popupHeight = constraints.maxHeight * .68;
                           return ConstrainedBox(
                             constraints: BoxConstraints(
                               maxWidth: 520,
