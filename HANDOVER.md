@@ -299,4 +299,13 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Nach PR #346 liegt die Gemüseillustration auf dem Launchscreen in einem `ClipRect` und wird horizontal mit `scaleX: 1.04` vergrößert, damit eingebettete Randlinien nicht als sichtbare Naht am Bildschirmrand erscheinen.
 - Regressionstest `test/regression/launch_artwork_test.dart` sichert den Clip, den horizontalen Zuschnitt und die unveränderte Bildausrichtung ab.
 - Der Test ist ein Quelltext-Vertragstest und ersetzt keine visuelle Geräteprüfung.
-- CI und Merge für diesen Folge-PR sind noch ausstehend; Geräteprüfung nicht durchgeführt.
+- Über PR [#347](https://github.com/Connes/Fatzomat/pull/347) gemergt; Merge-Commit `1955241eb8c6a1b283cf5c53ed02a5785f8b7a67`. Der Regressionstest `test/regression/launch_artwork_test.dart` schützt den Zuschnitt. Die beiden PR-Workflows waren erfolgreich; visuelle Geräteprüfung nicht durchgeführt.
+
+
+## Überrasch-mich: Gewinner im Mittelpunkt animieren (Arbeitsstand 2026-10-29)
+
+- In `lib/features/shared/surprise_mode_roulette_page.dart` blendet sich der Fatzomat nach dem Stoppen per Fade-/Scale-Übergang aus, während die Gewinnerkategorie aus nahezu unsichtbarer Größe langsam ins Zentrum wächst.
+- Nach dem Einblenden pulsiert die Gewinnerkarte dezent weiter. Die Buttons „NOCHMAL DREHEN“ und „WEITER MIT …“ bleiben darunter erhalten.
+- „NOCHMAL DREHEN“ setzt Einblend- und Pulsanimation zurück und startet die Walzen neu; die nächste Gewinneranzeige beginnt damit wieder von vorn.
+- Regressionstest: `test/regression/surprise_winner_focus_animation_test.dart`.
+- Branch `ux/surprise-winner-focus-animation`; PR, CI, Merge und Geräteprüfung stehen noch aus.
