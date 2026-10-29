@@ -298,26 +298,24 @@ class CollaborationRepository {
     return result;
   }
 
-  /// Repairs legacy shared plans whose shopping rows were never generated.
-  /// Existing rows (including manually edited lists) are always preserved.
+  /// Repairs missing rows for legacy shared plans without replacing or
+  /// resetting items that the household has already edited or checked.
+  ///
+  /// Older versions could leave a partially populated list behind. Treating
+  /// the existence of a single row as proof that the list is complete meant
+  /// those plans could never be repaired by a later refresh.
   Future<void> ensureSharedRecipeShoppingItems({
     required String planId,
     required String recipeId,
     required int servings,
   }) async {
-    final existing = await client
-        .from('shopping_items')
-        .select('id')
-        .eq('shared_recipe_plan_id', planId)
-        .limit(1);
-    if (existing.isNotEmpty) return;
-
     final recipe = await client
         .from('recipes')
         .select('servings,recipe_ingredients(food_id,name,quantity,unit)')
         .eq('id', recipeId)
         .maybeSingle();
     if (recipe == null || recipe['recipe_ingredients'] is! List) return;
+
     final ingredients = (recipe['recipe_ingredients'] as List)
         .whereType<Map>()
         .map((row) => Map<String, dynamic>.from(row))
@@ -325,9 +323,28 @@ class CollaborationRepository {
         .toList(growable: false);
     if (ingredients.isEmpty) return;
 
+    final existingRows = await client
+        .from('shopping_items')
+        .select('food_id,name,unit')
+        .eq('shared_recipe_plan_id', planId);
+    String key(Object? foodId, Object? name, Object? unit) =>
+        '${foodId?.toString() ?? ''}|'
+        '${(name?.toString() ?? '').trim().toLowerCase()}|'
+        '${(unit?.toString() ?? '').trim().toLowerCase()}';
+    final existingKeys = existingRows
+        .map((row) => key(row['food_id'], row['name'], row['unit']))
+        .toSet();
+    final missing = ingredients.where((ingredient) =>
+        !existingKeys.contains(key(
+          ingredient['food_id'],
+          ingredient['name'],
+          ingredient['unit'],
+        ))).toList(growable: false);
+    if (missing.isEmpty) return;
+
     final baseServings = (recipe['servings'] as num?)?.toInt() ?? 2;
     final factor = baseServings > 0 ? servings / baseServings : 1.0;
-    await client.from('shopping_items').insert(ingredients.map((ingredient) {
+    await client.from('shopping_items').insert(missing.map((ingredient) {
       final rawQuantity = ingredient['quantity'];
       final quantity = rawQuantity is num ? rawQuantity * factor : 1;
       return <String, dynamic>{
