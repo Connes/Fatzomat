@@ -251,7 +251,7 @@ class CollaborationRepository {
   Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate}) async {
     var query = client
         .from('shared_recipe_plans')
-        .select('id,recipe_id,status,servings,plan_date,recipes(name,description,image_url,image_path)')
+        .select('id,recipe_id,status,plan_date,recipes(name,description,servings,image_url,image_path)')
         .neq('status', 'cancelled');
     final start = fromDate ?? DateTime.now();
     final date = '${start.year.toString().padLeft(4, '0')}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}';
