@@ -38,6 +38,7 @@ class TodayPage extends StatefulWidget {
   final ValueChanged<int>? onNavigateToTab;
   final VoidCallback? onNavigateToToday;
   final ValueListenable<int>? resetToTodaySignal;
+  final ValueListenable<DateTime?>? notificationDateSignal;
 
   const TodayPage({
     super.key,
@@ -45,6 +46,7 @@ class TodayPage extends StatefulWidget {
     this.onNavigateToTab,
     this.onNavigateToToday,
     this.resetToTodaySignal,
+    this.notificationDateSignal,
   });
 
   @override
@@ -85,6 +87,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     widget.resetToTodaySignal?.addListener(_resetToToday);
+    widget.notificationDateSignal?.addListener(_handleNotificationDateChanged);
     final today = _dateOnly(DateTime.now());
     _selectedDate = _dateOnly(widget.initialDate ?? today);
     if (_selectedDate.isBefore(today)) _selectedDate = today;
@@ -98,6 +101,23 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
   }
 
   DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+
+  void _handleNotificationDateChanged() {
+    final requestedDate = widget.notificationDateSignal?.value;
+    if (requestedDate == null || !mounted) return;
+    final today = _dateOnly(DateTime.now());
+    final target = _dateOnly(requestedDate);
+    final targetDate = target.isBefore(today) ? today : target;
+    final direction = targetDate.isBefore(_selectedDate) ? -1 : 1;
+    setState(() {
+      _selectedDate = targetDate;
+      _displayedDate = targetDate;
+      _pageTransitionDirection = direction;
+      loading = true;
+      loadError = null;
+    });
+    load();
+  }
 
   void _resetToToday() {
     if (!mounted) return;
@@ -118,6 +138,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     if (oldWidget.resetToTodaySignal != widget.resetToTodaySignal) {
       oldWidget.resetToTodaySignal?.removeListener(_resetToToday);
       widget.resetToTodaySignal?.addListener(_resetToToday);
+    }
+    if (oldWidget.notificationDateSignal != widget.notificationDateSignal) {
+      oldWidget.notificationDateSignal?.removeListener(_handleNotificationDateChanged);
+      widget.notificationDateSignal?.addListener(_handleNotificationDateChanged);
     }
   }
 
@@ -467,6 +491,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     _dayBoundaryTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     widget.resetToTodaySignal?.removeListener(_resetToToday);
+    widget.notificationDateSignal?.removeListener(_handleNotificationDateChanged);
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     if (channel != null) {
       try {

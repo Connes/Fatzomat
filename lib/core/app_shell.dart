@@ -10,6 +10,9 @@ import '../features/shared/today_page.dart';
 import '../features/shared/shopping_list_page.dart';
 
 class AppShell extends StatefulWidget {
+  /// Routes notification taps into the currently mounted shell, if any.
+  static void Function(DateTime?)? notificationNavigationHandler;
+
   final DateTime? initialDate;
 
   const AppShell({super.key, this.initialDate});
@@ -19,6 +22,23 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
+  final ValueNotifier<DateTime?> _notificationDateSignal = ValueNotifier<DateTime?>(null);
+
+  void _handleNotificationNavigation(DateTime? targetDate) {
+    // Close any detail route inside the shell without disposing the IndexedStack.
+    _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+    // Keep the existing IndexedStack alive, especially the shopping-list page
+    // and its Realtime channel.
+    if (index != 0) {
+      setState(() {
+        index = 0;
+        _contentIndex.value = 0;
+      });
+    }
+    _notificationDateSignal.value = null;
+    _notificationDateSignal.value = targetDate ?? DateTime.now();
+  }
+
   // „Heute“ ist der zentrale Einstieg: Die App beantwortet zuerst die Frage,
   // was wir heute gemeinsam machen.
   int index = 0;
@@ -30,6 +50,7 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
+    AppShell.notificationNavigationHandler = _handleNotificationNavigation;
     _network = NetworkStatusService();
     _network.start();
   }
@@ -62,6 +83,10 @@ class _AppShellState extends State<AppShell> {
 
   @override
   void dispose() {
+    if (AppShell.notificationNavigationHandler == _handleNotificationNavigation) {
+      AppShell.notificationNavigationHandler = null;
+    }
+    _notificationDateSignal.dispose();
     _network.dispose();
     _contentIndex.dispose();
     _todayResetSignal.dispose();
@@ -105,6 +130,7 @@ class _AppShellState extends State<AppShell> {
         onNavigateToTab: _selectTab,
         onNavigateToToday: _returnToTodayPreservingDate,
         resetToTodaySignal: _todayResetSignal,
+        notificationDateSignal: _notificationDateSignal,
       ),
       SavedRecipesPage(onNavigateToTab: _selectTab),
       const ShoppingListPage(),
