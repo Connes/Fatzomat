@@ -135,4 +135,20 @@ void main() {
     expect(collaboration, contains("rpc('update_shared_recipe_plan_servings'"));
   });
 
+  test('shared recipe plans load their current serving count, not the original recipe count', () {
+    final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(collaboration, contains(".select('id,recipe_id,status,plan_date,servings,recipes(name,description,servings,image_url,image_path)')"));
+    expect(page, contains("(shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2"));
+  });
+
+  test('serving count cannot drop below one and has no UI upper cap', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('if (servings < 1) return;'));
+    expect(page, contains('onPressed: () => _updatePlanServings(plan, plan.servings + 1)'));
+    expect(page, isNot(contains('plan.servings >= 12')));
+  });
+
 }
