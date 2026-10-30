@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/recipe_collection_events.dart';
+
 import '../models/app_notification.dart';
 import '../models/connection_info.dart';
 import '../models/decision_request.dart';
@@ -97,6 +99,7 @@ class CollaborationRepository {
       'p_result_id': resultId,
       'p_servings': servings,
     });
+    RecipeCollectionEvents.notifyChanged();
   }
 
   Future<DecisionRequest?> latestResolvedDecisionRequestCreatedByMe() async {
@@ -217,6 +220,7 @@ class CollaborationRepository {
     await client.rpc('accept_decision_share', params: {
       'p_share_id': id,
     });
+    RecipeCollectionEvents.notifyChanged();
   }
 
   Future<void> rejectDecisionShare(String shareId) async {
