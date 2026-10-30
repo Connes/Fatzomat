@@ -273,6 +273,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                 plan.isSharedAccepted &&
                 sharedRecipeId != null &&
                 plan.recipeId == sharedRecipeId);
+            final completedBy = shared['shopping_list_completed_by']?.toString();
+            final completedByName = completedBy == null || shared['connection_id'] == null
+                ? null
+                : await _collaboration.connectionMemberDisplayName(shared['connection_id'].toString(), completedBy);
             final recipe = shared['recipes'] is Map
                 ? Map<String, dynamic>.from(shared['recipes'] as Map)
                 : <String, dynamic>{};
@@ -295,6 +299,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               shoppingListCompletedAt: shared['shopping_list_completed_at'] == null
                   ? null
                   : DateTime.tryParse(shared['shopping_list_completed_at'].toString()),
+              shoppingListCompletedByName: completedByName,
               servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
               name: recipe['name']?.toString() ?? 'Gemeinsames Rezept',
               description: recipe['description']?.toString(),
@@ -479,6 +484,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     } finally {
       if (mounted) setState(() => _updatingItems.remove(item.key));
     }
+  }
+
+  String _completionLabel(DateTime day) {
+    final names = _plansFor(day).where((plan) => plan.shoppingListCompletedAt != null)
+        .map((plan) => plan.shoppingListCompletedByName?.trim() ?? '')
+        .where((name) => name.isNotEmpty).toSet();
+    return names.isEmpty ? 'Erledigt' : names.join(', ');
   }
 
   bool _isDayCompleted(DateTime day) {
@@ -790,7 +802,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 // Legacy regression contract: const Text('Erledigt').
                                 // The user-facing label adds context below.
                                 subtitle: _isDayCompleted(day)
-                                    ? const Text('Erledigt · Einkauf erledigt')
+                                    ? Text('${_completionLabel(day)} · Einkauf erledigt')
                                     : null,
                                 trailing: _isDayCompleted(day)
                                     ? const Icon(
