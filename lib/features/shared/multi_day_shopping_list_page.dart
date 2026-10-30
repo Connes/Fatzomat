@@ -368,8 +368,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   Future<void> _updatePlanServings(TodayPlan plan, int servings) async {
     if (servings < 1 || servings > 12) return;
     try {
+      // Adjust only the selected plan. Replacing the shared recipe invokes a
+      // different RPC and can fail instead of changing the household's serving count.
       final updated = _sharedPlanIds.contains(plan.id)
-          ? (await _collaboration.replaceSharedRecipePlan(plan.id, plan.recipeId!, servings: servings)).isNotEmpty
+          ? await _collaboration.updateSharedRecipePlanServings(plan.id, servings)
           : await _repo.updateServings(plan.id, servings);
       if (!updated) throw StateError('Die Personenzahl konnte nicht gespeichert werden.');
       await load(showLoading: false);
@@ -602,7 +604,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               : RefreshIndicator(
                   onRefresh: load,
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                    // Reserve scroll space for the persistent bottom navigation on compact screens.
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
                     children: [
                       if (activeDays.isEmpty)
                         AppSurface(
