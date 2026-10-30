@@ -1072,6 +1072,15 @@ class _IncomingDecisionShareCard extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             if (isDineOut) ...[
+              Text(
+                'Wir gehen essen',
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppDesign.primaryDark,
+                    ),
+              ),
+              const SizedBox(height: 12),
               ClipRRect(
                 borderRadius: BorderRadius.circular(22),
                 child: Image.asset(
@@ -1082,11 +1091,11 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               if (cuisine != null) ...[
                 Text(
                   cuisine,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.left,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppDesign.primaryDark.withValues(alpha: 0.72),
@@ -1094,19 +1103,11 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
               ],
-              Text(
-                'Wir gehen essen',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppDesign.primaryDark,
-                    ),
-              ),
               if (restaurantName != null) ...[
                 const SizedBox(height: 6),
                 Text(
                   restaurantName,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.left,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppDesign.text,
@@ -1114,6 +1115,15 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 ),
               ],
             ] else if (share.decisionType == 'order') ...[
+              Text(
+                'Wir bestellen',
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppDesign.primaryDark,
+                    ),
+              ),
+              const SizedBox(height: 12),
               ClipRRect(
                 borderRadius: BorderRadius.circular(22),
                 child: orderCategory == null
@@ -1127,13 +1137,15 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                         errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain)),
               ),
               const SizedBox(height: 12),
-              if (orderCategory != null) ...[
-                Text(orderCategory, textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: AppDesign.primaryDark.withValues(alpha: 0.72))),
-                const SizedBox(height: 6),
-              ],
-              Text('Wir bestellen', textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: AppDesign.primaryDark)),
+              if (orderCategory != null)
+                Text(
+                  orderCategory,
+                  textAlign: TextAlign.left,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppDesign.primaryDark.withValues(alpha: 0.72),
+                      ),
+                ),
             ] else ...[
               Text(
                 _decisionLabel,
