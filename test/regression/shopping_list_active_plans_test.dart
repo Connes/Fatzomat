@@ -20,6 +20,8 @@ void main() {
     expect(page, contains('Keep a planned recipe date visible even if its shopping rows'));
     expect(page, contains('_plans[i].any((plan) => plan.isRecipe)'));
     expect(page, contains('final personalDays = await _repo.plannedShoppingDates();'));
+    expect(page, contains('sharedPlanIds.add(id);'));
+    expect(page.indexOf('sharedPlanIds.add(id);'), lessThan(page.indexOf('if (dayPlans.any((plan) => plan.id == id)) continue;')));
   });
 
   test('ingredient search is removed and shopping content uses opaque surfaces', () {
