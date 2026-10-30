@@ -255,7 +255,7 @@ class CollaborationRepository {
   Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate}) async {
     var query = client
         .from('shared_recipe_plans')
-        .select('id,recipe_id,status,plan_date,servings,shopping_list_completed_at,shopping_list_completed_by,connection_id,recipes(name,description,servings,image_url,image_path)')
+        .select('id,recipe_id,status,plan_date,servings,shopping_list_completed_at,recipes(name,description,servings,image_url,image_path)')
         .neq('status', 'cancelled');
     final start = fromDate ?? DateTime.now();
     final date = '${start.year.toString().padLeft(4, '0')}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')}';
@@ -558,17 +558,6 @@ class CollaborationRepository {
     return result.toString();
   }
 
-
-  Future<String?> connectionMemberDisplayName(String connectionId, String userId) async {
-    final row = await client.from('connection_members').select('display_name')
-        .eq('connection_id', connectionId).eq('user_id', userId).maybeSingle();
-    final name = row?['display_name']?.toString().trim() ?? '';
-    if (name.isNotEmpty) return name;
-    final profile = await client.from('profiles').select('display_name')
-        .eq('id', userId).maybeSingle();
-    final profileName = profile?['display_name']?.toString().trim() ?? '';
-    return profileName.isEmpty ? null : profileName;
-  }
 
   Future<bool> completeSharedShoppingList(String planId) async {
     final result = await client.rpc('complete_shared_shopping_list', params: {
