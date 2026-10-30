@@ -151,4 +151,14 @@ void main() {
     expect(page, isNot(contains('plan.servings >= 12')));
   });
 
+  test('shopping realtime subscription reconnects and reloads after subscribing', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('RealtimeSubscribeStatus.subscribed'));
+    expect(page, contains('RealtimeSubscribeStatus.channelError'));
+    expect(page, contains('RealtimeSubscribeStatus.timedOut'));
+    expect(page, contains('_scheduleRealtimeReload();'));
+    expect(page, contains('client.removeChannel(oldChannel).whenComplete(_subscribe)'));
+  });
+
 }
