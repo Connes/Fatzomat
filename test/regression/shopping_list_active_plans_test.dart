@@ -139,7 +139,7 @@ void main() {
     final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
-    expect(collaboration, contains(".select('id,recipe_id,status,plan_date,servings,recipes(name,description,servings,image_url,image_path)')"));
+    expect(collaboration, contains(".select('id,recipe_id,status,plan_date,servings,shopping_list_completed_at,recipes(name,description,servings,image_url,image_path)')"));
     expect(page, contains("(shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2"));
   });
 
@@ -168,7 +168,7 @@ void main() {
 
     expect(page, contains('_collaboration.completeSharedShoppingList(id)'));
     expect(page, isNot(contains("_collaboration.updateSharedRecipeStatus(id, 'cooked')")));
-    expect(page, contains("shopping_list_completed_at: shared['shopping_list_completed_at']"));
+    expect(page, contains("shoppingListCompletedAt: shared['shopping_list_completed_at']"));
     expect(collaboration, contains("rpc('complete_shared_shopping_list'"));
     expect(migration, contains('shopping_list_completed_at'));
     expect(migration, contains('CREATE OR REPLACE FUNCTION public.complete_shared_shopping_list'));
