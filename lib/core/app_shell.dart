@@ -25,6 +25,8 @@ class _AppShellState extends State<AppShell> {
   final ValueNotifier<DateTime?> _notificationDateSignal = ValueNotifier<DateTime?>(null);
 
   void _handleNotificationNavigation(DateTime? targetDate) {
+    // Close any detail route inside the shell without disposing the IndexedStack.
+    _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     // Keep the existing IndexedStack alive, especially the shopping-list page
     // and its Realtime channel.
     if (index != 0) {
