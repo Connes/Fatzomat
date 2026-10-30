@@ -67,7 +67,7 @@ void main() {
     expect(page, contains("'\${selectedDays.length} von \${activeDays.length} Tagen ausgewählt'"));
     expect(page, contains('await load(showLoading: false);'));
     expect(page, contains('_isDayCompleted(day)'));
-    expect(page, contains("_completionLabel(day)"));
+    expect(page, contains("const Text('Erledigt')"));
     expect(page, isNot(contains('_repo.deleteShoppingItem(item.id)')));
   });
 
@@ -139,7 +139,7 @@ void main() {
     final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
-    expect(collaboration, contains(".select('id,recipe_id,status,plan_date,servings,shopping_list_completed_at,shopping_list_completed_by,connection_id,recipes(name,description,servings,image_url,image_path)')"));
+    expect(collaboration, contains(".select('id,recipe_id,status,plan_date,servings,shopping_list_completed_at,recipes(name,description,servings,image_url,image_path)')"));
     expect(page, contains("(shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2"));
   });
 
