@@ -35,6 +35,7 @@ void main() {
     expect(page, contains("table: 'personal_today_plans'"));
     expect(page, contains("table: 'shopping_items'"));
     expect(page, contains('_handleShoppingItemRealtime(payload)'));
+    expect(page, contains('_sharedPlanIds\n          ..clear()\n          ..addAll(sharedPlanIds);'));
     expect(page, contains('checked: checked,'));
     expect(page, contains('BorderSide('));
     expect(page, contains('Icons.people_alt_rounded'));
