@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/recipe_collection_events.dart';
 import '../../core/app_exception.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,9 +18,7 @@ import '../../data/services/shopping_list_aggregator.dart';
 
 /// Personal shopping list aggregated across the next three calendar days.
 class MultiDayShoppingListPage extends StatefulWidget {
-  final ValueListenable<int>? refreshSignal;
-
-  const MultiDayShoppingListPage({super.key, this.refreshSignal});
+  const MultiDayShoppingListPage({super.key});
 
   @override
   State<MultiDayShoppingListPage> createState() => _MultiDayShoppingListPageState();
@@ -93,18 +91,12 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     load();
   }
 
-  void _onRefreshRequested() {
+  void _onRecipeCollectionChanged() {
+    // Recipe decisions are persisted before RecipeCollectionEvents fires.
+    // Refresh in the background now, not when the user later opens Einkauf.
     if (mounted) load(showLoading: false);
   }
 
-  @override
-  void didUpdateWidget(covariant MultiDayShoppingListPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.refreshSignal != widget.refreshSignal) {
-      oldWidget.refreshSignal?.removeListener(_onRefreshRequested);
-      widget.refreshSignal?.addListener(_onRefreshRequested);
-    }
-  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -121,7 +113,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   @override
   void initState() {
     super.initState();
-    widget.refreshSignal?.addListener(_onRefreshRequested);
+    RecipeCollectionEvents.revision.addListener(_onRecipeCollectionChanged);
     WidgetsBinding.instance.addObserver(this);
     _observedToday = _dateOnly(DateTime.now());
     _days = _makeDays(_observedToday);
@@ -484,7 +476,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   @override
   void dispose() {
-    widget.refreshSignal?.removeListener(_onRefreshRequested);
+    RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     _dayBoundaryTimer?.cancel();
     for (final timer in _checkedVisibilityTimers.values) {
       timer.cancel();
