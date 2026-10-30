@@ -48,6 +48,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   Object? _error;
   int _generation = 0;
   RealtimeChannel? _channel;
+  int _realtimeSubscriptionGeneration = 0;
 
   DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
   List<DateTime> _makeDays(DateTime today) => [today];
@@ -133,22 +134,37 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   }
 
   void _subscribe() {
+    if (!mounted) return;
+
+    final int generation = ++_realtimeSubscriptionGeneration;
     try {
       final client = Supabase.instance.client;
       _realtimeRetryTimer?.cancel();
-      _channel = client.channel('shopping-list-live');
-      _channel!
+
+      final channel = client.channel('shopping-list-live');
+      _channel = channel;
+      channel
           .onPostgresChanges(
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'personal_today_plans',
-            callback: (_) => _scheduleRealtimeReload(),
+            callback: (_) {
+              if (mounted && generation == _realtimeSubscriptionGeneration &&
+                  identical(_channel, channel)) {
+                _scheduleRealtimeReload();
+              }
+            },
           )
           .onPostgresChanges(
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'shopping_items',
-            callback: (payload) => _handleShoppingItemRealtime(payload),
+            callback: (payload) {
+              if (mounted && generation == _realtimeSubscriptionGeneration &&
+                  identical(_channel, channel)) {
+                _handleShoppingItemRealtime(payload);
+              }
+            },
           )
           // Shared decisions have their own lifecycle. Refresh when a partner
           // accepts, cancels, or completes a shared plan, even if no shopping
@@ -157,33 +173,78 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'shared_recipe_plans',
-            callback: (_) => load(showLoading: false),
+            callback: (_) {
+              if (mounted && generation == _realtimeSubscriptionGeneration &&
+                  identical(_channel, channel)) {
+                load(showLoading: false);
+              }
+            },
           )
           .onPostgresChanges(
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'decision_shares',
-            callback: (_) => load(showLoading: false),
+            callback: (_) {
+              if (mounted && generation == _realtimeSubscriptionGeneration &&
+                  identical(_channel, channel)) {
+                load(showLoading: false);
+              }
+            },
           )
           .subscribe((status, error) {
-            debugPrint('Shopping list Realtime status: $status');
-            if (status == RealtimeSubscribeStatus.subscribed) {
-              _scheduleRealtimeReload();
-            } else if (status == RealtimeSubscribeStatus.channelError ||
-                status == RealtimeSubscribeStatus.timedOut ||
-                status == RealtimeSubscribeStatus.closed) {
-              _realtimeRetryTimer?.cancel();
-              _realtimeRetryTimer = Timer(const Duration(seconds: 2), () {
-                if (!mounted) return;
-                final oldChannel = _channel;
-                _channel = null;
-                if (oldChannel != null) {
-                  client.removeChannel(oldChannel).whenComplete(_subscribe);
-                } else {
-                  _subscribe();
-                }
-              });
+            // A removed/replaced channel can still deliver a final status
+            // callback. Ignore it so stale callbacks cannot start extra retries.
+            if (!mounted ||
+                generation != _realtimeSubscriptionGeneration ||
+                !identical(_channel, channel)) {
+              return;
             }
+
+            debugPrint(
+              'Shopping list Realtime status: $status'
+              '${error == null ? '' : ' ($error)'}',
+            );
+
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              _realtimeRetryTimer?.cancel();
+              _realtimeRetryTimer = null;
+              _scheduleRealtimeReload();
+              return;
+            }
+
+            if (status != RealtimeSubscribeStatus.channelError &&
+                status != RealtimeSubscribeStatus.timedOut &&
+                status != RealtimeSubscribeStatus.closed) {
+              return;
+            }
+
+            // Coalesce repeated error/closed notifications into one retry.
+            if (_realtimeRetryTimer?.isActive ?? false) return;
+            _realtimeRetryTimer = Timer(const Duration(seconds: 2), () async {
+              if (!mounted ||
+                  generation != _realtimeSubscriptionGeneration ||
+                  !identical(_channel, channel)) {
+                return;
+              }
+
+              _realtimeRetryTimer = null;
+              _channel = null;
+              // Invalidate callbacks from this channel before removing it.
+              final retryGeneration = ++_realtimeSubscriptionGeneration;
+              try {
+                await client.removeChannel(channel);
+              } catch (removeError) {
+                debugPrint(
+                  'Shopping list Realtime channel removal failed: $removeError',
+                );
+              }
+
+              if (!mounted ||
+                  retryGeneration != _realtimeSubscriptionGeneration) {
+                return;
+              }
+              _subscribe();
+            });
           });
     } on AssertionError {
       // Widget tests/previews may mount before Supabase is initialized.
@@ -555,6 +616,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   @override
   void dispose() {
+    // Invalidate pending Realtime callbacks/retries before tearing down the page.
+    _realtimeSubscriptionGeneration++;
+    _channel = null;
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     _dayBoundaryTimer?.cancel();
     _realtimeReloadTimer?.cancel();
