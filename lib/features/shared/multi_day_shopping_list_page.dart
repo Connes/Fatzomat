@@ -306,6 +306,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
         _days = days;
         _plans = plans;
         _items = items;
+        // Keep the shared-plan IDs used by card styling, checkbox writes and
+        // serving updates in sync with the plans just loaded. Previously the
+        // local set shadowed this field, so shared days were never gold-marked
+        // and shared-item writes could be routed through the personal repo.
+        _sharedPlanIds
+          ..clear()
+          ..addAll(sharedPlanIds);
         final activeDays = _activeDays;
         final activeKeys = activeDays.map(_key).toSet();
         _selected.removeWhere((key) =>
