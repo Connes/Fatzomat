@@ -34,6 +34,11 @@ void main() {
     expect(page, contains('surfaceTintColor: Colors.transparent'));
     expect(page, contains("table: 'personal_today_plans'"));
     expect(page, contains("table: 'shopping_items'"));
+    expect(page, contains('_handleShoppingItemRealtime(payload)'));
+    expect(page, contains('checked: checked,'));
+    expect(page, contains('BorderSide('));
+    expect(page, contains('Icons.people_alt_rounded'));
+    expect(page, contains('color: AppDesign.iconGold'));
     expect(page, contains('load(showLoading: false)'));
     final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
     expect(collaboration, contains('food_id,shared_recipe_plan_id,foods(category)'));
