@@ -30,9 +30,9 @@ void main() {
     expect(recipe, isNot(contains("'Für heute festlegen'")));
     expect(recipe, isNot(contains("'Für diesen Tag festlegen'")));
     expect(recipe, contains('final bool canMarkCooked'));
-    expect(recipe, contains('if (!widget.canMarkCooked || working) return;'));
+    expect(recipe, contains('if (!widget.viewingTodaySelection || !personalTodaySelected || working) return;'));
     expect(recipe, contains("label: const Text('Als gekocht abschließen')"));
-    expect(recipe, contains("widget.viewingTodaySelection &&\n              widget.canMarkCooked &&\n              steps.isNotEmpty &&\n              completedSteps.length == steps.length"));
+    expect(recipe, contains("widget.viewingTodaySelection &&\n              personalTodaySelected &&\n              _isPlanDateToday &&\n              steps.isNotEmpty &&\n              completedSteps.length == steps.length"));
     expect(recipe, contains("completedSteps.length == steps.length"));
     expect(recipe, contains("if (widget.viewingTodaySelection &&\n              widget.canMarkCooked"));
     expect(recipe, contains('FilledButton.icon('));
