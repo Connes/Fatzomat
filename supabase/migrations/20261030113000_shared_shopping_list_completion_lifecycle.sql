@@ -2,6 +2,9 @@
 ALTER TABLE public.shared_recipe_plans
   ADD COLUMN IF NOT EXISTS shopping_list_completed_at timestamptz;
 
+ALTER TABLE public.shared_recipe_plans
+  ADD COLUMN IF NOT EXISTS shopping_list_completed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;
+
 CREATE OR REPLACE FUNCTION public.complete_shared_shopping_list(p_plan_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql
@@ -26,7 +29,8 @@ BEGIN
   END IF;
 
   UPDATE public.shared_recipe_plans
-  SET shopping_list_completed_at = COALESCE(shopping_list_completed_at, now())
+  SET shopping_list_completed_at = COALESCE(shopping_list_completed_at, now()),
+      shopping_list_completed_by = COALESCE(shopping_list_completed_by, auth.uid())
   WHERE id = p_plan_id;
 
   RETURN true;
