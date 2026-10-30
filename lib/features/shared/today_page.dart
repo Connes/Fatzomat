@@ -998,6 +998,19 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     return cuisine == null || cuisine.isEmpty ? null : cuisine;
   }
 
+  String? get _orderCategory {
+    if (share.decisionType != 'order') return null;
+    final value = share.decisionValue?.trim();
+    if (value != null && value.isNotEmpty && !value.startsWith('{')) return value;
+    final title = share.decisionName?.trim();
+    if (title != null && title.isNotEmpty) {
+      final separator = title.indexOf('·');
+      final category = separator >= 0 ? title.substring(separator + 1).trim() : title;
+      if (category.isNotEmpty && category.toLowerCase() != 'wir bestellen') return category;
+    }
+    return null;
+  }
+
   String? get _sharedRecipeName {
     if (share.decisionType == 'dine_out') return null;
     final title = share.decisionName?.trim();
@@ -1027,6 +1040,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
     final restaurantName = _restaurantName;
     final cuisine = _cuisine;
     final sharedRecipeName = _sharedRecipeName;
+    final orderCategory = _orderCategory;
 
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.98),
@@ -1099,6 +1113,27 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                       ),
                 ),
               ],
+            ] else if (share.decisionType == 'order') ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: orderCategory == null
+                    ? (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty
+                        ? Image.network(share.imageUrl!, height: 180, width: double.infinity, fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain))
+                        : Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain))
+                    : Image.asset(
+                        FoodChoiceAssetService.assetFor(FoodMode.order, orderCategory) ?? 'assets/together/clean/icons/icon_delivery.png',
+                        height: 180, width: double.infinity, fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain)),
+              ),
+              const SizedBox(height: 12),
+              if (orderCategory != null) ...[
+                Text(orderCategory, textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: AppDesign.primaryDark.withValues(alpha: 0.72))),
+                const SizedBox(height: 6),
+              ],
+              Text('Wir bestellen', textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: AppDesign.primaryDark)),
             ] else ...[
               Text(
                 _decisionLabel,
