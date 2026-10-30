@@ -120,4 +120,19 @@ void main() {
     expect(page, contains('Icons.people_alt_rounded'));
   });
 
+  test('shopping list reserves space above the persistent bottom navigation', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+
+    expect(page, contains('padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),'));
+  });
+
+  test('shared serving controls update servings without replacing the selected recipe', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+    final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
+
+    expect(page, contains('_collaboration.updateSharedRecipePlanServings(plan.id, servings)'));
+    expect(page, isNot(contains('_collaboration.replaceSharedRecipePlan(plan.id, plan.recipeId!, servings: servings)')));
+    expect(collaboration, contains("rpc('update_shared_recipe_plan_servings'"));
+  });
+
 }
