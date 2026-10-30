@@ -142,7 +142,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   }
 
   Future<void> markCooked() async {
-    if (!widget.canMarkCooked || working) return;
+    if (!widget.viewingTodaySelection || !personalTodaySelected || working) return;
     // Never allow a future-dated detail route to complete today's plan by
     // accident when the same recipe happens to be selected for both dates.
     if (!_isPlanDateToday) {
@@ -545,7 +545,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             ),
           ),
           if (widget.viewingTodaySelection &&
-              widget.canMarkCooked &&
+              personalTodaySelected &&
+              _isPlanDateToday &&
               steps.isNotEmpty &&
               completedSteps.length == steps.length) ...[
             const SizedBox(height: 8),
