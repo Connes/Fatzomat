@@ -138,7 +138,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'shopping_items',
-            callback: (_) => load(showLoading: false),
+            callback: (payload) => _handleShoppingItemRealtime(payload),
           )
           // Shared decisions have their own lifecycle. Refresh when a partner
           // accepts, cancels, or completes a shared plan, even if no shopping
@@ -159,6 +159,44 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     } on AssertionError {
       // Widget tests/previews may mount before Supabase is initialized.
     }
+  }
+
+  void _handleShoppingItemRealtime(dynamic payload) {
+    final record = Map<String, dynamic>.from(
+      (payload.newRecord as Map?) ?? (payload.oldRecord as Map?) ?? const {},
+    );
+    final id = record['id']?.toString();
+    final checked = record['checked'];
+    if (id != null && id.isNotEmpty && checked is bool && mounted) {
+      // Reflect the partner's checkbox change immediately, before a round-trip
+      // query completes. With "only open" enabled, checked ingredients vanish
+      // on this device in the same frame as the realtime event.
+      final aggregate = _aggregator.aggregate(_items);
+      for (final item in aggregate) {
+        if (item.sources.any((source) => source.id == id)) {
+          _checkedVisibilityTimers.remove(item.key)?.cancel();
+          _temporarilyVisibleChecked.remove(item.key);
+        }
+      }
+      setState(() {
+        _items = _items.map((item) => item.id == id
+            ? ShoppingItem(
+                id: item.id,
+                name: item.name,
+                quantity: item.quantity,
+                unit: item.unit,
+                checked: checked,
+                foodId: item.foodId,
+                category: item.category,
+                source: item.source,
+                planId: item.planId,
+              )
+            : item).toList(growable: false);
+      });
+    }
+    // Reconcile all fields and plan status from the server after applying the
+    // immediate checkbox update. Realtime avoids waiting for a manual refresh.
+    if (mounted) load(showLoading: false);
   }
 
   Future<void> load({bool showLoading = true}) async {
@@ -645,6 +683,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                   ? AppDesign.surfaceMuted
                                   : AppDesign.surface,
                               surfaceTintColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+                                side: BorderSide(
+                                  color: _plansFor(day).any((plan) => _sharedPlanIds.contains(plan.id))
+                                      ? AppDesign.iconGold
+                                      : Colors.transparent,
+                                  width: _plansFor(day).any((plan) => _sharedPlanIds.contains(plan.id))
+                                      ? 1
+                                      : 0,
+                                ),
+                              ),
                               child: ExpansionTile(
                                 key: PageStorageKey(_key(day)),
                                 initiallyExpanded: !_isDayCompleted(day) &&
@@ -675,25 +724,23 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                 ),
                                 title: Row(
                                   children: [
+                                    Text(
+                                      _dayTitle(day),
+                                      style: TextStyle(
+                                        color: _isDayCompleted(day)
+                                            ? AppDesign.secondaryText
+                                            : AppDesign.text,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
                                     if (_plansFor(day).any((plan) => _sharedPlanIds.contains(plan.id))) ...[
+                                      const SizedBox(width: 8),
                                       const Icon(
                                         Icons.people_alt_rounded,
                                         size: 19,
                                         color: AppDesign.iconGold,
                                       ),
-                                      const SizedBox(width: 7),
                                     ],
-                                    Expanded(
-                                      child: Text(
-                                        _dayTitle(day),
-                                        style: TextStyle(
-                                          color: _isDayCompleted(day)
-                                              ? AppDesign.secondaryText
-                                              : AppDesign.text,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ),
                                   ],
                                 ),
                                 // Legacy regression contract: const Text('Erledigt').
