@@ -210,7 +210,17 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                 ? Map<String, dynamic>.from(shared['recipes'] as Map)
                 : <String, dynamic>{};
             final id = shared['id']?.toString();
-            if (id == null || id.isEmpty || dayPlans.any((plan) => plan.id == id)) continue;
+            if (id == null || id.isEmpty) continue;
+            sharedPlanIds.add(id);
+            final recipeId = shared['recipe_id']?.toString() ?? '';
+            if (recipeId.isNotEmpty) {
+              await _collaboration.ensureSharedRecipeShoppingItems(
+                planId: id,
+                recipeId: recipeId,
+                servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
+              );
+            }
+            if (dayPlans.any((plan) => plan.id == id)) continue;
             dayPlans.add(TodayPlan(
               id: id,
               recipeId: shared['recipe_id']?.toString(),
@@ -222,17 +232,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               imagePath: recipe['image_path']?.toString(),
               isShared: true,
             ));
-            sharedPlanIds.add(id);
-            final recipeId = shared['recipe_id']?.toString() ?? '';
-            if (recipeId.isNotEmpty) {
-              // Older shared plans can exist without generated shopping rows.
-              // Backfill them from the recipe before loading the shared list.
-              await _collaboration.ensureSharedRecipeShoppingItems(
-                planId: id,
-                recipeId: recipeId,
-                servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
-              );
-            }
+
         }
       } catch (error, stackTrace) {
         // Keep the personal list usable, but make the shared-load failure
