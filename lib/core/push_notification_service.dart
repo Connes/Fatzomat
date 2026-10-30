@@ -243,7 +243,15 @@ class PushNotificationService with WidgetsBindingObserver {
             // The target date remains the primary action if read-state sync fails.
           }
         }
-        navigator.push(MaterialPageRoute(builder: (_) => AppShell(initialDate: targetDate)));
+        // A notification can be tapped while an AppShell is already alive. Pushing
+        // another shell leaves the old IndexedStack mounted underneath it, so
+        // both shopping-list pages can own a channel named shopping-list-live.
+// Reset the root navigation stack so only one AppShell and one shopping-list
+        // Realtime subscription remain alive after handling the notification.
+        navigator.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => AppShell(initialDate: targetDate)),
+          (route) => false,
+        );
         return;
       }
 
