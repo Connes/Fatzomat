@@ -32,6 +32,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   late List<DateTime> _days;
   DateTime _observedToday = DateTime.now();
   Timer? _dayBoundaryTimer;
+  Timer? _realtimeReloadTimer;
+  Timer? _realtimeRetryTimer;
   final Set<String> _selected = <String>{};
   final Set<String> _expanded = <String>{};
   final Set<String> _updatingItems = <String>{};
@@ -123,16 +125,24 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     load();
   }
 
+  void _scheduleRealtimeReload() {
+    _realtimeReloadTimer?.cancel();
+    _realtimeReloadTimer = Timer(const Duration(milliseconds: 120), () {
+      if (mounted) load(showLoading: false);
+    });
+  }
+
   void _subscribe() {
     try {
       final client = Supabase.instance.client;
-      _channel = client.channel('personal-shopping-list');
+      _realtimeRetryTimer?.cancel();
+      _channel = client.channel('shopping-list-live');
       _channel!
           .onPostgresChanges(
             event: PostgresChangeEvent.all,
             schema: 'public',
             table: 'personal_today_plans',
-            callback: (_) => load(showLoading: false),
+            callback: (_) => _scheduleRealtimeReload(),
           )
           .onPostgresChanges(
             event: PostgresChangeEvent.all,
@@ -155,7 +165,26 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
             table: 'decision_shares',
             callback: (_) => load(showLoading: false),
           )
-          .subscribe();
+          .subscribe((status, error) {
+            debugPrint('Shopping list Realtime status: $status');
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              _scheduleRealtimeReload();
+            } else if (status == RealtimeSubscribeStatus.channelError ||
+                status == RealtimeSubscribeStatus.timedOut ||
+                status == RealtimeSubscribeStatus.closed) {
+              _realtimeRetryTimer?.cancel();
+              _realtimeRetryTimer = Timer(const Duration(seconds: 2), () {
+                if (!mounted) return;
+                final oldChannel = _channel;
+                _channel = null;
+                if (oldChannel != null) {
+                  client.removeChannel(oldChannel).whenComplete(_subscribe);
+                } else {
+                  _subscribe();
+                }
+              });
+            }
+          });
     } on AssertionError {
       // Widget tests/previews may mount before Supabase is initialized.
     }
@@ -196,7 +225,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     }
     // Reconcile all fields and plan status from the server after applying the
     // immediate checkbox update. Realtime avoids waiting for a manual refresh.
-    if (mounted) load(showLoading: false);
+    if (mounted) _scheduleRealtimeReload();
   }
 
   Future<void> load({bool showLoading = true}) async {
@@ -525,6 +554,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   void dispose() {
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     _dayBoundaryTimer?.cancel();
+    _realtimeReloadTimer?.cancel();
+    _realtimeRetryTimer?.cancel();
     for (final timer in _checkedVisibilityTimers.values) {
       timer.cancel();
     }
