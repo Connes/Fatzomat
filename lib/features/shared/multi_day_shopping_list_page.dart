@@ -366,7 +366,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   }
 
   Future<void> _updatePlanServings(TodayPlan plan, int servings) async {
-    if (servings < 1 || servings > 12) return;
+    if (servings < 1) return;
     try {
       // Adjust only the selected plan. Replacing the shared recipe invokes a
       // different RPC and can fail instead of changing the household's serving count.
@@ -793,9 +793,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                               ),
                                               IconButton(
                                                 tooltip: 'Eine Person mehr',
-                                                onPressed: plan.servings >= 12
-                                                    ? null
-                                                    : () => _updatePlanServings(plan, plan.servings + 1),
+                                                onPressed: () => _updatePlanServings(plan, plan.servings + 1),
                                                 icon: const Icon(Icons.add_circle_outline_rounded),
                                               ),
                                             ],
