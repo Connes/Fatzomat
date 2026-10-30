@@ -157,8 +157,13 @@ void main() {
     expect(page, contains('RealtimeSubscribeStatus.subscribed'));
     expect(page, contains('RealtimeSubscribeStatus.channelError'));
     expect(page, contains('RealtimeSubscribeStatus.timedOut'));
+    expect(page, contains('RealtimeSubscribeStatus.closed'));
     expect(page, contains('_scheduleRealtimeReload();'));
-    expect(page, contains('client.removeChannel(oldChannel).whenComplete(_subscribe)'));
+    expect(page, contains('_realtimeSubscriptionGeneration'));
+    expect(page, contains('identical(_channel, channel)'));
+    expect(page, contains('if (_realtimeRetryTimer?.isActive ?? false) return;'));
+    expect(page, contains('await client.removeChannel(channel)'));
+    expect(page, contains('Invalidate pending Realtime callbacks/retries before tearing down the page.'));
   });
 
   test('shared shopping list completion does not complete the shared day decision', () {
