@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'multi_day_shopping_list_page.dart';
@@ -7,11 +6,9 @@ import 'multi_day_shopping_list_page.dart';
 /// connection exists. Shared and personal recipe plans are combined by the
 /// multi-day list itself.
 class ShoppingListPage extends StatelessWidget {
-  final ValueListenable<int>? refreshSignal;
-
-  const ShoppingListPage({super.key, this.refreshSignal});
+  const ShoppingListPage({super.key});
 
   @override
   Widget build(BuildContext context) =>
-      MultiDayShoppingListPage(refreshSignal: refreshSignal);
+      const MultiDayShoppingListPage();
 }
