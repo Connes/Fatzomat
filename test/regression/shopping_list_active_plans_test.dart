@@ -35,6 +35,8 @@ void main() {
     expect(page, contains("table: 'personal_today_plans'"));
     expect(page, contains("table: 'shopping_items'"));
     expect(page, contains('load(showLoading: false)'));
+    final collaboration = File('lib/data/repositories/collaboration_repository.dart').readAsStringSync();
+    expect(collaboration, contains('food_id,shared_recipe_plan_id,foods(category)'));
   });
 
   test('day rows show only the date and checked ingredients are struck through', () {

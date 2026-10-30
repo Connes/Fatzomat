@@ -364,7 +364,7 @@ class CollaborationRepository {
   Future<List<ShoppingItem>> shoppingItems(String planId) async {
     final rows = await client
         .from('shopping_items')
-        .select('id,name,quantity,unit,checked,checked_by,food_id,foods(category)')
+        .select('id,name,quantity,unit,checked,checked_by,food_id,shared_recipe_plan_id,foods(category)')
         .eq('shared_recipe_plan_id', planId)
         .order('name');
     return rows.map((row) => ShoppingItem.fromMap(Map<String, dynamic>.from(row))).toList();
