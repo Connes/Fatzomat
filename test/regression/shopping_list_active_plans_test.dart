@@ -67,7 +67,7 @@ void main() {
     expect(page, contains("'\${selectedDays.length} von \${activeDays.length} Tagen ausgewählt'"));
     expect(page, contains('await load(showLoading: false);'));
     expect(page, contains('_isDayCompleted(day)'));
-    expect(page, contains("const Text('Erledigt')"));
+    expect(page, contains("_completionLabel(day)"));
     expect(page, isNot(contains('_repo.deleteShoppingItem(item.id)')));
   });
 
