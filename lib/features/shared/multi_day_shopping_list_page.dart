@@ -616,8 +616,10 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
 
   @override
   void dispose() {
+    // Keep the channel reference before clearing state so it can actually be removed.
     // Invalidate pending Realtime callbacks/retries before tearing down the page.
     _realtimeSubscriptionGeneration++;
+    final channel = _channel;
     _channel = null;
     RecipeCollectionEvents.revision.removeListener(_onRecipeCollectionChanged);
     _dayBoundaryTimer?.cancel();
@@ -628,9 +630,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     }
     _checkedVisibilityTimers.clear();
     WidgetsBinding.instance.removeObserver(this);
-    if (_channel != null) {
+    if (channel != null) {
       try {
-        Supabase.instance.client.removeChannel(_channel!);
+        Supabase.instance.client.removeChannel(channel);
       } on AssertionError {
         // Ignore unavailable Supabase in previews/tests.
       }
