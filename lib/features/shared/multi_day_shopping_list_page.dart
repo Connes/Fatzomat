@@ -292,6 +292,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
               id: id,
               recipeId: shared['recipe_id']?.toString(),
               status: shared['status']?.toString() ?? 'planned',
+              shoppingListCompletedAt: shared['shopping_list_completed_at'] == null
+                  ? null
+                  : DateTime.tryParse(shared['shopping_list_completed_at'].toString()),
               servings: (shared['servings'] as num?)?.toInt() ?? (recipe['servings'] as num?)?.toInt() ?? 2,
               name: recipe['name']?.toString() ?? 'Gemeinsames Rezept',
               description: recipe['description']?.toString(),
@@ -490,7 +493,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     setState(() => _completingList = true);
     try {
       await Future.wait(planIds.map((id) => _sharedPlanIds.contains(id)
-          ? _collaboration.updateSharedRecipeStatus(id, 'cooked')
+          ? _collaboration.completeSharedShoppingList(id)
           : _repo.completeShoppingList(id)));
       setState(() {
         for (final day in _activeDays) {
