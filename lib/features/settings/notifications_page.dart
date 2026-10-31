@@ -29,7 +29,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
   final repo = CollaborationRepository();
   List<AppNotification> items = const [];
   bool loading = true;
-  bool markingAllRead = false;
   Object? loadError;
   RealtimeChannel? channel;
   bool _openedInitialNotification = false;
@@ -234,19 +233,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
   }
 
-  Future<void> markAllRead() async {
-    if (markingAllRead || unreadCount == 0) return;
-    setState(() => markingAllRead = true);
-    try {
-      await repo.markAllNotificationsRead();
-      await load();
-    } catch (error) {
-      if (mounted) showAppError(context, error);
-    } finally {
-      if (mounted) setState(() => markingAllRead = false);
-    }
-  }
-
   int get unreadCount => items.where((item) => !item.isRead).length;
 
   String timeLabel(DateTime value) {
@@ -283,10 +269,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             ],
           ],
         ),
-        actions: [
-          if (unread > 0)
-            TextButton(onPressed: markingAllRead ? null : markAllRead, child: Text(markingAllRead ? 'Wird gespeichert …' : 'Alle gelesen')),
-        ],
+        actions: const [],
       ),
       body: loadError != null
           ? AppErrorView(error: loadError!, onRetry: load)
@@ -364,9 +347,31 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         color: item.isRead ? null : AppDesign.softSurface,
                         child: ListTile(
                           onTap: item.isRead ? null : () => open(item),
-                          leading: CircleAvatar(
-                            backgroundColor: AppDesign.peachSurface,
-                            child: Icon(iconFor(item), color: AppDesign.iconGold),
+                          leading: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: AppDesign.peachSurface,
+                                child: Icon(iconFor(item), color: AppDesign.iconGold),
+                              ),
+                              if (!item.isRead)
+                                Positioned(
+                                  top: -1,
+                                  right: -1,
+                                  child: Container(
+                                    width: 11,
+                                    height: 11,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppDesign.peachSurface,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           title: Row(
                             children: [
