@@ -14,7 +14,8 @@ void main() {
     expect(migration, contains('Sie kann nur einmal geteilt werden.'));
     expect(migration, contains('source_plan_id'));
     expect(repo, contains(".eq('message_type', 'share')"));
-    expect(repo, contains("map['is_shared'] = share != null"));
+    expect(repo, contains("map['is_shared'] = sentShareDelivered || receivedShare != null"));
+    expect(repo, contains(".select('id,accepted_at,cancelled_at,push_delivered_at')"));
     expect(model, contains('final bool isShared;'));
     expect(model, contains('final bool isSharedAccepted;'));
     expect(today, contains("onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision"));
