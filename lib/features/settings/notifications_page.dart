@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/app_shell.dart';
 
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
@@ -169,10 +170,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
       if (!mounted) return;
       // Open the date attached to the shared decision, not an unrelated Today.
       // Legacy notifications without a share ID retain the current-day fallback.
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => TodayPage(initialDate: targetDate)),
-      );
+      final navigateToToday = AppShell.notificationNavigationHandler;
+      if (navigateToToday != null) {
+        // Reuse the active shell so the Today tab is selected as well.
+        navigateToToday(targetDate);
+      } else {
+        // Fallback for notification entry points before an AppShell is mounted.
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => TodayPage(initialDate: targetDate)),
+        );
+      }
       await load();
       return;
     }
@@ -225,10 +233,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
     }
 
     if (item.sharedRecipePlanId != null || item.type == 'shared_recipe') {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const TodayPage()),
-      );
+      final navigateToToday = AppShell.notificationNavigationHandler;
+      if (navigateToToday != null) {
+        navigateToToday(null);
+      } else {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const TodayPage()),
+        );
+      }
       await load();
     }
   }
