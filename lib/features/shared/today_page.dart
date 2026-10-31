@@ -224,14 +224,35 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     try {
       final client = Supabase.instance.client;
       channel = client.channel('today-plan');
-      channel!.onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'personal_today_plans',
-        callback: (_) {
-          if (mounted) load();
-        },
-      ).subscribe();
+      channel!
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'personal_today_plans',
+          callback: (_) {
+            if (mounted) load();
+          },
+        )
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'decision_shares',
+          callback: (payload) {
+            if (!mounted) return;
+            // Acceptance updates the share row. Reload immediately so the sender's
+            // Today card reflects the shared decision without requiring a tap.
+            final newRecord = payload.newRecord;
+            final oldRecord = payload.oldRecord;
+            final acceptedAt = newRecord['accepted_at'];
+            final oldAcceptedAt = oldRecord['accepted_at'];
+            if (acceptedAt != oldAcceptedAt ||
+                payload.eventType == PostgresChangeEvent.insert ||
+                payload.eventType == PostgresChangeEvent.delete) {
+              load();
+            }
+          },
+        )
+        .subscribe();
     } on AssertionError {
       // Widget tests and offline previews can mount before Supabase exists.
     }
