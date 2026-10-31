@@ -363,10 +363,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       return Card(
                         color: item.isRead ? null : AppDesign.softSurface,
                         child: ListTile(
-                          onTap: () => open(item),
+                          onTap: item.isRead ? null : () => open(item),
                           leading: CircleAvatar(
                             backgroundColor: AppDesign.peachSurface,
-                            child: Icon(iconFor(item), color: AppDesign.primaryDark),
+                            child: Icon(iconFor(item), color: AppDesign.iconGold),
                           ),
                           title: Row(
                             children: [
