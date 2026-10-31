@@ -47,7 +47,7 @@ class PersonalTodayRepository {
       final map = Map<String, dynamic>.from(rows.first);
       final sentShare = await client
           .from('decision_shares')
-          .select('id,accepted_at,cancelled_at')
+          .select('id,accepted_at,cancelled_at,push_delivered_at')
           .eq('sender_id', userId)
           .eq('source_plan_id', map['id'].toString())
           .eq('message_type', 'share')
@@ -63,8 +63,9 @@ class PersonalTodayRepository {
           .isFilter('cancelled_at', null)
           .limit(1)
           .maybeSingle();
-      final share = sentShare ?? receivedShare;
-      map['is_shared'] = share != null;
+      final sentShareDelivered = sentShare?['push_delivered_at'] != null;
+      final share = sentShareDelivered ? sentShare : receivedShare;
+      map['is_shared'] = sentShareDelivered || receivedShare != null;
       map['is_shared_accepted'] = share?['accepted_at'] != null;
       await _resolveNestedRecipeImage(map);
       return TodayPlan.fromMap(map);
@@ -351,14 +352,16 @@ class PersonalTodayRepository {
       final planId = map['id'].toString();
       final activeShares = await client
           .from('decision_shares')
-          .select('id,accepted_at,created_at')
+          .select('id,accepted_at,created_at,push_delivered_at')
           .or('source_plan_id.eq.$planId,accepted_plan_id.eq.$planId')
           .eq('message_type', 'share')
           .isFilter('cancelled_at', null)
           .order('created_at', ascending: false)
           .limit(10);
-      map['is_shared'] = activeShares.isNotEmpty;
-      map['is_shared_accepted'] = activeShares.any((share) => share['accepted_at'] != null);
+      final effectiveShares = activeShares.where((share) =>
+          share['push_delivered_at'] != null || share['accepted_at'] != null).toList();
+      map['is_shared'] = effectiveShares.isNotEmpty;
+      map['is_shared_accepted'] = effectiveShares.any((share) => share['accepted_at'] != null);
     }
     return maps.map(TodayPlan.fromMap).toList(growable: false);
   }

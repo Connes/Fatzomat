@@ -248,6 +248,27 @@ Deno.serve(async (request) => {
       }
     }
 
+    // A successful FCM send means the push was accepted for delivery. Only now
+    // should the sender's daily-decision Share button become inactive.
+    const decisionShareId = String(notification.decision_share_id ?? '').trim();
+    if (decisionShareId && successfulDeliveries > 0) {
+      const shareDeliveryResponse = await fetch(
+        `${supabaseUrl}/rest/v1/decision_shares?id=eq.${encodeURIComponent(decisionShareId)}`,
+        {
+          method: 'PATCH',
+          headers: {
+            ...adminHeaders,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify({ push_delivered_at: new Date().toISOString() }),
+        },
+      );
+      if (!shareDeliveryResponse.ok) {
+        console.error('Could not mark decision share as push-delivered:', await shareDeliveryResponse.text());
+      }
+    }
+
     return Response.json({ sent: results.length, results, deliveryState });
   } catch (error) {
     console.error('Push notification failed:', error);
