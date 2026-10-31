@@ -93,7 +93,7 @@ class _HistoryTile extends StatelessWidget {
               : Image.asset('assets/together/clean/background/recipe_detail_background.png', width: 52, height: 52, fit: BoxFit.cover),
         ),
         title: Text(entry.recipeName ?? entry.label, style: const TextStyle(fontWeight: FontWeight.w700)),
-        subtitle: Text('${entry.label}\n${_formatDate(entry.createdAt)}'),
+        subtitle: Text(_formatDate(entry.createdAt)),
         isThreeLine: true,
       ),
     );
