@@ -11,8 +11,18 @@ create table if not exists public.decision_delivery_state (
   primary key (connection_id, sender_id, recipient_id)
 );
 
+create table if not exists public.decision_delivery_events (
+  notification_id uuid primary key,
+  connection_id uuid not null,
+  sender_id uuid not null,
+  recipient_id uuid not null,
+  created_at timestamptz not null default now()
+);
+
 alter table public.decision_delivery_state enable row level security;
+alter table public.decision_delivery_events enable row level security;
 revoke all on public.decision_delivery_state from public, anon, authenticated;
+revoke all on public.decision_delivery_events from public, anon, authenticated;
 
 create or replace function public.record_decision_push_delivery(
   p_notification_id uuid,
@@ -75,15 +85,14 @@ begin
     return 'delivered';
   end if;
 
-  -- Each notification may only contribute one failure, even if the webhook is
-  -- retried. Do not count the same notification twice.
-  if exists (
-    select 1 from public.decision_delivery_state s
-    where s.connection_id = share_row.connection_id
-      and s.sender_id = share_row.sender_id
-      and s.recipient_id = share_row.recipient_id
-      and s.last_notification_id = p_notification_id
-  ) then
+  -- Each notification may only contribute one failure, even if webhook
+  -- retries arrive after a newer notification has already been processed.
+  insert into public.decision_delivery_events (
+    notification_id, connection_id, sender_id, recipient_id
+  ) values (
+    p_notification_id, share_row.connection_id, share_row.sender_id, share_row.recipient_id
+  ) on conflict (notification_id) do nothing;
+  if not found then
     return 'duplicate';
   end if;
 
