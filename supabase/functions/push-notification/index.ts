@@ -168,6 +168,8 @@ Deno.serve(async (request) => {
 
     const devices = await deviceResponse.json() as Array<{ id: string; device_token: string }>;
     const results: unknown[] = [];
+    let successfulDeliveries = 0;
+    let permanentFailures = 0;
     for (const device of devices) {
       const response = await fetch(
         `https://fcm.googleapis.com/v1/projects/${encodeURIComponent(account.project_id)}/messages:send`,
@@ -207,15 +209,46 @@ Deno.serve(async (request) => {
       const responseText = await response.text();
       results.push({ deviceId: device.id, status: response.status, response: response.ok ? 'ok' : responseText.slice(0, 500) });
 
-      if (response.status === 404 || response.status === 410 || responseText.includes('UNREGISTERED')) {
-        await fetch(`${supabaseUrl}/rest/v1/push_devices?id=eq.${encodeURIComponent(device.id)}`, {
-          method: 'DELETE',
-          headers: adminHeaders,
-        });
+      if (response.ok) {
+        successfulDeliveries += 1;
+      } else if (
+        response.status === 404 ||
+        response.status === 410 ||
+        responseText.includes('UNREGISTERED')
+      ) {
+        // Keep invalid tokens as tombstones. FCM can then confirm the failure
+        // again for a later message, allowing the two-failure policy to work.
+        // register_push_device upserts a fresh token after app reinstall.
+        permanentFailures += 1;
       }
     }
 
-    return Response.json({ sent: results.length, results });
+    let deliveryState: string | null = null;
+    const isDecisionMessage = String(notification.type ?? '') === 'decision_message'
+      && Boolean(String(notification.decision_share_id ?? ''));
+    if (isDecisionMessage && devices.length > 0) {
+      // Count a failure only when every registered device has a confirmed
+      // permanent FCM failure. Transient errors, offline devices and missing
+      // tokens are not proof that the recipient uninstalled the app.
+      const allDevicesPermanentlyFailed = permanentFailures === devices.length;
+      if (successfulDeliveries > 0 || allDevicesPermanentlyFailed) {
+        const deliveryResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/record_decision_push_delivery`, {
+          method: 'POST',
+          headers: { ...adminHeaders, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            p_notification_id: String(notification.id ?? ''),
+            p_permanent_failure: allDevicesPermanentlyFailed && successfulDeliveries === 0,
+          }),
+        });
+        if (!deliveryResponse.ok) {
+          console.error('Could not record decision push delivery:', await deliveryResponse.text());
+        } else {
+          deliveryState = await deliveryResponse.text();
+        }
+      }
+    }
+
+    return Response.json({ sent: results.length, results, deliveryState });
   } catch (error) {
     console.error('Push notification failed:', error);
     return Response.json({
