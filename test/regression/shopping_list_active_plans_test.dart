@@ -110,7 +110,7 @@ void main() {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 
     expect(repository, contains("from('decision_shares')"));
-    expect(repository, contains("map['is_shared_accepted'] = activeShares.any"));
+    expect(repository, contains("map['is_shared_accepted'] = effectiveShares.any"));
     expect(page, contains('Keep accepted shared-decision plans as a fallback'));
     expect(collaboration, contains('Future<List<Map<String, dynamic>>> sharedRecipePlans({DateTime? fromDate})'));
     expect(page, contains('_collaboration.sharedRecipePlans('));
