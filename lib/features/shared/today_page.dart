@@ -245,7 +245,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
             final oldRecord = payload.oldRecord;
             final acceptedAt = newRecord['accepted_at'];
             final oldAcceptedAt = oldRecord['accepted_at'];
+            final deliveredAt = newRecord['push_delivered_at'];
+            final oldDeliveredAt = oldRecord['push_delivered_at'];
             if (acceptedAt != oldAcceptedAt ||
+                deliveredAt != oldDeliveredAt ||
                 payload.eventType == PostgresChangeEvent.insert ||
                 payload.eventType == PostgresChangeEvent.delete) {
               load();
