@@ -164,7 +164,7 @@ configure_firebase_if_needed() {
       --project=schmackofatz-25cce \
       --platforms=android,ios \
       --android-package-name=com.example.food_app_mvp \
-      --ios-bundle-id=com.example.foodAppMvp
+      --ios-bundle-id=com.example.food_app_mvp
   ) > >(tee "$flutterfire_log") 2>&1
   local status=$?
   set -e
