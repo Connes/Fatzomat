@@ -1,4 +1,4 @@
-name: iOS simulator build
+name: iPhone simulator smoke test
 
 on:
   push:
@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   ios-simulator:
-    name: Build iPhone and iPad simulator app
+    name: Build and launch iPhone simulator app
     runs-on: xcode-27
     timeout-minutes: 45
 
@@ -52,3 +52,17 @@ jobs:
       - name: Verify simulator app bundle
         run: test -d build/ios/iphonesimulator/Runner.app
 
+
+      - name: Boot an available iPhone simulator
+        id: simulator
+        run: |
+          DEVICE_ID="$(xcrun simctl list devices available -j | python3 -c 'import json,sys; data=json.load(sys.stdin); devices=[d for group in data["devices"].values() for d in group if d["name"].startswith("iPhone")]; print(devices[0]["udid"] if devices else "")')"
+          test -n "$DEVICE_ID"
+          echo "udid=$DEVICE_ID" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$DEVICE_ID" || true
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
+      - name: Install and launch app in iPhone simulator
+        run: |
+          xcrun simctl install "${{ steps.simulator.outputs.udid }}" build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch "${{ steps.simulator.outputs.udid }}" com.example.food_app_mvp
