@@ -159,80 +159,100 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
       body: SafeArea(
         child: Column(
           children: [
+            // The setup card and both control rows stay fixed. Only the food
+            // choices below are allowed to scroll.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              child: Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: AppDesign.softSurface,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(color: AppDesign.divider),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Image.asset(
+                        'assets/branding/app_icon.png',
+                        key: const ValueKey<String>('food_onboarding_setup_app_logo'),
+                        width: 72,
+                        height: 72,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.high,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Kurz einrichten',
+                      key: const ValueKey<String>('food_onboarding_setup_title'),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Markiere, was du magst oder lieber auslässt.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                height: 42,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (_, index) {
+                    final value = categories[index];
+                    return ChoiceChip(
+                      label: Text(value),
+                      selected: category == value,
+                      onSelected: (_) => setState(() => category = value),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  _CountPill(icon: Icons.favorite_rounded, text: '$liked', color: AppDesign.primaryDark),
+                  const SizedBox(width: 8),
+                  _CountPill(icon: Icons.block_rounded, text: '$disliked', color: AppDesign.secondaryText),
+                  const Spacer(),
+                  Material(
+                    color: AppDesign.softSurface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: BorderSide(color: AppDesign.divider),
+                    ),
+                    child: IconButton(
+                      key: const ValueKey<String>('food_onboarding_add_food_button'),
+                      tooltip: 'Eigenes Lebensmittel hinzufügen',
+                      onPressed: saving ? null : addFood,
+                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                      icon: const Icon(Icons.add_rounded, size: 26, color: AppDesign.primaryDark),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                key: const ValueKey<String>('food_onboarding_food_list'),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(22),
-                    decoration: BoxDecoration(
-                      color: AppDesign.softSurface,
-                      borderRadius: BorderRadius.circular(26),
-                      border: Border.all(color: AppDesign.divider),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(18),
-                          child: Image.asset(
-                            'assets/branding/app_icon.png',
-                            key: const ValueKey<String>('food_onboarding_setup_app_logo'),
-                            width: 72,
-                            height: 72,
-                            fit: BoxFit.cover,
-                            filterQuality: FilterQuality.high,
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        Text(
-                          'Kurz einrichten',
-                          key: const ValueKey<String>('food_onboarding_setup_title'),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.displaySmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Markiere, was du magst oder lieber auslässt.',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    height: 42,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (_, index) {
-                        final value = categories[index];
-                        return ChoiceChip(
-                          label: Text(value),
-                          selected: category == value,
-                          onSelected: (_) => setState(() => category = value),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _CountPill(icon: Icons.favorite_rounded, text: '$liked', color: AppDesign.primaryDark),
-                      const SizedBox(width: 8),
-                      _CountPill(icon: Icons.block_rounded, text: '$disliked', color: AppDesign.secondaryText),
-                      const Spacer(),
-                      IconButton(
-                        key: const ValueKey<String>('food_onboarding_add_food_button'),
-                        tooltip: 'Eigenes Lebensmittel hinzufügen',
-                        onPressed: saving ? null : addFood,
-                        icon: const Icon(Icons.add_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
                   if (shown.isEmpty)
                     Padding(
                       padding: const EdgeInsets.all(28),
