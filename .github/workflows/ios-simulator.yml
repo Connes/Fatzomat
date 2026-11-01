@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   ios-simulator:
-    name: Build iPhone simulator app
+    name: Build iPhone and iPad simulator app
     runs-on: xcode-27
     timeout-minutes: 45
 
@@ -51,3 +51,4 @@ jobs:
 
       - name: Verify simulator app bundle
         run: test -d build/ios/iphonesimulator/Runner.app
+

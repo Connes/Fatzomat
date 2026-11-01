@@ -13,6 +13,8 @@ void main() {
     expect(android, contains('applicationId = "$applicationId"'));
     expect(iosProject, contains('PRODUCT_BUNDLE_IDENTIFIER = $applicationId;'));
     expect(iosProject, isNot(contains('com.example.foodAppMvp')));
+    expect(RegExp(r'TARGETED_DEVICE_FAMILY = "1,2";').allMatches(iosProject), hasLength(3));
+    expect(iosProject, isNot(contains('TARGETED_DEVICE_FAMILY = 1;')));
     expect(firebaseOptions, contains("iosBundleId: '$applicationId'"));
 
     final setupScript = File('scripts/common.sh').readAsStringSync();
