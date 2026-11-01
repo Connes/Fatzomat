@@ -31,6 +31,22 @@ void main() {
     final countsIndex = setupSource.indexOf('_CountPill(icon: Icons.favorite_rounded');
     expect(addButtonIndex, greaterThan(countsIndex));
 
+    // The add action has its own visible surface and a sufficiently large touch target.
+    expect(setupSource, contains('color: AppDesign.softSurface'));
+    expect(setupSource, contains('constraints: const BoxConstraints(minWidth: 48, minHeight: 48)'));
+
+    // The setup card, category row and preference counters stay outside the
+    // only vertically scrollable region, which contains the food choices.
+    final setupCardIndex = setupSource.indexOf('food_onboarding_setup_title');
+    final categoryIndex = setupSource.indexOf('scrollDirection: Axis.horizontal');
+    final countersIndex = setupSource.indexOf('_CountPill(icon: Icons.favorite_rounded');
+    final foodListIndex = setupSource.indexOf("ValueKey<String>('food_onboarding_food_list')");
+    expect(setupCardIndex, greaterThanOrEqualTo(0));
+    expect(categoryIndex, greaterThan(setupCardIndex));
+    expect(countersIndex, greaterThan(categoryIndex));
+    expect(foodListIndex, greaterThan(countersIndex));
+    expect(setupSource, contains('Expanded(\n              child: ListView('));
+
     // The existing real app icon is used in the setup card and centered with its title.
     expect(designSource, contains("'assets/branding/app_icon.png'"));
     expect(setupSource, contains("'assets/branding/app_icon.png'"));
