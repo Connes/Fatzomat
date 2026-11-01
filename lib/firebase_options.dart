@@ -25,7 +25,7 @@ class DefaultFirebaseOptions {
         messagingSenderId:
             String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
         projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
-        iosBundleId: 'com.example.foodAppMvp',
+        iosBundleId: 'com.example.food_app_mvp',
       );
 
   static FirebaseOptions get currentPlatform {
