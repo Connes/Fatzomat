@@ -226,7 +226,7 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  _CountPill(icon: Icons.favorite_rounded, text: '$liked', color: AppDesign.primaryDark),
+                  _CountPill(icon: Icons.favorite_rounded, text: '$liked', color: Colors.red),
                   const SizedBox(width: 8),
                   _CountPill(icon: Icons.block_rounded, text: '$disliked', color: AppDesign.secondaryText),
                   const Spacer(),
@@ -240,7 +240,9 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
                       key: const ValueKey<String>('food_onboarding_add_food_button'),
                       tooltip: 'Eigenes Lebensmittel hinzufügen',
                       onPressed: saving ? null : addFood,
-                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                      constraints: const BoxConstraints(minWidth: 48, minHeight: 36),
+                      visualDensity: const VisualDensity(horizontal: 0, vertical: -3),
+                      padding: EdgeInsets.zero,
                       icon: const Icon(Icons.add_rounded, size: 26, color: AppDesign.primaryDark),
                     ),
                   ),

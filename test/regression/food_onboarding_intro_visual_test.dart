@@ -33,7 +33,8 @@ void main() {
 
     // The add action has its own visible surface and a sufficiently large touch target.
     expect(setupSource, contains('color: AppDesign.softSurface'));
-    expect(setupSource, contains('constraints: const BoxConstraints(minWidth: 48, minHeight: 48)'));
+    expect(setupSource, contains('constraints: const BoxConstraints(minWidth: 48, minHeight: 36)'));
+    expect(setupSource, contains('visualDensity: const VisualDensity(horizontal: 0, vertical: -3)'));
 
     // The setup card, category row and preference counters stay outside the
     // only vertically scrollable region, which contains the food choices.
