@@ -18,5 +18,9 @@ void main() {
     final setupScript = File('scripts/common.sh').readAsStringSync();
     expect(setupScript, contains('--ios-bundle-id=$applicationId'));
     expect(setupScript, isNot(contains('--ios-bundle-id=com.example.foodAppMvp')));
+
+    final generator = File('scripts/generate_firebase_options.py').readAsStringSync();
+    expect(generator, contains("iosBundleId: '$applicationId'"));
+    expect(generator, isNot(contains('com.example.foodAppMvp')));
   });
 }
