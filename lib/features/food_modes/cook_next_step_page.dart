@@ -9,6 +9,7 @@ import '../../core/food_mode.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
 import '../recipes/additional_ingredients_page.dart';
+import '../recipes/cooking_ingredient_group.dart';
 import '../recipes/saved_recipes_page.dart';
 import '../recipes/add_recipe_page.dart';
 
@@ -226,36 +227,17 @@ class _MyChoiceCard extends StatelessWidget {
   });
 
   List<Food> get _vegetableFoods => selectedFoods
-      .where((food) => _isVegetable(food) && !_isPotato(food))
+      .where((food) =>
+          cookingIngredientGroup(food) == CookingIngredientGroup.vegetables)
       .toList(growable: false);
 
   List<Food> get _sideFoods => selectedFoods
-      .where(_isSideFood)
+      .where((food) => cookingIngredientGroup(food) == CookingIngredientGroup.side)
       .toList(growable: false);
 
   List<Food> get _otherFoods => selectedFoods
-      .where((food) => !_isVegetable(food) && !_isPotato(food) && !_isSideFood(food))
+      .where((food) => cookingIngredientGroup(food) == CookingIngredientGroup.other)
       .toList(growable: false);
-
-  bool _isVegetable(Food food) =>
-      food.category.toLowerCase().contains('gemüse') ||
-      food.category.toLowerCase().contains('vegetable');
-
-  bool _isPotato(Food food) => food.name.toLowerCase().contains('kartoffel');
-
-  bool _isSideFood(Food food) {
-    final category = food.category.trim();
-    final name = food.name.toLowerCase();
-    if (['weisse bohne', 'weiße bohne', 'kidney bohne', 'grune bohne', 'grüne bohne', 'tortilla', 'toast']
-        .any(name.contains)) return false;
-    return name.contains('reis') || name.contains('nudel') || name.contains('pasta') ||
-        name.contains('kartoffel') ||
-        (category == 'Getreide & Beilagen' &&
-            !['haferflocken', 'semmelbrösel'].any(name.contains)) ||
-        category == 'Hülsenfrüchte' ||
-        ['couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette', 'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse']
-            .any(name.contains);
-  }
 
   @override
   Widget build(BuildContext context) {
