@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
@@ -49,6 +50,9 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
       .map((id) => foods.where((food) => food.id == id).firstOrNull)
       .whereType<Food>()
       .toList(growable: false);
+
+  List<Food> get alphabetizedSelectedFoods =>
+      sortByGermanName(selectedFoods, (food) => food.name);
 
   Future<void> _openCategory(IngredientCategory category) async {
     final result = await Navigator.push<Set<String>>(
@@ -123,7 +127,7 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
                     ),
                     if (selectedFoods.isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      ...selectedFoods.map(
+                      ...alphabetizedSelectedFoods.map(
                         (food) => Padding(
                           padding: const EdgeInsets.only(left: 36, bottom: 6),
                           child: Text('• ${food.name}'),
@@ -256,7 +260,10 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
           : <String, String>{};
       if (!mounted) return;
       setState(() {
-        foods = rows.where((food) => _matchesCategory(food, preferences)).toList();
+        foods = sortByGermanName(
+          rows.where((food) => _matchesCategory(food, preferences)),
+          (food) => food.name,
+        );
         loading = false;
       });
     } catch (e) {
