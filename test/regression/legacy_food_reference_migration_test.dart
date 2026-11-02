@@ -10,7 +10,8 @@ void main() {
 
     expect(source, contains("('onb_hackfleisch', 'mixed_minced_meat')"));
     expect(source, contains("('onb_mais', 'corn')"));
-    expect(source, contains("('corn', 'Mais', 'Gemüse'"));
+    // The canonical corn row is inserted with INSERT ... SELECT, not VALUES.
+    expect(source, contains("'corn', 'Mais', 'Gemüse', 'g'"));
     expect(source, contains("array['Hackfleisch']"));
     expect(source, contains('insert into public.user_food_preferences'));
     expect(source, contains('update public.recipe_ingredients'));
