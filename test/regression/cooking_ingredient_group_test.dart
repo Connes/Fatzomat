@@ -41,29 +41,33 @@ void main() {
     );
   });
 
-  test('gewünschte Zutaten wechseln zu Sonstiges', () {
-    for (final name in [
-      'Semmelbrösel',
-      'Haferflocken',
-      'Lasagneplatten',
-      'Tortillas',
+  test('nur Gemüse und Beilagen verlassen Sonstiges', () {
+    for (final item in [
+      food('Hähnchenfleisch', 'Fleisch'),
+      food('Lachs', 'Fisch'),
+      food('Apfel', 'Obst'),
+      food('Joghurt', 'Milchprodukte & Eier'),
+      food('Olivenöl', 'Saucen & Grundzutaten'),
+      food('Petersilie', 'Gewürze & Kräuter'),
+      food('Haferflocken', 'Getreide & Beilagen'),
+      food('Semmelbrösel', 'Getreide & Beilagen'),
+      food('Lasagneplatten', 'Getreide & Beilagen'),
+      food('Tortillas', 'Getreide & Beilagen'),
     ]) {
       expect(
-        cookingIngredientGroup(food(name, 'Getreide & Beilagen')),
+        cookingIngredientGroup(item),
         CookingIngredientGroup.other,
-        reason: '$name soll bei Sonstiges erscheinen',
+        reason: '${item.name} muss in Sonstiges erscheinen',
       );
     }
   });
 
-  test('Reis erscheint nur als allgemeiner Eintrag', () {
-    expect(cookingIngredientGroup(food('Reis', 'Getreide & Beilagen')),
-        CookingIngredientGroup.side);
-    for (final name in ['Basmatireis', 'Vollkornreis', 'Risottoreis']) {
+  test('Reisvarianten bleiben sichtbar unter Beilagen', () {
+    for (final name in ['Reis', 'Basmatireis', 'Vollkornreis', 'Risottoreis']) {
       expect(
         cookingIngredientGroup(food(name, 'Getreide & Beilagen')),
-        CookingIngredientGroup.hidden,
-        reason: '$name soll nicht angezeigt werden',
+        CookingIngredientGroup.side,
+        reason: '$name soll bei Beilagen erscheinen',
       );
     }
   });
