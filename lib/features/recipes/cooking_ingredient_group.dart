@@ -1,7 +1,7 @@
 import '../../core/food_name_normalizer.dart';
 import '../../data/models/food.dart';
 
-enum CookingIngredientGroup { vegetables, side, other }
+enum CookingIngredientGroup { vegetables, side, other, hidden }
 
 CookingIngredientGroup cookingIngredientGroup(Food food) {
   final category = food.category.trim().toLowerCase();
@@ -29,13 +29,15 @@ CookingIngredientGroup cookingIngredientGroup(Food food) {
   }
 
   final isRice = name == 'reis';
+  final isRiceVariant = hasAny(const ['basmatireis', 'vollkornreis', 'risottoreis']);
+  if (isRiceVariant) return CookingIngredientGroup.hidden;
   final isPasta = name.contains('nudel') || name.contains('pasta');
   final isSideOverride = hasAny(const [
     'couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette',
-    'toast', 'tortilla', 'linsen',
+    'toast', 'linsen',
   ]);
   final isOtherOverride = hasAny(const [
-    'haferflocken', 'semmelbroesel', 'lasagneplatten',
+    'haferflocken', 'semmelbroesel', 'lasagneplatten', 'tortilla',
   ]);
 
   if (isOtherOverride) return CookingIngredientGroup.other;
