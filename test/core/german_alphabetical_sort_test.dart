@@ -8,7 +8,7 @@ void main() {
       (value) => value,
     );
 
-    expect(values, ['Äpfel', 'Apfel', 'Banane', 'Öl', 'ß', 'Übriges', 'Zucchini']);
+    expect(values, ['Apfel', 'Äpfel', 'Banane', 'Öl', 'ß', 'Übriges', 'Zucchini']);
   });
 
   test('sorts objects by their displayed food name without mutating input', () {
