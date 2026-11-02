@@ -1,4 +1,5 @@
 import '../models/shopping_item.dart';
+import '../../core/german_alphabetical_sort.dart';
 
 /// A display-only shopping row backed by one or more persisted items.
 /// Source IDs remain intact so checking an aggregate can update each day
@@ -73,7 +74,7 @@ class ShoppingListAggregator {
       );
     }).toList()
       ..sort((a, b) {
-        final byName = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        final byName = compareGermanAlphabetically(a.name, b.name);
         if (byName != 0) return byName;
         final byUnit = a.unit.toLowerCase().compareTo(b.unit.toLowerCase());
         if (byUnit != 0) return byUnit;
