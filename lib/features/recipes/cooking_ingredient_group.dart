@@ -18,7 +18,7 @@ CookingIngredientGroup cookingIngredientGroup(Food food) {
 
   final isPotato = name.contains('kartoffel');
   final isBeanOrChickpea = hasAny(const [
-    'schwarze bohne', 'weisse bohne', 'kidney bohne', 'kichererbse',
+    'schwarze bohne', 'schwarze bohnen', 'weisse bohne', 'kidney bohne', 'kichererbse',
   ]);
   if (isBeanOrChickpea) return CookingIngredientGroup.vegetables;
 
