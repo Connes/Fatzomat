@@ -108,24 +108,34 @@ update public.foods set name = 'Kresse',
   aliases = array['Brunnenkresse']
 where id = 'watercress' and created_by is null;
 
+-- Keep the fresh chili entry, but simplify its display name as requested.
+update public.foods set name = 'Chilischote',
+  aliases = array['Frische Chilischote']
+where id = 'red_chili_pepper' and created_by is null;
+
 delete from public.foods
 where created_by is null
   and id in (
     'cherry_tomatoes', 'red_onion', 'celeriac', 'celery_stalk',
-    'pointed_cabbage', 'lettuce', 'parsley_root', 'okra',
-    'red_chili_pepper', 'ham',
+    'pointed_cabbage', 'lettuce', 'parsley_root', 'okra', 'ham',
     'italian_herbs', 'herbes_de_provence', 'garam_masala'
   );
 
--- Canonical category names. User-created foods are deliberately not rewritten.
+-- Canonical category names and the agreed final category set.
 update public.foods
 set category = case
   when category = 'Milchprodukte' then 'Milchprodukte & Eier'
   when category = 'Gewürze' then 'Gewürze & Kräuter'
+  when id = 'tofu' then 'Getreide & Beilagen'
+  when id = 'coconut_milk' then 'Saucen & Grundzutaten'
+  when id = 'sesame' then 'Nüsse & Kerne'
   else category
 end
 where created_by is null
-  and category in ('Milchprodukte', 'Gewürze');
+  and (
+    category in ('Milchprodukte', 'Gewürze', 'Sonstiges', 'Pflanzliche Alternativen')
+    or id in ('tofu', 'coconut_milk', 'sesame')
+  );
 
 -- Restore commonly used catalog items that were missing from older seed data,
 -- and add the agreed practical additions.
@@ -136,7 +146,7 @@ values
   ('green_beans', 'Grüne Bohnen', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
   ('peas', 'Erbsen', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
   ('corn', 'Mais', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
-  ('tofu', 'Tofu', 'Pflanzliche Alternativen', 'g', array['Sojatofu']::text[], 'vegan', 'plant'),
+  ('tofu', 'Tofu', 'Getreide & Beilagen', 'g', array['Sojatofu']::text[], 'vegan', 'plant'),
   ('sour_cream', 'Schmand', 'Milchprodukte & Eier', 'g', array[]::text[], 'vegetarian', 'dairy'),
   ('skyr', 'Skyr', 'Milchprodukte & Eier', 'g', array[]::text[], 'vegetarian', 'dairy')
 on conflict (id) do update
