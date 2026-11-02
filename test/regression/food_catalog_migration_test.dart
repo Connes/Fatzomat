@@ -26,7 +26,9 @@ void main() {
     expect(source, contains("'Pflanzliche Alternativen'"));
     expect(source, contains("'Kresse'"));
     expect(source, contains("'Meeresfrüchte'"));
-    expect(source, isNot(contains("'italian_herbs', 'herbes_de_provence', 'garam_masala'")));
+    expect(source, contains("'italian_herbs'"));
+    expect(source, contains("'herbes_de_provence'"));
+    expect(source, contains("'garam_masala'"));
   });
 
   test('Onboarding-Seed hat für Mango, Pfirsich und Kiwi vollständige Spaltenwerte', () {
