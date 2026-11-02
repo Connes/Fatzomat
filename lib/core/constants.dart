@@ -1,19 +1,19 @@
 const foodCategories = <String>[
   'Fleisch',
   'Fisch',
+  'Meeresfrüchte',
   'Gemüse',
   'Obst',
-  'Milchprodukte',
+  'Milchprodukte & Eier',
   'Getreide & Beilagen',
   'Hülsenfrüchte',
   'Nüsse & Kerne',
-  'Gewürze',
+  'Gewürze & Kräuter',
   'Saucen & Grundzutaten',
   'Backen & Süßes',
-  'Sonstiges',
 ];
 
 const hiddenRecipeCategories = <String>{
-  'Gewürze',
+  'Gewürze & Kräuter',
   'Saucen & Grundzutaten',
 };

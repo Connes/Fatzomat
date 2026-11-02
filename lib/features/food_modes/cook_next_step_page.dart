@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
@@ -9,6 +10,7 @@ import '../../core/food_mode.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
 import '../recipes/additional_ingredients_page.dart';
+import '../recipes/cooking_ingredient_group.dart';
 import '../recipes/saved_recipes_page.dart';
 import '../recipes/add_recipe_page.dart';
 
@@ -226,36 +228,23 @@ class _MyChoiceCard extends StatelessWidget {
   });
 
   List<Food> get _vegetableFoods => selectedFoods
-      .where((food) => _isVegetable(food) && !_isPotato(food))
+      .where((food) =>
+          cookingIngredientGroup(food) == CookingIngredientGroup.vegetables)
       .toList(growable: false);
+
+  List<Food> get _sortedVegetableFoods => sortByGermanName(_vegetableFoods, (food) => food.name);
 
   List<Food> get _sideFoods => selectedFoods
-      .where(_isSideFood)
+      .where((food) => cookingIngredientGroup(food) == CookingIngredientGroup.side)
       .toList(growable: false);
+
+  List<Food> get _sortedSideFoods => sortByGermanName(_sideFoods, (food) => food.name);
 
   List<Food> get _otherFoods => selectedFoods
-      .where((food) => !_isVegetable(food) && !_isPotato(food) && !_isSideFood(food))
+      .where((food) => cookingIngredientGroup(food) == CookingIngredientGroup.other)
       .toList(growable: false);
 
-  bool _isVegetable(Food food) =>
-      food.category.toLowerCase().contains('gemüse') ||
-      food.category.toLowerCase().contains('vegetable');
-
-  bool _isPotato(Food food) => food.name.toLowerCase().contains('kartoffel');
-
-  bool _isSideFood(Food food) {
-    final category = food.category.trim();
-    final name = food.name.toLowerCase();
-    if (['weisse bohne', 'weiße bohne', 'kidney bohne', 'grune bohne', 'grüne bohne', 'tortilla', 'toast']
-        .any(name.contains)) return false;
-    return name.contains('reis') || name.contains('nudel') || name.contains('pasta') ||
-        name.contains('kartoffel') ||
-        (category == 'Getreide & Beilagen' &&
-            !['haferflocken', 'semmelbrösel'].any(name.contains)) ||
-        category == 'Hülsenfrüchte' ||
-        ['couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette', 'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse']
-            .any(name.contains);
-  }
+  List<Food> get _sortedOtherFoods => sortByGermanName(_otherFoods, (food) => food.name);
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +289,7 @@ class _MyChoiceCard extends StatelessWidget {
               const SizedBox(height: 14),
               if (_vegetableFoods.isNotEmpty) ...[
                 const _IngredientGroupHeading('Gemüse'),
-                ..._vegetableFoods.map(
+                ..._sortedVegetableFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),
@@ -314,7 +303,7 @@ class _MyChoiceCard extends StatelessWidget {
               ],
               if (_sideFoods.isNotEmpty) ...[
                 const _IngredientGroupHeading('Beilagen'),
-                ..._sideFoods.map(
+                ..._sortedSideFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),
@@ -328,7 +317,7 @@ class _MyChoiceCard extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
                 const _IngredientGroupHeading('Sonstiges'),
-                ..._otherFoods.map(
+                ..._sortedOtherFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),

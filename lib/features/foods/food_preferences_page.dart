@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import 'add_food_dialog.dart';
 import '../../core/async_error.dart';
 import '../../data/repositories/food_repository.dart';
@@ -106,12 +107,15 @@ class _FoodPreferencesPageState extends State<FoodPreferencesPage> {
   }
 
   List<Food> get filteredFoods {
-    return filterFoods(
-      foods: foods,
-      preferences: preferences,
-      query: searchController.text,
-      preferenceFilter: preferenceFilter,
-      categoryFilter: categoryFilter,
+    return sortByGermanName(
+      filterFoods(
+        foods: foods,
+        preferences: preferences,
+        query: searchController.text,
+        preferenceFilter: preferenceFilter,
+        categoryFilter: categoryFilter,
+      ),
+      (food) => food.name,
     );
   }
 

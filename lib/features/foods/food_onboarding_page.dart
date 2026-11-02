@@ -7,6 +7,7 @@ import '../../core/async_error.dart';
 import '../../core/app_design.dart';
 import '../../core/constants.dart';
 import '../../core/food_name_normalizer.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
 import '../../data/repositories/profile_repository.dart';
@@ -76,13 +77,14 @@ class _FoodOnboardingPageState extends State<FoodOnboardingPage> {
 
   List<Food> get visibleFoods {
     final query = searchController.text.trim().toLowerCase();
-    return foods.where((food) {
+    final filtered = foods.where((food) {
       final foodCategory = food.category;
       if (category != 'Alle' && foodCategory != category) return false;
       if (query.isEmpty) return true;
       final terms = [food.name, ...food.searchTerms, ...food.aliases];
       return terms.any((term) => FoodNameNormalizer.matches(term, query));
-    }).toList();
+    });
+    return sortByGermanName(filtered, (food) => food.name);
   }
 
   void choose(String id, String value) {

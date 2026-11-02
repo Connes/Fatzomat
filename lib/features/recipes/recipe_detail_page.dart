@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/async_error.dart';
 import '../../core/error_text.dart';
 import '../../data/repositories/recipe_repository.dart';
@@ -47,7 +48,10 @@ List<(String?, List<RecipeIngredient>)> _groupIngredients(List<RecipeIngredient>
     final section = ingredient.section?.trim();
     groups.putIfAbsent(section == null || section.isEmpty ? null : section, () => <RecipeIngredient>[]).add(ingredient);
   }
-  return groups.entries.map((entry) => (entry.key, List<RecipeIngredient>.unmodifiable(entry.value))).toList(growable: false);
+  return groups.entries.map((entry) => (
+    entry.key,
+    List<RecipeIngredient>.unmodifiable(sortByGermanName(entry.value, (item) => item.name)),
+  )).toList(growable: false);
 }
 
 class _RecipeDetailPageState extends State<RecipeDetailPage> {

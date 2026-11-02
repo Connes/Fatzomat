@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
-import '../../core/food_name_normalizer.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food.dart';
+import 'cooking_ingredient_group.dart';
 
 class AdditionalIngredientsPage extends StatefulWidget {
   final String? mainChoice;
@@ -49,6 +50,9 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
       .map((id) => foods.where((food) => food.id == id).firstOrNull)
       .whereType<Food>()
       .toList(growable: false);
+
+  List<Food> get alphabetizedSelectedFoods =>
+      sortByGermanName(selectedFoods, (food) => food.name);
 
   Future<void> _openCategory(IngredientCategory category) async {
     final result = await Navigator.push<Set<String>>(
@@ -123,7 +127,7 @@ class _AdditionalIngredientsPageState extends State<AdditionalIngredientsPage> {
                     ),
                     if (selectedFoods.isNotEmpty) ...[
                       const SizedBox(height: 10),
-                      ...selectedFoods.map(
+                      ...alphabetizedSelectedFoods.map(
                         (food) => Padding(
                           padding: const EdgeInsets.only(left: 36, bottom: 6),
                           child: Text('• ${food.name}'),
@@ -256,7 +260,10 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
           : <String, String>{};
       if (!mounted) return;
       setState(() {
-        foods = rows.where((food) => _matchesCategory(food, preferences)).toList();
+        foods = sortByGermanName(
+          rows.where((food) => _matchesCategory(food, preferences)),
+          (food) => food.name,
+        );
         loading = false;
       });
     } catch (e) {
@@ -269,48 +276,17 @@ class _IngredientCategoryPageState extends State<IngredientCategoryPage> {
   }
 
   bool _matchesCategory(Food food, Map<String, String> preferences) {
-    final category = food.category.trim();
-    final name = FoodNameNormalizer.normalize(food.name);
-    // Keep these items out of the side-dish picker while leaving other beans available.
-    if (widget.category == IngredientCategory.side &&
-        _containsAny(name, const [
-          'weisse bohne', 'kidney bohne', 'grune bohne', 'tortilla', 'toast',
-        ])) {
-      return false;
+    if (widget.category == IngredientCategory.favorites) {
+      return preferences[food.id] == 'like';
     }
-    final isPotato = name.contains('kartoffel');
-    final isVegetable = category.toLowerCase().contains('gemüse') ||
-        category.toLowerCase().contains('vegetable');
-    final isSide = _isSideFood(food);
 
+    final group = cookingIngredientGroup(food);
     return switch (widget.category) {
-      IngredientCategory.side => isSide,
-      IngredientCategory.vegetables => isVegetable && !isPotato,
-      IngredientCategory.other => !isVegetable && !isSide,
-      IngredientCategory.favorites => preferences[food.id] == 'like',
+      IngredientCategory.side => group == CookingIngredientGroup.side,
+      IngredientCategory.vegetables => group == CookingIngredientGroup.vegetables,
+      IngredientCategory.other => group == CookingIngredientGroup.other,
+      IngredientCategory.favorites => false,
     };
-  }
-
-  bool _containsAny(String value, List<String> terms) =>
-      terms.any((term) => FoodNameNormalizer.equivalentOrContains(value, term));
-
-  bool _isSideFood(Food food) {
-    final category = food.category.trim();
-    final name = FoodNameNormalizer.normalize(food.name);
-    if (_containsAny(name, const [
-      'weisse bohne', 'kidney bohne', 'grune bohne', 'tortilla', 'toast',
-    ])) return false;
-    final isPotato = name.contains('kartoffel');
-    final isRice = name.contains('reis');
-    final isPasta = name.contains('nudel') || name.contains('pasta');
-    return isRice || isPasta || isPotato ||
-        (category == 'Getreide & Beilagen' &&
-            !_containsAny(name, const ['haferflocken', 'semmelbrösel'])) ||
-        category == 'Hülsenfrüchte' ||
-        _containsAny(name, const [
-          'couscous', 'bulgur', 'quinoa', 'gnocchi', 'brot', 'baguette',
-          'toast', 'tortilla', 'bohne', 'linsen', 'kichererbse',
-        ]);
   }
 
   void _toggle(String id) {
