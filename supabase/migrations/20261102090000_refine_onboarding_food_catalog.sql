@@ -140,7 +140,9 @@ where created_by is null
 -- Restore commonly used catalog items that were missing from older seed data,
 -- and add the agreed practical additions.
 insert into public.foods (id, name, category, default_unit, search_terms, dietary_type, protein_type)
-values
+select item.id, item.name, item.category, item.default_unit, item.search_terms,
+       item.dietary_type, item.protein_type
+from (values
   ('mango', 'Mango', 'Obst', 'Stück', array[]::text[], 'vegan', 'plant'),
   ('peach', 'Pfirsich', 'Obst', 'Stück', array[]::text[], 'vegan', 'plant'),
   ('green_beans', 'Grüne Bohnen', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
@@ -149,6 +151,12 @@ values
   ('tofu', 'Tofu', 'Getreide & Beilagen', 'g', array['Sojatofu']::text[], 'vegan', 'plant'),
   ('sour_cream', 'Schmand', 'Milchprodukte & Eier', 'g', array[]::text[], 'vegetarian', 'dairy'),
   ('skyr', 'Skyr', 'Milchprodukte & Eier', 'g', array[]::text[], 'vegetarian', 'dairy')
+) as item(id, name, category, default_unit, search_terms, dietary_type, protein_type)
+where not exists (
+  -- Older seeds may already contain the same food under a different stable ID.
+  -- Keep that existing row rather than violating foods_name_key or duplicating it.
+  select 1 from public.foods existing where lower(existing.name) = lower(item.name)
+)
 on conflict (id) do update
 set name = excluded.name,
     category = excluded.category,
