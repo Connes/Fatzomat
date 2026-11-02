@@ -317,3 +317,14 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Danach läuft die bestehende Konfetti-/Jackpot-Animation für 2,4 Sekunden.
 - Erst nach dem Konfettiregen erscheinen „NOCHMAL DREHEN“ und „WEITER MIT …“. Ein erneuter Dreh setzt die Sequenz zurück.
 - Geräteprüfung und CI für diese Änderung stehen noch aus.
+
+
+## Lebensmittelkatalog: Legacy-Onboarding-IDs konsolidiert (2026-11-02)
+
+- Live-Datenprüfung zeigte zusätzliche Standarddatensätze mit `onb_*`-IDs, die von der Migration aus PR #409 nicht erfasst wurden. Betroffen waren unter anderem Hähnchen, Rindersteak, Schweinefleisch, Putenbrust, Salami, Speck, Würstchen, Garnelen, Champignons, Erbsen, grüne Bohnen, Mango, Pfirsich und Joghurt.
+- PR [#411 – Consolidate legacy onboarding food catalog IDs](https://github.com/Connes/Fatzomat/pull/411) führt diese eindeutig zuordenbaren Datensätze in kanonische IDs über. Vor dem Löschen werden Nutzerpräferenzen und Rezeptzutaten-Referenzen umgehängt. Die Migration arbeitet ausschließlich mit Standarddatensätzen (`created_by IS NULL`) und bricht ab, wenn ein Ziel fehlt.
+- Garnelen werden in der kanonischen Kategorie `Meeresfrüchte` angelegt. Mehrdeutige Einträge wie generisches Hackfleisch und Schinken bleiben unangetastet, statt sie fachlich falsch zuzuordnen.
+- Regressionstest in `test/regression/food_catalog_migration_test.dart` erweitert.
+- PR #411 gemergt; Merge-Commit `e6b31274f495822fce4b77855c413065e690e2e7`. Beide Post-Merge-Workflows für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/41437756678) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/41437756741).
+- Die neue Migration `20261102120000_consolidate_legacy_onboarding_foods` ist im Repository, aber **noch nicht auf Live-Supabase angewendet**. Die vorhandenen `onb_*`-Datensätze hatten bei der Prüfung keine Präferenz- oder Rezeptreferenzen; die Migration sichert die Referenzübertragung dennoch für spätere bzw. abweichende Datenstände ab.
+- Nach Merge ergab die Live-Abfrage keine offenen PRs. Geräteprüfung nicht durchgeführt.
