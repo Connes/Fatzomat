@@ -7,7 +7,7 @@ update public.foods
 set name = 'Legacy onboarding item ' || id
 where created_by is null
   and id in (
-    'onb_schweinefleisch', 'onb_salami', 'onb_speck',
+    'onb_schweinefleisch', 'onb_salami', 'onb_speck', 'onb_garnelen',
     'onb_mango', 'onb_pfirsich', 'onb_bohnen'
   )
   and not exists (
@@ -17,6 +17,7 @@ where created_by is null
       when 'onb_schweinefleisch' then 'pork_chop'
       when 'onb_salami' then 'salami'
       when 'onb_speck' then 'bacon'
+      when 'onb_garnelen' then 'shrimp'
       when 'onb_mango' then 'mango'
       when 'onb_pfirsich' then 'peach'
       when 'onb_bohnen' then 'green_beans'
