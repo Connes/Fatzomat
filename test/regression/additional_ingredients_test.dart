@@ -92,7 +92,7 @@ void main() {
 
     final listView = find.byType(ListView).last;
     final card = find.ancestor(of: listView, matching: find.byType(Material)).first;
-    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(7));
+    expect(find.descendant(of: card, matching: find.byType(Divider)), findsNWidgets(6));
 
     final cardPadding = tester.widget<Padding>(
       find.ancestor(of: card, matching: find.byType(Padding)).first,
