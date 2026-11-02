@@ -37,7 +37,7 @@ void main() {
   });
 
   test('Legacy-Onboarding-IDs werden in den kanonischen Katalog überführt', () {
-    final source = File('supabase/migrations/20261102120000_consolidate_legacy_onboarding_foods.sql').readAsStringSync();
+    final source = File('supabase/migrations/20261102120017_consolidate_legacy_onboarding_foods.sql').readAsStringSync();
 
     expect(source, contains("('onb_hähnchen', 'chicken_breast')"));
     expect(source, contains("('onb_beef_steak', 'ground_beef')"));
