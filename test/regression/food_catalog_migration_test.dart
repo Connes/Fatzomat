@@ -9,7 +9,9 @@ void main() {
     expect(source, contains("'Meeresfrüchte'"));
     expect(source, contains("'Milchprodukte & Eier'"));
     expect(source, contains("'Gewürze & Kräuter'"));
-    expect(source, contains("'Pflanzliche Alternativen'"));
+    expect(source, contains("'Getreide & Beilagen'"));
+    expect(source, isNot(contains("'Pflanzliche Alternativen'")));
+    expect(source, isNot(contains("'Sonstiges'")));
     expect(source, isNot(contains("'Milchprodukte',")));
     expect(source, isNot(contains("'Gewürze',")));
   });
@@ -23,9 +25,12 @@ void main() {
     expect(source, contains('insert into public.user_food_preferences'));
     expect(source, contains('update public.recipe_ingredients'));
     expect(source, contains("'Gemischtes Hackfleisch'"));
-    expect(source, contains("'Pflanzliche Alternativen'"));
     expect(source, contains("'Kresse'"));
     expect(source, contains("'Meeresfrüchte'"));
+    expect(source, contains("'Chilischote'"));
+    expect(source, contains("'coconut_milk'"));
+    expect(source, contains("'sesame'"));
+    expect(source, contains("'Getreide & Beilagen'"));
     expect(source, contains("'italian_herbs'"));
     expect(source, contains("'herbes_de_provence'"));
     expect(source, contains("'garam_masala'"));
