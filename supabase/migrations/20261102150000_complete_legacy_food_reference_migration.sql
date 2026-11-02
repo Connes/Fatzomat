@@ -24,7 +24,7 @@ where not exists (select 1 from public.foods where id = 'corn');
 update public.foods
 set aliases = (
   select array_agg(distinct alias order by alias)
-  from unnest(coalesce(aliases, array[]::text[]) || array['Hackfleisch']::text[]) alias
+  from unnest(coalesce(aliases, array[]::text[]) || array['Hackfleisch']::text[]) as item(alias)
 )
 where id = 'mixed_minced_meat'
   and created_by is null;
