@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/async_error.dart';
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/food_mode.dart';
 import '../../core/services/food_choice_asset_service.dart';
 import '../../core/widgets/together_background.dart';
@@ -327,7 +328,10 @@ List<(String?, List<RecipeIngredient>)> _ingredientSections(List<RecipeIngredien
     final section = ingredient.section?.trim();
     groups.putIfAbsent(section == null || section.isEmpty ? null : section, () => <RecipeIngredient>[]).add(ingredient);
   }
-  return groups.entries.map((entry) => (entry.key, List<RecipeIngredient>.unmodifiable(entry.value))).toList(growable: false);
+  return groups.entries.map((entry) => (
+    entry.key,
+    List<RecipeIngredient>.unmodifiable(sortByGermanName(entry.value, (item) => item.name)),
+  )).toList(growable: false);
 }
 
 class RecipeImportPreviewPage extends StatefulWidget {
@@ -1075,6 +1079,7 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
   }
 
   String _joinNames(List<String> names) {
+    names = sortByGermanName(names, (name) => name);
     if (names.length < 2) return names.join();
     if (names.length == 2) return '${names[0]} und ${names[1]}';
     return '${names.sublist(0, names.length - 1).join(', ')} und ${names.last}';
