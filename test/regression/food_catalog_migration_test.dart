@@ -42,6 +42,7 @@ void main() {
     expect(source, contains("('onb_hähnchen', 'chicken_breast')"));
     expect(source, contains("('onb_beef_steak', 'ground_beef')"));
     expect(source, contains("('onb_garnelen', 'shrimp')"));
+    expect(source, contains("'onb_garnelen',\n    'onb_mango'"));
     expect(source, contains("('onb_champignons', 'mushrooms')"));
     expect(source, contains("('onb_griechischer_joghurt', 'yogurt')"));
     expect(source, contains("('onb_joghurt', 'yogurt')"));
