@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
@@ -231,13 +232,19 @@ class _MyChoiceCard extends StatelessWidget {
           cookingIngredientGroup(food) == CookingIngredientGroup.vegetables)
       .toList(growable: false);
 
+  List<Food> get _sortedVegetableFoods => sortByGermanName(_vegetableFoods, (food) => food.name);
+
   List<Food> get _sideFoods => selectedFoods
       .where((food) => cookingIngredientGroup(food) == CookingIngredientGroup.side)
       .toList(growable: false);
 
+  List<Food> get _sortedSideFoods => sortByGermanName(_sideFoods, (food) => food.name);
+
   List<Food> get _otherFoods => selectedFoods
       .where((food) => cookingIngredientGroup(food) == CookingIngredientGroup.other)
       .toList(growable: false);
+
+  List<Food> get _sortedOtherFoods => sortByGermanName(_otherFoods, (food) => food.name);
 
   @override
   Widget build(BuildContext context) {
@@ -282,7 +289,7 @@ class _MyChoiceCard extends StatelessWidget {
               const SizedBox(height: 14),
               if (_vegetableFoods.isNotEmpty) ...[
                 const _IngredientGroupHeading('Gemüse'),
-                ..._vegetableFoods.map(
+                ..._sortedVegetableFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),
@@ -296,7 +303,7 @@ class _MyChoiceCard extends StatelessWidget {
               ],
               if (_sideFoods.isNotEmpty) ...[
                 const _IngredientGroupHeading('Beilagen'),
-                ..._sideFoods.map(
+                ..._sortedSideFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),
@@ -310,7 +317,7 @@ class _MyChoiceCard extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
                 const _IngredientGroupHeading('Sonstiges'),
-                ..._otherFoods.map(
+                ..._sortedOtherFoods.map(
                   (food) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _ChoiceRow(label: food.name),
