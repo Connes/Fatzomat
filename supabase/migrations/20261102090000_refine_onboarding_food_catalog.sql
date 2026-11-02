@@ -88,6 +88,9 @@ update public.foods set name = 'Wurst',
   aliases = array['Würstchen', 'Bratwurst']
 where id = 'sausage' and created_by is null;
 
+update public.foods set name = 'Joghurt', aliases = array['Naturjoghurt', 'Griechischer Joghurt']
+where id = 'yogurt' and created_by is null;
+
 update public.foods set name = 'Gemischtes Hackfleisch',
   aliases = array['Gemischtes Hack', 'Hackfleisch gemischt']
 where id = 'mixed_minced_meat' and created_by is null;
@@ -126,18 +129,20 @@ where created_by is null
 
 -- Restore commonly used catalog items that were missing from older seed data,
 -- and add the agreed practical additions.
-insert into public.foods (id, name, category, default_unit, search_terms)
+insert into public.foods (id, name, category, default_unit, search_terms, dietary_type, protein_type)
 values
-  ('mango', 'Mango', 'Obst', 'Stück', array[]::text[]),
-  ('peach', 'Pfirsich', 'Obst', 'Stück', array[]::text[]),
-  ('green_beans', 'Grüne Bohnen', 'Gemüse', 'g', array[]::text[]),
-  ('peas', 'Erbsen', 'Gemüse', 'g', array[]::text[]),
-  ('corn', 'Mais', 'Gemüse', 'g', array[]::text[]),
-  ('tofu', 'Tofu', 'Pflanzliche Alternativen', 'g', array['Sojatofu']::text[]),
-  ('sour_cream', 'Schmand', 'Milchprodukte & Eier', 'g', array[]::text[]),
-  ('skyr', 'Skyr', 'Milchprodukte & Eier', 'g', array[]::text[])
+  ('mango', 'Mango', 'Obst', 'Stück', array[]::text[], 'vegan', 'plant'),
+  ('peach', 'Pfirsich', 'Obst', 'Stück', array[]::text[], 'vegan', 'plant'),
+  ('green_beans', 'Grüne Bohnen', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
+  ('peas', 'Erbsen', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
+  ('corn', 'Mais', 'Gemüse', 'g', array[]::text[], 'vegan', 'plant'),
+  ('tofu', 'Tofu', 'Pflanzliche Alternativen', 'g', array['Sojatofu']::text[], 'vegan', 'plant'),
+  ('sour_cream', 'Schmand', 'Milchprodukte & Eier', 'g', array[]::text[], 'vegetarian', 'dairy'),
+  ('skyr', 'Skyr', 'Milchprodukte & Eier', 'g', array[]::text[], 'vegetarian', 'dairy')
 on conflict (id) do update
 set name = excluded.name,
     category = excluded.category,
-    default_unit = excluded.default_unit
+    default_unit = excluded.default_unit,
+    dietary_type = excluded.dietary_type,
+    protein_type = excluded.protein_type
 where public.foods.created_by is null;
