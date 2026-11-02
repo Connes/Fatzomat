@@ -14,6 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/async_error.dart';
 import '../../core/error_text.dart';
 import '../../core/app_design.dart';
+import '../../core/german_alphabetical_sort.dart';
 import '../../core/recipe_collection_events.dart';
 import '../../data/models/shopping_item.dart';
 import '../../data/models/today_plan.dart';
@@ -2258,6 +2259,16 @@ class _ShoppingPageState extends State<ShoppingPage> {
 
     final openGrouped = grouped(openItems);
     final completedGrouped = grouped(completedItems);
+    for (final group in openGrouped.values) {
+      group.sort((a, b) => compareGermanAlphabetically(a.name, b.name));
+    }
+    for (final group in completedGrouped.values) {
+      group.sort((a, b) => compareGermanAlphabetically(a.name, b.name));
+    }
+    final sortedOpenGroups = openGrouped.entries.toList()
+      ..sort((a, b) => compareGermanAlphabetically(a.key, b.key));
+    final sortedCompletedGroups = completedGrouped.entries.toList()
+      ..sort((a, b) => compareGermanAlphabetically(a.key, b.key));
 
     if (loadError != null) {
       return TogetherScaffold(
@@ -2410,7 +2421,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          ...openGrouped.entries.map(
+                          ...sortedOpenGroups.map(
                             (entry) => _ShoppingGroup(
                               category: entry.key,
                               items: entry.value,
@@ -2451,7 +2462,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
                             ],
                           ),
                           const SizedBox(height: 4),
-                          ...completedGrouped.entries.map(
+                          ...sortedCompletedGroups.map(
                             (entry) => _ShoppingGroup(
                               category: entry.key,
                               items: entry.value,
