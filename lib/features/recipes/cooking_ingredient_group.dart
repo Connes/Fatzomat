@@ -13,7 +13,8 @@ CookingIngredientGroup cookingIngredientGroup(Food food) {
 
   // Blattsalate sollen im Koch-Flow unter Sonstiges auftauchen, auch wenn
   // sie im Onboarding der Kategorie Gemüse zugeordnet sind.
-  final isSalad = hasAny(const [
+  // Chicorée enthält ein é, das der allgemeine Such-Normalizer entfernt.
+  final isSalad = name.contains('chicor') || hasAny(const [
     'salat', 'rucola', 'feldsalat', 'endivie', 'chicoree',
   ]);
   if (isSalad) return CookingIngredientGroup.other;
