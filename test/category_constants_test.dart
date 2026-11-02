@@ -7,7 +7,7 @@ void main() {
     expect(foodCategories, contains('Getreide & Beilagen'));
     expect(foodCategories, contains('Saucen & Grundzutaten'));
     expect(foodCategories, contains('Backen & Süßes'));
-    expect(hiddenRecipeCategories, contains('Gewürze'));
+    expect(hiddenRecipeCategories, contains('Gewürze & Kräuter'));
     expect(hiddenRecipeCategories, contains('Saucen & Grundzutaten'));
   });
 }
