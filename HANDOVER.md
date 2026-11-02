@@ -69,9 +69,20 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 - App: Flutter; CI verwendet Flutter 3.47.2 stable.
 - Kommunikation mit dem Nutzer auf Deutsch.
 - Nach Möglichkeit Umsetzung, Tests, PR und Verifikation autonom erledigen.
-- Relevante Checks: Repository-Hygiene, `flutter analyze`, `flutter test` und weitere projektspezifische Prüfungen nach Bedarf.
+- Relevante Checks: Repository-Hygiene, `flutter analyze`, `flutter test` und weitere projektspezifische Prüfungen nach Bedarf. Bei Änderungen an App-Code, iOS-Konfiguration, Flutter-Abhängigkeiten oder Assets ist zusätzlich der iOS-Simulator-Workflow verpflichtend; siehe Abschnitt „Apple-/iOS-Kompatibilität als Pflicht“.
 - Nach Merge tatsächlichen `main`-Commit und Post-Merge-CI prüfen. Nicht aus einem erfolgreichen PR-Lauf auf den Zustand des Merge-Commits schließen.
 - Der Nutzer führt lokal `git pull` aus und prüft die App auf seinem Gerät. Keine Geräteprüfung behaupten, solange sie nicht stattgefunden hat.
+
+## Apple-/iOS-Kompatibilität als Pflicht
+
+- **Jede Änderung muss auch unter iOS funktionsfähig bleiben.** iOS ist keine nachgelagerte Portierungsaufgabe. Bei jeder Planung und Implementierung ist zu prüfen, ob Verhalten, UI, Datenzugriff, Berechtigungen, Plugins, Assets und Konfiguration auch auf iPhone/iPad funktionieren.
+- Flutter-Code unter `lib/` wird von Android und iOS gemeinsam verwendet. Änderungen daran müssen deshalb ohne unbeabsichtigte Plattformunterschiede funktionieren. Plattformabhängige Implementierungen sind ausdrücklich für beide Plattformen zu prüfen.
+- Bei Änderungen an `ios/**`, `lib/**`, `assets/**`, `pubspec.yaml`, `pubspec.lock` oder am iOS-Workflow muss der Workflow **„iPhone simulator smoke test“** für den aktuellen PR-Head erfolgreich sein. Er baut die iOS-Simulator-App und installiert/startet sie in einem iPhone-Simulator. Der Workflow ist in `.github/workflows/ios-simulator.yml` für diese Pfade auf Pull Requests und Pushes nach `main` eingerichtet.
+- **Merge-Gate:** Wenn eine Änderung einen der genannten iOS-relevanten Pfade betrifft, darf sie nicht gemergt werden, solange der iOS-Simulator-Workflow für exakt den aktuellen PR-Head fehlt, läuft oder fehlgeschlagen ist. Bei ausbleibendem Workflow ist zuerst die Ursache zu klären; ein grüner Android-/Flutter-Check ersetzt den iOS-Check nicht.
+- Änderungen an Supabase-Schema, RPCs, Edge Functions oder sonstigen Backend-Verträgen müssen zusätzlich auf iOS-Kompatibilität geprüft werden: verwendete Tabellen, Spalten, RPC-Parameter/-Antworten, Authentifizierung und Datenformate müssen mit dem gemeinsam genutzten Flutter-Client kompatibel bleiben. Ein Simulator-Build allein beweist keine Backend-Kompatibilität.
+- Bei nativen iOS-Funktionen sind die betroffenen Plattformdateien und Einstellungen gezielt zu prüfen, insbesondere `Info.plist`, Berechtigungsbeschreibungen, URL-Schemes, Entitlements, Deployment Target, Plugin-Integration und erforderliche Xcode-Konfiguration. Keine Android-Konfiguration ungeprüft als iOS-Ersatz übernehmen.
+- Neue oder geänderte Plugins und native Abhängigkeiten müssen auf iOS-Unterstützung und erforderliche Pod-/Xcode-Schritte geprüft werden. Lockfile und iOS-Projektintegration müssen zusammenpassen.
+- Der Simulator-Workflow ist ein Build-/Start-Smoke-Test, kein vollständiger UI-, Hardware- oder Release-Test. Keine Prüfung auf echtem iPhone/iPad, Signierung, TestFlight oder App-Store-Verteilung behaupten, solange sie nicht tatsächlich durchgeführt wurde. Release-/Store-Arbeiten bleiben außerhalb des normalen Entwicklungsworkflows.
 
 ## PR-Reihenfolge und Merge-Gates
 
@@ -79,6 +90,7 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 - Ältere PRs zuerst prüfen und nach Möglichkeit zuerst abschließen. Die Nummer bzw. das Alter allein entscheidet nicht: Abhängigkeiten, überlappende Dateien und die Basis-Commits sind ausschlaggebend.
 - PRs, die auf Änderungen eines anderen offenen PRs aufbauen, erst nach dessen Merge integrieren oder die Abhängigkeit ausdrücklich sauber abbilden. Keine abhängigen PRs so behandeln, als wären sie unabhängig.
 - Vor jedem Merge müssen alle für den aktuellen Head-Commit erforderlichen CI-Checks erfolgreich sein und der PR mergebar sein. Bei roten Checks Logs lesen, Ursache beheben und die neuen Läufe abwarten. Nicht wegen Zeitdruck überspringen.
+- Zusätzlich gilt das iOS-Merge-Gate aus „Apple-/iOS-Kompatibilität als Pflicht“: Bei iOS-relevanten Änderungen muss der iPhone-Simulator-Workflow für exakt den aktuellen PR-Head erfolgreich sein. Allgemeine Flutter-/Android-Checks reichen dafür nicht aus.
 - Nach jedem Merge den tatsächlichen neuen `main`-Commit und dessen CI prüfen. Anschließend offene PRs erneut auf Aktualität, Konflikte, Basis und CI kontrollieren; Änderungen an `main` können frühere Prüfungen entwerten.
 - Keine grünen Ergebnisse von einem älteren Commit auf einen neueren Commit oder den Merge-Commit übertragen. Nur den exakt geprüften Commit als erfolgreich bezeichnen.
 - App-PRs erst als abgeschlossen melden, wenn sie gemergt und der resultierende `main`-Stand geprüft wurde. Lokale Geräteprüfung bleibt Aufgabe des Nutzers und darf nicht behauptet werden, solange sie nicht stattgefunden hat.
