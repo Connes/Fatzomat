@@ -36,6 +36,25 @@ void main() {
     expect(source, contains("'garam_masala'"));
   });
 
+  test('Legacy-Onboarding-IDs werden in den kanonischen Katalog überführt', () {
+    final source = File('supabase/migrations/20261102120000_consolidate_legacy_onboarding_foods.sql').readAsStringSync();
+
+    expect(source, contains("('onb_hähnchen', 'chicken_breast')"));
+    expect(source, contains("('onb_beef_steak', 'ground_beef')"));
+    expect(source, contains("('onb_garnelen', 'shrimp')"));
+    expect(source, contains("('onb_champignons', 'mushrooms')"));
+    expect(source, contains("('onb_griechischer_joghurt', 'yogurt')"));
+    expect(source, contains("('onb_joghurt', 'yogurt')"));
+    expect(source, contains("('onb_mango', 'mango')"));
+    expect(source, contains("('onb_pfirsich', 'peach')"));
+    expect(source, contains("('onb_bohnen', 'green_beans')"));
+    expect(source, contains('insert into public.user_food_preferences'));
+    expect(source, contains('update public.recipe_ingredients'));
+    expect(source, contains('raise exception'));
+    expect(source, contains("set category = 'Meeresfrüchte'"));
+    expect(source, contains("where created_by is null"));
+  });
+
   test('Onboarding-Seed hat für Mango, Pfirsich und Kiwi vollständige Spaltenwerte', () {
     final source = File('supabase/migrations/202609140001_onboarding_and_custom_foods.sql').readAsStringSync();
 
