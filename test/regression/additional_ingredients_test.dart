@@ -82,7 +82,7 @@ void main() {
     expect(find.text('Brot'), findsOneWidget);
     expect(find.text('Couscous'), findsOneWidget);
     expect(find.text('Quinoa'), findsOneWidget);
-    expect(find.text('Kichererbsen'), findsOneWidget);
+    expect(find.text('Kichererbsen'), findsNothing);
     expect(find.text('🍚'), findsNothing);
     expect(find.text('🍞'), findsNothing);
   });
