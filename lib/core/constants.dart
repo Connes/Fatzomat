@@ -9,10 +9,8 @@ const foodCategories = <String>[
   'Hülsenfrüchte',
   'Nüsse & Kerne',
   'Gewürze & Kräuter',
-  'Pflanzliche Alternativen',
   'Saucen & Grundzutaten',
   'Backen & Süßes',
-  'Sonstiges',
 ];
 
 const hiddenRecipeCategories = <String>{
