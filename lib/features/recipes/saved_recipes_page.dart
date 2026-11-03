@@ -180,6 +180,7 @@ class _RecipeCardImageState extends State<_RecipeCardImage> {
 class SavedRecipesPage extends StatefulWidget {
   final ValueChanged<int>? onNavigateToTab;
   final VoidCallback? onNavigateToToday;
+  final ValueChanged<DateTime>? onNavigateToTodayForDate;
   final String? mainChoice;
   final Set<String> selectedFoodIds;
   final String? decisionRequestId;
@@ -190,6 +191,7 @@ class SavedRecipesPage extends StatefulWidget {
     super.key,
     this.onNavigateToTab,
     this.onNavigateToToday,
+    this.onNavigateToTodayForDate,
     this.mainChoice,
     this.selectedFoodIds = const <String>{},
     this.decisionRequestId,
@@ -469,11 +471,17 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       if (widget.decisionRequestId == null) {
         final navigateToToday = widget.onNavigateToToday;
         if (navigateToToday != null) {
-          // Unwind the recipe-search flow to the existing TodayPage. Its
-          // selected date is intentionally preserved, including future dates.
-          // The shell callback owns both stack unwinding and tab selection.
-          // It deliberately does not emit the explicit "reset to today" signal.
+          // When this flow started on Today, that page already owns the
+          // selected date. Unwind to it without emitting the reset-to-today signal.
           navigateToToday();
+          return;
+        }
+        final navigateToTodayForDate = widget.onNavigateToTodayForDate;
+        if (navigateToTodayForDate != null) {
+          // Standalone recipe browsing chooses its own date. Pass that exact
+          // date to the mounted TodayPage instead of triggering the tab's
+          // normal reset-to-current-day behavior.
+          navigateToTodayForDate(planDate);
           return;
         }
         if (widget.onNavigateToTab != null) {
