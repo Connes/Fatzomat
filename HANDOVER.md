@@ -348,3 +348,10 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Die Migration `complete_legacy_food_reference_migration` wurde am 2026-11-03 auf dem Live-Projekt `MVP` (`oidxezjdwqktpxuypbfb`) angewendet und in der Datenbank als Version `20261103132309` registriert.
 - Read-only Nachprüfung: 0 verbleibende Legacy-Zeilen (`onb_hackfleisch`, `onb_mais`), beide kanonischen IDs vorhanden, 0 verbliebene Legacy-Referenzen in Präferenzen/Rezeptzutaten/Einkaufsartikeln; Alias `Hackfleisch` ist am kanonischen Eintrag `mixed_minced_meat` vorhanden.
 - GitHub-Liveprüfung: `main` auf `caae31158662459b457ff008a5605e9aba2da7d5`, keine offenen PRs. Der verfügbare Commit-Workflow-Endpunkt lieferte keine Runs und der kombinierte Status keine Statuschecks; Post-Merge-CI ist damit nicht als erfolgreich bestätigt. Keine Geräteprüfung durchgeführt.
+
+## Rezeptauswahl übernimmt das gewählte Plan-Datum (2026-11-03)
+
+- Fehlerbild: Wird ein gespeichertes Rezept direkt aus dem Rezepte-Tab als Tagesentscheidung ausgewählt, speichert der Ablauf zwar das in der Datumsauswahl gewählte Datum, der Rücksprung über den normalen Tab-Wechsel löst jedoch das explizite Zurücksetzen der Heute-Seite auf das aktuelle Datum aus.
+- `SavedRecipesPage` erhält jetzt zusätzlich `onNavigateToTodayForDate`. Bei eigenständiger Rezeptauswahl übergibt sie nach erfolgreicher Speicherung das konkrete Plan-Datum an die Shell. Diese aktiviert „Heute“ über den vorhandenen datumsbewussten Navigationspfad (`_handleNotificationNavigation`) statt über den Reset-Tab-Wechsel.
+- Wird die Rezeptauswahl aus einem bereits datierten Heute-/Kochablauf geöffnet, bleibt der bestehende Rückweg erhalten, da die Heute-Seite das ausgewählte Datum bereits hält.
+- Regressionstest `test/regression/future_date_planning_navigation_test.dart` erweitert. CI und Gerätetest stehen noch aus.
