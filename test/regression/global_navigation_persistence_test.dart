@@ -23,7 +23,9 @@ void main() {
     expect(shell, contains('ValueListenableBuilder<int>('));
     expect(shell, contains('index: selectedIndex'));
     expect(shell, contains('_contentIndex.value = value'));
-    expect(shell, contains('SavedRecipesPage(onNavigateToTab: _selectTab)'));
+    expect(shell, contains('SavedRecipesPage('));
+    expect(shell, contains('onNavigateToTab: _selectTab,'));
+    expect(shell, contains('onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),'));
     expect(shell, contains('void _selectTab(int value)'));
   });
 

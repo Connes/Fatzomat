@@ -132,7 +132,10 @@ class _AppShellState extends State<AppShell> {
         resetToTodaySignal: _todayResetSignal,
         notificationDateSignal: _notificationDateSignal,
       ),
-      SavedRecipesPage(onNavigateToTab: _selectTab),
+      SavedRecipesPage(
+        onNavigateToTab: _selectTab,
+        onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),
+      ),
       const ShoppingListPage(),
       const SettingsPage(),
     ];
