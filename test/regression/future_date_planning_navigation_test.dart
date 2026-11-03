@@ -126,5 +126,8 @@ void main() {
     expect(shell.substring(returnStart, returnEnd), isNot(contains('_todayResetSignal.value++')));
     expect(today, contains('onNavigateToToday: widget.onNavigateToToday ??'));
     expect(shell, contains('resetToTodaySignal: _todayResetSignal'));
+    expect(saved, contains('onNavigateToTodayForDate(planDate);'));
+    expect(shell, contains('onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),'));
+    expect(shell, contains('_notificationDateSignal.value = targetDate ?? DateTime.now();'));
   });
 }
