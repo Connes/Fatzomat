@@ -361,4 +361,4 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 
 - Der Zustand ohne persönliche Entscheidungen wird als zentrierte, nahezu deckend weiße Karte mit abgerundeten Ecken und leichtem Schatten dargestellt, damit der Text nicht mehr im Foto-Hintergrund untergeht.
 - Das History-Icon verwendet das zentrale Gold-Token `AppDesign.iconGold`; der Text nutzt die Inter-Typografie aus dem App-Theme und die zentrale Textfarbe.
-- Umsetzung in `lib/features/settings/personal_history_page.dart`. CI-Prüfungen stehen noch aus.
+- Umsetzung in `lib/features/settings/personal_history_page.dart`. Regressionstest `test/regression/personal_history_empty_state_test.dart` ergänzt. CI-Prüfungen stehen noch aus.
