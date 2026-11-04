@@ -56,14 +56,59 @@ class _PersonalHistoryPageState extends State<PersonalHistoryPage> {
             : loading
                 ? const Center(child: CircularProgressIndicator())
                 : entries.isEmpty
-                    ? ListView(
-                        padding: const EdgeInsets.all(24),
-                        children: const [
-                          SizedBox(height: 80),
-                          Icon(Icons.history_rounded, size: 52, color: AppDesign.secondaryText),
-                          SizedBox(height: 16),
-                          Center(child: Text('Noch keine persönlichen Entscheidungen.')),
-                        ],
+                    ? LayoutBuilder(
+                        builder: (context, constraints) => ListView(
+                          padding: const EdgeInsets.all(24),
+                          children: [
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight - 48,
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 28,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppDesign.surface.withValues(alpha: 0.97),
+                                    borderRadius: BorderRadius.circular(AppDesign.radiusHero),
+                                    border: Border.all(
+                                      color: AppDesign.divider.withValues(alpha: 0.7),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppDesign.text.withValues(alpha: 0.10),
+                                        blurRadius: 24,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.history_rounded,
+                                        size: 64,
+                                        color: AppDesign.iconGold,
+                                      ),
+                                      const SizedBox(height: 18),
+                                      Text(
+                                        'Noch keine persönlichen Entscheidungen.',
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                          color: AppDesign.text,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
