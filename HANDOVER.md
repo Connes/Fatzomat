@@ -355,3 +355,10 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - `SavedRecipesPage` erhält jetzt zusätzlich `onNavigateToTodayForDate`. Bei eigenständiger Rezeptauswahl übergibt sie nach erfolgreicher Speicherung das konkrete Plan-Datum an die Shell. Diese aktiviert „Heute“ über den vorhandenen datumsbewussten Navigationspfad (`_handleNotificationNavigation`) statt über den Reset-Tab-Wechsel.
 - Wird die Rezeptauswahl aus einem bereits datierten Heute-/Kochablauf geöffnet, bleibt der bestehende Rückweg erhalten, da die Heute-Seite das ausgewählte Datum bereits hält.
 - Regressionstest `test/regression/future_date_planning_navigation_test.dart` erweitert. CI und Gerätetest stehen noch aus.
+
+
+## Persönliche History: Empty State besser lesbar (2026-11-04)
+
+- Der Zustand ohne persönliche Entscheidungen wird als zentrierte, nahezu deckend weiße Karte mit abgerundeten Ecken und leichtem Schatten dargestellt, damit der Text nicht mehr im Foto-Hintergrund untergeht.
+- Das History-Icon verwendet das zentrale Gold-Token `AppDesign.iconGold`; der Text nutzt die Inter-Typografie aus dem App-Theme und die zentrale Textfarbe.
+- Umsetzung in `lib/features/settings/personal_history_page.dart`. CI-Prüfungen stehen noch aus.
