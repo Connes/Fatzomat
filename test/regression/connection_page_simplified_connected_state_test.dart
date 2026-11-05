@@ -3,15 +3,20 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('connected state avoids redundant status copy and manual refresh action', () {
+  test('connected state is compact and hides code and disconnect controls', () {
     final page = File('lib/features/shared/connection_page.dart').readAsStringSync();
+    final connectedSection = page.substring(
+      page.indexOf('final connected ='),
+      page.indexOf('                  : ListView('),
+    );
 
-    expect(page, contains("Text(memberCount >= 2 ? 'Ihr seid verbunden' : 'Verbindung bereit'"));
-    expect(page, contains("'Der Code kann auf dem zweiten Gerät eingegeben werden.'"));
-    expect(page, isNot(contains('2 Personen nutzen jetzt dieselbe gemeinsame Sammlung.')));
-    expect(page, isNot(contains('Status prüfen')));
-    expect(page, contains('callback: (_) => load()'));
-    expect(page, contains('OutlinedButton.icon(onPressed: working ? null : disconnect'));
+    expect(connectedSection, contains("'Ihr seid verbunden'"));
+    expect(connectedSection, contains('Dein Name:'));
+    expect(connectedSection, contains('Verbunden mit:'));
+    expect(connectedSection, contains('Ihr seid jetzt gemeinsam unterwegs.'));
+    expect(connectedSection, isNot(contains('Verbindungscode')));
+    expect(connectedSection, isNot(contains('Verbindung trennen')));
+    expect(connectedSection, contains('LayoutBuilder'));
   });
 
   test('creating a connection from Today stays in the pushed connection page', () {
