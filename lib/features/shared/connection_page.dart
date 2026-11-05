@@ -199,119 +199,206 @@ class _ConnectionPageState extends State<ConnectionPage> {
   }
 
   @override Widget build(BuildContext context) {
-    return TogetherScaffold(backgroundType: TogetherBackgroundType.share, 
+    final connected = myCode != null && memberCount >= 2;
+    return TogetherScaffold(
+      backgroundType: TogetherBackgroundType.share,
       appBar: TogetherAppBar(title: const Text('Gemeinsam nutzen')),
       body: loadError != null
           ? AppErrorView(error: loadError!, onRetry: load)
           : loading
               ? const Center(child: CircularProgressIndicator())
-              : ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Icon(
-                    Icons.people_alt_outlined,
-                    size: 56,
-                    color: AppDesign.iconGold,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Optional zu zweit',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Die App funktioniert alleine. Wenn ihr verbunden seid, könnt ihr Rezepte vorschlagen und gemeinsame Mahlzeiten planen.',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          if (myCode != null) ...[
-            Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(children: [
-              Icon(memberCount >= 2 ? Icons.people : Icons.person_add_alt_1, size: 36),
-              const SizedBox(height: 8),
-              Text(memberCount >= 2 ? 'Ihr seid verbunden' : 'Verbindung bereit', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-              if (memberCount < 2) ...[
-                const SizedBox(height: 6),
-                const Text(
-                  'Der Code kann auf dem zweiten Gerät eingegeben werden.',
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              if (info?.myDisplayName != null) ...[
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Dein Name: ${info!.myDisplayName}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
-                const SizedBox(height: 6),
-              ],
-              if (memberCount >= 2 && info?.partnerDisplayName != null) ...[
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Verbunden mit: ${info!.partnerDisplayName}'),
-                ),
-                const SizedBox(height: 12),
-              ],
-              const SizedBox(height: 6),
-              const Text('Verbindungscode'),
-              const SizedBox(height: 8),
-              SelectableText(myCode!, style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w800, letterSpacing: 4)),
-              const SizedBox(height: 10),
-              if (memberCount < 2)
-                const Text('Gib diesen Code auf dem zweiten Gerät ein. Sobald die Person beitritt, aktualisiert sich dieser Bildschirm automatisch.', textAlign: TextAlign.center)
-              else
-                const Text('Ihr seid jetzt gemeinsam unterwegs. Vorschläge und gemeinsame Mahlzeiten laufen über die Verbindung. Deine persönlichen Entscheidungen bleiben getrennt.', textAlign: TextAlign.center),
-              const SizedBox(height: 12),
-              const SizedBox(height: 20),
-              OutlinedButton.icon(onPressed: working ? null : disconnect, icon: const Icon(Icons.link_off), label: const Text('Verbindung trennen')),
-            ]))),
-          ] else ...[
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    FilledButton.icon(
-                      onPressed: working ? null : create,
-                      icon: const Icon(Icons.add_link),
-                      label: const Text('Verbindungscode erstellen'),
+              : connected
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        final compact = constraints.maxHeight < 560;
+                        final cardPadding = compact ? 14.0 : 20.0;
+                        return Padding(
+                          padding: EdgeInsets.all(compact ? 12 : 20),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(cardPadding),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.people_alt_outlined,
+                                        size: compact ? 44 : 56,
+                                        color: AppDesign.iconGold,
+                                      ),
+                                      SizedBox(height: compact ? 8 : 14),
+                                      Text(
+                                        'Optional zu zweit',
+                                        style: Theme.of(context).textTheme.headlineSmall,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 6),
+                                      const Text(
+                                        'Die App funktioniert alleine. Wenn ihr verbunden seid, könnt ihr Rezepte vorschlagen und gemeinsame Mahlzeiten planen.',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(cardPadding),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.people,
+                                        size: compact ? 32 : 36,
+                                        color: AppDesign.iconGold,
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Ihr seid verbunden',
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      if (info?.myDisplayName != null)
+                                        Text(
+                                          'Dein Name: ${info!.myDisplayName}',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontWeight: FontWeight.w700),
+                                        ),
+                                      if (info?.partnerDisplayName != null) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Verbunden mit: ${info!.partnerDisplayName}',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                      SizedBox(height: compact ? 10 : 14),
+                                      const Text(
+                                        'Ihr seid jetzt gemeinsam unterwegs. Vorschläge und gemeinsame Mahlzeiten laufen über die Verbindung. Deine persönlichen Entscheidungen bleiben getrennt.',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.all(20),
+                      children: [
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                const Icon(
+                                  Icons.people_alt_outlined,
+                                  size: 56,
+                                  color: AppDesign.iconGold,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Optional zu zweit',
+                                  style: Theme.of(context).textTheme.headlineSmall,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Die App funktioniert alleine. Wenn ihr verbunden seid, könnt ihr Rezepte vorschlagen und gemeinsame Mahlzeiten planen.',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        if (myCode != null)
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  const Icon(Icons.person_add_alt_1, size: 36),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Verbindung bereit',
+                                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  const Text(
+                                    'Der Code kann auf dem zweiten Gerät eingegeben werden.',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  if (info?.myDisplayName != null) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Dein Name: ${info!.myDisplayName}',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                  const SizedBox(height: 12),
+                                  const Text('Verbindungscode'),
+                                  const SizedBox(height: 8),
+                                  SelectableText(
+                                    myCode!,
+                                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 4,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    'Gib diesen Code auf dem zweiten Gerät ein. Sobald die Person beitritt, aktualisiert sich dieser Bildschirm automatisch.',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  FilledButton.icon(
+                                    onPressed: working ? null : create,
+                                    icon: const Icon(Icons.add_link),
+                                    label: const Text('Verbindungscode erstellen'),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  const Center(child: Text('oder')),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                    controller: code,
+                                    textCapitalization: TextCapitalization.characters,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Verbindungscode',
+                                      prefixIcon: Icon(Icons.link),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  OutlinedButton.icon(
+                                    onPressed: working ? null : join,
+                                    icon: const Icon(Icons.group_add_outlined),
+                                    label: const Text('Mit Person verbinden'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                    const Center(child: Text('oder')),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: code,
-                      textCapitalization: TextCapitalization.characters,
-                      decoration: const InputDecoration(
-                        labelText: 'Verbindungscode',
-                        prefixIcon: Icon(Icons.link),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: working ? null : join,
-                      icon: const Icon(Icons.group_add_outlined),
-                      label: const Text('Mit Person verbinden'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
