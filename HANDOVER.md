@@ -362,3 +362,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Der Zustand ohne persönliche Entscheidungen wird als zentrierte, nahezu deckend weiße Karte mit abgerundeten Ecken und leichtem Schatten dargestellt, damit der Text nicht mehr im Foto-Hintergrund untergeht.
 - Das History-Icon verwendet das zentrale Gold-Token `AppDesign.iconGold`; der Text nutzt die Inter-Typografie aus dem App-Theme und die zentrale Textfarbe.
 - Umsetzung in `lib/features/settings/personal_history_page.dart`. Regressionstest `test/regression/personal_history_empty_state_test.dart` ergänzt. CI-Prüfungen stehen noch aus.
+
+
+## Gemeinsam nutzen: Verbunden-Ansicht vereinfachen (2026-11-05)
+
+- In der verbundenen Ansicht wurde der redundante Satz „2 Personen nutzen jetzt dieselbe gemeinsame Sammlung.“ entfernt.
+- Die manuelle Aktion „Status prüfen“ wurde entfernt. Die Seite lädt den Status weiterhin beim Öffnen und aktualisiert ihn über Supabase Realtime.
+- „Verbindung trennen“, Namen und Verbindungscode bleiben erhalten.
+- Beim Erstellen einer Verbindung aus „Heute“ bleibt der Nutzer auf der geöffneten „Gemeinsam nutzen“-Unterseite; der vorhandene Navigationsfluss kehrt nicht ins Profil um.
+- Regressionstests: `test/regression/connection_page_simplified_connected_state_test.dart`.
