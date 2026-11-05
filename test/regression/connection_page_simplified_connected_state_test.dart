@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('connected state is compact and hides code and disconnect controls', () {
+  test('connected state offers a confirmed disconnect action and hides the code', () {
     final page = File('lib/features/shared/connection_page.dart').readAsStringSync();
     final connectedSection = page.substring(
       page.indexOf('final connected ='),
@@ -15,7 +15,9 @@ void main() {
     expect(connectedSection, contains('Verbunden mit:'));
     expect(connectedSection, contains('Ihr seid jetzt gemeinsam unterwegs.'));
     expect(connectedSection, isNot(contains('Verbindungscode')));
-    expect(connectedSection, isNot(contains('Verbindung trennen')));
+    expect(connectedSection, contains("label: const Text('Verbindung trennen')"));
+    expect(connectedSection, contains('onPressed: working ? null : disconnect'));
+    expect(page, contains("title: const Text('Verbindung trennen?')"));
     expect(connectedSection, contains('LayoutBuilder'));
   });
 

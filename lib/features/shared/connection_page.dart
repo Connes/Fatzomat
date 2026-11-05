@@ -281,6 +281,12 @@ class _ConnectionPageState extends State<ConnectionPage> {
                                         'Ihr seid jetzt gemeinsam unterwegs. Vorschläge und gemeinsame Mahlzeiten laufen über die Verbindung. Deine persönlichen Entscheidungen bleiben getrennt.',
                                         textAlign: TextAlign.center,
                                       ),
+                                      const SizedBox(height: 12),
+                                      TextButton.icon(
+                                        onPressed: working ? null : disconnect,
+                                        icon: const Icon(Icons.link_off, size: 18),
+                                        label: const Text('Verbindung trennen'),
+                                      ),
                                     ],
                                   ),
                                 ),
