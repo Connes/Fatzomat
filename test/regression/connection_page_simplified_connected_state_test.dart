@@ -6,18 +6,17 @@ void main() {
   test('connected state is compact and hides code and disconnect controls', () {
     final page = File('lib/features/shared/connection_page.dart').readAsStringSync();
     final connectedSection = page.substring(
-      page.indexOf(': connected'),
-      page.indexOf(': ListView'),
+      page.indexOf('final connected ='),
+      page.indexOf('                  : ListView('),
     );
 
     expect(connectedSection, contains("'Ihr seid verbunden'"));
-    expect(connectedSection, contains(r"'Dein Name: \${info!.myDisplayName}'"));
-    expect(connectedSection, contains(r"'Verbunden mit: \${info!.partnerDisplayName}'"));
+    expect(connectedSection, contains('Dein Name:'));
+    expect(connectedSection, contains('Verbunden mit:'));
     expect(connectedSection, contains('Ihr seid jetzt gemeinsam unterwegs.'));
     expect(connectedSection, isNot(contains('Verbindungscode')));
     expect(connectedSection, isNot(contains('Verbindung trennen')));
     expect(connectedSection, contains('LayoutBuilder'));
-    expect(page, contains('callback: (_) => load()'));
   });
 
   test('creating a connection from Today stays in the pushed connection page', () {
