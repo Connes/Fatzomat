@@ -5,14 +5,18 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('connected state is compact and hides code and disconnect controls', () {
     final page = File('lib/features/shared/connection_page.dart').readAsStringSync();
+    final connectedSection = page.substring(
+      page.indexOf(': connected'),
+      page.indexOf(': ListView'),
+    );
 
-    expect(page, contains("Text(\n                                        'Ihr seid verbunden'"));
-    expect(page, contains("'Dein Name: ${info!.myDisplayName}'"));
-    expect(page, contains("'Verbunden mit: ${info!.partnerDisplayName}'"));
-    expect(page, contains('Ihr seid jetzt gemeinsam unterwegs.'));
-    expect(page, contains('connected\n                  ? LayoutBuilder'));
-    expect(page, isNot(contains("const Text('Verbindungscode')")));
-    expect(page, isNot(contains("label: const Text('Verbindung trennen')")));
+    expect(connectedSection, contains("'Ihr seid verbunden'"));
+    expect(connectedSection, contains(r"'Dein Name: \${info!.myDisplayName}'"));
+    expect(connectedSection, contains(r"'Verbunden mit: \${info!.partnerDisplayName}'"));
+    expect(connectedSection, contains('Ihr seid jetzt gemeinsam unterwegs.'));
+    expect(connectedSection, isNot(contains('Verbindungscode')));
+    expect(connectedSection, isNot(contains('Verbindung trennen')));
+    expect(connectedSection, contains('LayoutBuilder'));
     expect(page, contains('callback: (_) => load()'));
   });
 
