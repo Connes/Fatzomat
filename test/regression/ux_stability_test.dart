@@ -53,7 +53,7 @@ void main() {
     expect(home, contains("sendDecisionMessage(type: 'ask')"));
     expect(modes, contains('button: true'));
     expect(today, contains("tooltip: '"));
-    expect(connection, contains("label: const Text('Status prüfen')"));
+    expect(connection, isNot(contains("label: const Text('Status prüfen')")));
     expect(connection, contains("label: const Text('Verbindung trennen')"));
     expect(connection, isNot(contains("label: const Text('Code kopieren')")));
     expect(connection, isNot(contains("label: const Text('Rezeptvorschläge')")));

@@ -239,8 +239,13 @@ class _ConnectionPageState extends State<ConnectionPage> {
               Icon(memberCount >= 2 ? Icons.people : Icons.person_add_alt_1, size: 36),
               const SizedBox(height: 8),
               Text(memberCount >= 2 ? 'Ihr seid verbunden' : 'Verbindung bereit', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 6),
-              Text(memberCount >= 2 ? '2 Personen nutzen jetzt dieselbe gemeinsame Sammlung.' : 'Der Code kann auf dem zweiten Gerät eingegeben werden.', textAlign: TextAlign.center),
+              if (memberCount < 2) ...[
+                const SizedBox(height: 6),
+                const Text(
+                  'Der Code kann auf dem zweiten Gerät eingegeben werden.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
               if (info?.myDisplayName != null) ...[
                 Align(
                   alignment: Alignment.centerLeft,
@@ -268,19 +273,7 @@ class _ConnectionPageState extends State<ConnectionPage> {
               else
                 const Text('Ihr seid jetzt gemeinsam unterwegs. Vorschläge und gemeinsame Mahlzeiten laufen über die Verbindung. Deine persönlichen Entscheidungen bleiben getrennt.', textAlign: TextAlign.center),
               const SizedBox(height: 12),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: loading || working ? null : load,
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Status prüfen'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const SizedBox(height: 8),
+              const SizedBox(height: 20),
               OutlinedButton.icon(onPressed: working ? null : disconnect, icon: const Icon(Icons.link_off), label: const Text('Verbindung trennen')),
             ]))),
           ] else ...[
