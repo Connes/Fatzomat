@@ -159,6 +159,7 @@ class RecipeRepository {
         // Keep the collection compatible with currently deployed databases.
         // `recipes.updated_at` is introduced by the later shared-recipe
         // collection migration and is not required to display saved recipes.
+        .eq('created_by', userId)
         .order('created_at', ascending: false);
 
     final recipes = (rows as List)
@@ -176,6 +177,7 @@ class RecipeRepository {
           .from('recipes')
           .select('*,recipe_ingredients(*)')
           .eq('id', id)
+          .eq('created_by', client.auth.currentUser?.id ?? '')
           .single(),
     );
     return _withResolvedImage(Recipe.fromMap(Map<String, dynamic>.from(row)));
