@@ -513,14 +513,14 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           decisionMode: 'cook',
           resultType: 'recipe',
           resultId: recipeId,
-          servings: _recipe.servings.clamp(1, 12).toInt(),
+          servings: _recipe.servings.clamp(1, 999).toInt(),
         );
       }
 
       if (widget.selectForToday && widget.decisionRequestId == null) {
         await PersonalTodayRepository().selectRecipeForToday(
           recipeId,
-          servings: _recipe.servings.clamp(1, 12).toInt(),
+          servings: _recipe.servings.clamp(1, 999).toInt(),
           date: widget.planDate,
         );
       }
