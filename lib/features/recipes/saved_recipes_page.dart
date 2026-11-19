@@ -1074,26 +1074,12 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                         label: const Text('Auswählen'),
                                       ),
                                       const Spacer(),
-                                      if (recipe.createdBy == repo.client.auth.currentUser?.id)
-                                        IconButton(
-                                          tooltip: 'Rezept bearbeiten',
-                                          visualDensity: VisualDensity.compact,
-                                          onPressed: () => editRecipe(recipe),
-                                          icon: const Icon(Icons.edit_outlined, color: AppDesign.iconGold),
-                                        ),
                                       IconButton(
                                         tooltip: 'Rezept teilen',
                                         visualDensity: VisualDensity.compact,
                                         onPressed: () => shareRecipe(recipe),
                                         icon: const Icon(Icons.share_outlined, color: AppDesign.iconGold),
                                       ),
-                                      if (recipe.createdBy == repo.client.auth.currentUser?.id)
-                                        IconButton(
-                                          tooltip: 'Rezept löschen',
-                                          visualDensity: VisualDensity.compact,
-                                          onPressed: () => deleteRecipe(recipe),
-                                          icon: const Icon(Icons.delete_outline_rounded, color: AppDesign.error),
-                                        ),
                                     ],
                                   ),
                                 ],
