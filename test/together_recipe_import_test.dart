@@ -28,9 +28,30 @@ void main() {
 
     expect(recipe.name, 'Kartoffelgratin');
     expect(recipe.servings, 4);
+    expect(recipe.servingsUnit, 'Personen');
     expect(recipe.ingredients, hasLength(2));
     expect(recipe.ingredients.first.quantity, 800);
     expect(recipe.instructions, ['Kartoffeln schneiden.', 'Backen.']);
+  });
+
+  test('imports a piece-based recipe yield', () {
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': 'Cake Pops',
+        'servings': 8,
+        'servings_unit': 'Stück',
+        'ingredients': [
+          {'name': 'Kuchenkrümel', 'amount': 200, 'unit': 'g'},
+        ],
+        'steps': ['Vermengen und formen.'],
+      },
+    }));
+
+    expect(recipe.servings, 8);
+    expect(recipe.servingsUnit, 'Stück');
+    expect(recipe.toTogetherRecipeJson()['recipe']['servings_unit'], 'Stück');
   });
 
   test('normalizes piece units to an empty unit', () {
