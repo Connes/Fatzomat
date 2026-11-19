@@ -225,6 +225,7 @@ class TogetherRecipeImporter {
       name: title,
       description: description,
       servings: _positiveInt(recipe['servings']) ?? 1,
+      servingsUnit: recipe['servings_unit']?.toString() ?? recipe['servingsUnit']?.toString() ?? 'Personen',
       prepTimeMinutes: _nonNegativeInt(recipe['prep_time_minutes'] ?? recipe['prepTimeMinutes']) ?? 0,
       cookTimeMinutes: _nonNegativeInt(recipe['cook_time_minutes'] ?? recipe['cookTimeMinutes']) ?? 0,
       difficulty: recipe['difficulty']?.toString().trim().isNotEmpty == true
