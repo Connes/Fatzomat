@@ -317,6 +317,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final ingredients = recipe!.ingredients;
     final steps = recipe!.instructions;
     final total = recipe!.prepTimeMinutes + recipe!.cookTimeMinutes;
+    final isOwner = recipe!.createdBy == repo.client.auth.currentUser?.id;
 
     return TogetherScaffold(backgroundType: TogetherBackgroundType.recipeDetail, respectTopSafeArea: true, topSafeAreaColor: AppDesign.background,
       appBar: TogetherAppBar(
@@ -329,21 +330,23 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             onPressed: working ? null : exportRecipe,
             icon: const Icon(Icons.file_download_outlined),
           ),
-          IconButton(
-            tooltip: 'Rezeptbild verwalten',
-            onPressed: working ? null : manageRecipeImage,
-            icon: const Icon(Icons.add_photo_alternate_outlined),
-          ),
-          IconButton(
-            tooltip: 'Rezept bearbeiten',
-            onPressed: working ? null : editRecipe,
-            icon: const Icon(Icons.edit_outlined),
-          ),
-          IconButton(
-            tooltip: 'Rezept aus Sammlung löschen',
-            onPressed: working ? null : removeFromCollection,
-            icon: const Icon(Icons.delete_outline),
-          ),
+          if (isOwner) ...[
+            IconButton(
+              tooltip: 'Rezeptbild verwalten',
+              onPressed: working ? null : manageRecipeImage,
+              icon: const Icon(Icons.add_photo_alternate_outlined),
+            ),
+            IconButton(
+              tooltip: 'Rezept bearbeiten',
+              onPressed: working ? null : editRecipe,
+              icon: const Icon(Icons.edit_outlined),
+            ),
+            IconButton(
+              tooltip: 'Rezept löschen',
+              onPressed: working ? null : removeFromCollection,
+              icon: const Icon(Icons.delete_outline),
+            ),
+          ],
         ],
       ),
       body: ListView(
