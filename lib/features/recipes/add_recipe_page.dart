@@ -64,7 +64,7 @@ class AddRecipePage extends StatelessWidget {
           _OptionCard(
             icon: Icons.photo_camera_rounded,
             title: 'Rezept aus Foto erstellen',
-            subtitle: 'Foto eines Rezepts an ChatGPT übergeben und als together_recipe.json übernehmen.',
+            subtitle: 'Foto eines Rezepts an ChatGPT übergeben.',
             onTap: () async {
               final imported = await Navigator.push<bool>(
                 context,
@@ -270,17 +270,14 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.document_scanner_rounded, size: 46, color: AppDesign.primaryDark),
+                const Icon(Icons.photo_camera_rounded, size: 46, color: AppDesign.iconGold),
                 const SizedBox(height: 16),
-                Text('Rezeptfotos an ChatGPT übergeben', style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 10),
-                const Text(
-                  'Füge alle Fotos hinzu, auf denen das Rezept verteilt ist. '
-                  'ChatGPT soll sie gemeinsam auslesen, überlappende Bereiche erkennen, '
-                  'angeschnittene Zeilen verbinden und doppelte Zutaten nur einmal übernehmen. '
-                  'Danach erstellt ChatGPT eine einzige together_recipe.json.',
+                Text(
+                  'Rezeptfotos an ChatGPT übergeben',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
                 OutlinedButton.icon(
                   onPressed: working ? null : _chooseSource,
                   icon: const Icon(Icons.add_photo_alternate_outlined),
@@ -342,13 +339,7 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
                     minimumSize: const Size.fromHeight(52),
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Du kannst Fotos aus der Galerie gesammelt auswählen oder mehrere Bilder nacheinander aufnehmen. '
-                  'Der Teilen-Dialog übergibt alle ausgewählten Bilder zusammen mit dem kopierten Prompt. '
-                  'Prüfe das importierte Rezept anschließend in der Vorschau.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+
               ],
             ),
           ),
