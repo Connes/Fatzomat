@@ -575,7 +575,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
                     Expanded(
                       child: _MetaChip(
                         icon: Icons.people_outline,
-                        label: '${recipe.servings} Portionen',
+                        label: '${recipe.servings} ${recipe.servingsUnit}',
                         compact: true,
                       ),
                     ),
@@ -1348,6 +1348,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   final name = TextEditingController();
   final description = TextEditingController();
   final servings = TextEditingController(text: '2');
+  String servingsUnit = 'Personen';
   final prep = TextEditingController();
   final cook = TextEditingController();
   final difficulty = TextEditingController(text: 'Einfach');
@@ -1364,6 +1365,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     name.text = initial.name;
     description.text = initial.description;
     servings.text = initial.servings.toString();
+    servingsUnit = initial.servingsUnit;
     prep.text = initial.prepTimeMinutes.toString();
     cook.text = initial.cookTimeMinutes.toString();
     difficulty.text = initial.difficulty;
@@ -1435,7 +1437,8 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
       final recipe = Recipe(
         name: name.text.trim(),
         description: description.text.trim(),
-        servings: _int(servings.text, fallback: 2, min: 1, max: 99),
+        servings: _int(servings.text, fallback: 2, min: 1, max: 999),
+        servingsUnit: servingsUnit,
         prepTimeMinutes: _int(prep.text, fallback: 0, min: 0, max: 1440),
         cookTimeMinutes: _int(cook.text, fallback: 0, min: 0, max: 1440),
         difficulty: difficulty.text.trim().isEmpty ? 'Einfach' : difficulty.text.trim(),
@@ -1448,6 +1451,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           name: recipe.name,
           description: recipe.description,
           servings: recipe.servings,
+          servingsUnit: recipe.servingsUnit,
           prepTimeMinutes: recipe.prepTimeMinutes,
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
@@ -1522,9 +1526,23 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           const SizedBox(height: 12),
           _RecipeFieldCard(
             icon: Icons.groups_rounded,
-            label: 'Portionen',
+            label: 'Anzahl ${servingsUnit.toLowerCase()}',
             controller: servings,
             keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(value: 'Personen', label: Text('Personen')),
+                ButtonSegment(value: 'Stück', label: Text('Stück')),
+              ],
+              selected: {servingsUnit},
+              onSelectionChanged: saving ? null : (selection) {
+                setState(() => servingsUnit = selection.first);
+              },
+            ),
           ),
           const SizedBox(height: 12),
           _RecipeFieldCard(
