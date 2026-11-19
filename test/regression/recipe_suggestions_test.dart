@@ -27,7 +27,7 @@ void main() {
     expect(saved, isNot(contains("tooltip: 'Rezept löschen'")));
     expect(detail, isNot(contains("'Rezept teilen'")));
     expect(detail, contains("title: Text('Rezept bearbeiten')"));
-    expect(detail, contains("title: Text('Rezept löschen'"));
+    expect(detail, contains("title: Text(\n                            'Rezept löschen',"));
     expect(notifications, contains("item.type == 'recipe_created'"));
   });
 
