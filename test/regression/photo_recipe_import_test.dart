@@ -17,6 +17,11 @@ void main() {
     expect(page, contains('List<XFile> selectedImages'));
     expect(page, contains('List<XFile>.unmodifiable(selectedImages)'));
     expect(page, contains('Fotos hinzufügen'));
+    expect(page, contains("subtitle: 'Foto eines Rezepts an ChatGPT übergeben.'"));
+    expect(page, contains('Icons.photo_camera_rounded, size: 46, color: AppDesign.iconGold'));
+    expect(page, contains('textAlign: TextAlign.center'));
+    expect(page, isNot(contains('Füge alle Fotos hinzu, auf denen das Rezept verteilt ist.')));
+    expect(page, isNot(contains('Du kannst Fotos aus der Galerie gesammelt auswählen')));
     expect(prompt, contains('Erfinde keine Zutaten'));
     expect(prompt, contains('"format": "together_recipe"'));
     expect(prompt, contains('"version": 1'));
