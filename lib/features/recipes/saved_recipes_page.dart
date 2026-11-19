@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -639,11 +641,21 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 
   Future<void> shareRecipe(Recipe recipe) async {
-    final ingredients = recipe.ingredients.map((ingredient) {
+    final ingredientLines = recipe.ingredients.map((ingredient) {
       final amount = ingredient.isQualitative
           ? ''
           : '${ingredient.quantity} ${ingredient.unit}'.trim();
-      return amount.isEmpty ? '• ${ingredient.name}' : '• $amount ${ingredient.name}';
+      final section = ingredient.section?.trim();
+      final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
+      final flags = [
+        if (ingredient.isAdditional) 'Zusätzlich',
+        if (ingredient.isUserSelected) 'Eigene Auswahl',
+      ];
+      return [
+        if (section != null && section.isNotEmpty) '[$section]',
+        if (flags.isNotEmpty) '(${flags.join(', ')})',
+        '• $label',
+      ].join(' ');
     }).join('\n');
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
@@ -651,21 +663,593 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     final details = [
       recipe.description.trim(),
       '${recipe.servings} ${recipe.servingsUnit}',
-      if (ingredients.isNotEmpty) 'Zutaten:\n$ingredients',
+      'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
+      'Kochzeit: ${recipe.cookTimeMinutes} Min.',
+      'Schwierigkeit: ${recipe.difficulty}',
+      if (ingredientLines.isNotEmpty) 'Zutaten:\n$ingredientLines',
       if (steps.isNotEmpty) 'Zubereitung:\n$steps',
     ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
     try {
+      final export = jsonEncode(recipe.toTogetherRecipeJson());
+      final files = <XFile>[
+        XFile.fromData(
+          Uint8List.fromList(utf8.encode(export)),
+          mimeType: 'application/json',
+          name: '${_recipeExportFileName(recipe.name)}.json',
+        ),
+      ];
+
+      // Private recipe images are downloaded with the authenticated Supabase
+      // session and attached as bytes. Never share a short-lived signed URL.
+      final imagePath = recipe.imagePath?.trim() ?? '';
+      if (imagePath.isNotEmpty) {
+        final imageBytes = await RecipeImageService().download(imagePath);
+        final extension = imagePath.split('.').last.toLowerCase();
+        final safeExtension = const {'png', 'webp'}.contains(extension)
+            ? extension
+            : 'jpg';
+        files.add(
+          XFile.fromData(
+            imageBytes,
+            mimeType: switch (safeExtension) {
+              'png' => 'image/png',
+              'webp' => 'image/webp',
+              _ => 'image/jpeg',
+            },
+            name: '${_recipeExportFileName(recipe.name)}.$safeExtension',
+          ),
+        );
+      }
+
       await SharePlus.instance.share(
         ShareParams(
           title: recipe.name,
           subject: 'Rezept: ${recipe.name}',
           text: '${recipe.name}\n\n$details',
+          files: files,
         ),
       );
     } catch (e) {
       if (mounted) showAppError(context, e);
     }
+  }
+
+  String _recipeExportFileName(String name) {
+    final normalized = name
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+
+  Future<void> editRecipe(Recipe recipe) async {
+    final changed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => ManualRecipePage(initialRecipe: recipe)),
+    );
+    if (changed == true && mounted) await load();
+  }
+
+  Future<void> deleteRecipe(Recipe recipe) async {
+    if (recipe.id == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Rezept aus der gemeinsamen Bibliothek löschen?'),
+        content: Text('„${recipe.name}“ ist für alle Nutzer verfügbar. Bei bestehender Connection wird eine Löschanfrage an die verbundene Person gesendet. Das Rezept bleibt bis zur Zustimmung erhalten.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Abbrechen')),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Löschen')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      final removed = await repo.removeRecipeFromCollection(recipe.id!);
+      if (!removed && mounted) {
+        AppFeedback.showSnackBar(context, 
+          const SnackBar(
+            content: Text('Die Löschanfrage wurde an die verbundene Person gesendet. Das Rezept bleibt bis zur ausdrücklichen Zustimmung erhalten.'),
+          ),
+        );
+      }
+      await load();
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectionActive = hasSelectionFilter;
+
+    if (selectionActive) {
+      if (visibleRecipes.isEmpty) {
+        return TogetherScaffold(
+          backgroundType: TogetherBackgroundType.recipes,
+          appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                decoration: BoxDecoration(
+                  color: AppDesign.surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: AppDesign.divider),
+                ),
+                child: Text(
+                  'Kein passendes Rezept gefunden.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      return TogetherScaffold(
+        backgroundType: TogetherBackgroundType.recipes,
+        appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
+        body: ListView.separated(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+          itemCount: visibleRecipes.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          itemBuilder: (_, i) {
+            final recipe = visibleRecipes[i];
+            return SizedBox(
+              height: 148,
+              child: Card(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(22),
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecipeDetailPage(
+                        recipeId: recipe.id!,
+                        showManagementActions: widget.mainChoice == null,
+                        planDate: widget.planDate,
+                        onTodayPlanChanged: load,
+                        onNavigateToToday: widget.onNavigateToToday ??
+                            (widget.onNavigateToTab == null
+                                ? null
+                                : () => widget.onNavigateToTab!(0)),
+                        onNavigateToShoppingList: widget.onNavigateToTab == null
+                            ? null
+                            : () => widget.onNavigateToTab!(2),
+                      ),
+                    ),
+                  );
+                  if (mounted) load();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 12, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _RecipeCardImage(
+                              imageUrl: recipe.imageUrl,
+                              imagePath: recipe.imagePath,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  recipe.name.length > 40
+                                      ? '${recipe.name.substring(0, 40).trimRight()}…'
+                                      : recipe.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            key: Key('cook-search-select-recipe-${recipe.id}'),
+                            onPressed: () => selectRecipeForToday(recipe),
+                            icon: const Icon(Icons.event_available_rounded, size: 18),
+                            label: Text(
+                              widget.planDate == null || _isSelectedDateToday
+                                  ? 'Für heute auswählen'
+                                  : 'Für diesen Tag auswählen',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    return TogetherScaffold(
+      backgroundType: TogetherBackgroundType.recipes,
+      appBar: TogetherAppBar(
+        leading: PopupMenuButton<String>(
+          tooltip: 'Rezepte nach Hauptzutat filtern',
+          initialValue: mainIngredientFilter ?? 'Alle',
+          onSelected: (value) => setState(
+            () => mainIngredientFilter = value == 'Alle' ? null : value,
+          ),
+          icon: Icon(
+            Icons.tune_rounded,
+            size: 22,
+            color: mainIngredientFilter == null
+                ? Theme.of(context).colorScheme.onSurfaceVariant
+                : Theme.of(context).colorScheme.primary,
+          ),
+          color: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          elevation: 8,
+          shadowColor: Colors.black.withValues(alpha: .12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
+            ),
+          ),
+          constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+          menuPadding: const EdgeInsets.symmetric(vertical: 8),
+          itemBuilder: (_) {
+            final options = <(String, Widget)>[
+              ('Alle', const Icon(Icons.grid_view_rounded, color: AppDesign.iconGold)),
+              ('Schwein', SvgPicture.asset(
+                'assets/icons/pig_head.svg',
+                width: 24,
+                height: 24,
+                color: AppDesign.iconGold,
+              )),
+              ('Rind', SvgPicture.asset(
+                'assets/icons/cow_head.svg',
+                width: 24,
+                height: 24,
+                color: AppDesign.iconGold,
+              )),
+              ('Huhn', SvgPicture.asset(
+                'assets/icons/rooster.svg',
+                width: 24,
+                height: 24,
+                color: AppDesign.iconGold,
+              )),
+              ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
+              ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
+            ];
+            final selected = mainIngredientFilter ?? 'Alle';
+            return options.map((option) {
+              final value = option.$1;
+              final isSelected = selected == value;
+              return PopupMenuItem<String>(
+                value: value,
+                height: 48,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppDesign.secondarySurface
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Center(child: option.$2),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          value == 'Alle' ? 'Alle Rezepte' : value,
+                          style: TextStyle(
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected
+                                ? AppDesign.primaryDark
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        const Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: AppDesign.primaryDark,
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList();
+          },
+        ),
+        title: const Text('Meine Rezepte'),
+        actions: [
+          IconButton(
+            tooltip: 'Rezept hinzufügen',
+            onPressed: loading ? null : addFavorite,
+            icon: const Icon(Icons.add_rounded),
+          ),
+        ],
+      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: (value) => setState(() => query = value),
+                    decoration: InputDecoration(
+                      hintText: 'Rezepte suchen',
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      suffixIcon: query.isEmpty
+                          ? null
+                          : IconButton(
+                              onPressed: () {
+                                searchController.clear();
+                                setState(() => query = '');
+                              },
+                              icon: const Icon(Icons.clear_rounded),
+                            ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: load,
+                    child: ListView.separated(
+                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+                      itemCount: visibleRecipes.isEmpty ? 1 : visibleRecipes.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (_, i) {
+                        if (visibleRecipes.isEmpty) {
+                          return recipes.isEmpty
+                              ? const SavedRecipesEmptyState()
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 32),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 22,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppDesign.surface,
+                                        borderRadius: BorderRadius.circular(22),
+                                        border: Border.all(color: AppDesign.divider),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Color(0x18000000),
+                                            blurRadius: 12,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        'Kein passendes Rezept gefunden.',
+                                        textAlign: TextAlign.center,
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                        }
+                        final recipe = visibleRecipes[i];
+                        return SizedBox(
+                          height: 148,
+                          child: Card(
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(22),
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => RecipeDetailPage(
+                                    recipeId: recipe.id!,
+                        showManagementActions: widget.mainChoice == null,
+                                    planDate: widget.planDate,
+                                    onTodayPlanChanged: load,
+                                    onNavigateToToday: widget.onNavigateToToday ??
+                                        (widget.onNavigateToTab == null
+                                            ? null
+                                            : () => widget.onNavigateToTab!(0)),
+                                    onNavigateToShoppingList: widget.onNavigateToTab == null
+                                        ? null
+                                        : () => widget.onNavigateToTab!(2),
+                                  ),
+                                ),
+                              );
+                              if (mounted) load();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(14, 10, 12, 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        _RecipeCardImage(
+                                          imageUrl: recipe.imageUrl,
+                                          imagePath: recipe.imagePath,
+                                        ),
+                                        const SizedBox(width: 14),
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              (recipe.name.length > 40
+                                                  ? '${recipe.name.substring(0, 40).trimRight()}…'
+                                                  : recipe.name),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      TextButton.icon(
+                                        key: Key('saved-recipe-select-today-${recipe.id}'),
+                                        onPressed: () => selectRecipeForToday(recipe),
+                                        icon: const Icon(Icons.event_available_rounded, size: 18),
+                                        label: const Text('Auswählen'),
+                                      ),
+                                      const Spacer(),
+                                      IconButton(
+                                        tooltip: 'Rezept teilen',
+                                        visualDensity: VisualDensity.compact,
+                                        onPressed: () => shareRecipe(recipe),
+                                        icon: const Icon(Icons.share_outlined, color: AppDesign.iconGold),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+
+}
+
+class _ServingsDialog extends StatefulWidget {
+  final int initial;
+  final String unit;
+  final String confirmLabel;
+  const _ServingsDialog({
+    required this.initial,
+    this.unit = 'Personen',
+    this.confirmLabel = 'Zur Einkaufsliste',
+  });
+
+  @override
+  State<_ServingsDialog> createState() => _ServingsDialogState();
+}
+
+class _ServingsDialogState extends State<_ServingsDialog> {
+  late int servings = widget.initial;
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: Text('Wie viele ${widget.unit.toLowerCase()}?'),
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              tooltip: 'Weniger',
+              onPressed: servings > 1 ? () => setState(() => servings--) : null,
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            SizedBox(
+              width: 100,
+              child: Text('$servings ${widget.unit}', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+            ),
+            IconButton(
+              tooltip: 'Mehr',
+              onPressed: servings < 999 ? () => setState(() => servings++) : null,
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, servings),
+            child: Text(widget.confirmLabel),
+          ),
+        ],
+      );
+}
+
+
+class SavedRecipesEmptyState extends StatelessWidget {
+  const SavedRecipesEmptyState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+        child: SizedBox(
+          key: const ValueKey<String>('my_recipes_empty_state'),
+          width: double.infinity,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
+            decoration: BoxDecoration(
+              color: AppDesign.surface,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: AppDesign.divider),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.menu_book_outlined,
+                  size: 56,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Noch keine Rezepte in deiner Sammlung',
+                  style: Theme.of(context).textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Finde ein Rezept oder füge ein Lieblingsrezept hinzu.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+), '');
+    return normalized.isEmpty ? 'rezept' : normalized;
   }
   Future<void> editRecipe(Recipe recipe) async {
     final changed = await Navigator.push<bool>(
