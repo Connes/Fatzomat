@@ -13,7 +13,8 @@ void main() {
     expect(service, contains('Future<bool> saveRecipe(Recipe recipe'));
     expect(service, contains("allowedExtensions: const ['json']"));
     expect(service, contains('toTogetherRecipeJson()'));
-    expect(detail, contains("tooltip: 'Rezeptdatei speichern'"));
+    expect(detail, contains("value: 'export'"));
+    expect(detail, contains("title: Text('Rezept herunterladen')"));
     expect(detail, contains('exportRecipe'));
     expect(model, contains("'format': 'together_recipe'"));
     expect(model, contains("'version': 1"));

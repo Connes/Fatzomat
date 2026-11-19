@@ -25,16 +25,16 @@ void main() {
   test('V86 keeps the saved recipe overflow menu focused on recipe actions', () {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
-    expect(source, contains("tooltip: 'Rezept bearbeiten'"));
-    expect(source, contains("tooltip: 'Rezept löschen'"));
+    expect(source, isNot(contains("tooltip: 'Rezept bearbeiten'")));
+    expect(source, isNot(contains("tooltip: 'Rezept löschen'")));
     expect(source, contains("tooltip: 'Rezept teilen'"));
-    expect(source, contains("onPressed: () => editRecipe(recipe)"));
-    expect(source, contains("onPressed: () => deleteRecipe(recipe)"));
+    expect(source, isNot(contains("onPressed: () => editRecipe(recipe)")));
+    expect(source, isNot(contains("onPressed: () => deleteRecipe(recipe)")));
     expect(source, contains("onPressed: () => shareRecipe(recipe)"));
-    expect(source, contains("Icons.edit_outlined, color: AppDesign.iconGold"));
-    expect(source, contains("Icons.delete_outline_rounded, color: AppDesign.error"));
+    expect(source, isNot(contains("Icons.edit_outlined, color: AppDesign.iconGold")));
+    expect(source, isNot(contains("Icons.delete_outline_rounded, color: AppDesign.error")));
     expect(source, contains("Icons.share_outlined, color: AppDesign.iconGold"));
-    expect(source, isNot(contains("tooltip: 'Rezeptoptionen'")));
+    expect(source, contains("tooltip: 'Rezept teilen'"));
 
     expect(source, contains("import 'package:share_plus/share_plus.dart';"));
     expect(source, contains('Future<void> shareRecipe(Recipe recipe) async'));

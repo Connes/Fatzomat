@@ -317,34 +317,80 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     final ingredients = recipe!.ingredients;
     final steps = recipe!.instructions;
     final total = recipe!.prepTimeMinutes + recipe!.cookTimeMinutes;
+    final isOwner = recipe!.createdBy == repo.client.auth.currentUser?.id;
 
     return TogetherScaffold(backgroundType: TogetherBackgroundType.recipeDetail, respectTopSafeArea: true, topSafeAreaColor: AppDesign.background,
       appBar: TogetherAppBar(
         title: const Text('Rezept'),
         backgroundColor: const Color(0xF7FFFBF7),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        actions: !widget.showManagementActions ? null : [
-          IconButton(
-            tooltip: 'Rezeptdatei speichern',
-            onPressed: working ? null : exportRecipe,
-            icon: const Icon(Icons.file_download_outlined),
-          ),
-          IconButton(
-            tooltip: 'Rezeptbild verwalten',
-            onPressed: working ? null : manageRecipeImage,
-            icon: const Icon(Icons.add_photo_alternate_outlined),
-          ),
-          IconButton(
-            tooltip: 'Rezept bearbeiten',
-            onPressed: working ? null : editRecipe,
-            icon: const Icon(Icons.edit_outlined),
-          ),
-          IconButton(
-            tooltip: 'Rezept aus Sammlung löschen',
-            onPressed: working ? null : removeFromCollection,
-            icon: const Icon(Icons.delete_outline),
-          ),
-        ],
+        actions: !widget.showManagementActions
+            ? null
+            : [
+                PopupMenuButton<String>(
+                  tooltip: 'Weitere Aktionen',
+                  enabled: !working,
+                  onSelected: (action) {
+                    switch (action) {
+                      case 'export':
+                        exportRecipe();
+                        break;
+                      case 'image':
+                        manageRecipeImage();
+                        break;
+                      case 'edit':
+                        editRecipe();
+                        break;
+                      case 'delete':
+                        removeFromCollection();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: 'export',
+                      child: ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(Icons.file_download_outlined),
+                        title: Text('Rezept herunterladen'),
+                      ),
+                    ),
+                    if (isOwner) ...[
+                      const PopupMenuItem<String>(
+                        value: 'image',
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.add_photo_alternate_outlined),
+                          title: Text('Rezeptbild verwalten'),
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'edit',
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.edit_outlined),
+                          title: Text('Rezept bearbeiten'),
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
+                          title: Text(
+                            'Rezept löschen',
+                            style: TextStyle(color: Theme.of(context).colorScheme.error),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
