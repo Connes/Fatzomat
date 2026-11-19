@@ -78,6 +78,17 @@ class RecipeImageService {
     }
   }
 
+  Future<Uint8List> download(String path) async {
+    final normalized = path.trim();
+    if (normalized.isEmpty) {
+      throw const FormatException('Für dieses Rezept ist kein Bildpfad hinterlegt.');
+    }
+    return AuthSessionService.runWithRefresh(
+      client: client,
+      action: () => client.storage.from(bucket).download(normalized),
+    );
+  }
+
   Future<void> delete(String path) async {
     final normalized = path.trim();
     if (normalized.isEmpty) return;
