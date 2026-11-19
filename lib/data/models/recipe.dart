@@ -3,6 +3,7 @@ class Recipe {
   final String name;
   final String description;
   final int servings;
+  final String servingsUnit;
   final int prepTimeMinutes;
   final int cookTimeMinutes;
   final String difficulty;
@@ -20,6 +21,7 @@ class Recipe {
     required this.name,
     required this.description,
     required this.servings,
+    this.servingsUnit = 'Personen',
     required this.prepTimeMinutes,
     required this.cookTimeMinutes,
     required this.difficulty,
@@ -38,6 +40,7 @@ class Recipe {
         name: map['name']?.toString() ?? 'Rezept',
         description: map['description']?.toString() ?? '',
         servings: _int(map['servings']),
+        servingsUnit: _normalizeServingsUnit(map['servings_unit'] ?? map['servingsUnit']),
         prepTimeMinutes: _int(map['prep_time_minutes']),
         cookTimeMinutes: _int(map['cook_time_minutes']),
         difficulty: map['difficulty']?.toString() ?? 'Einfach',
@@ -62,6 +65,7 @@ class Recipe {
       name: name,
       description: description,
       servings: target,
+      servingsUnit: servingsUnit,
       prepTimeMinutes: prepTimeMinutes,
       cookTimeMinutes: cookTimeMinutes,
       difficulty: difficulty,
@@ -84,6 +88,8 @@ class Recipe {
           'title': name,
           'description': description.isEmpty ? null : description,
           'servings': servings,
+        'servings_unit': servingsUnit,
+          'servings_unit': servingsUnit,
           'prep_time_minutes': prepTimeMinutes,
           'cook_time_minutes': cookTimeMinutes,
           'difficulty': difficulty,
@@ -116,6 +122,13 @@ class Recipe {
         'image_url': imageUrl,
         'ingredients': ingredients.map((e) => e.toMap()).toList(),
       };
+
+  static String _normalizeServingsUnit(dynamic value) {
+    final unit = value?.toString().trim().toLowerCase();
+    return unit == 'stück' || unit == 'stueck' || unit == 'stücke' || unit == 'stuecke'
+        ? 'Stück'
+        : 'Personen';
+  }
 
   static int _int(dynamic value) => value is int ? value : int.tryParse(value?.toString() ?? '') ?? 0;
   static List<String> _strings(dynamic value) => value is List ? value.map((e) => e.toString()).toList() : const [];
