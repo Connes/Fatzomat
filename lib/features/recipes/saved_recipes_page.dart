@@ -661,9 +661,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         ];
         final suffix = flags.isEmpty ? '' : ' (${flags.join(', ')})';
         return '• $label$suffix';
-      }).join('\\n');
-      return '${entry.key}:\\n$lines';
-    }).join('\\n\\n');
+      }).join('\n');
+      return '${entry.key}:\n$lines';
+    }).join('\n\n');
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
         .join('\n');
@@ -673,7 +673,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
       'Kochzeit: ${recipe.cookTimeMinutes} Min.',
       'Schwierigkeit: ${recipe.difficulty}',
-      if (ingredientSections.isNotEmpty) 'Zutaten:\\n$ingredientSections',
+      if (ingredientSections.isNotEmpty) 'Zutaten:\n$ingredientSections',
       if (steps.isNotEmpty) 'Zubereitung:\n$steps',
     ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
