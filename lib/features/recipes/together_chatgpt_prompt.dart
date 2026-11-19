@@ -91,7 +91,7 @@ Regeln:
 3. Markiere jede von mir ausgewählte Zutat mit "is_user_selected": true und "is_additional": false.
 4. Du darfst sinnvolle zusätzliche Zutaten ergänzen, wenn sie für ein vollständiges Rezept nötig sind. Markiere diese mit "is_user_selected": false und "is_additional": true.
 5. Verwende bei Zutaten, die als einzelne Stücke gezählt werden, KEINE Einheit. Schreibe z. B. "amount": 1, "unit": "" für eine Zwiebel, ein Ei, eine Karotte oder eine Kartoffel. Verwende niemals "Stück", "Stk." oder "Stk" als Einheit. Bei messbaren Mengen wie g, kg, ml, l, EL, TL oder Pck. soll die passende Einheit erhalten bleiben.
-6. Erstelle ein realistisches Rezept für 2 Portionen mit Zubereitungs- und Kochzeit sowie einer Schwierigkeit.
+6. Erstelle eine realistische Rezeptmenge. Bei Gerichten, die als einzelne Teile/Stücke hergestellt werden (z. B. Kuchen, Muffins, Cake Pops, Kekse, Pralinen), gib die Ausbeute als Stückzahl aus und setze zusätzlich servings_unit auf "Stück". Bei Gerichten, die als Mahlzeit für Menschen gedacht sind, verwende servings_unit "Personen". servings enthält immer die passende Anzahl. Verwende keine Personenangabe für Backwaren oder einzelne Snacks.
 7. Diese JSON-Regeln gelten ausschließlich in Phase 2, nachdem ich einen Vorschlag ausgewählt habe. Die JSON-Datei selbst enthält ausschließlich die Rezeptdaten, ohne Markdown-Codeblöcke, Einleitung oder Erklärung.
 8. Verwende exakt dieses Format und diese Feldnamen:
 {
@@ -143,7 +143,7 @@ WICHTIG:
 - Führe abgeschnittene Zeilen und Sätze über mehrere Fotos hinweg zusammen, wenn der Zusammenhang eindeutig ist. Bewahre die Reihenfolge des Rezepts.
 - Zähle eine Zutat nur einmal, sofern das Rezept sie nicht ausdrücklich an verschiedenen Stellen als getrennte Mengen aufführt. Wenn dieselbe Zutat tatsächlich in mehreren Abschnitten mit unterschiedlichen Mengen benötigt wird, erhalte diese getrennten Einträge und ihre Abschnittsnamen.
 - Wenn sich Fotos widersprechen oder ein Bereich trotz aller Bilder unleserlich bleibt, rate nicht. Verwende null bzw. leere Textfelder gemäß Schema.
-- Erfinde keine Zutaten, Mengen, Zeiten, Portionen oder Zubereitungsschritte.
+- Erfinde keine Zutaten, Mengen, Zeiten, Portionen/Stückzahlen oder Zubereitungsschritte.\n- Bestimme die Rezeptausbeute passend zum Gericht: bei Kuchen, Cake Pops, Muffins, Keksen und ähnlichen Einzelstücken servings_unit="Stück" und servings als Anzahl der Stücke; bei Mahlzeiten servings_unit="Personen". Erfinde keine Stückzahl, wenn sie auf den Fotos nicht erkennbar ist.
 - Wenn eine Angabe auf dem Foto nicht eindeutig lesbar ist, verwende null für die Menge oder eine leere Zeichenkette für Textfelder, sofern das Schema dies erlaubt.
 - Erhalte die Reihenfolge der Zutaten und Zubereitungsschritte.
 - Erkenne ausdrücklich Zutatenabschnitte bzw. Überschriften wie „Teig“, „Füllung“, „Belag“, „Creme“, „Sauce“, „Topping“ usw. und ordne jede Zutat dem auf dem Foto erkennbaren Abschnitt zu.
