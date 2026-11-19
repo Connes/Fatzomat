@@ -65,10 +65,15 @@ class AddRecipePage extends StatelessWidget {
             icon: Icons.photo_camera_rounded,
             title: 'Rezept aus Foto erstellen',
             subtitle: 'Foto eines Rezepts an ChatGPT übergeben und als together_recipe.json übernehmen.',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PhotoRecipeChatGptPage()),
-            ),
+            onTap: () async {
+              final imported = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(builder: (_) => const PhotoRecipeChatGptPage()),
+              );
+              if (imported == true && context.mounted) {
+                Navigator.pop(context, true);
+              }
+            },
           ),
           const SizedBox(height: 12),
           _OptionCard(
@@ -185,6 +190,28 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
       await _pickCameraPhoto();
     } else if (source == ImageSource.gallery) {
       await _pickGalleryPhotos();
+    }
+  }
+
+  Future<void> _importGeneratedRecipe() async {
+    if (working) return;
+    setState(() => working = true);
+    try {
+      final recipe = await const TogetherRecipeFileService().pickRecipe();
+      if (recipe == null || !mounted) return;
+      final saved = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RecipeImportPreviewPage(recipe: recipe),
+        ),
+      );
+      if (saved == true && mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) showAppError(context, e);
+    } finally {
+      if (mounted) setState(() => working = false);
     }
   }
 
@@ -306,6 +333,15 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: working ? null : _importGeneratedRecipe,
+                  icon: const Icon(Icons.file_download_outlined),
+                  label: const Text('Zurück aus ChatGPT? Rezeptdatei importieren'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Text(
                   'Du kannst Fotos aus der Galerie gesammelt auswählen oder mehrere Bilder nacheinander aufnehmen. '
