@@ -270,7 +270,7 @@ class _PhotoRecipeChatGptPageState extends State<PhotoRecipeChatGptPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.photo_camera_rounded, size: 46, color: AppDesign.iconGold),
+                const Align(\n                  alignment: Alignment.center,\n                  child: Icon(Icons.photo_camera_rounded, size: 46, color: AppDesign.iconGold),\n                ),
                 const SizedBox(height: 16),
                 Text(
                   'Rezeptfotos an ChatGPT übergeben',
