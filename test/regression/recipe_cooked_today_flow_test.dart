@@ -39,7 +39,10 @@ void main() {
     expect(recipe, isNot(contains('bottomNavigationBar: widget.viewingTodaySelection')));
     expect(recipe, isNot(contains("if (personalTodaySelected || widget.viewingTodaySelection) ...[")));
     expect(recipe, contains("final bool viewingTodaySelection"));
-    expect(recipe, contains("actions: !widget.showManagementActions ? null : ["));
+    expect(recipe, contains('actions: !widget.showManagementActions'));
+    expect(recipe, contains('PopupMenuButton<String>'));
+    expect(recipe, contains("value: 'edit'"));
+    expect(recipe, contains("value: 'delete'"));
     expect(recipe, isNot(contains("'Für heute ausgewählt'")));
     expect(recipe, isNot(contains("'Für diesen Tag ausgewählt'")));
     expect(recipe, isNot(contains("'Für heute ausgewählt'")));
