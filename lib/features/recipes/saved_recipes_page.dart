@@ -718,8 +718,11 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   String _recipeExportFileName(String name) {
     final normalized = name
         .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), '-')
-        .replaceAll(RegExp(r'^-+|-+
+        .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), '-');
+    final trimmed = normalized.replaceAll(RegExp(r'^-+'), '').replaceAll(RegExp(r'-+$'), '');
+    return trimmed.isEmpty ? 'rezept' : trimmed;
+  }
+
   Future<void> editRecipe(Recipe recipe) async {
     final changed = await Navigator.push<bool>(
       context,
