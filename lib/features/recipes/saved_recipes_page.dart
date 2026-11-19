@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/app_feedback.dart';
@@ -682,15 +683,40 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         ),
       ];
 
-      // Private recipe images are downloaded with the authenticated Supabase
-      // session and attached as bytes. Never share a short-lived signed URL.
+      // Attach the actual image bytes. New private uploads use imagePath;
+      // older/imported recipes may only have an imageUrl.
+      Uint8List? imageBytes;
+      var safeExtension = 'jpg';
       final imagePath = recipe.imagePath?.trim() ?? '';
       if (imagePath.isNotEmpty) {
-        final imageBytes = await RecipeImageService().download(imagePath);
-        final extension = imagePath.split('.').last.toLowerCase();
-        final safeExtension = const {'png', 'webp'}.contains(extension)
-            ? extension
-            : 'jpg';
+        try {
+          imageBytes = await RecipeImageService().download(imagePath);
+          final extension = imagePath.split('.').last.toLowerCase();
+          safeExtension = const {'png', 'webp'}.contains(extension)
+              ? extension
+              : 'jpg';
+        } catch (_) {
+          // Fall back to imageUrl for older recipes whose storage path is no
+          // longer accessible but whose resolved image URL is still available.
+        }
+      }
+
+      final imageUrl = recipe.imageUrl?.trim() ?? '';
+      if (imageBytes == null && imageUrl.isNotEmpty) {
+        final uri = Uri.tryParse(imageUrl);
+        if (uri != null && (uri.scheme == 'https' || uri.scheme == 'http')) {
+          final data = await NetworkAssetBundle(uri).load(uri.toString());
+          imageBytes = data.buffer.asUint8List();
+          final urlExtension = uri.pathSegments.isEmpty
+              ? ''
+              : uri.pathSegments.last.split('.').last.toLowerCase();
+          safeExtension = const {'png', 'webp'}.contains(urlExtension)
+              ? urlExtension
+              : 'jpg';
+        }
+      }
+
+      if (imageBytes != null && imageBytes.isNotEmpty) {
         files.add(
           XFile.fromData(
             imageBytes,
