@@ -83,7 +83,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         // Personal Today state is optional metadata for recipe rendering.
       }
       if (!mounted) return;
-      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; loading = false; });
+      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 999).toInt(); personalTodaySelected = selectedForToday; loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
@@ -97,7 +97,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
-  double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 12).toDouble();
+  double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 999).toDouble();
   String formatQuantity(double value) => value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(value < 10 ? 1 : 0);
   String difficulty(String value) => switch (value) { 'easy' => 'Einfach', 'medium' => 'Mittel', 'hard' => 'Aufwendig', _ => value };
 
