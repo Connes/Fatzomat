@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -639,11 +641,21 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 
   Future<void> shareRecipe(Recipe recipe) async {
-    final ingredients = recipe.ingredients.map((ingredient) {
+    final ingredientLines = recipe.ingredients.map((ingredient) {
       final amount = ingredient.isQualitative
           ? ''
           : '${ingredient.quantity} ${ingredient.unit}'.trim();
-      return amount.isEmpty ? '• ${ingredient.name}' : '• $amount ${ingredient.name}';
+      final section = ingredient.section?.trim();
+      final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
+      final flags = [
+        if (ingredient.isAdditional) 'Zusätzlich',
+        if (ingredient.isUserSelected) 'Eigene Auswahl',
+      ];
+      return [
+        if (section != null && section.isNotEmpty) '[$section]',
+        if (flags.isNotEmpty) '(${flags.join(', ')})',
+        '• $label',
+      ].join(' ');
     }).join('\n');
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
@@ -651,22 +663,66 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     final details = [
       recipe.description.trim(),
       '${recipe.servings} ${recipe.servingsUnit}',
-      if (ingredients.isNotEmpty) 'Zutaten:\n$ingredients',
+      'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
+      'Kochzeit: ${recipe.cookTimeMinutes} Min.',
+      'Schwierigkeit: ${recipe.difficulty}',
+      if (ingredientLines.isNotEmpty) 'Zutaten:\n$ingredientLines',
       if (steps.isNotEmpty) 'Zubereitung:\n$steps',
     ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
     try {
+      final export = jsonEncode(recipe.toTogetherRecipeJson());
+      final files = <XFile>[
+        XFile.fromData(
+          Uint8List.fromList(utf8.encode(export)),
+          mimeType: 'application/json',
+          name: '${_recipeExportFileName(recipe.name)}.json',
+        ),
+      ];
+
+      // Private recipe images are downloaded with the authenticated Supabase
+      // session and attached as bytes. Never share a short-lived signed URL.
+      final imagePath = recipe.imagePath?.trim() ?? '';
+      if (imagePath.isNotEmpty) {
+        final imageBytes = await RecipeImageService().download(imagePath);
+        final extension = imagePath.split('.').last.toLowerCase();
+        final safeExtension = const {'png', 'webp'}.contains(extension)
+            ? extension
+            : 'jpg';
+        files.add(
+          XFile.fromData(
+            imageBytes,
+            mimeType: switch (safeExtension) {
+              'png' => 'image/png',
+              'webp' => 'image/webp',
+              _ => 'image/jpeg',
+            },
+            name: '${_recipeExportFileName(recipe.name)}.$safeExtension',
+          ),
+        );
+      }
+
       await SharePlus.instance.share(
         ShareParams(
           title: recipe.name,
           subject: 'Rezept: ${recipe.name}',
           text: '${recipe.name}\n\n$details',
+          files: files,
         ),
       );
     } catch (e) {
       if (mounted) showAppError(context, e);
     }
   }
+
+  String _recipeExportFileName(String name) {
+    final normalized = name
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), '-');
+    final trimmed = normalized.replaceAll(RegExp(r'^-+'), '').replaceAll(RegExp(r'-+$'), '');
+    return trimmed.isEmpty ? 'rezept' : trimmed;
+  }
+
   Future<void> editRecipe(Recipe recipe) async {
     final changed = await Navigator.push<bool>(
       context,
