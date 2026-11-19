@@ -1476,6 +1476,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           name: recipe.name,
           description: recipe.description,
           servings: recipe.servings,
+          servingsUnit: recipe.servingsUnit,
           prepTimeMinutes: recipe.prepTimeMinutes,
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
