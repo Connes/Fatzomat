@@ -334,12 +334,16 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                     switch (action) {
                       case 'export':
                         exportRecipe();
+                        break;
                       case 'image':
                         manageRecipeImage();
+                        break;
                       case 'edit':
                         editRecipe();
+                        break;
                       case 'delete':
                         removeFromCollection();
+                        break;
                     }
                   },
                   itemBuilder: (context) => [
