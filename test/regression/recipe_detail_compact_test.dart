@@ -7,7 +7,10 @@ void main() {
     final source = File('lib/features/recipes/recipe_detail_page.dart').readAsStringSync();
 
     expect(source, contains('final bool showManagementActions;'));
-    expect(source, contains('actions: !widget.showManagementActions ? null : ['));
+    expect(source, contains('actions: !widget.showManagementActions'));
+    expect(source, contains('PopupMenuButton<String>'));
+    expect(source, contains("value: 'edit'"));
+    expect(source, contains("value: 'delete'"));
     final savedRecipes = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
     expect(savedRecipes, contains('showManagementActions: widget.mainChoice == null,'));
     expect(source, contains('bool ingredientsExpanded = false;'));
