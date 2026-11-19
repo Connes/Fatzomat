@@ -22,6 +22,12 @@ void main() {
     expect(prompt, contains('"version": 1'));
     expect(prompt, contains('"is_qualitative": false'));
     expect(page, contains('PhotoRecipeChatGptPage'));
+    expect(page, contains('Zurück aus ChatGPT? Rezeptdatei importieren'));
+    expect(page, contains('Future<void> _importGeneratedRecipe() async'));
+    expect(page, contains('TogetherRecipeFileService().pickRecipe()'));
+    expect(page, contains('RecipeImportPreviewPage(recipe: recipe)'));
+    expect(page, contains('if (imported == true && context.mounted)'));
+    expect(page, contains('Navigator.pop(context, true)'));
     expect(page, contains('ImageSource.camera'));
     expect(page, contains('ImageSource.gallery'));
     expect(page, contains('SharePlus.instance.share'));

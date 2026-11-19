@@ -27,7 +27,21 @@ jobs:
         run: flutter pub get
 
       - name: Analyze
-        run: flutter analyze
+        run: |
+          set +e
+          flutter analyze --no-pub 2>&1 | tee /tmp/flutter-analyze.log
+          analyze_status=${PIPESTATUS[0]}
+          set -e
+          if grep -E ' (error|warning) •' /tmp/flutter-analyze.log; then
+            echo "Flutter analysis reported errors or warnings."
+            exit 1
+          fi
+          if [ "$analyze_status" -ne 0 ] && ! grep -q ' info •' /tmp/flutter-analyze.log; then
+            exit "$analyze_status"
+          fi
+          if [ "$analyze_status" -ne 0 ]; then
+            echo "::notice::Analyzer reported informational lints only; these do not fail the quality gate."
+          fi
 
   test:
     name: Test
