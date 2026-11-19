@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -674,14 +673,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
     try {
-      final export = jsonEncode(recipe.toTogetherRecipeJson());
-      final files = <XFile>[
-        XFile.fromData(
-          Uint8List.fromList(utf8.encode(export)),
-          mimeType: 'application/json',
-          name: '${_recipeExportFileName(recipe.name)}.json',
-        ),
-      ];
+      final files = <XFile>[];
 
       // Attach the actual image bytes. New private uploads use imagePath;
       // older/imported recipes may only have an imageUrl.
