@@ -984,14 +984,9 @@ class _ChatGptRecipeSetupPageState extends State<ChatGptRecipeSetupPage> with Wi
           builder: (dialogContext) => AlertDialog(
             title: const Text('Lebensmittel, die du nicht magst'),
             content: Text(
-              'Dieses Rezept enthält Lebensmittel, die du als „Mag ich nicht“ markiert hast:
-
-'
-              '${conflicts.map((ingredient) => '• $ingredient').join('
-')}'
-              '
-
-Möchtest du das Rezept trotzdem importieren?',
+              'Dieses Rezept enthält Lebensmittel, die du als „Mag ich nicht“ markiert hast:\n\n'
+              '${conflicts.map((ingredient) => '• $ingredient').join('\n')}'
+              '\n\nMöchtest du das Rezept trotzdem importieren?',
             ),
             actions: [
               TextButton(
