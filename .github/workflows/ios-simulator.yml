@@ -64,5 +64,32 @@ jobs:
 
       - name: Install and launch app in iPhone simulator
         run: |
-          xcrun simctl install "${{ steps.simulator.outputs.udid }}" build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch "${{ steps.simulator.outputs.udid }}" com.example.food_app_mvp
+          set -euo pipefail
+          DEVICE_ID="${{ steps.simulator.outputs.udid }}"
+          APP_PATH="build/ios/iphonesimulator/Runner.app"
+          BUNDLE_ID="com.example.food_app_mvp"
+
+          for attempt in 1 2 3; do
+            echo "Simulator install/launch attempt ${attempt}/3"
+            STATE="$(xcrun simctl list devices | grep "$DEVICE_ID" | sed -E 's/.*\(([A-F0-9-]+)\) \(([^)]*)\).*/\2/' | head -n 1)"
+            if [ "$STATE" != "Booted" ]; then
+              xcrun simctl boot "$DEVICE_ID" || true
+            fi
+
+            if xcrun simctl bootstatus "$DEVICE_ID" -b &&
+               xcrun simctl install "$DEVICE_ID" "$APP_PATH" &&
+               xcrun simctl launch "$DEVICE_ID" "$BUNDLE_ID"; then
+              echo "App installed and launched successfully."
+              exit 0
+            fi
+
+            echo "Simulator attempt ${attempt} failed; restarting simulator before retry."
+            xcrun simctl shutdown "$DEVICE_ID" || true
+            if [ "$attempt" -lt 3 ]; then
+              sleep 5
+              xcrun simctl boot "$DEVICE_ID" || true
+            fi
+          done
+
+          echo "Unable to install and launch the app after 3 simulator attempts."
+          exit 1
