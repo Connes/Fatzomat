@@ -352,7 +352,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                       child: ListTile(
                         dense: true,
                         contentPadding: EdgeInsets.zero,
-                        leading: Icon(Icons.file_download_outlined),
+                        leading: Icon(Icons.file_download_outlined, color: AppDesign.iconGold),
                         title: Text('Rezept herunterladen'),
                       ),
                     ),
@@ -362,7 +362,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         child: ListTile(
                           dense: true,
                           contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.add_photo_alternate_outlined),
+                          leading: Icon(Icons.add_photo_alternate_outlined, color: AppDesign.iconGold),
                           title: Text('Rezeptbild verwalten'),
                         ),
                       ),
@@ -371,7 +371,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         child: ListTile(
                           dense: true,
                           contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.edit_outlined),
+                          leading: Icon(Icons.edit_outlined, color: AppDesign.iconGold),
                           title: Text('Rezept bearbeiten'),
                         ),
                       ),
@@ -446,13 +446,15 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
               ),
             ),
           ],
-          const SizedBox(height: 18),
-          AppSurface(
-            color: AppDesign.background.withValues(alpha: .94),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: Text(recipe!.description, style: Theme.of(context).textTheme.bodyLarge),
-          ),
-          const SizedBox(height: 14),
+          if (recipe!.description.trim().isNotEmpty) ...[
+            const SizedBox(height: 18),
+            AppSurface(
+              color: AppDesign.background.withValues(alpha: .94),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Text(recipe!.description, style: Theme.of(context).textTheme.bodyLarge),
+            ),
+            const SizedBox(height: 14),
+          ],
           const SizedBox(height: 18),
           AppSurface(
             padding: EdgeInsets.zero,
