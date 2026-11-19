@@ -52,6 +52,7 @@ void main() {
     expect(recipe.servings, 8);
     expect(recipe.servingsUnit, 'Stück');
     expect(recipe.toTogetherRecipeJson()['recipe']['servings_unit'], 'Stück');
+    expect(recipe.toMap()['servings_unit'], 'Stück');
   });
 
   test('normalizes piece units to an empty unit', () {
