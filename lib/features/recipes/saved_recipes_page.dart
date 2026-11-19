@@ -1131,7 +1131,7 @@ class _ServingsDialogState extends State<_ServingsDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        title: Text('Wie viele ${unit.toLowerCase()}?'),
+        title: Text('Wie viele ${widget.unit.toLowerCase()}?'),
         content: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -1142,7 +1142,7 @@ class _ServingsDialogState extends State<_ServingsDialog> {
             ),
             SizedBox(
               width: 100,
-              child: Text('$servings $unit', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+              child: Text('$servings ${widget.unit}', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
             ),
             IconButton(
               tooltip: 'Mehr',
