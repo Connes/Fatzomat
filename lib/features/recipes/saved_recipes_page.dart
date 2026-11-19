@@ -641,22 +641,29 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 
   Future<void> shareRecipe(Recipe recipe) async {
-    final ingredientLines = recipe.ingredients.map((ingredient) {
-      final amount = ingredient.isQualitative
-          ? ''
-          : '${ingredient.quantity} ${ingredient.unit}'.trim();
+    final ingredientsBySection = <String, List<RecipeIngredient>>{};
+    for (final ingredient in recipe.ingredients) {
       final section = ingredient.section?.trim();
-      final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
-      final flags = [
-        if (ingredient.isAdditional) 'Zusätzlich',
-        if (ingredient.isUserSelected) 'Eigene Auswahl',
-      ];
-      return [
-        if (section != null && section.isNotEmpty) '[$section]',
-        if (flags.isNotEmpty) '(${flags.join(', ')})',
-        '• $label',
-      ].join(' ');
-    }).join('\n');
+      final sectionName = section == null || section.isEmpty
+          ? 'Weitere Zutaten'
+          : section;
+      ingredientsBySection.putIfAbsent(sectionName, () => []).add(ingredient);
+    }
+    final ingredientSections = ingredientsBySection.entries.map((entry) {
+      final lines = entry.value.map((ingredient) {
+        final amount = ingredient.isQualitative
+            ? ''
+            : '${ingredient.quantity} ${ingredient.unit}'.trim();
+        final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
+        final flags = [
+          if (ingredient.isAdditional) 'Zusätzlich',
+          if (ingredient.isUserSelected) 'Eigene Auswahl',
+        ];
+        final suffix = flags.isEmpty ? '' : ' (${flags.join(', ')})';
+        return '• $label$suffix';
+      }).join('\n');
+      return '${entry.key}:\n$lines';
+    }).join('\n\n');
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
         .join('\n');
@@ -666,7 +673,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
       'Kochzeit: ${recipe.cookTimeMinutes} Min.',
       'Schwierigkeit: ${recipe.difficulty}',
-      if (ingredientLines.isNotEmpty) 'Zutaten:\n$ingredientLines',
+      if (ingredientSections.isNotEmpty) 'Zutaten:\n$ingredientSections',
       if (steps.isNotEmpty) 'Zubereitung:\n$steps',
     ].where((part) => part.trim().isNotEmpty).join('\n\n');
 
