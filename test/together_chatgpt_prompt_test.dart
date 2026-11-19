@@ -19,6 +19,8 @@ void main() {
     expect(prompt, isNot(contains('(Einheit:')));
     expect(prompt, contains('"format": "together_recipe"'));
     expect(prompt, contains('"version": 1'));
+    expect(prompt, contains('servings_unit'));
+    expect(prompt, contains('Cake Pops'));
     expect(prompt, isNot(contains('PDF-Datei')));
     expect(prompt, contains('DATEINAME: together_recipe.json'));
     expect(prompt, contains('echte Datei „together_recipe.json“'));

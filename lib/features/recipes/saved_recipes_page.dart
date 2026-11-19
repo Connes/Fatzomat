@@ -445,7 +445,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         final servings = await showDialog<int>(
           context: context,
           builder: (_) => _ServingsDialog(
-            initial: recipe.servings.clamp(1, 12).toInt(),
+            initial: recipe.servings.clamp(1, 999).toInt(),
+            unit: recipe.servingsUnit,
             confirmLabel: 'Bestätigen',
           ),
         );
@@ -536,7 +537,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         final servings = await showDialog<int>(
           context: context,
           builder: (_) => _ServingsDialog(
-            initial: recipe.servings < 1 ? 1 : (recipe.servings > 12 ? 12 : recipe.servings),
+            initial: recipe.servings.clamp(1, 999).toInt(),
+            unit: recipe.servingsUnit,
           ),
         );
         if (servings == null || !mounted) return;
@@ -586,7 +588,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       final baseServings = recipe.servings;
       final servings = await showDialog<int>(
         context: context,
-        builder: (_) => _ServingsDialog(initial: baseServings < 1 ? 1 : (baseServings > 12 ? 12 : baseServings)),
+        builder: (_) => _ServingsDialog(initial: baseServings.clamp(1, 999).toInt(), unit: recipe.servingsUnit),
       );
       if (servings == null || !mounted) return;
 
@@ -648,7 +650,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         .join('\n');
     final details = [
       recipe.description.trim(),
-      'Für ${recipe.servings} Personen',
+      '${recipe.servings} ${recipe.servingsUnit}',
       if (ingredients.isNotEmpty) 'Zutaten:\n$ingredients',
       if (steps.isNotEmpty) 'Zubereitung:\n$steps',
     ].where((part) => part.trim().isNotEmpty).join('\n\n');
@@ -1112,9 +1114,11 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 class _ServingsDialog extends StatefulWidget {
   final int initial;
+  final String unit;
   final String confirmLabel;
   const _ServingsDialog({
     required this.initial,
+    this.unit = 'Personen',
     this.confirmLabel = 'Zur Einkaufsliste',
   });
 
@@ -1127,7 +1131,7 @@ class _ServingsDialogState extends State<_ServingsDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        title: const Text('Für wie viele Personen?'),
+        title: Text('Wie viele ${widget.unit.toLowerCase()}?'),
         content: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -1138,11 +1142,11 @@ class _ServingsDialogState extends State<_ServingsDialog> {
             ),
             SizedBox(
               width: 100,
-              child: Text('$servings Personen', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+              child: Text('$servings ${widget.unit}', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
             ),
             IconButton(
               tooltip: 'Mehr',
-              onPressed: servings < 12 ? () => setState(() => servings++) : null,
+              onPressed: servings < 999 ? () => setState(() => servings++) : null,
               icon: const Icon(Icons.add_circle_outline),
             ),
           ],

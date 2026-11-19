@@ -24,6 +24,7 @@ class RecipeRepository {
         'name': recipe.name,
         'description': recipe.description,
         'servings': recipe.servings,
+        'servings_unit': recipe.servingsUnit,
         'prep_time_minutes': recipe.prepTimeMinutes,
         'cook_time_minutes': recipe.cookTimeMinutes,
         'difficulty': recipe.difficulty,
@@ -154,7 +155,7 @@ class RecipeRepository {
     if (userId == null) return const [];
     final rows = await client
         .from('recipes')
-        .select('id,created_by,name,description,servings,prep_time_minutes,cook_time_minutes,difficulty,instructions,image_url,image_path,created_at,recipe_ingredients(*)')
+        .select('id,created_by,name,description,servings,servings_unit,prep_time_minutes,cook_time_minutes,difficulty,instructions,image_url,image_path,created_at,recipe_ingredients(*)')
         // Keep the collection compatible with currently deployed databases.
         // `recipes.updated_at` is introduced by the later shared-recipe
         // collection migration and is not required to display saved recipes.
@@ -189,6 +190,7 @@ class RecipeRepository {
       name: recipe.name,
       description: recipe.description,
       servings: recipe.servings,
+      servingsUnit: recipe.servingsUnit,
       prepTimeMinutes: recipe.prepTimeMinutes,
       cookTimeMinutes: recipe.cookTimeMinutes,
       difficulty: recipe.difficulty,

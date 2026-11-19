@@ -83,7 +83,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         // Personal Today state is optional metadata for recipe rendering.
       }
       if (!mounted) return;
-      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 12).toInt(); personalTodaySelected = selectedForToday; loading = false; });
+      setState(() { recipe = r; loadError = null; servings = (loadedPlanServings ?? r.servings).clamp(1, 999).toInt(); personalTodaySelected = selectedForToday; loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { loading = false; loadError = e; });
@@ -97,7 +97,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
-  double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 12).toDouble();
+  double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 999).toDouble();
   String formatQuantity(double value) => value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(value < 10 ? 1 : 0);
   String difficulty(String value) => switch (value) { 'easy' => 'Einfach', 'medium' => 'Mittel', 'hard' => 'Aufwendig', _ => value };
 
@@ -239,7 +239,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         if (mounted) {
           setState(() {
             recipe = Recipe(
-              id: recipe!.id, name: recipe!.name, description: recipe!.description, servings: recipe!.servings,
+              id: recipe!.id, name: recipe!.name, description: recipe!.description, servings: recipe!.servings, servingsUnit: recipe!.servingsUnit,
               prepTimeMinutes: recipe!.prepTimeMinutes, cookTimeMinutes: recipe!.cookTimeMinutes, difficulty: recipe!.difficulty,
               instructions: recipe!.instructions, ingredients: recipe!.ingredients, imageUrl: null, imagePath: null,
               createdBy: recipe!.createdBy, savedBy: recipe!.savedBy, savedAt: recipe!.savedAt, updatedAt: recipe!.updatedAt,
@@ -378,7 +378,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   children: [
                     MetaPill(icon: Icons.timer_outlined, label: '$total Min.'),
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
-                    MetaPill(icon: Icons.people_alt_outlined, label: '$servings Personen'),
+                    MetaPill(icon: Icons.people_alt_outlined, label: '$servings ${recipe!.servingsUnit}'),
                   ],
                 ),
               ],
