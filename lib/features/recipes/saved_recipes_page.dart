@@ -655,12 +655,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
             ? ''
             : '${ingredient.quantity} ${ingredient.unit}'.trim();
         final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
-        final flags = [
-          if (ingredient.isAdditional) 'Zusätzlich',
-          if (ingredient.isUserSelected) 'Eigene Auswahl',
-        ];
-        final suffix = flags.isEmpty ? '' : ' (${flags.join(', ')})';
-        return '• $label$suffix';
+        return '• $label';
       }).join('\n');
       return '${entry.key}:\n$lines';
     }).join('\n\n');
