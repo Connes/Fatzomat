@@ -58,7 +58,7 @@ class Recipe {
       );
 
   Recipe scaledTo(int targetServings) {
-    final target = targetServings.clamp(1, 12).toInt();
+    final target = targetServings.clamp(1, 999).toInt();
     final base = servings <= 0 ? 1 : servings;
     return Recipe(
       id: id,
@@ -89,7 +89,6 @@ class Recipe {
           'description': description.isEmpty ? null : description,
           'servings': servings,
         'servings_unit': servingsUnit,
-          'servings_unit': servingsUnit,
           'prep_time_minutes': prepTimeMinutes,
           'cook_time_minutes': cookTimeMinutes,
           'difficulty': difficulty,
@@ -115,6 +114,7 @@ class Recipe {
         'name': name,
         'description': description,
         'servings': servings,
+        'servings_unit': servingsUnit,
         'prep_time_minutes': prepTimeMinutes,
         'cook_time_minutes': cookTimeMinutes,
         'difficulty': difficulty,
