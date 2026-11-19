@@ -12,7 +12,7 @@ void main() {
     expect(savedRecipes, contains('showManagementActions: widget.mainChoice == null,'));
     expect(source, contains('bool ingredientsExpanded = false;'));
     expect(source, contains('bool preparationExpanded = false;'));
-    expect(source, contains(r"MetaPill(icon: Icons.people_alt_outlined, label: '$servings Personen')"));
+    expect(source, contains(r"MetaPill(icon: Icons.people_alt_outlined, label: '$servings ${recipe!.servingsUnit}')"));
     expect(source, contains("initiallyExpanded: false"));
     expect(source, contains("title: const Text('Zutaten'"));
     expect(source, contains("title: const Text('Zubereitung'"));
