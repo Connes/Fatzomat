@@ -421,8 +421,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    if (recipe!.prepTimeMinutes > 0) MetaPill(icon: Icons.timer_outlined, label: 'Vorbereitung: ${recipe!.prepTimeMinutes} Min.'),
-                    if (recipe!.cookTimeMinutes > 0) MetaPill(icon: Icons.local_fire_department_outlined, label: '${recipe!.category == 'Süßspeise' ? 'Backzeit' : 'Kochzeit'}: ${recipe!.cookTimeMinutes} Min.'),
+                    if (recipe!.prepTimeMinutes + recipe!.cookTimeMinutes > 0)
+                      MetaPill(
+                        icon: Icons.timer_outlined,
+                        label: '${recipe!.prepTimeMinutes + recipe!.cookTimeMinutes} Min.',
+                      ),
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
                     MetaPill(icon: Icons.people_alt_outlined, label: '$servings ${recipe!.servingsUnit}'),
                   ],
