@@ -659,7 +659,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
                         ),
                       ),
                     ...group.$2.map((ingredient) {
-                      final amount = ingredient.isQualitative ? '' : '${_formatQuantity(ingredient.quantity)} ';
+                      final amount = ingredient.hidesQuantity ? '' : '${_formatQuantity(ingredient.quantity)} ';
                       final unit = ingredient.unit.trim();
                       final separator = amount.isEmpty || unit.isEmpty ? '' : ' ';
                       return Padding(
