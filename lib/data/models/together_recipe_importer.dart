@@ -102,12 +102,12 @@ class TogetherRecipeImporter {
 
     final ingredientsRaw = recipe['ingredients'];
     final stepsRaw = recipe['steps'];
-    if (ingredientsRaw.length > maxIngredients) {
+    if (ingredientsRaw is List && ingredientsRaw.length > maxIngredients) {
       throw const TogetherRecipeImportException(
         'Das Rezept enthält zu viele Zutaten. Maximal 50 sind erlaubt.',
       );
     }
-    if (stepsRaw.length > maxSteps) {
+    if (stepsRaw is List && stepsRaw.length > maxSteps) {
       throw const TogetherRecipeImportException(
         'Das Rezept enthält zu viele Zubereitungsschritte. Maximal 50 sind erlaubt.',
       );
