@@ -1736,7 +1736,6 @@ class _RecipeFieldCard extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType? keyboardType;
   final int? maxLines;
-  final Widget? suffixIcon;
 
   const _RecipeFieldCard({
     required this.icon,
@@ -1745,7 +1744,6 @@ class _RecipeFieldCard extends StatelessWidget {
     required this.controller,
     this.keyboardType,
     this.maxLines = 1,
-    this.suffixIcon,
   });
 
   @override
@@ -1780,7 +1778,6 @@ class _RecipeFieldCard extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: label,
                 hintText: hint,
-                suffixIcon: suffixIcon,
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 filled: false,
                 border: InputBorder.none,
