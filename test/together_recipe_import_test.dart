@@ -93,21 +93,44 @@ void main() {
     expect(recipe.ingredients.last.unit, 'Prise');
   });
 
-  test('rejects missing amount', () {
-    expect(
-      () => importer.parse(jsonEncode({
-        'format': 'together_recipe',
-        'version': 1,
-        'recipe': {
-          'title': 'Ohne Menge',
-          'ingredients': [
-            {'name': 'Salz', 'unit': 'Prise'},
-          ],
-          'steps': ['Würzen.'],
-        },
-      })),
-      throwsA(isA<TogetherRecipeImportException>()),
-    );
+  test('keeps an ingredient with a missing amount for preview completion', () {
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': 'Ohne Menge',
+        'ingredients': [
+          {'name': 'Salz', 'unit': 'Prise'},
+        ],
+        'steps': ['Würzen.'],
+      },
+    }));
+
+    expect(recipe.ingredients, hasLength(1));
+    expect(recipe.ingredients.single.name, 'Salz');
+    expect(recipe.ingredients.single.quantity, 0);
+  });
+
+  test('accepts incomplete recipe metadata and missing ingredient and step lists', () {
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': '',
+        'servings': null,
+        'prep_time_minutes': null,
+        'cook_time_minutes': null,
+        'difficulty': '',
+      },
+    }));
+
+    expect(recipe.name, isEmpty);
+    expect(recipe.servings, 0);
+    expect(recipe.prepTimeMinutes, 0);
+    expect(recipe.cookTimeMinutes, 0);
+    expect(recipe.difficulty, isEmpty);
+    expect(recipe.ingredients, isEmpty);
+    expect(recipe.instructions, isEmpty);
   });
 
   test('rejects oversized recipes', () {
