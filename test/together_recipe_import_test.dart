@@ -34,6 +34,24 @@ void main() {
     expect(recipe.instructions, ['Kartoffeln schneiden.', 'Backen.']);
   });
 
+  test('imports and exports recipe category', () {
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': 'Tiramisu Cake Pops',
+        'category': 'Süßspeise',
+        'ingredients': [
+          {'name': 'Löffelbiskuits', 'amount': 200, 'unit': 'g'},
+        ],
+        'steps': ['Vermengen und formen.'],
+      },
+    }));
+
+    expect(recipe.category, 'Süßspeise');
+    expect(recipe.toTogetherRecipeJson()['recipe']['category'], 'Süßspeise');
+  });
+
   test('imports a piece-based recipe yield', () {
     final recipe = importer.parse(jsonEncode({
       'format': 'together_recipe',
