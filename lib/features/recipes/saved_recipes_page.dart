@@ -615,7 +615,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           !recipe.description.toLowerCase().contains(normalizedQuery)) {
         return false;
       }
-      if (mainIngredientFilter != null &&
+      if (mainIngredientFilter == 'Süßspeise' && recipe.category.trim() != 'Süßspeise') return false;
+      if (mainIngredientFilter != null && mainIngredientFilter != 'Süßspeise' &&
           !recipeModelMatchesSelection(
             recipe,
             mainChoice: mainIngredientFilter,
@@ -664,8 +665,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     final details = [
       recipe.description.trim(),
       '${recipe.servings} ${recipe.servingsUnit}',
-      'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
-      'Kochzeit: ${recipe.cookTimeMinutes} Min.',
+      if (recipe.prepTimeMinutes > 0) 'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
+      if (recipe.cookTimeMinutes > 0) '${recipe.category == 'Süßspeise' ? 'Backzeit' : 'Kochzeit'}: ${recipe.cookTimeMinutes} Min.',
       'Schwierigkeit: ${recipe.difficulty}',
       if (ingredientSections.isNotEmpty) 'Zutaten:\n$ingredientSections',
       if (steps.isNotEmpty) 'Zubereitung:\n$steps',
@@ -908,7 +909,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(
         leading: PopupMenuButton<String>(
-          tooltip: 'Rezepte nach Hauptzutat filtern',
+          tooltip: 'Rezepte nach Kategorie oder Hauptzutat filtern',
           initialValue: mainIngredientFilter ?? 'Alle',
           onSelected: (value) => setState(
             () => mainIngredientFilter = value == 'Alle' ? null : value,
@@ -955,6 +956,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               )),
               ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
               ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
+              ('Süßspeise', const Icon(Icons.cake_rounded, color: AppDesign.iconGold)),
             ];
             final selected = mainIngredientFilter ?? 'Alle';
             return options.map((option) {
