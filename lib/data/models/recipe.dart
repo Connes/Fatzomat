@@ -96,7 +96,6 @@ class Recipe {
           'prep_time_minutes': prepTimeMinutes,
           'cook_time_minutes': cookTimeMinutes,
           'difficulty': difficulty,
-        'category': category,
           'category': category,
           'ingredients': ingredients
               .map((ingredient) => {
@@ -124,6 +123,7 @@ class Recipe {
         'prep_time_minutes': prepTimeMinutes,
         'cook_time_minutes': cookTimeMinutes,
         'difficulty': difficulty,
+        'category': category,
         'instructions': instructions,
         'image_url': imageUrl,
         'ingredients': ingredients.map((e) => e.toMap()).toList(),
