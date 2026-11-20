@@ -909,7 +909,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(
         leading: PopupMenuButton<String>(
-          tooltip: 'Rezepte nach Kategorie oder Hauptzutat filtern',
+          tooltip: 'Rezepte nach Hauptzutat filtern',
           initialValue: mainIngredientFilter ?? 'Alle',
           onSelected: (value) => setState(
             () => mainIngredientFilter = value == 'Alle' ? null : value,
