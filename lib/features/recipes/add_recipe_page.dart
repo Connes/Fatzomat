@@ -1486,8 +1486,8 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
       if (_int(prep.text, fallback: 0, min: 0, max: 1440) <= 0 ||
           _int(cook.text, fallback: 0, min: 0, max: 1440) <= 0) {
         _show(category == 'Süßspeise'
-            ? 'Bitte Vorbereitungs- und Backzeit ergänzen.'
-            : 'Bitte Vorbereitungs- und Kochzeit ergänzen.');
+            ? 'Bitte Vorbereitungs- und Zubereitungszeit ergänzen.'
+            : 'Bitte Vorbereitungs- und Zubereitungszeit ergänzen.');
         return;
       }
       if (difficulty.text.trim().isEmpty) {
@@ -1542,6 +1542,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           prepTimeMinutes: recipe.prepTimeMinutes,
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
+          category: recipe.category,
           instructions: recipe.instructions,
           ingredients: recipe.ingredients,
           imageUrl: widget.initialRecipe!.imageUrl,
@@ -1635,17 +1636,16 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           const SizedBox(height: 12),
           _RecipeFieldCard(
             icon: Icons.schedule_rounded,
-            label: category == 'Süßspeise' ? 'Backzeit (Min.)' : 'Kochzeit (Min.)',
-            hint: category == 'Süßspeise' ? 'z. B. 25' : 'z. B. 30',
+            label: 'Zubereitungszeit (Min.)',
+            hint: 'z. B. 30',
             controller: cook,
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 12),
-          _RecipeFieldCard(
-            icon: Icons.bar_chart_rounded,
-            label: 'Schwierigkeit',
-            controller: difficulty,
-            suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded),
+          _RecipeDifficultyField(
+            value: difficulty.text,
+            enabled: !saving,
+            onChanged: (value) => setState(() => difficulty.text = value),
           ),
           const SizedBox(height: 12),
           _RecipeCategoryField(
@@ -1818,9 +1818,9 @@ class _RecipeCategoryField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       decoration: BoxDecoration(
-        color: AppDesign.surface.withValues(alpha: .96),
+        color: AppDesign.surface.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(AppDesign.radiusXl),
         boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
@@ -1830,14 +1830,90 @@ class _RecipeCategoryField extends StatelessWidget {
         itemBuilder: (context) => categories
             .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
             .toList(),
-        child: InputDecorator(
-          decoration: const InputDecoration(
-            labelText: 'Rezeptkategorie *',
-            border: InputBorder.none,
-            prefixIcon: Icon(Icons.category_outlined, color: AppDesign.iconGold),
-            suffixIcon: Icon(Icons.arrow_drop_down_rounded),
-          ),
-          child: Text(value.isEmpty ? 'Kategorie auswählen' : value),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                color: AppDesign.primarySoft,
+                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+              ),
+              child: const Icon(Icons.category_outlined, color: AppDesign.iconGold, size: 28),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Rezeptkategorie *', style: TextStyle(color: AppDesign.secondaryText, fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  Text(value.isEmpty ? 'Kategorie auswählen' : value, style: const TextStyle(fontSize: 18, color: AppDesign.text)),
+                ],
+              ),
+            ),
+            const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RecipeDifficultyField extends StatelessWidget {
+  final String value;
+  final bool enabled;
+  final ValueChanged<String> onChanged;
+
+  const _RecipeDifficultyField({
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  static const options = <String>['Einfach', 'Mittel', 'Schwer'];
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = options.contains(value) ? value : 'Einfach';
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      decoration: BoxDecoration(
+        color: AppDesign.surface.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+      ),
+      child: PopupMenuButton<String>(
+        enabled: enabled,
+        onSelected: onChanged,
+        itemBuilder: (context) => options
+            .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
+            .toList(),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                color: AppDesign.primarySoft,
+                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+              ),
+              child: const Icon(Icons.bar_chart_rounded, color: AppDesign.iconGold, size: 28),
+            ),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Schwierigkeit', style: TextStyle(color: AppDesign.secondaryText, fontSize: 14, fontWeight: FontWeight.w600)),
+                  SizedBox(height: 4),
+                ],
+              ),
+            ),
+            Text(selected, style: const TextStyle(fontSize: 18, color: AppDesign.text)),
+            const SizedBox(width: 8),
+            const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
+          ],
         ),
       ),
     );
