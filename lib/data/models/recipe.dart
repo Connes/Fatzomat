@@ -166,6 +166,11 @@ class RecipeIngredient {
         section: map['section']?.toString().trim().isEmpty == true ? null : map['section']?.toString().trim(),
       );
 
+  /// A qualitative flag must not hide an explicitly measured ingredient.
+  /// Legacy imports sometimes set is_qualitative while still storing a unit
+  /// such as EL or g; in that case the numeric amount is meaningful.
+  bool get hidesQuantity => isQualitative && unit.trim().isEmpty;
+
   RecipeIngredient scaledTo(num factor) => RecipeIngredient(
         foodId: foodId,
         name: name,
