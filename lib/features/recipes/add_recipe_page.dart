@@ -1394,6 +1394,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   final description = TextEditingController();
   final servings = TextEditingController(text: '2');
   String servingsUnit = 'Personen';
+  String category = '';
   final prep = TextEditingController();
   final cook = TextEditingController();
   final difficulty = TextEditingController(text: 'Einfach');
@@ -1757,7 +1758,7 @@ class _RecipeFieldCard extends StatelessWidget {
         boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Row(
-        crossAxisAlignment: maxLines == null || maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: maxLines == null || maxLines! > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           Container(
             width: 54,
@@ -1800,7 +1801,7 @@ class _RecipeFieldCard extends StatelessWidget {
 
 class _RecipeCategoryField extends StatelessWidget {
   final String value;
-  final ValueChanged<String>? onChanged;
+  final ValueChanged<String?>? onChanged;
 
   const _RecipeCategoryField({required this.value, required this.onChanged});
 
