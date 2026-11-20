@@ -1415,6 +1415,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     cook.text = initial.cookTimeMinutes.toString();
     difficulty.text = initial.difficulty;
     category = initial.category;
+    category = initial.category;
     for (final draft in ingredients) {
       draft.dispose();
     }
@@ -1484,7 +1485,9 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
       }
       if (_int(prep.text, fallback: 0, min: 0, max: 1440) <= 0 ||
           _int(cook.text, fallback: 0, min: 0, max: 1440) <= 0) {
-        _show('Bitte fehlende Vorbereitungs- und Kochzeiten ergänzen.');
+        _show(category == 'Süßspeise'
+            ? 'Bitte Vorbereitungs- und Backzeit ergänzen.'
+            : 'Bitte Vorbereitungs- und Kochzeit ergänzen.');
         return;
       }
       if (difficulty.text.trim().isEmpty) {
@@ -1521,6 +1524,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           prepTimeMinutes: recipe.prepTimeMinutes,
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
+          category: recipe.category,
           instructions: recipe.instructions,
           ingredients: recipe.ingredients,
           imageUrl: widget.initialRecipe?.imageUrl,
