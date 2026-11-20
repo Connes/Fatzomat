@@ -7,6 +7,7 @@ class Recipe {
   final int prepTimeMinutes;
   final int cookTimeMinutes;
   final String difficulty;
+  final String category;
   final List<String> instructions;
   final List<RecipeIngredient> ingredients;
   final String? imageUrl;
@@ -25,6 +26,7 @@ class Recipe {
     required this.prepTimeMinutes,
     required this.cookTimeMinutes,
     required this.difficulty,
+    this.category = '',
     required this.instructions,
     required this.ingredients,
     this.imageUrl,
@@ -44,6 +46,7 @@ class Recipe {
         prepTimeMinutes: _int(map['prep_time_minutes']),
         cookTimeMinutes: _int(map['cook_time_minutes']),
         difficulty: map['difficulty']?.toString() ?? 'Einfach',
+        category: map['category']?.toString().trim() ?? '',
         instructions: _strings(map['instructions'] ?? map['steps']),
         ingredients: ((map['ingredients'] ?? map['recipe_ingredients']) as List? ?? const [])
             .whereType<Map>()
@@ -69,6 +72,7 @@ class Recipe {
       prepTimeMinutes: prepTimeMinutes,
       cookTimeMinutes: cookTimeMinutes,
       difficulty: difficulty,
+      category: category,
       instructions: List<String>.from(instructions),
       ingredients: ingredients.map((ingredient) => ingredient.scaledTo(target / base)).toList(),
       imageUrl: imageUrl,
@@ -92,6 +96,8 @@ class Recipe {
           'prep_time_minutes': prepTimeMinutes,
           'cook_time_minutes': cookTimeMinutes,
           'difficulty': difficulty,
+        'category': category,
+          'category': category,
           'ingredients': ingredients
               .map((ingredient) => {
                     'food_id': ingredient.foodId,
