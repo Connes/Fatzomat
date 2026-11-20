@@ -650,9 +650,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     }
     final ingredientSections = ingredientsBySection.entries.map((entry) {
       final lines = entry.value.map((ingredient) {
-        final amount = ingredient.isQualitative
+        final amount = ingredient.hidesQuantity
             ? ''
-            : '${ingredient.quantity} ${ingredient.unit}'.trim();
+            : '${ingredient.quantity == ingredient.quantity.roundToDouble() ? ingredient.quantity.toInt() : ingredient.quantity} ${ingredient.unit}'.trim();
         final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
         return '• $label';
       }).join('\n');
