@@ -100,7 +100,9 @@ void main() {
     expect(prompt, contains('Erst nach meiner Auswahl'));
     expect(prompt, contains('Erst nach meiner Auswahl: Erzeuge „together_recipe.json“'));
     expect(prompt, contains('recipe.title'));
-    expect(prompt, contains('das vollständige rohe JSON als Chat-Antwort'));
+    expect(prompt, contains('Gib den JSON-Inhalt niemals im Chat aus'));
+    expect(prompt, contains('ausschließlich diese Datei als herunterladbaren Dateianhang'));
+    expect(prompt, isNot(contains('vollständige rohe JSON als Chat-Antwort')));
     expect(prompt, contains('Generiere kein Bild und rufe keine Bildgenerierung auf.'));
     expect(prompt, isNot(contains('generiere AUTOMATISCH und direkt anschließend')));
     expect(prompt, isNot(contains('fotorealistisches, appetitliches Bild')));
@@ -111,6 +113,8 @@ void main() {
 
     expect(prompt, contains('together_recipe.json'));
     expect(prompt, contains('Das Ergebnis muss syntaktisch gültiges JSON sein.'));
-    expect(prompt, contains('Gib nur das JSON bzw. die erzeugte Datei zurück.'));
+    expect(prompt, contains('Stelle ausschließlich die erzeugte JSON-Datei als herunterladbaren Dateianhang bereit.'));
+    expect(prompt, contains('Gib den JSON-Inhalt niemals im Chat aus'));
+    expect(prompt, isNot(contains('Gib nur das JSON bzw. die erzeugte Datei zurück.')));
   });
 }
