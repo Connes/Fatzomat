@@ -87,11 +87,6 @@ class TogetherRecipeImporter {
 
     final recipe = Map<String, dynamic>.from(recipeRaw);
     final title = recipe['title']?.toString().trim() ?? '';
-    if (title.isEmpty) {
-      throw const TogetherRecipeImportException(
-        'Das Rezept benötigt einen Titel.',
-      );
-    }
     if (title.length > maxTitleLength) {
       throw const TogetherRecipeImportException(
         'Der Rezepttitel ist zu lang.',
@@ -107,24 +102,9 @@ class TogetherRecipeImporter {
 
     final ingredientsRaw = recipe['ingredients'];
     final stepsRaw = recipe['steps'];
-    if (ingredientsRaw is! List || stepsRaw is! List) {
-      throw const TogetherRecipeImportException(
-        'Zutaten und Zubereitung müssen als Listen vorliegen.',
-      );
-    }
-    if (ingredientsRaw.isEmpty) {
-      throw const TogetherRecipeImportException(
-        'Das Rezept benötigt mindestens eine Zutat.',
-      );
-    }
     if (ingredientsRaw.length > maxIngredients) {
       throw const TogetherRecipeImportException(
         'Das Rezept enthält zu viele Zutaten. Maximal 50 sind erlaubt.',
-      );
-    }
-    if (stepsRaw.isEmpty) {
-      throw const TogetherRecipeImportException(
-        'Das Rezept benötigt mindestens einen Zubereitungsschritt.',
       );
     }
     if (stepsRaw.length > maxSteps) {
@@ -134,20 +114,13 @@ class TogetherRecipeImporter {
     }
 
     final ingredients = <RecipeIngredient>[];
-    for (var index = 0; index < ingredientsRaw.length; index++) {
-      final raw = ingredientsRaw[index];
-      if (raw is! Map) {
-        throw TogetherRecipeImportException(
-          'Zutat ${index + 1} ist ungültig.',
-        );
-      }
+    final ingredientList = ingredientsRaw is List ? ingredientsRaw : const <dynamic>[];
+    final stepList = stepsRaw is List ? stepsRaw : const <dynamic>[];
+    for (var index = 0; index < ingredientList.length; index++) {
+      final raw = ingredientList[index];
+      if (raw is! Map) continue;
       final item = Map<String, dynamic>.from(raw);
       final name = item['name']?.toString().trim() ?? '';
-      if (name.isEmpty) {
-        throw TogetherRecipeImportException(
-          'Zutat ${index + 1} hat keinen Namen.',
-        );
-      }
       if (name.length > maxIngredientNameLength) {
         throw TogetherRecipeImportException(
           'Der Name von Zutat ${index + 1} ist zu lang.',
@@ -157,12 +130,7 @@ class TogetherRecipeImporter {
       final hasAmount = item.containsKey('amount') || item.containsKey('quantity');
       final rawAmount = item.containsKey('amount') ? item['amount'] : item['quantity'];
       final isQualitative = hasAmount && rawAmount == null;
-      final quantity = _number(rawAmount) ?? (isQualitative ? 1 : null);
-      if (quantity == null || quantity <= 0) {
-        throw TogetherRecipeImportException(
-          'Zutat „$name“ hat keine gültige Menge. Verwende eine positive Zahl oder null für qualitative Mengen.',
-        );
-      }
+      final quantity = _number(rawAmount) ?? (isQualitative ? 1 : 0);
       if (quantity > 100000) {
         throw TogetherRecipeImportException(
           'Die Menge von Zutat „$name“ ist unrealistisch groß.',
@@ -199,13 +167,9 @@ class TogetherRecipeImporter {
     }
 
     final steps = <String>[];
-    for (var index = 0; index < stepsRaw.length; index++) {
-      final value = stepsRaw[index]?.toString().trim() ?? '';
-      if (value.isEmpty) {
-        throw TogetherRecipeImportException(
-          'Zubereitungsschritt ${index + 1} ist leer.',
-        );
-      }
+    for (var index = 0; index < stepList.length; index++) {
+      final value = stepList[index]?.toString().trim() ?? '';
+      if (value.isEmpty) continue;
       if (value.length > maxStepLength) {
         throw TogetherRecipeImportException(
           'Zubereitungsschritt ${index + 1} ist zu lang.',
@@ -224,13 +188,11 @@ class TogetherRecipeImporter {
     return Recipe(
       name: title,
       description: description,
-      servings: _positiveInt(recipe['servings']) ?? 1,
+      servings: _positiveInt(recipe['servings']) ?? 0,
       servingsUnit: recipe['servings_unit']?.toString() ?? recipe['servingsUnit']?.toString() ?? 'Personen',
       prepTimeMinutes: _nonNegativeInt(recipe['prep_time_minutes'] ?? recipe['prepTimeMinutes']) ?? 0,
       cookTimeMinutes: _nonNegativeInt(recipe['cook_time_minutes'] ?? recipe['cookTimeMinutes']) ?? 0,
-      difficulty: recipe['difficulty']?.toString().trim().isNotEmpty == true
-          ? recipe['difficulty'].toString().trim()
-          : 'Einfach',
+      difficulty: recipe['difficulty']?.toString().trim() ?? '',
       instructions: steps,
       ingredients: ingredients,
       imageUrl: imageUrl == null || imageUrl.isEmpty ? null : imageUrl,
