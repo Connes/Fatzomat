@@ -1415,7 +1415,6 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     cook.text = initial.cookTimeMinutes.toString();
     difficulty.text = initial.difficulty;
     category = initial.category;
-    category = initial.category;
     for (final draft in ingredients) {
       draft.dispose();
     }
