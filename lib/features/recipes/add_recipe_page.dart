@@ -655,7 +655,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           FilledButton.icon(
             onPressed: saving ? null : _editRecipe,
             icon: const Icon(Icons.edit_rounded),
-            label: Text(_missingRequiredFields.isEmpty ? 'Rezept bearbeiten' : 'Fehlende Angaben ergänzen'),
+            label: const Text('Rezept bearbeiten'),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
               backgroundColor: AppDesign.primarySoft,
