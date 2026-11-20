@@ -99,7 +99,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
 
   double scaled(num base) => base.toDouble() * servings / recipe!.servings.clamp(1, 999).toDouble();
   String formatQuantity(double value) => value == value.roundToDouble() ? value.toInt().toString() : value.toStringAsFixed(value < 10 ? 1 : 0);
-  String difficulty(String value) => switch (value) { 'easy' => 'Einfach', 'medium' => 'Mittel', 'hard' => 'Aufwendig', _ => value };
+  String difficulty(String value) => switch (value.toLowerCase()) { 'easy' => 'Einfach', 'medium' => 'Mittel', 'hard' => 'Schwer', _ => value };
 
   Future<void> editRecipe() async {
     if (recipe == null || working) return;
@@ -421,11 +421,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    if (recipe!.prepTimeMinutes + recipe!.cookTimeMinutes > 0)
-                      MetaPill(
-                        icon: Icons.timer_outlined,
-                        label: '${recipe!.prepTimeMinutes + recipe!.cookTimeMinutes} Min.',
-                      ),
+                    if (recipe!.prepTimeMinutes > 0) MetaPill(icon: Icons.timer_outlined, label: 'Vorbereitung: ${recipe!.prepTimeMinutes} Min.'),
+                    if (recipe!.cookTimeMinutes > 0) MetaPill(icon: Icons.local_fire_department_outlined, label: '${recipe!.category == 'Süßspeise' ? 'Backzeit' : 'Kochzeit'}: ${recipe!.cookTimeMinutes} Min.'),
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
                     MetaPill(icon: Icons.people_alt_outlined, label: '$servings ${recipe!.servingsUnit}'),
                   ],
