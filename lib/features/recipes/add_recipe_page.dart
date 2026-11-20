@@ -462,8 +462,9 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     if (_recipe.name.trim().isEmpty) missing.add('Rezeptname');
     if (_recipe.servings <= 0) missing.add('Portionen bzw. Stückzahl');
     if (_recipe.prepTimeMinutes <= 0) missing.add('Vorbereitungszeit');
-    if (_recipe.cookTimeMinutes <= 0) missing.add('Kochzeit');
+    if (_recipe.cookTimeMinutes <= 0) missing.add(_recipe.category == 'Süßspeise' ? 'Backzeit' : 'Kochzeit');
     if (_recipe.difficulty.trim().isEmpty) missing.add('Schwierigkeitsgrad');
+    if (_recipe.category.trim().isEmpty) missing.add('Kategorie');
     if (_recipe.ingredients.isEmpty ||
         _recipe.ingredients.any((item) => item.name.trim().isEmpty || item.quantity <= 0)) {
       missing.add('vollständige Zutaten');
@@ -1393,6 +1394,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   final description = TextEditingController();
   final servings = TextEditingController(text: '2');
   String servingsUnit = 'Personen';
+  String category = '';
   final prep = TextEditingController();
   final cook = TextEditingController();
   final difficulty = TextEditingController(text: 'Einfach');
@@ -1413,6 +1415,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     prep.text = initial.prepTimeMinutes.toString();
     cook.text = initial.cookTimeMinutes.toString();
     difficulty.text = initial.difficulty;
+    category = initial.category;
     for (final draft in ingredients) {
       draft.dispose();
     }
@@ -1482,11 +1485,17 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
       }
       if (_int(prep.text, fallback: 0, min: 0, max: 1440) <= 0 ||
           _int(cook.text, fallback: 0, min: 0, max: 1440) <= 0) {
-        _show('Bitte fehlende Vorbereitungs- und Kochzeiten ergänzen.');
+        _show(category == 'Süßspeise'
+            ? 'Bitte Vorbereitungs- und Backzeit ergänzen.'
+            : 'Bitte Vorbereitungs- und Kochzeit ergänzen.');
         return;
       }
       if (difficulty.text.trim().isEmpty) {
         _show('Bitte einen Schwierigkeitsgrad eintragen.');
+        return;
+      }
+      if (category.trim().isEmpty) {
+        _show('Bitte eine Rezeptkategorie auswählen.');
         return;
       }
     }
@@ -1501,6 +1510,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
         prepTimeMinutes: _int(prep.text, fallback: 0, min: 0, max: 1440),
         cookTimeMinutes: _int(cook.text, fallback: 0, min: 0, max: 1440),
         difficulty: difficulty.text.trim().isEmpty ? 'Einfach' : difficulty.text.trim(),
+        category: category,
         instructions: validSteps,
         ingredients: validIngredients.map((i) => i.toIngredient()).toList(growable: false),
       );
@@ -1514,6 +1524,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           prepTimeMinutes: recipe.prepTimeMinutes,
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
+          category: recipe.category,
           instructions: recipe.instructions,
           ingredients: recipe.ingredients,
           imageUrl: widget.initialRecipe?.imageUrl,
@@ -1581,7 +1592,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
             label: 'Beschreibung (optional)',
             hint: 'z. B. Ein schnelles und leckeres Rezept …',
             controller: description,
-            maxLines: 3,
+            maxLines: null,
           ),
           const SizedBox(height: 12),
           _RecipeFieldCard(
@@ -1591,14 +1602,23 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppDesign.surface.withValues(alpha: .97),
+              borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+              boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+            ),
             child: SegmentedButton<String>(
               segments: const [
                 ButtonSegment(value: 'Personen', label: Text('Personen')),
                 ButtonSegment(value: 'Stück', label: Text('Stück')),
               ],
               selected: {servingsUnit},
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) =>
+                  states.contains(WidgetState.selected) ? AppDesign.accentSoft : Colors.white),
+              ),
               onSelectionChanged: saving ? null : (selection) {
                 setState(() => servingsUnit = selection.first);
               },
@@ -1615,8 +1635,8 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           const SizedBox(height: 12),
           _RecipeFieldCard(
             icon: Icons.schedule_rounded,
-            label: 'Kochen (Min.)',
-            hint: 'z. B. 30',
+            label: category == 'Süßspeise' ? 'Backzeit (Min.)' : 'Kochzeit (Min.)',
+            hint: category == 'Süßspeise' ? 'z. B. 25' : 'z. B. 30',
             controller: cook,
             keyboardType: TextInputType.number,
           ),
@@ -1626,6 +1646,11 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
             label: 'Schwierigkeit',
             controller: difficulty,
             suffixIcon: const Icon(Icons.keyboard_arrow_down_rounded),
+          ),
+          const SizedBox(height: 12),
+          _RecipeCategoryField(
+            value: category,
+            onChanged: saving ? null : (value) => setState(() => category = value ?? ''),
           ),
           const SizedBox(height: 16),
           _RecipeSectionCard(
@@ -1710,7 +1735,7 @@ class _RecipeFieldCard extends StatelessWidget {
   final String? hint;
   final TextEditingController controller;
   final TextInputType? keyboardType;
-  final int maxLines;
+  final int? maxLines;
   final Widget? suffixIcon;
 
   const _RecipeFieldCard({
@@ -1733,7 +1758,7 @@ class _RecipeFieldCard extends StatelessWidget {
         boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Row(
-        crossAxisAlignment: maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: maxLines == null || maxLines! > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           Container(
             width: 54,
@@ -1749,6 +1774,7 @@ class _RecipeFieldCard extends StatelessWidget {
             child: TextField(
               controller: controller,
               keyboardType: keyboardType,
+              minLines: maxLines == null ? 1 : null,
               maxLines: maxLines,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
@@ -1768,6 +1794,51 @@ class _RecipeFieldCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RecipeCategoryField extends StatelessWidget {
+  final String value;
+  final ValueChanged<String?>? onChanged;
+
+  const _RecipeCategoryField({required this.value, required this.onChanged});
+
+  static const categories = <String>[
+    'Hauptgericht',
+    'Süßspeise',
+    'Beilage',
+    'Salat',
+    'Suppe',
+    'Snack',
+    'Frühstück',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+      decoration: BoxDecoration(
+        color: AppDesign.surface.withValues(alpha: .96),
+        borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+      ),
+      child: PopupMenuButton<String>(
+        enabled: onChanged != null,
+        onSelected: onChanged,
+        itemBuilder: (context) => categories
+            .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
+            .toList(),
+        child: InputDecorator(
+          decoration: const InputDecoration(
+            labelText: 'Rezeptkategorie *',
+            border: InputBorder.none,
+            prefixIcon: Icon(Icons.category_outlined, color: AppDesign.iconGold),
+            suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+          ),
+          child: Text(value.isEmpty ? 'Kategorie auswählen' : value),
+        ),
       ),
     );
   }
