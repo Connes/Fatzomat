@@ -487,7 +487,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            '${i.isQualitative ? '' : '${formatQuantity(scaled(i.quantity))} '}${i.unit} ${i.name}',
+                            '${i.hidesQuantity ? '' : '${formatQuantity(scaled(i.quantity))} '}${i.unit.trim().isEmpty ? '' : '${i.unit.trim()} '}${i.name}',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
