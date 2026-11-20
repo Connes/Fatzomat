@@ -1650,7 +1650,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           const SizedBox(height: 12),
           _RecipeCategoryField(
             value: category,
-            onChanged: saving ? null : (value) => setState(() => category = value),
+            onChanged: saving ? null : (value) => setState(() => category = value ?? ''),
           ),
           const SizedBox(height: 16),
           _RecipeSectionCard(
