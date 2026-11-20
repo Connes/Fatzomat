@@ -1795,6 +1795,46 @@ class _RecipeFieldCard extends StatelessWidget {
   }
 }
 
+class _RecipeCategoryField extends StatelessWidget {
+  final String value;
+  final ValueChanged<String>? onChanged;
+
+  const _RecipeCategoryField({required this.value, required this.onChanged});
+
+  static const categories = <String>[
+    'Hauptgericht',
+    'Süßspeise',
+    'Beilage',
+    'Salat',
+    'Suppe',
+    'Snack',
+    'Frühstück',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+      decoration: BoxDecoration(
+        color: AppDesign.surface.withValues(alpha: .96),
+        borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+      ),
+      child: DropdownButtonFormField<String>(
+        value: categories.contains(value) ? value : null,
+        decoration: const InputDecoration(
+          labelText: 'Rezeptkategorie *',
+          border: InputBorder.none,
+          prefixIcon: Icon(Icons.category_outlined, color: AppDesign.iconGold),
+        ),
+        hint: const Text('Kategorie auswählen'),
+        items: categories.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
 class _RecipeSectionCard extends StatelessWidget {
   final IconData icon;
   final String title;
