@@ -1635,7 +1635,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           const SizedBox(height: 12),
           _RecipeFieldCard(
             icon: Icons.schedule_rounded,
-            label: category == 'Süßspeise' ? 'Backen (Min.)' : 'Kochen (Min.)',
+            label: category == 'Süßspeise' ? 'Backzeit (Min.)' : 'Kochzeit (Min.)',
             hint: category == 'Süßspeise' ? 'z. B. 25' : 'z. B. 30',
             controller: cook,
             keyboardType: TextInputType.number,
