@@ -240,7 +240,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           setState(() {
             recipe = Recipe(
               id: recipe!.id, name: recipe!.name, description: recipe!.description, servings: recipe!.servings, servingsUnit: recipe!.servingsUnit,
-              prepTimeMinutes: recipe!.prepTimeMinutes, cookTimeMinutes: recipe!.cookTimeMinutes, difficulty: recipe!.difficulty,
+              prepTimeMinutes: recipe!.prepTimeMinutes, cookTimeMinutes: recipe!.cookTimeMinutes, difficulty: recipe!.difficulty, category: recipe!.category,
               instructions: recipe!.instructions, ingredients: recipe!.ingredients, imageUrl: null, imagePath: null,
               createdBy: recipe!.createdBy, savedBy: recipe!.savedBy, savedAt: recipe!.savedAt, updatedAt: recipe!.updatedAt,
             );
@@ -316,7 +316,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     if (recipe == null) return TogetherScaffold(backgroundType: TogetherBackgroundType.recipeDetail, respectTopSafeArea: true, topSafeAreaColor: AppDesign.background, appBar: const TogetherAppBar(title: Text('Rezept'), backgroundColor: Color(0xF7FFFBF7), systemOverlayStyle: SystemUiOverlayStyle.dark), body: const _RecipeErrorState());
     final ingredients = recipe!.ingredients;
     final steps = recipe!.instructions;
-    final total = recipe!.prepTimeMinutes + recipe!.cookTimeMinutes;
     final isOwner = recipe!.createdBy == repo.client.auth.currentUser?.id;
 
     return TogetherScaffold(backgroundType: TogetherBackgroundType.recipeDetail, respectTopSafeArea: true, topSafeAreaColor: AppDesign.background,
@@ -422,7 +421,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    MetaPill(icon: Icons.timer_outlined, label: '$total Min.'),
+                    if (recipe!.prepTimeMinutes > 0) MetaPill(icon: Icons.timer_outlined, label: 'Vorbereitung: ${recipe!.prepTimeMinutes} Min.'),
+                    if (recipe!.cookTimeMinutes > 0) MetaPill(icon: Icons.local_fire_department_outlined, label: '${recipe!.category == 'Süßspeise' ? 'Backzeit' : 'Kochzeit'}: ${recipe!.cookTimeMinutes} Min.'),
                     MetaPill(icon: Icons.bar_chart_outlined, label: difficulty(recipe!.difficulty)),
                     MetaPill(icon: Icons.people_alt_outlined, label: '$servings ${recipe!.servingsUnit}'),
                   ],
