@@ -457,8 +457,29 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     setState(() => selectedImage = null);
   }
 
+  List<String> get _missingRequiredFields {
+    final missing = <String>[];
+    if (_recipe.name.trim().isEmpty) missing.add('Rezeptname');
+    if (_recipe.servings <= 0) missing.add('Portionen bzw. Stückzahl');
+    if (_recipe.prepTimeMinutes <= 0) missing.add('Vorbereitungszeit');
+    if (_recipe.cookTimeMinutes <= 0) missing.add('Kochzeit');
+    if (_recipe.difficulty.trim().isEmpty) missing.add('Schwierigkeitsgrad');
+    if (_recipe.ingredients.isEmpty ||
+        _recipe.ingredients.any((item) => item.name.trim().isEmpty || item.quantity <= 0)) {
+      missing.add('vollständige Zutaten');
+    }
+    if (_recipe.instructions.isEmpty) missing.add('Zubereitungsschritte');
+    return missing;
+  }
+
   Future<void> _save() async {
     if (saving) return;
+    if (_missingRequiredFields.isNotEmpty) {
+      AppFeedback.showSnackBar(context, SnackBar(
+        content: Text('Bitte zuerst ergänzen: ${_missingRequiredFields.join(', ')}.'),
+      ));
+      return;
+    }
     setState(() => saving = true);
     try {
       if (_savedRecipeId == null) {
@@ -603,7 +624,27 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          if (_missingRequiredFields.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppDesign.surfaceSoft,
+                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+                border: Border.all(color: AppDesign.divider),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Rezept ist noch unvollständig', style: TextStyle(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 6),
+                  const Text('Ergänze die fehlenden Angaben vor dem Speichern:'),
+                  const SizedBox(height: 6),
+                  Text(_missingRequiredFields.map((field) => '• $field').join('\\n')),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           _RecipeImagePickerCard(
             image: selectedImage,
             existingUrl: recipe.imageUrl,
@@ -614,7 +655,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
           FilledButton.icon(
             onPressed: saving ? null : _editRecipe,
             icon: const Icon(Icons.edit_rounded),
-            label: const Text('Rezept bearbeiten'),
+            label: Text(_missingRequiredFields.isEmpty ? 'Rezept bearbeiten' : 'Fehlende Angaben ergänzen'),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(50),
               backgroundColor: AppDesign.primarySoft,
@@ -730,11 +771,11 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDesign.radiusXl)),
             ),
-            onPressed: saving ? null : _save,
+            onPressed: saving || _missingRequiredFields.isNotEmpty ? null : _save,
             icon: saving
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                 : const Icon(Icons.save_rounded),
-            label: Text(saving ? 'Speichern …' : 'Rezept speichern'),
+            label: Text(saving ? 'Speichern …' : _missingRequiredFields.isEmpty ? 'Rezept speichern' : 'Bitte Angaben ergänzen'),
           ),
         ),
       ),
@@ -1433,6 +1474,21 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     if (validSteps.isEmpty) {
       _show('Bitte mindestens einen Zubereitungsschritt eingeben.');
       return;
+    }
+    if (widget.returnRecipeOnly) {
+      if (_int(servings.text, fallback: 0, min: 0, max: 999) <= 0) {
+        _show('Bitte eine gültige Anzahl an Personen oder Stück eintragen.');
+        return;
+      }
+      if (_int(prep.text, fallback: 0, min: 0, max: 1440) <= 0 ||
+          _int(cook.text, fallback: 0, min: 0, max: 1440) <= 0) {
+        _show('Bitte fehlende Vorbereitungs- und Kochzeiten ergänzen.');
+        return;
+      }
+      if (difficulty.text.trim().isEmpty) {
+        _show('Bitte einen Schwierigkeitsgrad eintragen.');
+        return;
+      }
     }
 
     setState(() => saving = true);
