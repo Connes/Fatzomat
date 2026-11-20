@@ -1824,16 +1824,21 @@ class _RecipeCategoryField extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDesign.radiusXl),
         boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
-      child: DropdownButtonFormField<String>(
-        value: categories.contains(value) ? value : null,
-        decoration: const InputDecoration(
-          labelText: 'Rezeptkategorie *',
-          border: InputBorder.none,
-          prefixIcon: Icon(Icons.category_outlined, color: AppDesign.iconGold),
+      child: PopupMenuButton<String>(
+        enabled: onChanged != null,
+        onSelected: onChanged,
+        itemBuilder: (context) => categories
+            .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
+            .toList(),
+        child: InputDecorator(
+          decoration: const InputDecoration(
+            labelText: 'Rezeptkategorie *',
+            border: InputBorder.none,
+            prefixIcon: Icon(Icons.category_outlined, color: AppDesign.iconGold),
+            suffixIcon: Icon(Icons.arrow_drop_down_rounded),
+          ),
+          child: Text(value.isEmpty ? 'Kategorie auswählen' : value),
         ),
-        hint: const Text('Kategorie auswählen'),
-        items: categories.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
-        onChanged: onChanged,
       ),
     );
   }
