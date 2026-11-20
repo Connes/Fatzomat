@@ -105,6 +105,7 @@ Regeln:
     "prep_time_minutes": 10,
     "cook_time_minutes": 20,
     "difficulty": "Einfach",
+    "category": "Süßspeise",
     "ingredients": [
       {
         "food_id": null,
@@ -126,7 +127,7 @@ Regeln:
 11. "servings", "prep_time_minutes" und "cook_time_minutes" müssen ganze Zahlen sein.
 12. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
 13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
-14. Der Rezeptname im Feld recipe.title darf höchstens 40 Zeichen enthalten. Prüfe die Länge vor der Ausgabe und kürze ihn nötigenfalls sinnvoll auf maximal 40 Zeichen. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, category, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
+14. Fülle recipe.category zwingend mit einer passenden Kategorie: „Hauptgericht“, „Süßspeise“, „Beilage“, „Salat“, „Suppe“, „Snack“ oder „Frühstück“. Kuchen, Torten, Cake Pops, Kekse, Gebäck, Desserts, Pudding und Eis sind immer „Süßspeise“. Der Rezeptname im Feld recipe.title darf höchstens 40 Zeichen enthalten. Prüfe die Länge vor der Ausgabe und kürze ihn nötigenfalls sinnvoll auf maximal 40 Zeichen. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, category, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
 15. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle ausschließlich diese Datei als herunterladbaren Dateianhang bereit. Prüfe intern, dass die Datei gültiges JSON im together_recipe-Format Version 1 enthält. Gib den JSON-Inhalt niemals im Chat aus, auch nicht ersatzweise, nicht als Codeblock, Klartext, Python-Dictionary oder Vorschau. Falls die Dateierstellung technisch nicht möglich ist, erkläre kurz, dass die Datei gerade nicht erstellt werden konnte, und bitte um einen erneuten Versuch. Gib keinesfalls den Dateiinhalt aus.
 16. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
 17. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.
