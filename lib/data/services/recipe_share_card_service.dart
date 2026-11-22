@@ -19,7 +19,7 @@ class RecipeShareCardService {
     final photo = await _loadRecipeImage(recipe);
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final bounds = const Rect.fromLTWH(0, 0, _width.toDouble(), _height.toDouble());
+    final bounds = const Rect.fromLTWH(0, 0, 1080.0, _height.toDouble());
 
     canvas.drawRect(
       bounds,
@@ -31,7 +31,7 @@ class RecipeShareCardService {
         ).createShader(bounds),
     );
 
-    final photoRect = const Rect.fromLTWH(0, 0, _width.toDouble(), 720);
+    final photoRect = const Rect.fromLTWH(0, 0, 1080.0, 720);
     canvas.save();
     canvas.clipRRect(RRect.fromRectAndRadius(photoRect, const Radius.circular(0)));
     if (photo != null) {
@@ -75,7 +75,7 @@ class RecipeShareCardService {
     photo?.dispose();
 
     // Warm paper-like footer and metadata.
-    canvas.drawRect(const Rect.fromLTWH(0, 720, _width.toDouble(), 360), Paint()..color = const Color(0xFFFFF8ED));
+    canvas.drawRect(const Rect.fromLTWH(0, 720, 1080.0, 360), Paint()..color = const Color(0xFFFFF8ED));
     canvas.drawRect(const Rect.fromLTWH(64, 780, 150, 7), Paint()..color = const Color(0xFFD6A72C));
     _drawText(canvas, 'MIT LIEBE ZUBEREITET', const Offset(64, 820), 26, const Color(0xFF64715C), bold: true, letterSpacing: 2);
     final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
