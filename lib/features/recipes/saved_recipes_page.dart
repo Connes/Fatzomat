@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/app_feedback.dart';
@@ -27,6 +26,7 @@ import '../shared/today_page.dart';
 import 'add_recipe_page.dart';
 import 'food_preference_recipe_guard.dart';
 import 'recipe_detail_page.dart';
+import '../../data/services/recipe_image_service.dart';
 import '../../data/services/recipe_share_card_service.dart';
 
 /// Filters a saved recipe against the cooking summary selection.
