@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - "ios/**"
-      - "lib/**"
-      - "assets/**"
       - "pubspec.yaml"
       - "pubspec.lock"
       - ".github/workflows/ios-simulator.yml"
@@ -16,8 +14,6 @@ on:
       - main
     paths:
       - "ios/**"
-      - "lib/**"
-      - "assets/**"
       - "pubspec.yaml"
       - "pubspec.lock"
       - ".github/workflows/ios-simulator.yml"
