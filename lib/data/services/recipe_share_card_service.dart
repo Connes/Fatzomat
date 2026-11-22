@@ -118,18 +118,10 @@ class RecipeShareCardService {
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
         .join('\n');
-    final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+
     return [
-      recipe.name,
-      if (recipe.description.trim().isNotEmpty) recipe.description.trim(),
-      [
-        if (recipe.servings > 0) '${recipe.servings} ${recipe.servingsUnit}',
-        if (total > 0) 'Gesamtzeit: $total Min. (${recipe.prepTimeMinutes} + ${recipe.cookTimeMinutes} Min.)',
-        'Schwierigkeit: ${_difficulty(recipe.difficulty)}',
-      ].join('  •  '),
       if (ingredientText.isNotEmpty) 'ZUTATEN\n$ingredientText',
       if (steps.isNotEmpty) 'ZUBEREITUNG\n$steps',
-      'Geteilt mit Fatzomat',
     ].join('\n\n');
   }
 
