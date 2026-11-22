@@ -27,7 +27,7 @@ import '../shared/today_page.dart';
 import 'add_recipe_page.dart';
 import 'food_preference_recipe_guard.dart';
 import 'recipe_detail_page.dart';
-import '../../data/services/recipe_image_service.dart';
+import '../../data/services/recipe_share_card_service.dart';
 
 /// Filters a saved recipe against the cooking summary selection.
 ///
@@ -641,106 +641,61 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
 
 
   Future<void> shareRecipe(Recipe recipe) async {
-    final ingredientsBySection = <String, List<RecipeIngredient>>{};
-    for (final ingredient in recipe.ingredients) {
-      final section = ingredient.section?.trim();
-      final sectionName = section == null || section.isEmpty
-          ? 'Weitere Zutaten'
-          : section;
-      ingredientsBySection.putIfAbsent(sectionName, () => []).add(ingredient);
-    }
-    final ingredientSections = ingredientsBySection.entries.map((entry) {
-      final lines = entry.value.map((ingredient) {
-        final amount = ingredient.hidesQuantity
-            ? ''
-            : '${ingredient.quantity == ingredient.quantity.roundToDouble() ? ingredient.quantity.toInt() : ingredient.quantity} ${ingredient.unit}'.trim();
-        final label = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
-        return '• $label';
-      }).join('\n');
-      return '${entry.key}:\n$lines';
-    }).join('\n\n');
-    final steps = recipe.instructions.asMap().entries
-        .map((entry) => '${entry.key + 1}. ${entry.value}')
-        .join('\n');
-    final details = [
-      recipe.description.trim(),
-      '${recipe.servings} ${recipe.servingsUnit}',
-      if (recipe.prepTimeMinutes > 0) 'Vorbereitung: ${recipe.prepTimeMinutes} Min.',
-      if (recipe.cookTimeMinutes > 0) '${recipe.category == 'Süßspeise' ? 'Backzeit' : 'Kochzeit'}: ${recipe.cookTimeMinutes} Min.',
-      'Schwierigkeit: ${recipe.difficulty}',
-      if (ingredientSections.isNotEmpty) 'Zutaten:\n$ingredientSections',
-      if (steps.isNotEmpty) 'Zubereitung:\n$steps',
-    ].where((part) => part.trim().isNotEmpty).join('\n\n');
-
+    final shareService = const RecipeShareCardService();
     try {
-      final files = <XFile>[];
+      final coverBytes = await shareService.buildCover(recipe);
+      if (!mounted) return;
 
-      // Attach the actual image bytes. New private uploads use imagePath;
-      // older/imported recipes may only have an imageUrl.
-      Uint8List? imageBytes;
-      var safeExtension = 'jpg';
-      final imagePath = recipe.imagePath?.trim() ?? '';
-      if (imagePath.isNotEmpty) {
-        try {
-          imageBytes = await RecipeImageService().download(imagePath);
-          final extension = imagePath.split('.').last.toLowerCase();
-          safeExtension = const {'png', 'webp'}.contains(extension)
-              ? extension
-              : 'jpg';
-        } catch (_) {
-          // Fall back to imageUrl for older recipes whose storage path is no
-          // longer accessible but whose resolved image URL is still available.
-        }
-      }
-
-      final imageUrl = recipe.imageUrl?.trim() ?? '';
-      if (imageBytes == null && imageUrl.isNotEmpty) {
-        final uri = Uri.tryParse(imageUrl);
-        if (uri != null && (uri.scheme == 'https' || uri.scheme == 'http')) {
-          final data = await NetworkAssetBundle(uri).load(uri.toString());
-          imageBytes = data.buffer.asUint8List();
-          final urlExtension = uri.pathSegments.isEmpty
-              ? ''
-              : uri.pathSegments.last.split('.').last.toLowerCase();
-          safeExtension = const {'png', 'webp'}.contains(urlExtension)
-              ? urlExtension
-              : 'jpg';
-        }
-      }
-
-      if (imageBytes != null && imageBytes.isNotEmpty) {
-        files.add(
-          XFile.fromData(
-            imageBytes,
-            mimeType: switch (safeExtension) {
-              'png' => 'image/png',
-              'webp' => 'image/webp',
-              _ => 'image/jpeg',
-            },
-            name: '${_recipeExportFileName(recipe.name)}.$safeExtension',
-          ),
-        );
-      }
-
+      // Send the visual cover first. WhatsApp treats image+caption as one
+      // message, so the recipe body is deliberately shared in a second step.
       await SharePlus.instance.share(
         ShareParams(
           title: recipe.name,
           subject: 'Rezept: ${recipe.name}',
-          text: '${recipe.name}\n\n$details',
-          files: files,
+          files: [
+            XFile.fromData(
+              coverBytes,
+              mimeType: 'image/png',
+              name: 'fatzomat-rezept.png',
+            ),
+          ],
+        ),
+      );
+
+      if (!mounted) return;
+      final shareText = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Rezepttext auch teilen?'),
+          content: const Text(
+            'Das Rezeptbild ist vorbereitet. Teile jetzt Zutaten und Zubereitung '
+            'als separate, kopierbare WhatsApp-Nachricht.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Später'),
+            ),
+            FilledButton.icon(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              icon: const Icon(Icons.chat_outlined),
+              label: const Text('Rezepttext teilen'),
+            ),
+          ],
+        ),
+      );
+
+      if (shareText != true || !mounted) return;
+      await SharePlus.instance.share(
+        ShareParams(
+          title: recipe.name,
+          subject: 'Rezept: ${recipe.name}',
+          text: shareService.buildRecipeText(recipe),
         ),
       );
     } catch (e) {
       if (mounted) showAppError(context, e);
     }
-  }
-
-  String _recipeExportFileName(String name) {
-    final normalized = name
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9äöüß]+'), '-');
-    final trimmed = normalized.replaceAll(RegExp(r'^-+'), '').replaceAll(RegExp(r'-+$'), '');
-    return trimmed.isEmpty ? 'rezept' : trimmed;
   }
 
   Future<void> editRecipe(Recipe recipe) async {
