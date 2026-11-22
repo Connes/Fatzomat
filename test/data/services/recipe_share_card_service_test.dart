@@ -6,7 +6,7 @@ void main() {
   group('RecipeShareCardService', () {
     const service = RecipeShareCardService();
 
-    test('builds a readable recipe message with metadata, sections and steps', () {
+    test('shares only ingredients and preparation without recipe metadata', () {
       const recipe = Recipe(
         name: 'Fisch-Curry mit Reis',
         description: 'Cremiges Curry mit Seelachs.',
@@ -40,15 +40,18 @@ void main() {
 
       final text = service.buildRecipeText(recipe);
 
-      expect(text, contains('Fisch-Curry mit Reis'));
-      expect(text, contains('Gesamtzeit: 30 Min. (15 + 15 Min.)'));
-      expect(text, contains('Schwierigkeit: Einfach'));
+      expect(text, startsWith('ZUTATEN\n'));
       expect(text, contains('Beilage:\n• 1 Portion Basmatireis'));
       expect(text, contains('Curry:\n• 75 g Shiitakepilze\n• Salz'));
       expect(text, contains('ZUBEREITUNG\n1. Reis garen.\n2. Curry zubereiten.'));
+      expect(text, isNot(contains('Fisch-Curry mit Reis')));
+      expect(text, isNot(contains('Cremiges Curry')));
+      expect(text, isNot(contains('Gesamtzeit')));
+      expect(text, isNot(contains('Schwierigkeit')));
+      expect(text, isNot(contains('Geteilt mit Fatzomat')));
     });
 
-    test('keeps recipes shareable when optional content is empty', () {
+    test('omits empty ingredient or instruction sections', () {
       const recipe = Recipe(
         name: 'Einfaches Rezept',
         description: '',
@@ -57,15 +60,28 @@ void main() {
         cookTimeMinutes: 0,
         difficulty: 'Mittel',
         ingredients: [],
+        instructions: ['Alles vermengen.'],
+      );
+
+      expect(
+        service.buildRecipeText(recipe),
+        'ZUBEREITUNG\n1. Alles vermengen.',
+      );
+    });
+
+    test('returns empty text when ingredients and instructions are empty', () {
+      const recipe = Recipe(
+        name: 'Leeres Rezept',
+        description: 'Beschreibung wird nicht geteilt.',
+        servings: 4,
+        prepTimeMinutes: 10,
+        cookTimeMinutes: 20,
+        difficulty: 'Mittel',
+        ingredients: [],
         instructions: [],
       );
 
-      final text = service.buildRecipeText(recipe);
-
-      expect(text, startsWith('Einfaches Rezept'));
-      expect(text, contains('Schwierigkeit: Mittel'));
-      expect(text, isNot(contains('ZUTATEN')));
-      expect(text, isNot(contains('ZUBEREITUNG')));
+      expect(service.buildRecipeText(recipe), isEmpty);
     });
   });
 }
