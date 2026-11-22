@@ -389,3 +389,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Die Bildunterschrift enthält ausschließlich Zutaten (mit Abschnitten) und Zubereitungsschritte. Die Abschnittsüberschriften `*Zutaten*` und `*Zubereitung*` sind für WhatsApp-Fettdruck markiert und stehen jeweils mit einer Leerzeile Abstand vor dem Inhalt.
 - Regressionstests in `test/data/services/recipe_share_card_service_test.dart` prüfen den reinen Inhalt, die formatierten Überschriften, Leerzeilen, Zutatenabschnitte, Mengen und Zubereitung sowie leere optionale Inhalte.
 - Die PR-Workflows für den ursprünglichen PR-Head waren erfolgreich. Für den Merge-Commit lieferte die verfügbare Workflow-/Status-Abfrage keine Post-Merge-Runs bzw. Statuschecks; Post-Merge-CI daher nicht als erfolgreich bestätigt. Keine Geräteprüfung durchgeführt.
+
+
+## Rezept-Share-Layout (Arbeitsstand 2026-11-22)
+
+- Folgeänderung zu PR #439: Cover ohne „REZEPT“-Label, goldenen Strich, „MIT LIEBE ZUBEREITET“ und „Geteilt mit Fatzomat“.
+- Rezeptname steht nun zentriert im Footer anstelle des Slogans; Portions-/Zeit-/Schwierigkeits-Metadaten bleiben darunter erhalten.
+- Zutatenzeilen erhalten bei manuellem Umbruch einen hängenden Einzug mit geschützten Leerzeichen, sodass Folgezeilen optisch unter dem Zutaten-Text statt unter dem Aufzählungspunkt beginnen.
+- Regressionstest für den hängenden Einzug ergänzt. WhatsApp-Darstellung und Umbruchbreite müssen nach dem Merge auf dem Zielgerät geprüft werden.
