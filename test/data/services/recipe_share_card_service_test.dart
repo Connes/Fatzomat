@@ -40,10 +40,10 @@ void main() {
 
       final text = service.buildRecipeText(recipe);
 
-      expect(text, startsWith('*Zutaten*\n'));
+      expect(text, startsWith('*Zutaten*\n\n'));
       expect(text, contains('Beilage:\n• 1 Portion Basmatireis'));
       expect(text, contains('Curry:\n• 75 g Shiitakepilze\n• Salz'));
-      expect(text, contains('*Zubereitung*\n1. Reis garen.\n2. Curry zubereiten.'));
+      expect(text, contains('*Zubereitung*\n\n1. Reis garen.\n2. Curry zubereiten.'));
       expect(text, isNot(contains('Fisch-Curry mit Reis')));
       expect(text, isNot(contains('Cremiges Curry')));
       expect(text, isNot(contains('Gesamtzeit')));
@@ -65,7 +65,7 @@ void main() {
 
       expect(
         service.buildRecipeText(recipe),
-        '*Zubereitung*\n1. Alles vermengen.',
+        '*Zubereitung*\n\n1. Alles vermengen.',
       );
     });
 
