@@ -127,7 +127,7 @@ class RecipeShareCardService {
   String _formatBulletItem(String value) {
     const continuationIndent = '  ';
     const maxLineLength = 26;
-    final words = value.split(RegExp(r'\\s+'));
+    final words = value.split(RegExp(r'\s+'));
     final lines = <String>[];
     var line = '•';
     for (final word in words) {
@@ -140,7 +140,7 @@ class RecipeShareCardService {
       }
     }
     lines.add(line);
-    return lines.join('\\n');
+    return lines.join('\n');
   }
 
   void _drawCenteredText(
