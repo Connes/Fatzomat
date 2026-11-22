@@ -126,7 +126,7 @@ class RecipeShareCardService {
 
   String _formatBulletItem(String value) {
     const continuationIndent = '  ';
-    const maxLineLength = 30;
+    const maxLineLength = 26;
     final words = value.split(RegExp(r'\\s+'));
     final lines = <String>[];
     var line = '•';
