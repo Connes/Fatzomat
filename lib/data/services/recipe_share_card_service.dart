@@ -59,7 +59,6 @@ class RecipeShareCardService {
           stops: [0.38, 1],
         ).createShader(photoRect),
     );
-    _drawText(canvas, 'REZEPT', const Offset(64, 62), 30, Colors.white, bold: true, letterSpacing: 4);
     _drawText(
       canvas,
       recipe.name.trim().isEmpty ? 'Leckeres Rezept' : recipe.name.trim(),
@@ -75,8 +74,7 @@ class RecipeShareCardService {
 
     // Warm paper-like footer and metadata.
     canvas.drawRect(const Rect.fromLTWH(0, 720, 1080.0, 360), Paint()..color = const Color(0xFFFFF8ED));
-    canvas.drawRect(const Rect.fromLTWH(64, 780, 150, 7), Paint()..color = const Color(0xFFD6A72C));
-    _drawText(canvas, 'MIT LIEBE ZUBEREITET', const Offset(64, 820), 26, const Color(0xFF64715C), bold: true, letterSpacing: 2);
+    _drawCenteredText(canvas, recipe.name.trim().isEmpty ? 'Leckeres Rezept' : recipe.name.trim(), const Rect.fromLTWH(64, 770, 952, 100), 46, const Color(0xFF1D3829), bold: true, maxLines: 2);
     final total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
     final meta = [
       if (recipe.servings > 0) '${recipe.servings} ${recipe.servingsUnit}',
@@ -84,7 +82,6 @@ class RecipeShareCardService {
       _difficulty(recipe.difficulty),
     ].where((value) => value.trim().isNotEmpty).join('   •   ');
     _drawText(canvas, meta, const Offset(64, 890), 42, const Color(0xFF1D3829), bold: true, maxWidth: 950, maxLines: 2);
-    _drawText(canvas, 'Geteilt mit Fatzomat', const Offset(64, 1000), 24, const Color(0xFF7A806F));
 
     final picture = recorder.endRecording();
     final image = await picture.toImage(_width, _height);
@@ -111,7 +108,8 @@ class RecipeShareCardService {
         final amount = ingredient.hidesQuantity
             ? ''
             : '${_formatQuantity(ingredient.quantity)} ${ingredient.unit.trim()}'.trim();
-        return '• ${amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}'}';
+        final value = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
+        return _formatBulletItem(value);
       }).join('\n');
       return '${entry.key}:\n$lines';
     }).join('\n\n');
@@ -123,6 +121,55 @@ class RecipeShareCardService {
       if (ingredientText.isNotEmpty) '*Zutaten*\n\n$ingredientText',
       if (steps.isNotEmpty) '*Zubereitung*\n\n$steps',
     ].join('\n\n');
+  }
+
+
+  String _formatBulletItem(String value) {
+    const continuationIndent = '  ';
+    const maxLineLength = 30;
+    final words = value.split(RegExp(r'\\s+'));
+    final lines = <String>[];
+    var line = '•';
+    for (final word in words) {
+      final candidate = line == '•' ? '$line $word' : '$line $word';
+      if (line != '•' && candidate.length > maxLineLength) {
+        lines.add(line);
+        line = '$continuationIndent$word';
+      } else {
+        line = candidate;
+      }
+    }
+    lines.add(line);
+    return lines.join('\\n');
+  }
+
+  void _drawCenteredText(
+    Canvas canvas,
+    String value,
+    Rect bounds,
+    double fontSize,
+    Color color, {
+    bool bold = false,
+    int maxLines = 1,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: value,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
+          fontFamily: 'Inter',
+          height: 1.12,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+      maxLines: maxLines,
+      ellipsis: '…',
+    )..layout(maxWidth: bounds.width);
+    painter.paint(canvas, Offset(bounds.left, bounds.top + (bounds.height - painter.height) / 2));
+    painter.dispose();
   }
 
   Future<ui.Image?> _loadRecipeImage(Recipe recipe) async {
