@@ -646,8 +646,8 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       final coverBytes = await shareService.buildCover(recipe);
       if (!mounted) return;
 
-      // Send the visual cover first. WhatsApp treats image+caption as one
-      // message, so the recipe body is deliberately shared in a second step.
+      // Share the cover first. Once the native share sheet closes, open the
+      // second share sheet automatically for ingredients and instructions.
       await SharePlus.instance.share(
         ShareParams(
           title: recipe.name,
@@ -663,34 +663,14 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       );
 
       if (!mounted) return;
-      final shareText = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Rezepttext auch teilen?'),
-          content: const Text(
-            'Das Rezeptbild ist vorbereitet. Teile jetzt Zutaten und Zubereitung '
-            'als separate, kopierbare WhatsApp-Nachricht.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Später'),
-            ),
-            FilledButton.icon(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              icon: const Icon(Icons.chat_outlined),
-              label: const Text('Rezepttext teilen'),
-            ),
-          ],
-        ),
-      );
+      final recipeText = shareService.buildRecipeText(recipe);
+      if (recipeText.trim().isEmpty) return;
 
-      if (shareText != true || !mounted) return;
       await SharePlus.instance.share(
         ShareParams(
-          title: recipe.name,
-          subject: 'Rezept: ${recipe.name}',
-          text: shareService.buildRecipeText(recipe),
+          title: 'Zutaten und Zubereitung',
+          subject: 'Zutaten und Zubereitung',
+          text: recipeText,
         ),
       );
     } catch (e) {
