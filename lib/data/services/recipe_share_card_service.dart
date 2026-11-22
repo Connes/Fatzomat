@@ -120,8 +120,8 @@ class RecipeShareCardService {
         .join('\n');
 
     return [
-      if (ingredientText.isNotEmpty) 'ZUTATEN\n$ingredientText',
-      if (steps.isNotEmpty) 'ZUBEREITUNG\n$steps',
+      if (ingredientText.isNotEmpty) '*Zutaten*\n\n$ingredientText',
+      if (steps.isNotEmpty) '*Zubereitung*\n\n$steps',
     ].join('\n\n');
   }
 

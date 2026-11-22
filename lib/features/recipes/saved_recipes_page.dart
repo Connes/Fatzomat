@@ -646,12 +646,12 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       final coverBytes = await shareService.buildCover(recipe);
       if (!mounted) return;
 
-      // Share the cover first. Once the native share sheet closes, open the
-      // second share sheet automatically for ingredients and instructions.
+      final recipeText = shareService.buildRecipeText(recipe);
       await SharePlus.instance.share(
         ShareParams(
           title: recipe.name,
           subject: 'Rezept: ${recipe.name}',
+          text: recipeText.isEmpty ? null : recipeText,
           files: [
             XFile.fromData(
               coverBytes,
@@ -659,18 +659,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               name: 'fatzomat-rezept.png',
             ),
           ],
-        ),
-      );
-
-      if (!mounted) return;
-      final recipeText = shareService.buildRecipeText(recipe);
-      if (recipeText.trim().isEmpty) return;
-
-      await SharePlus.instance.share(
-        ShareParams(
-          title: 'Zutaten und Zubereitung',
-          subject: 'Zutaten und Zubereitung',
-          text: recipeText,
         ),
       );
     } catch (e) {
