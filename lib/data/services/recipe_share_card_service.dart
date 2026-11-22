@@ -19,7 +19,7 @@ class RecipeShareCardService {
     final photo = await _loadRecipeImage(recipe);
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final bounds = const Rect.fromLTWH(0, 0, 1080.0, _height.toDouble());
+    final bounds = const Rect.fromLTWH(0, 0, 1080.0, 1080.0);
 
     canvas.drawRect(
       bounds,
