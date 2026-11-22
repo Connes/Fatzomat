@@ -69,7 +69,7 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 - App: Flutter; CI verwendet Flutter 3.47.2 stable.
 - Kommunikation mit dem Nutzer auf Deutsch.
 - Nach Möglichkeit Umsetzung, Tests, PR und Verifikation autonom erledigen.
-- Relevante Checks: Repository-Hygiene, `flutter analyze`, `flutter test` und weitere projektspezifische Prüfungen nach Bedarf. Bei Änderungen an App-Code, iOS-Konfiguration, Flutter-Abhängigkeiten oder Assets ist zusätzlich der iOS-Simulator-Workflow verpflichtend; siehe Abschnitt „Apple-/iOS-Kompatibilität als Pflicht“.
+- Relevante Pflicht-Checks bei jedem PR: Repository-Hygiene, `flutter analyze`, `flutter test` und ein erfolgreicher iOS-Build. Weitere projektspezifische Prüfungen nach Bedarf. Der iPhone-Simulator-Smoke-Test ist kein allgemeines Merge-Gate; siehe Abschnitt „Apple-/iOS-Kompatibilität als Pflicht“.
 - Nach Merge tatsächlichen `main`-Commit und Post-Merge-CI prüfen. Nicht aus einem erfolgreichen PR-Lauf auf den Zustand des Merge-Commits schließen.
 - Der Nutzer führt lokal `git pull` aus und prüft die App auf seinem Gerät. Keine Geräteprüfung behaupten, solange sie nicht stattgefunden hat.
 
@@ -77,8 +77,9 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 
 - **Jede Änderung muss auch unter iOS funktionsfähig bleiben.** iOS ist keine nachgelagerte Portierungsaufgabe. Bei jeder Planung und Implementierung ist zu prüfen, ob Verhalten, UI, Datenzugriff, Berechtigungen, Plugins, Assets und Konfiguration auch auf iPhone/iPad funktionieren.
 - Flutter-Code unter `lib/` wird von Android und iOS gemeinsam verwendet. Änderungen daran müssen deshalb ohne unbeabsichtigte Plattformunterschiede funktionieren. Plattformabhängige Implementierungen sind ausdrücklich für beide Plattformen zu prüfen.
-- Bei Änderungen an `ios/**`, `lib/**`, `assets/**`, `pubspec.yaml`, `pubspec.lock` oder am iOS-Workflow muss der Workflow **„iPhone simulator smoke test“** für den aktuellen PR-Head erfolgreich sein. Er baut die iOS-Simulator-App und installiert/startet sie in einem iPhone-Simulator. Der Workflow ist in `.github/workflows/ios-simulator.yml` für diese Pfade auf Pull Requests und Pushes nach `main` eingerichtet.
-- **Merge-Gate:** Wenn eine Änderung einen der genannten iOS-relevanten Pfade betrifft, darf sie nicht gemergt werden, solange der iOS-Simulator-Workflow für exakt den aktuellen PR-Head fehlt, läuft oder fehlgeschlagen ist. Bei ausbleibendem Workflow ist zuerst die Ursache zu klären; ein grüner Android-/Flutter-Check ersetzt den iOS-Check nicht.
+- Bei Änderungen an `ios/**`, `lib/**`, `assets/**`, `pubspec.yaml`, `pubspec.lock` oder am iOS-Workflow muss ein erfolgreicher iOS-Build für den aktuellen PR-Head vorliegen. Dieser Build ist neben Analyze und Tests ein verpflichtender PR-Check.
+- Der Workflow **„iPhone simulator smoke test“** baut die iOS-Simulator-App und installiert/startet sie in einem iPhone-Simulator. Er ist ein zusätzlicher Laufzeittest, aber **kein allgemeines Merge-Gate**. Er soll gezielt bei iOS-spezifischen Änderungen, Änderungen an nativen Plugins/Berechtigungen/Plattformkonfiguration sowie vor Releases ausgeführt werden. Ein Simulatorlauf bei jeder Flutter- oder UI-Änderung ist nicht erforderlich.
+- **Merge-Gate:** Für jeden PR müssen die verpflichtenden Checks (Repository-Hygiene, `flutter analyze`, `flutter test` und iOS-Build) für exakt den aktuellen PR-Head erfolgreich sein. Ein fehlgeschlagener oder fehlender gezielter Simulator-Smoke-Test blockiert den Merge nicht automatisch; wenn er aufgrund einer iOS-spezifischen Änderung oder eines konkreten Risikos ausgeführt wurde, müssen seine Ergebnisse vor dem Abschluss bewertet werden.
 - Änderungen an Supabase-Schema, RPCs, Edge Functions oder sonstigen Backend-Verträgen müssen zusätzlich auf iOS-Kompatibilität geprüft werden: verwendete Tabellen, Spalten, RPC-Parameter/-Antworten, Authentifizierung und Datenformate müssen mit dem gemeinsam genutzten Flutter-Client kompatibel bleiben. Ein Simulator-Build allein beweist keine Backend-Kompatibilität.
 - Bei nativen iOS-Funktionen sind die betroffenen Plattformdateien und Einstellungen gezielt zu prüfen, insbesondere `Info.plist`, Berechtigungsbeschreibungen, URL-Schemes, Entitlements, Deployment Target, Plugin-Integration und erforderliche Xcode-Konfiguration. Keine Android-Konfiguration ungeprüft als iOS-Ersatz übernehmen.
 - Neue oder geänderte Plugins und native Abhängigkeiten müssen auf iOS-Unterstützung und erforderliche Pod-/Xcode-Schritte geprüft werden. Lockfile und iOS-Projektintegration müssen zusammenpassen.
@@ -371,3 +372,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - „Verbindung trennen“, Namen und Verbindungscode bleiben erhalten.
 - Beim Erstellen einer Verbindung aus „Heute“ bleibt der Nutzer auf der geöffneten „Gemeinsam nutzen“-Unterseite; der vorhandene Navigationsfluss kehrt nicht ins Profil um.
 - Regressionstests: `test/regression/connection_page_simplified_connected_state_test.dart`.
+
+## CI-Strategie: iOS-Build verpflichtend, Simulator gezielt (2026-11-22)
+
+- Bei jedem Pull Request sind Repository-Hygiene, `flutter analyze`, `flutter test` und ein erfolgreicher iOS-Build verpflichtend. Der iOS-Build bestätigt die Kompilierbarkeit für iOS, ersetzt aber keinen gezielten Laufzeittest bei plattformspezifischen Risiken.
+- Der iPhone-Simulator-Smoke-Test (Installation und Start der App im simulierten iPhone) läuft nicht mehr als pauschales Pflicht-Gate bei jeder Änderung. Er wird gezielt bei iOS-spezifischen Änderungen, Änderungen an nativen Plugins/Berechtigungen/Plattformkonfiguration und vor Releases eingesetzt.
+- Der Simulator-Workflow bleibt als zusätzlicher Test erhalten; er wird nicht aus dem Repository entfernt. Seine Ausführung ist unabhängig von den verpflichtenden PR-Checks.
+- Diese Regel ersetzt die frühere Vorgabe, den Simulator bei jeder Änderung an `lib/**`, `assets/**`, `pubspec.yaml` oder `pubspec.lock` zwingend auszuführen. Die iOS-Kompatibilität bleibt für alle Änderungen verbindlich; nur der Umfang der automatischen Laufzeitprüfung wird risikobasiert gewählt.
+- Hinweis zum Umsetzungsstand: Diese Handover-Regel dokumentiert die vereinbarte CI-Strategie. Die tatsächliche Workflow-Konfiguration ist damit noch nicht geändert.
