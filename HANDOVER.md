@@ -380,3 +380,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Der Simulator-Workflow bleibt als zusätzlicher Test erhalten; er wird nicht aus dem Repository entfernt. Seine Ausführung ist unabhängig von den verpflichtenden PR-Checks.
 - Diese Regel ersetzt die frühere Vorgabe, den Simulator bei jeder Änderung an `lib/**`, `assets/**`, `pubspec.yaml` oder `pubspec.lock` zwingend auszuführen. Die iOS-Kompatibilität bleibt für alle Änderungen verbindlich; nur der Umfang der automatischen Laufzeitprüfung wird risikobasiert gewählt.
 - Tatsächliche Workflow-Konfiguration über PR [#437](https://github.com/Connes/Fatzomat/pull/437) umgesetzt und gemergt (Merge-Commit `06bb0d1c67913dbefe21f75b1c04ab4b33a95c19`): `.github/workflows/flutter.yml` enthält jetzt einen verpflichtenden iOS-Simulator-Build im regulären Quality Gate; `.github/workflows/ios-simulator.yml` startet den Installations-/Launch-Smoke-Test automatisch nur noch bei Änderungen an `ios/**`, `pubspec.yaml`, `pubspec.lock` oder am Workflow selbst. `workflow_dispatch` bleibt für manuelle gezielte Läufe erhalten.
+
+## Rezept teilen: Magazin-Cover und separater Rezepttext (2026-11-22)
+
+- PR [#436 – Share recipes with a magazine-style cover and separate text](https://github.com/Connes/Fatzomat/pull/436) ist gemergt; Merge-Commit `ba1e6c65443a7ec030fc9d96b3f1adb0def51e25`.
+- `RecipeShareCardService` erstellt ein quadratisches 1080×1080-PNG-Cover mit Rezeptfoto (inklusive Fallback für ältere Bild-URLs), Rezepttitel, Portionen, Gesamtzeit, Schwierigkeitsgrad und Fatzomat-Branding.
+- Der Teilen-Ablauf verschickt zuerst das Cover und fragt anschließend, ob Zutaten und Zubereitung als separate Textnachricht geteilt werden sollen. Das ist bewusst zweistufig, weil WhatsApp Bild und Rezepttext nicht zuverlässig als zwei getrennte Nachrichten aus einem einzelnen Share-Vorgang übernimmt.
+- Regressionstests in `test/data/services/recipe_share_card_service_test.dart` prüfen Rezepttext, Metadaten, Zutatenabschnitte, Mengen und Zubereitung sowie leere optionale Inhalte.
+- Die PR-Workflows für den ursprünglichen PR-Head waren erfolgreich. Für den Merge-Commit lieferte die verfügbare Workflow-/Status-Abfrage keine Post-Merge-Runs bzw. Statuschecks; Post-Merge-CI daher nicht als erfolgreich bestätigt. Keine Geräteprüfung durchgeführt.
