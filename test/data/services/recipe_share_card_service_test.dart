@@ -90,7 +90,7 @@ void main() {
 
       expect(
         service.buildRecipeText(recipe),
-        contains('• 50 g Manner\\n  kokosschnitten'),
+        contains('• 50 g Manner\n  kokosschnitten'),
       );
     });
 
