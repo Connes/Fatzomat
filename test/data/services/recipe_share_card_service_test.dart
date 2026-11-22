@@ -69,6 +69,31 @@ void main() {
       );
     });
 
+    test('indents wrapped ingredient continuation lines under the ingredient text', () {
+      const recipe = Recipe(
+        name: 'Raffaello Cake Pops',
+        description: '',
+        servings: 20,
+        prepTimeMinutes: 35,
+        cookTimeMinutes: 0,
+        difficulty: 'Mittel',
+        ingredients: [
+          RecipeIngredient(
+            name: 'Manner kokosschnitten',
+            quantity: 50,
+            unit: 'g',
+            section: 'Kuchenmasse',
+          ),
+        ],
+        instructions: [],
+      );
+
+      expect(
+        service.buildRecipeText(recipe),
+        contains('• 50 g Manner\\n  kokosschnitten'),
+      );
+    });
+
     test('returns empty text when ingredients and instructions are empty', () {
       const recipe = Recipe(
         name: 'Leeres Rezept',
