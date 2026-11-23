@@ -433,3 +433,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Personenzahl sowie Minus-/Plus-Aktionen bleiben in der Zeile darunter.
 - Regressionstest in `test/regression/shopping_list_test.dart` sichert das Fehlen des Besteck-Icons und die Positionierung der Teilen-Aktion in der Titelzeile ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Einkaufsliste: Rezeptzeilen mit Kartenabstand ausrichten (2026-11-23)
+
+- Rezeptname und Personenzahl in der aufgeklappten Tageskarte erhalten links und rechts denselben 16-Pixel-Innenabstand wie die Inhaltskarten darunter.
+- Die Teilen-Schaltfläche sitzt innerhalb dieses rechten Innenabstands mit kompakter 40-Pixel-Trefferfläche; ihr Symbol ist auf die rechte Flucht des Ausklapppfeils ausgerichtet.
+- Regressionstest in `test/regression/shopping_list_test.dart` prüft den horizontalen Innenabstand und die kompakte Teilen-Schaltfläche.
+- PR/CI und Geräteprüfung stehen noch aus.
