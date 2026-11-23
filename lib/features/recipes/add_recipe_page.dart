@@ -1861,8 +1861,8 @@ class _RecipeFoodTagsField extends StatelessWidget {
 
   static const options = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
 
-  Set<String> _toggle(String tag) {
-    final next = Set<String>.from(selectedTags);
+  Set<String> _toggle(String tag, Set<String> current) {
+    final next = Set<String>.from(current);
     if (next.contains(tag)) {
       next.remove(tag);
     } else if (tag == 'Vegetarisch') {
@@ -1907,7 +1907,7 @@ class _RecipeDropdownField extends StatefulWidget {
   final bool enabled;
   final bool multiSelect;
   final ValueChanged<Set<String>> onChanged;
-  final Set<String> Function(String)? onToggle;
+  final Set<String> Function(String, Set<String>)? onToggle;
 
   const _RecipeDropdownField({
     required this.title,
@@ -1995,10 +1995,17 @@ class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
                     return InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        final next = widget.multiSelect
-                            ? (widget.onToggle?.call(value) ?? Set<String>.from(selected)..remove(value))
-                            : <String>{value};
-                        if (widget.multiSelect && widget.onToggle == null && !isSelected) {
+                        final next = <String>{};
+                        if (widget.multiSelect) {
+                          next.addAll(widget.onToggle?.call(value, selected) ?? selected);
+                          if (widget.onToggle == null) {
+                            if (isSelected) {
+                              next.remove(value);
+                            } else {
+                              next.add(value);
+                            }
+                          }
+                        } else {
                           next.add(value);
                         }
                         _menuSelection!.value = next;
