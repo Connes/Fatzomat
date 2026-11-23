@@ -22,6 +22,7 @@ import '../../data/services/shopping_list_aggregator.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import 'controllers/today_controller.dart';
 import '../recipes/recipe_detail_page.dart';
+import 'menu_builder_page.dart';
 import '../../core/food_mode.dart';
 import '../../core/services/food_choice_asset_service.dart';
 import '../food_modes/food_mode_page.dart';
@@ -329,6 +330,16 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     } finally {
       if (mounted) setState(() => _decisionShareActionInFlight = false);
     }
+  }
+
+  Future<void> _openMenuBuilder() async {
+    final current = plan;
+    if (current == null || !current.isRecipe) return;
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => MenuBuilderPage(plan: current)),
+    );
+    if (saved == true && mounted) await load();
   }
 
   Future<void> _handleSurprise() async {
@@ -769,6 +780,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                             )
                           : _TodayResultCard(
                               plan: plan!,
+                              onManageMenu: plan!.isRecipe ? _openMenuBuilder : null,
                               onCancel: removeTodayPlan,
                               onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
                               onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'
@@ -1434,6 +1446,7 @@ class _TodayDecisionCard extends StatelessWidget {
 
 class _TodayResultCard extends StatelessWidget {
   final TodayPlan plan;
+  final VoidCallback? onManageMenu;
   final VoidCallback? onOpenRecipe;
   final VoidCallback? onOpenOrder;
   final VoidCallback onOpenDecisionTitle;
@@ -1442,6 +1455,7 @@ class _TodayResultCard extends StatelessWidget {
 
   const _TodayResultCard({
     required this.plan,
+    required this.onManageMenu,
     required this.onOpenRecipe,
     required this.onOpenOrder,
     required this.onOpenDecisionTitle,
@@ -1516,7 +1530,7 @@ class _TodayResultCard extends StatelessWidget {
 
 
     return SizedBox(
-      height: _todayDecisionCardHeight(context),
+      height: _todayDecisionCardHeight(context) + (plan.menuCourses.isEmpty ? 0 : 156),
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
@@ -1546,6 +1560,8 @@ class _TodayResultCard extends StatelessWidget {
                   title: title,
                   titleSize: titleSize,
                   onTitleTap: onOpenDecisionTitle,
+                  menuCourses: plan.menuCourses,
+                  onManageMenu: onManageMenu,
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1628,12 +1644,16 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String title;
   final double titleSize;
   final VoidCallback onTitleTap;
+  final List<Map<String, dynamic>> menuCourses;
+  final VoidCallback? onManageMenu;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
     required this.title,
     required this.titleSize,
     required this.onTitleTap,
+    required this.menuCourses,
+    required this.onManageMenu,
   });
 
   @override
@@ -1658,29 +1678,56 @@ class _TodayDecisionCardContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
               ],
-              Expanded(
-                child: Center(
-                  child: InkWell(
-                    onTap: onTitleTap,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                      child: Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              fontSize: titleSize,
-                              height: 1.05,
-                              fontWeight: FontWeight.w800,
-                              color: AppDesign.primaryDark,
-                            ),
-                      ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: InkWell(
+                  onTap: onTitleTap,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontSize: titleSize,
+                      height: 1.05,
+                      fontWeight: FontWeight.w800,
+                      color: AppDesign.primaryDark,
                     ),
                   ),
                 ),
               ),
+              if (menuCourses.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                for (final course in menuCourses)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Row(children: [
+                      Icon(
+                        course['course'] == 'starter' ? Icons.soup_kitchen_rounded : Icons.cake_rounded,
+                        color: AppDesign.iconGold,
+                        size: 19,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(
+                        '${course['course'] == 'starter' ? 'Vorspeise' : 'Nachtisch'} · ${course['name'] ?? 'Rezept'}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                      )),
+                    ]),
+                  ),
+              ],
+              if (onManageMenu != null)
+                Align(
+                  alignment: Alignment.center,
+                  child: TextButton.icon(
+                    onPressed: onManageMenu,
+                    icon: const Icon(Icons.restaurant_menu_rounded, size: 18),
+                    label: Text(menuCourses.isEmpty ? 'Vorspeise oder Nachtisch ergänzen' : 'Menü bearbeiten'),
+                    style: TextButton.styleFrom(foregroundColor: AppDesign.primaryDark),
+                  ),
+                ),
         ],
       ),
     );

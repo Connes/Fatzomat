@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -270,6 +271,22 @@ class PersonalTodayRepository {
           : 'Gemeinsam geplant · $name';
     }
     return labels;
+  }
+
+  /// Stores optional starter and dessert selections on an existing recipe plan.
+  Future<void> saveMenuCourses(String planId, List<Map<String, dynamic>> courses) async {
+    final payload = courses.isEmpty
+        ? null
+        : <String, dynamic>{
+            'type': 'fatzomat_menu',
+            'version': 1,
+            'courses': courses,
+          };
+    await client
+        .from('personal_today_plans')
+        .update({'decision_value': payload == null ? null : jsonEncode(payload)})
+        .eq('id', planId);
+    RecipeCollectionEvents.notifyChanged();
   }
 
   Future<bool> updateServings(String planId, int servings) async {
