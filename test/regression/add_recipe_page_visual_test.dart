@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:food_app_mvp/core/app_design.dart';
 import 'package:food_app_mvp/features/recipes/add_recipe_page.dart';
@@ -209,5 +210,58 @@ test('Rezeptvorschau integriert Überschriften in Karten und trennt Zutatenberei
   expect(source, isNot(contains("_SectionTitle(title: 'Zubereitung')")));
 });
 
+
+
+testWidgets('Rezepteditor zeigt Ernährungs-Tags mit Filter-Icons und Häkchen statt Checkboxen', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: AppDesign.theme(),
+      home: ManualRecipePage(
+        initialRecipe: const Recipe(
+          id: 'food-tag-dropdown-test',
+          name: 'Testrezept',
+          description: '',
+          servings: 2,
+          prepTimeMinutes: 10,
+          cookTimeMinutes: 20,
+          difficulty: 'Einfach',
+          category: 'Hauptgericht',
+          foodTags: ['Vegetarisch'],
+          instructions: ['Schritt 1'],
+          ingredients: [RecipeIngredient(name: 'Tomate', quantity: 2, unit: 'Stück')],
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+
+  final listView = find.byType(ListView).first;
+  final scrollable = find.descendant(
+    of: listView,
+    matching: find.byWidgetPredicate(
+      (widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down,
+    ),
+  ).first;
+  await tester.scrollUntilVisible(
+    find.text('Ernährungsart / Hauptzutat'),
+    220,
+    scrollable: scrollable,
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Ernährungsart / Hauptzutat'));
+  await tester.pumpAndSettle();
+
+  expect(find.byType(SvgPicture), findsNWidgets(3));
+  expect(find.byIcon(Icons.eco_rounded), findsOneWidget);
+  expect(find.byIcon(Icons.set_meal_rounded), findsOneWidget);
+  expect(find.byIcon(Icons.check_box_rounded), findsNothing);
+  expect(find.byIcon(Icons.check_box_outline_blank_rounded), findsNothing);
+  expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+
+  await tester.tap(find.text('Rind'));
+  await tester.pumpAndSettle();
+  expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+  expect(find.byIcon(Icons.check_box_rounded), findsNothing);
+});
 
 }
