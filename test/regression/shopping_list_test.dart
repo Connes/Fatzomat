@@ -74,8 +74,10 @@ void main() {
     final recipeCardEnd = page.indexOf("                                        ))", recipeCardStart);
     final recipeCard = page.substring(recipeCardStart, recipeCardEnd);
 
+    expect(recipeCard, contains('contentPadding: const EdgeInsets.symmetric(horizontal: 16)'));
     expect(recipeCard, contains('title: Row('));
     expect(recipeCard, contains('Expanded('));
+    expect(recipeCard, contains('constraints: const BoxConstraints(minWidth: 40, minHeight: 40)'));
     expect(recipeCard, contains("tooltip: 'Offene Zutaten dieses Rezepts teilen'"));
     expect(recipeCard, contains('icon: const Icon(Icons.share_rounded)'));
     expect(recipeCard, isNot(contains('leading:')));
