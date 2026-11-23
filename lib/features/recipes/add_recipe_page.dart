@@ -1860,7 +1860,7 @@ class _RecipeFoodTagsField extends StatelessWidget {
     required this.onChanged,
   });
 
-  static const options = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
+  static const options = <String>['Schwein', 'Rind', 'Huhn', 'Vegetarisch', 'Fisch'];
 
   Set<String> _toggle(String tag, Set<String> current) {
     final next = Set<String>.from(current);
