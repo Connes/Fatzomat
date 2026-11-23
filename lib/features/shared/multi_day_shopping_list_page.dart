@@ -915,7 +915,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     : _plansFor(day)
                                     .where((plan) => plan.isRecipe && plan.status == 'planned')
                                     .map((plan) => ListTile(
-                                          contentPadding: EdgeInsets.zero,
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                                           title: Row(
                                             children: [
                                               Expanded(
@@ -935,6 +935,8 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                 icon: const Icon(Icons.share_rounded),
                                                 color: AppDesign.iconGold,
                                                 visualDensity: VisualDensity.compact,
+                                                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                                                padding: EdgeInsets.zero,
                                               ),
                                             ],
                                           ),
