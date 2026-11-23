@@ -2013,8 +2013,7 @@ class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
                         if (!widget.multiSelect) {
                           Future<void>.delayed(const Duration(milliseconds: 200), () {
                             if (menuContext.mounted) Navigator.of(menuContext).pop();
-                            _menuSelection?.dispose();
-                            _menuSelection = null;
+                            // PopupMenuButton.onCanceled owns notifier cleanup.
                           });
                         }
                       },
