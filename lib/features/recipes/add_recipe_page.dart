@@ -1396,7 +1396,6 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   String servingsUnit = 'Personen';
   String category = '';
   final Set<String> foodTags = <String>{};
-  static const availableFoodTags = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
   final prep = TextEditingController();
   final cook = TextEditingController();
   final difficulty = TextEditingController(text: 'Einfach');
@@ -1744,7 +1743,6 @@ class _RecipeFieldCard extends StatelessWidget {
   final String? hint;
   final TextEditingController controller;
   final TextInputType? keyboardType;
-  final int? maxLines;
 
   const _RecipeFieldCard({
     required this.icon,
@@ -1752,7 +1750,6 @@ class _RecipeFieldCard extends StatelessWidget {
     this.hint,
     required this.controller,
     this.keyboardType,
-    this.maxLines = 1,
   });
 
   @override
@@ -1765,7 +1762,7 @@ class _RecipeFieldCard extends StatelessWidget {
         boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Row(
-        crossAxisAlignment: maxLines == null || maxLines! > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: 54,
@@ -1781,8 +1778,7 @@ class _RecipeFieldCard extends StatelessWidget {
             child: TextField(
               controller: controller,
               keyboardType: keyboardType,
-              minLines: maxLines == null ? 1 : null,
-              maxLines: maxLines,
+              maxLines: 1,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
                 labelText: label,
