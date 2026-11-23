@@ -29,6 +29,17 @@ import 'recipe_detail_page.dart';
 import '../../data/services/recipe_image_service.dart';
 import '../../data/services/recipe_share_card_service.dart';
 
+/// Applies the two independent saved-recipe filters together.
+bool recipeMatchesLibraryFilters(
+  Recipe recipe, {
+  String? category,
+  String? foodTag,
+}) {
+  if (category != null && recipe.category.trim() != category) return false;
+  if (foodTag != null && !recipe.foodTags.contains(foodTag)) return false;
+  return true;
+}
+
 /// Filters a saved recipe against the cooking summary selection.
 ///
 /// Recipes carry their ingredients in `recipe_ingredients`. The main choice is
@@ -616,9 +627,11 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           !recipe.description.toLowerCase().contains(normalizedQuery)) {
         return false;
       }
-      if (categoryFilter != null && recipe.category.trim() != categoryFilter) return false;
-      if (mainIngredientFilter != null &&
-          !recipe.foodTags.contains(mainIngredientFilter)) {
+      if (!recipeMatchesLibraryFilters(
+        recipe,
+        category: categoryFilter,
+        foodTag: mainIngredientFilter,
+      )) {
         return false;
       }
       if (FoodPreferenceRecipeGuard.findDislikedIngredients(
