@@ -465,11 +465,13 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     required Iterable<ShoppingItem> items,
     required String title,
     String? subtitle,
+    int? servings,
   }) async {
     final text = _shareService.buildText(
       items: items,
       title: title,
       subtitle: subtitle,
+      servings: servings,
     );
     if (text.isEmpty) {
       if (mounted) {
@@ -496,8 +498,9 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     final items = _items.where((item) => item.planId == plan.id);
     await _shareShoppingItems(
       items: items,
-      title: 'Einkaufsliste · ${plan.displayTitle}',
-      subtitle: '${plan.servings} Personen',
+      title: 'Meine Einkaufsliste',
+      subtitle: plan.displayTitle,
+      servings: plan.servings,
     );
   }
 
@@ -912,44 +915,53 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     : _plansFor(day)
                                     .where((plan) => plan.isRecipe && plan.status == 'planned')
                                     .map((plan) => ListTile(
+                                          contentPadding: EdgeInsets.zero,
                                           leading: const Icon(
                                             Icons.restaurant_menu_rounded,
-                                            color: AppDesign.primaryDark,
+                                            color: AppDesign.iconGold,
                                           ),
                                           title: Text(
                                             plan.displayTitle,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(color: AppDesign.text),
                                           ),
-                                          subtitle: Text(
-                                            '${plan.servings} Personen',
-                                            style: const TextStyle(color: AppDesign.secondaryText),
-                                          ),
-                                          trailing: Row(
-                                            mainAxisSize: MainAxisSize.min,
+                                          subtitle: Row(
                                             children: [
-                                              IconButton(
-                                                tooltip: 'Offene Zutaten dieses Rezepts teilen',
-                                                onPressed: _items.any((item) =>
-                                                        item.planId == plan.id && !item.checked)
-                                                    ? () => _shareRecipeShoppingList(plan)
-                                                    : null,
-                                                icon: const Icon(Icons.share_rounded),
-                                                color: AppDesign.primaryDark,
-                                                visualDensity: VisualDensity.compact,
+                                              Text(
+                                                '${plan.servings} Personen',
+                                                style: const TextStyle(color: AppDesign.secondaryText),
                                               ),
+                                              const SizedBox(width: 8),
                                               IconButton(
                                                 tooltip: 'Eine Person weniger',
                                                 onPressed: plan.servings <= 1
                                                     ? null
                                                     : () => _updatePlanServings(plan, plan.servings - 1),
                                                 icon: const Icon(Icons.remove_circle_outline_rounded),
+                                                visualDensity: VisualDensity.compact,
+                                                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+                                                padding: EdgeInsets.zero,
                                               ),
                                               IconButton(
                                                 tooltip: 'Eine Person mehr',
                                                 onPressed: () => _updatePlanServings(plan, plan.servings + 1),
                                                 icon: const Icon(Icons.add_circle_outline_rounded),
+                                                visualDensity: VisualDensity.compact,
+                                                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+                                                padding: EdgeInsets.zero,
                                               ),
                                             ],
+                                          ),
+                                          trailing: IconButton(
+                                            tooltip: 'Offene Zutaten dieses Rezepts teilen',
+                                            onPressed: _items.any((item) =>
+                                                    item.planId == plan.id && !item.checked)
+                                                ? () => _shareRecipeShoppingList(plan)
+                                                : null,
+                                            icon: const Icon(Icons.share_rounded),
+                                            color: AppDesign.iconGold,
+                                            visualDensity: VisualDensity.compact,
                                           ),
                                         ))
                                     .toList(),
@@ -995,21 +1007,23 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                       tooltip: 'Alle offenen Zutaten teilen',
                                       onPressed: aggregated.any((item) => !item.checked)
                                           ? () {
-                                              final recipeNames = selectedDays
+                                              final recipes = selectedDays
                                                   .expand(_plansFor)
                                                   .where((plan) => plan.isRecipe)
-                                                  .map((plan) => plan.displayTitle)
-                                                  .toSet()
-                                                  .join(', ');
+                                                  .toList();
+                                              final singleRecipe = recipes.length == 1
+                                                  ? recipes.single
+                                                  : null;
                                               _shareShoppingItems(
                                                 items: visibleItems,
                                                 title: 'Meine Einkaufsliste',
-                                                subtitle: recipeNames.isEmpty ? null : recipeNames,
+                                                subtitle: singleRecipe?.displayTitle,
+                                                servings: singleRecipe?.servings,
                                               );
                                             }
                                           : null,
                                       icon: const Icon(Icons.share_rounded),
-                                      color: AppDesign.primaryDark,
+                                      color: AppDesign.iconGold,
                                     ),
                                   ],
                                 ),
