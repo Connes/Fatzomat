@@ -519,3 +519,14 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Mehrfachauswahl und die bestehende Exklusivregel für „Vegetarisch“ bleiben unverändert.
 - Regressionstest in `test/regression/add_recipe_page_visual_test.dart` prüft Symbole, Häkchen und das Fehlen der Checkboxen.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Optionale Menüplanung auf der Heute-Seite (2026-11-23)
+
+- Eigenständiger Feature-Branch `feature/today-multi-course-menu`; die bisherige Heute-Seite auf `main` bleibt unverändert und kann durch Schließen des PRs unangetastet bleiben.
+- Nach Auswahl eines Hauptgerichts lässt sich über „Vorspeise oder Nachtisch ergänzen“ ein Menü bearbeiten. Beide Gänge bleiben optional und können wieder entfernt werden.
+- Die Menüauswahl wird als versionierte JSON-Metadaten in `personal_today_plans.decision_value` gespeichert; bestehende Restaurantentscheidungen verwenden das Feld weiterhin unabhängig. Es ist keine Datenbankmigration erforderlich.
+- Die Heute-Karte zeigt ausgewählte Zusatzgänge unter dem Hauptgericht und bietet „Menü bearbeiten“.
+- Vorspeise/Nachtisch werden aus den gespeicherten Rezepten gewählt. Eine gemeinsame aggregierte Einkaufsliste und ein zeitlich sortierter Kochplan sind noch nicht Teil dieses ersten Ausbauschritts.
+- Regressionstest für das Lesen der Menü-Metadaten: `test/data/models/today_plan_menu_test.dart`.
+- CI, Code-Review und Gerätetest stehen noch aus. Nicht mergen, bevor Pflicht-CI vollständig grün ist.
