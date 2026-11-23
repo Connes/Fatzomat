@@ -412,3 +412,13 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Rezeptname und Metadaten im Cover-Footer verwenden eine TextPainter-Layoutbreite mit gesetzter Mindestbreite, damit die Textausrichtung tatsächlich mittig auf der gesamten Footer-Breite erfolgt.
 - Zutaten-Untergruppen wie „Hauptzutaten“ oder „Soße“ werden in der WhatsApp-Bildunterschrift mit `_...:_` markiert und damit kursiv dargestellt.
 - Regressionstests prüfen die kursiv markierten Gruppenüberschriften.
+
+
+## Einkaufsliste teilen (Arbeitsstand 2026-11-23)
+
+- In der Rezeptkarte gibt es eine Teilen-Aktion für ausschließlich die noch offenen Zutaten dieses Rezepts.
+- Neben „Zusammengefasste Zutaten“ gibt es eine zweite Teilen-Aktion für die offene, zusammengefasste Einkaufsliste aller aktuell ausgewählten und nicht abgeschlossenen Tage/Rezeptpläne.
+- Beide Aktionen verwenden das native Android-/iOS-Share-Sheet (`share_plus`); WhatsApp ist dort als mögliches Ziel auswählbar. Die App sendet nicht automatisch an Kontakte.
+- `ShoppingListShareService` filtert abgehakte Einträge vor der Aggregation heraus, fasst offene Duplikate mit der vorhandenen Aggregationslogik zusammen und erhält Kategorien, Mengen und Einheiten.
+- Regressionstests prüfen offene/abgehakte Zutaten, Mengenaggregation und den Leerzustand ohne offene Zutaten.
+- PR/CI und Geräteprüfung stehen noch aus.
