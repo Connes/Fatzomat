@@ -49,26 +49,6 @@ class RecipeShareCardService {
       _drawText(canvas, 'FATZOMAT', const Offset(72, 110), 44, Colors.white, bold: true);
     }
 
-    canvas.drawRect(
-      photoRect,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.transparent, Color(0xCC10251C)],
-          stops: [0.38, 1],
-        ).createShader(photoRect),
-    );
-    _drawText(
-      canvas,
-      recipe.name.trim().isEmpty ? 'Leckeres Rezept' : recipe.name.trim(),
-      const Offset(64, 485),
-      76,
-      Colors.white,
-      bold: true,
-      maxWidth: 950,
-      maxLines: 2,
-    );
     canvas.restore();
     photo?.dispose();
 
@@ -81,7 +61,7 @@ class RecipeShareCardService {
       if (total > 0) '${total} Min.',
       _difficulty(recipe.difficulty),
     ].where((value) => value.trim().isNotEmpty).join('   •   ');
-    _drawText(canvas, meta, const Offset(64, 890), 42, const Color(0xFF1D3829), bold: true, maxWidth: 950, maxLines: 2);
+    _drawCenteredText(canvas, meta, const Rect.fromLTWH(64, 880, 952, 100), 42, const Color(0xFF1D3829), bold: true, maxLines: 2);
 
     final picture = recorder.endRecording();
     final image = await picture.toImage(_width, _height);
