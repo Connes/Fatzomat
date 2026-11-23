@@ -68,6 +68,22 @@ void main() {
     expect(migration, contains('shopping personal insert'));
   });
 
+  test('expanded recipe card omits cutlery and aligns share action with recipe title', () {
+    final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
+    final recipeCardStart = page.indexOf(".map((plan) => ListTile(");
+    final recipeCardEnd = page.indexOf("                                        ))", recipeCardStart);
+    final recipeCard = page.substring(recipeCardStart, recipeCardEnd);
+
+    expect(recipeCard, contains('title: Row('));
+    expect(recipeCard, contains('Expanded('));
+    expect(recipeCard, contains("tooltip: 'Offene Zutaten dieses Rezepts teilen'"));
+    expect(recipeCard, contains('icon: const Icon(Icons.share_rounded)'));
+    expect(recipeCard, isNot(contains('leading:')));
+    expect(recipeCard, isNot(contains('Icons.restaurant_menu_rounded')));
+    expect(recipeCard, isNot(contains('trailing:')));
+    expect(recipeCard, contains('subtitle: Row('));
+  });
+
   test('multi-day shopping list polish and checked-row visibility delay', () {
     final page = File('lib/features/shared/multi_day_shopping_list_page.dart').readAsStringSync();
 

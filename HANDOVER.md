@@ -424,3 +424,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Der Teilen-Text beginnt mit „🛒 Meine Einkaufsliste“, danach folgen Gericht und bei Einzelrezepten die Personenzahl. „Offene Zutaten“ ist fett, alle Kategorie-Unterüberschriften sind kursiv; ein zusätzlicher Fatzomat-Footer wird nicht ausgegeben.
 - Die Rezeptzeile zeigt den Gerichtsnamen einzeilig, darunter Personenzahl mit Minus/Plus und rechts außen das Teilen-Symbol. Besteck- und Teilen-Symbole verwenden `AppDesign.iconGold`.
 - Formatierungs- und Aggregationstests decken den neuen Textaufbau ab.
+
+
+## Einkaufsliste: Rezept-Teilen-Aktion bündig ausrichten (2026-11-23)
+
+- In der aufgeklappten Tageskarte entfällt das Besteck-Symbol vollständig.
+- Die Teilen-Aktion steht jetzt in derselben Zeile wie der Rezeptname, rechts bündig. Dadurch liegt sie auf derselben horizontalen Achse wie das Teilen-Symbol bei „Zusammengefasste Zutaten“.
+- Personenzahl sowie Minus-/Plus-Aktionen bleiben in der Zeile darunter.
+- Regressionstest in `test/regression/shopping_list_test.dart` sichert das Fehlen des Besteck-Icons und die Positionierung der Teilen-Aktion in der Titelzeile ab.
+- PR/CI und Geräteprüfung stehen noch aus.
