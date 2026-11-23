@@ -16,4 +16,14 @@ void main() {
     expect(source, contains("textAlign: TextAlign.center"));
     expect(source, contains("color: AppDesign.surface.withValues(alpha: .96)"));
   });
+
+  test('Rezeptprüfung verlangt keine Zutatenmenge oder Einheit', () {
+    final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
+
+    expect(source, contains("item.name.trim().isEmpty"));
+    expect(source, isNot(contains("item.quantity <= 0")));
+    expect(source, isNot(contains("positive Menge eingeben")));
+    expect(source, contains("Ingredient quantity and unit are optional"));
+    expect(source, isNot(contains("ingredient.amount.text.trim().replaceAll(',', '.')")));
+  });
 }
