@@ -471,3 +471,5 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Der erste CI-Lauf auf PR-Head `426cc1c23599e79d2a2e8a1b32eef0fefaece9c6` meldete einen Fehler im Widgettest `Rezept bearbeiten verwendet die bestehende responsive Editor-Struktur`: `scrollUntilVisible` erhielt versehentlich den Finder der `ListView` statt den darin liegenden `Scrollable`.
 - Der Test ermittelt nun den `Scrollable` als Nachfahren der `ListView`, prüft dessen Eindeutigkeit und übergibt diesen Finder an `scrollUntilVisible`.
 - Korrektur-Commit: `49e7710053ba31083070399acf4c7c91285ef727`. CI für diesen neuen Head muss vollständig erneut geprüft werden; bis dahin kein Merge.
+
+- Der nächste Lauf zeigte, dass innerhalb der ListView zusätzlich Scrollables der Textfelder liegen. Der Finder ist deshalb weiter eingegrenzt auf den vertikalen Scrollable und nimmt den ersten Treffer (äußerer Listen-Scroller). Korrektur-Commit `b4ac8b8ec2d2c9402822cb7fb9f68f76c814cae1`; erneute CI-Prüfung läuft.
