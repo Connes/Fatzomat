@@ -33,6 +33,24 @@ class TodayPlan {
 
   bool get isRecipe => decisionType == 'recipe' && recipeId != null;
 
+  /// Optional starter/dessert selections stored alongside the main recipe plan.
+  List<Map<String, dynamic>> get menuCourses {
+    final raw = decisionValue?.trim() ?? '';
+    if (raw.isEmpty || !raw.startsWith('{')) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map || decoded['type'] != 'fatzomat_menu') return const [];
+      final courses = decoded['courses'];
+      if (courses is! List) return const [];
+      return courses
+          .whereType<Map>()
+          .map((course) => Map<String, dynamic>.from(course))
+          .toList(growable: false);
+    } catch (_) {
+      return const [];
+    }
+  }
+
   Map<String, dynamic> get restaurantData {
     if (decisionType != 'dine_out' || decisionValue == null) return const <String, dynamic>{};
     try {
