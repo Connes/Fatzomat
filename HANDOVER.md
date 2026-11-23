@@ -405,3 +405,10 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Im Footer bleiben Rezeptname und Metadaten (Portionen, Gesamtzeit, Schwierigkeitsgrad) erhalten; beide Elemente werden horizontal zentriert.
 - Zutaten-/Zubereitungstext und hängender Einzug bleiben unverändert.
 - WhatsApp-Gerätedarstellung nach dem Merge erneut prüfen.
+
+
+## WhatsApp-Rezeptdarstellung: Zentrierung und Untergruppen (Arbeitsstand 2026-11-23)
+
+- Rezeptname und Metadaten im Cover-Footer verwenden eine TextPainter-Layoutbreite mit gesetzter Mindestbreite, damit die Textausrichtung tatsächlich mittig auf der gesamten Footer-Breite erfolgt.
+- Zutaten-Untergruppen wie „Hauptzutaten“ oder „Soße“ werden in der WhatsApp-Bildunterschrift mit `_...:_` markiert und damit kursiv dargestellt.
+- Regressionstests prüfen die kursiv markierten Gruppenüberschriften.
