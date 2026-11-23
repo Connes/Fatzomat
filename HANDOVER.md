@@ -464,3 +464,10 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Fehlende Zutatenmengen aus dem Import werden intern als qualitative Menge mit neutralem Speicherwert 1 behandelt, damit das bestehende positive Mengen-Datenbankschema erhalten bleibt; die Anzeige blendet den Zahlenwert bei qualitativen Zutaten aus.
 - Regressionstests für Modell, Import/Export, kombinierte Filter, Prompt-Regeln und optionale Zutatenmengen hinzugefügt.
 - PR und CI stehen noch aus; Supabase-Schema und Backfill sind live angewendet und per SELECT verifiziert.
+
+
+## CI-Korrektur Rezeptarten-PR #450 (2026-11-23)
+
+- Der erste CI-Lauf auf PR-Head `426cc1c23599e79d2a2e8a1b32eef0fefaece9c6` meldete einen Fehler im Widgettest `Rezept bearbeiten verwendet die bestehende responsive Editor-Struktur`: `scrollUntilVisible` erhielt versehentlich den Finder der `ListView` statt den darin liegenden `Scrollable`.
+- Der Test ermittelt nun den `Scrollable` als Nachfahren der `ListView`, prüft dessen Eindeutigkeit und übergibt diesen Finder an `scrollUntilVisible`.
+- Korrektur-Commit: `49e7710053ba31083070399acf4c7c91285ef727`. CI für diesen neuen Head muss vollständig erneut geprüft werden; bis dahin kein Merge.
