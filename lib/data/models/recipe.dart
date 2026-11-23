@@ -49,7 +49,7 @@ class Recipe {
         cookTimeMinutes: _int(map['cook_time_minutes']),
         difficulty: map['difficulty']?.toString() ?? 'Einfach',
         category: map['category']?.toString().trim() ?? '',
-        foodTags: _strings(map['food_tags'] ?? map['foodTags']),
+        foodTags: normalizeFoodTags(map['food_tags'] ?? map['foodTags']),
         instructions: _strings(map['instructions'] ?? map['steps']),
         ingredients: ((map['ingredients'] ?? map['recipe_ingredients']) as List? ?? const [])
             .whereType<Map>()
@@ -134,6 +134,20 @@ class Recipe {
         'image_url': imageUrl,
         'ingredients': ingredients.map((e) => e.toMap()).toList(),
       };
+
+  static const supportedFoodTags = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
+
+  static List<String> normalizeFoodTags(dynamic value) {
+    if (value is! List) return const <String>[];
+    final normalized = value
+        .map((item) => item.toString().trim())
+        .where((item) => supportedFoodTags.contains(item))
+        .toSet();
+    if (normalized.contains('Vegetarisch')) {
+      normalized.removeAll({'Schwein', 'Rind', 'Huhn', 'Fisch'});
+    }
+    return supportedFoodTags.where(normalized.contains).toList(growable: false);
+  }
 
   static String _normalizeServingsUnit(dynamic value) {
     final unit = value?.toString().trim().toLowerCase();
