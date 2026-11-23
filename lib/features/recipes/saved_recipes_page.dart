@@ -618,8 +618,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
       }
       if (categoryFilter != null && recipe.category.trim() != categoryFilter) return false;
       if (mainIngredientFilter != null &&
-          !(recipe.foodTags.contains(mainIngredientFilter) ||
-            recipeModelMatchesSelection(recipe, mainChoice: mainIngredientFilter))) {
+          !recipe.foodTags.contains(mainIngredientFilter)) {
         return false;
       }
       if (FoodPreferenceRecipeGuard.findDislikedIngredients(
