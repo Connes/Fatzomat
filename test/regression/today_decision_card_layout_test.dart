@@ -19,7 +19,7 @@ void main() {
     final content = source.substring(contentStart, actionsStart);
     final actions = source.substring(actionsStart);
 
-    expect(card, contains('height: _todayDecisionCardHeight(context)'));
+    expect(card, contains('height: _todayDecisionCardHeight(context) + (plan.menuCourses.isEmpty ? 0 : 156)'));
     expect(card, contains('_TodayDecisionCardHeader('));
     expect(card, contains('Expanded('));
     expect(card, contains('_TodayDecisionCardContent('));
@@ -31,8 +31,10 @@ void main() {
     expect(content, contains('onTap: onTitleTap'));
     expect(header, isNot(contains('onTap:')));
     expect(content, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
-    expect(content, contains('Expanded('));
-    expect(content, contains('child: Center('));
+    expect(content, contains('menuCourses'));
+    expect(content, contains('onManageMenu'));
+    expect(content, contains('Vorspeise'));
+    expect(content, contains('Nachtisch'));
     expect(content, contains('maxLines: 2'));
     expect(content, contains('TextOverflow.ellipsis'));
     expect(actions, contains('height: 58'));
