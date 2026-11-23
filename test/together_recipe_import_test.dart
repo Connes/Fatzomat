@@ -147,7 +147,8 @@ void main() {
 
     expect(recipe.ingredients, hasLength(1));
     expect(recipe.ingredients.single.name, 'Salz');
-    expect(recipe.ingredients.single.quantity, 0);
+    expect(recipe.ingredients.single.quantity, 1);
+    expect(recipe.ingredients.single.hidesQuantity, isTrue);
   });
 
   test('accepts incomplete recipe metadata and missing ingredient and step lists', () {
