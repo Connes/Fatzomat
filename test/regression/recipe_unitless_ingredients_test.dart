@@ -56,6 +56,25 @@ void main() {
     expect(sql, contains("if ingredient_name = '' then raise exception 'Eine Zutat benötigt einen Namen.'; end if;"));
   });
 
+  test('imported ingredient without an amount stays quantity-optional with a unit', () {
+    const importer = TogetherRecipeImporter();
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': 'Teig',
+        'ingredients': [
+          {'name': 'Mehl', 'unit': 'g'},
+        ],
+        'steps': ['Mischen'],
+      },
+    }));
+
+    expect(recipe.ingredients.single.unit, 'g');
+    expect(recipe.ingredients.single.quantityIsOptional, isTrue);
+    expect(recipe.ingredients.single.hidesQuantity, isTrue);
+  });
+
   test('optional amount stays hidden independently from its unit', () {
     const ingredient = RecipeIngredient(
       name: 'Mehl',
