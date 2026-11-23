@@ -547,4 +547,4 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Auf der Ergebniskarte skaliert der Inhalt auf kleineren Displays kompakter: Rezeptbild, Rezeptname, Zusatzgangzeilen und Menü-Bearbeiten-Aktion werden angepasst. Es wird ausdrücklich kein Scrollbereich ergänzt.
 - Die Aktionsleiste bleibt außerhalb des flexiblen Inhaltsbereichs und vollständig sichtbar.
 - Regressionstests für identische Kartenhöhen und die kompakte Darstellung aktualisiert.
-- PR und Pflicht-CI stehen noch aus. Kein Geräte-/Simulator-Test durchgeführt.
+- PR #459: Die erste CI-Runde deckte zwei veraltete Regressionserwartungen an die frühere Kartenhöhe/Bildhöhe auf; diese Tests wurden aktualisiert. Neue Pflicht-CI läuft. Kein Geräte-/Simulator-Test durchgeführt.
