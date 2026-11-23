@@ -450,3 +450,16 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.
 - Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptarten und unabhängige Ernährungs-/Hauptzutatenmerkmale (2026-11-23)
+
+- Rezeptart bleibt ein einzelnes Feld `recipes.category`: Hauptgericht, Süßspeise, Beilage, Salat, Suppe, Snack oder Frühstück.
+- Neue unabhängige Spalte `recipes.food_tags text[] not null default '{}'` speichert optionale Merkmale: Schwein, Rind, Huhn, Fisch und Vegetarisch. Vegetarisch wird nicht zusammen mit Fleisch-/Fisch-Tags gespeichert.
+- Supabase-Migrationen `20261123140756_recipe_food_tags` und `20261123141435_backfill_existing_recipe_types` wurden auf Projekt `oidxezjdwqktpxuypbfb` angewendet. Die vorhandenen Rezepte wurden anhand erkennbarer Zutaten konservativ klassifiziert; bekannte Dessertnamen als Süßspeise und klare Mahlzeiten als Hauptgericht.
+- Flutter-Modell, Repository, JSON-Import/-Export und ChatGPT-Prompts lesen bzw. speichern `food_tags` unabhängig von `category`. Das together_recipe-Format Version 1 erhält nur ein optionales Feld, keine neue Pflichtangabe.
+- Manuelle Rezeptbearbeitung bietet Mehrfachauswahl der Merkmale. Rezeptkarten zeigen Rezeptart und Merkmale.
+- Bibliotheksfilter sind getrennt: Rezeptart und Ernährungsart/Hauptzutat. Beide können kombiniert werden (UND-Verknüpfung). Fehlende Tags werden nicht automatisch geraten.
+- Die bisherige Pflichtprüfung auf positive Zutatenmengen wurde im selben Feature-Branch ebenfalls entfernt, damit die offene Korrektur für Eier/Zutaten ohne Menge mit ausgeliefert wird.
+- Regressionstests für Modell, Import/Export, kombinierte Filter, Prompt-Regeln und optionale Zutatenmengen hinzugefügt.
+- PR und CI stehen noch aus; Supabase-Schema und Backfill sind live angewendet und per SELECT verifiziert.
