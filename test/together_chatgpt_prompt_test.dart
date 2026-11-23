@@ -110,15 +110,19 @@ void main() {
     expect(prompt, isNot(contains('fotorealistisches, appetitliches Bild')));
   });
 
-  test('photo import prompt continues to return only recipe JSON', () {
+  test('photo import prompt creates a real JSON attachment and keeps data out of chat', () {
     final prompt = TogetherChatGptPrompt.buildPhotoImportPrompt();
 
     expect(prompt, contains('together_recipe.json'));
-    expect(prompt, contains('Das Ergebnis muss syntaktisch gültiges JSON sein.'));
+    expect(prompt, contains('Das Ergebnis muss syntaktisch gültiges JSON'));
     expect(prompt, contains('Eine Einheit ist optional.'));
     expect(prompt, contains('setze "unit": ""'));
-    expect(prompt, contains('Stelle ausschließlich die erzeugte JSON-Datei als herunterladbaren Dateianhang bereit.'));
-    expect(prompt, contains('Gib den JSON-Inhalt niemals im Chat aus'));
-    expect(prompt, isNot(contains('Gib nur das JSON bzw. die erzeugte Datei zurück.')));
+    expect(prompt, contains('Erzeuge die Datei'));
+    expect(prompt, contains('json.dump'));
+    expect(prompt, contains('anklickbaren Download-Link'));
+    expect(prompt, contains('Python-Dictionary-Darstellungen'));
+    expect(prompt, contains('keine Zeile wie „recipe_data =“'));
+    expect(prompt, contains('keinesfalls ersatzweise den Rezeptinhalt'));
+    expect(prompt, isNot(contains('Keine Einleitung und keine Erklärung außerhalb des JSON.')));
   });
 }
