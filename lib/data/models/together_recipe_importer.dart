@@ -129,7 +129,7 @@ class TogetherRecipeImporter {
 
       final hasAmount = item.containsKey('amount') || item.containsKey('quantity');
       final rawAmount = item.containsKey('amount') ? item['amount'] : item['quantity'];
-      final isQualitative = hasAmount && rawAmount == null;
+      final isQualitative = !hasAmount || rawAmount == null;
       final quantity = _number(rawAmount) ?? (isQualitative ? 1 : 0);
       if (quantity > 100000) {
         throw TogetherRecipeImportException(
