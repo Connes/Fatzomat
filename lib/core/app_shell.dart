@@ -23,8 +23,16 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   final ValueNotifier<DateTime?> _notificationDateSignal = ValueNotifier<DateTime?>(null);
+  final GlobalKey<SavedRecipesPageState> _savedRecipesKey = GlobalKey<SavedRecipesPageState>();
+
+  void _resetRecipeFiltersWhenLeaving(int targetIndex) {
+    if (index == 1 && targetIndex != 1) {
+      _savedRecipesKey.currentState?.resetFilters();
+    }
+  }
 
   void _handleNotificationNavigation(DateTime? targetDate) {
+    _resetRecipeFiltersWhenLeaving(0);
     // Close any detail route inside the shell without disposing the IndexedStack.
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     // Keep the existing IndexedStack alive, especially the shopping-list page
@@ -57,6 +65,7 @@ class _AppShellState extends State<AppShell> {
 
   // Recipe selection returns to Today without resetting the date the user chose.
   void _returnToTodayPreservingDate() {
+    _resetRecipeFiltersWhenLeaving(0);
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     if (index != 0) {
       setState(() {
@@ -67,6 +76,7 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _selectTab(int value) {
+    _resetRecipeFiltersWhenLeaving(value);
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     if (value == 0) {
       // Tapping Heute is an explicit request to return to the real current day,
@@ -107,6 +117,7 @@ class _AppShellState extends State<AppShell> {
           return;
         }
         if (index != 0) {
+          _resetRecipeFiltersWhenLeaving(0);
           setState(() {
             index = 0;
             _contentIndex.value = 0;
@@ -133,6 +144,7 @@ class _AppShellState extends State<AppShell> {
         notificationDateSignal: _notificationDateSignal,
       ),
       SavedRecipesPage(
+        key: _savedRecipesKey,
         onNavigateToTab: _selectTab,
         onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),
       ),
