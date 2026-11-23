@@ -43,6 +43,7 @@ class RecipeRepository {
             'is_user_selected': i.isUserSelected,
             'is_additional': i.isAdditional,
             'is_qualitative': i.isQualitative,
+            'quantity_is_optional': i.quantityIsOptional,
             'section': i.section,
           })
       .toList(growable: false);
