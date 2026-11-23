@@ -397,3 +397,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Rezeptname steht nun zentriert im Footer anstelle des Slogans; Portions-/Zeit-/Schwierigkeits-Metadaten bleiben darunter erhalten.
 - Zutatenzeilen erhalten bei manuellem Umbruch einen hängenden Einzug mit geschützten Leerzeichen, sodass Folgezeilen optisch unter dem Zutaten-Text statt unter dem Aufzählungspunkt beginnen.
 - Regressionstest für den hängenden Einzug ergänzt. WhatsApp-Darstellung und Umbruchbreite müssen nach dem Merge auf dem Zielgerät geprüft werden.
+
+
+## Rezept-Cover: Bildtitel entfernen und Footer zentrieren (Arbeitsstand 2026-11-23)
+
+- Der Rezeptname wird nicht mehr über das Rezeptfoto gelegt.
+- Im Footer bleiben Rezeptname und Metadaten (Portionen, Gesamtzeit, Schwierigkeitsgrad) erhalten; beide Elemente werden horizontal zentriert.
+- Zutaten-/Zubereitungstext und hängender Einzug bleiben unverändert.
+- WhatsApp-Gerätedarstellung nach dem Merge erneut prüfen.
