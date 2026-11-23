@@ -421,4 +421,6 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Beide Aktionen verwenden das native Android-/iOS-Share-Sheet (`share_plus`); WhatsApp ist dort als mögliches Ziel auswählbar. Die App sendet nicht automatisch an Kontakte.
 - `ShoppingListShareService` filtert abgehakte Einträge vor der Aggregation heraus, fasst offene Duplikate mit der vorhandenen Aggregationslogik zusammen und erhält Kategorien, Mengen und Einheiten.
 - Regressionstests prüfen offene/abgehakte Zutaten, Mengenaggregation und den Leerzustand ohne offene Zutaten.
-- PR/CI und Geräteprüfung stehen noch aus.
+- Der Teilen-Text beginnt mit „🛒 Meine Einkaufsliste“, danach folgen Gericht und bei Einzelrezepten die Personenzahl. „Offene Zutaten“ ist fett, alle Kategorie-Unterüberschriften sind kursiv; ein zusätzlicher Fatzomat-Footer wird nicht ausgegeben.
+- Die Rezeptzeile zeigt den Gerichtsnamen einzeilig, darunter Personenzahl mit Minus/Plus und rechts außen das Teilen-Symbol. Besteck- und Teilen-Symbole verwenden `AppDesign.iconGold`.
+- Formatierungs- und Aggregationstests decken den neuen Textaufbau ab.
