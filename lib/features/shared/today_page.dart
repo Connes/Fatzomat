@@ -1284,7 +1284,7 @@ class _TodayDecisionCard extends StatelessWidget {
     final padding = width >= 700 ? 24.0 : 16.0;
 
     return SizedBox(
-      height: _todayDecisionCardHeight(context) + (plan.menuCourses.isEmpty ? 0 : 156),
+      height: _todayDecisionCardHeight(context),
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
@@ -1530,7 +1530,7 @@ class _TodayResultCard extends StatelessWidget {
 
 
     return SizedBox(
-      height: _todayDecisionCardHeight(context),
+      height: _todayDecisionCardHeight(context) + (plan.menuCourses.isEmpty ? 0 : 156),
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
