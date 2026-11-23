@@ -846,97 +846,94 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Theme(
-              data: Theme.of(context).copyWith(hoverColor: Colors.transparent, focusColor: Colors.transparent, splashColor: Colors.transparent, highlightColor: Colors.transparent),
+            Transform.translate(
+              offset: const Offset(12, 0),
+              child: Theme(
+              data: Theme.of(context).copyWith(
+                hoverColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
               child: PopupMenuButton<String>(
-          tooltip: 'Rezepte nach Hauptzutat filtern',
-          initialValue: mainIngredientFilter ?? 'Alle',
-          onSelected: (value) => setState(
-            () => mainIngredientFilter = value == 'Alle' ? null : value,
-          ),
-          icon: const Icon(Icons.tune_rounded, size: 22, color: AppDesign.iconGold),
-          color: Theme.of(context).colorScheme.surface,
-          surfaceTintColor: Colors.transparent,
-          elevation: 8,
-          shadowColor: Colors.black.withValues(alpha: .12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
-            ),
-          ),
-          constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
-          menuPadding: const EdgeInsets.symmetric(vertical: 8),
-          itemBuilder: (_) {
-            final options = <(String, Widget)>[
-              ('Alle', const Icon(Icons.grid_view_rounded, color: AppDesign.iconGold)),
-              ('Schwein', SvgPicture.asset(
-                'assets/icons/pig_head.svg',
-                width: 24,
-                height: 24,
-                color: AppDesign.iconGold,
-              )),
-              ('Rind', SvgPicture.asset(
-                'assets/icons/cow_head.svg',
-                width: 24,
-                height: 24,
-                color: AppDesign.iconGold,
-              )),
-              ('Huhn', SvgPicture.asset(
-                'assets/icons/rooster.svg',
-                width: 24,
-                height: 24,
-                color: AppDesign.iconGold,
-              )),
-              ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
-              ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
-            ];
-            final selected = mainIngredientFilter ?? 'Alle';
-            return options.map((option) {
-              final value = option.$1;
-              final isSelected = selected == value;
-              return PopupMenuItem<String>(
-                value: value,
-                height: 48,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppDesign.secondarySurface
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Center(child: option.$2),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          value == 'Alle' ? 'Alle Rezepte' : value,
-                          style: TextStyle(
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected
-                                ? AppDesign.primaryDark
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_rounded,
-                          size: 18,
-                          color: AppDesign.primaryDark,
-                        ),
-                    ],
+                tooltip: 'Rezepte nach Hauptzutat filtern',
+                initialValue: mainIngredientFilter ?? 'Alle',
+                onSelected: null,
+                icon: const Icon(Icons.tune_rounded, size: 22, color: AppDesign.iconGold),
+                color: Theme.of(context).colorScheme.surface,
+                surfaceTintColor: Colors.transparent,
+                elevation: 8,
+                shadowColor: Colors.black.withValues(alpha: .12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
                   ),
                 ),
-              );
-            }).toList();
-          },
+                constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+                menuPadding: const EdgeInsets.symmetric(vertical: 8),
+                itemBuilder: (menuContext) {
+                  final options = <(String, Widget)>[
+                    ('Alle', const Icon(Icons.grid_view_rounded, color: AppDesign.iconGold)),
+                    ('Schwein', SvgPicture.asset('assets/icons/pig_head.svg', width: 24, height: 24, color: AppDesign.iconGold)),
+                    ('Rind', SvgPicture.asset('assets/icons/cow_head.svg', width: 24, height: 24, color: AppDesign.iconGold)),
+                    ('Huhn', SvgPicture.asset('assets/icons/rooster.svg', width: 24, height: 24, color: AppDesign.iconGold)),
+                    ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
+                    ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
+                  ];
+                  final selectedValue = ValueNotifier<String>(mainIngredientFilter ?? 'Alle');
+                  return options.map((option) {
+                    final value = option.$1;
+                    return PopupMenuItem<String>(
+                      value: value,
+                      enabled: false,
+                      height: 48,
+                      padding: EdgeInsets.zero,
+                      child: ValueListenableBuilder<String>(
+                        valueListenable: selectedValue,
+                        builder: (context, selected, _) {
+                          final isSelected = selected == value;
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              selectedValue.value = value;
+                              setState(() => mainIngredientFilter = value == 'Alle' ? null : value);
+                              Future<void>.delayed(const Duration(milliseconds: 200), () {
+                                if (menuContext.mounted) Navigator.of(menuContext).pop();
+                                selectedValue.dispose();
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 24, height: 24, child: Center(child: option.$2)),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      value == 'Alle' ? 'Alle Rezepte' : value,
+                                      style: TextStyle(
+                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                        color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }).toList();
+                },
+              ),
               ),
             ),
             PopupMenuButton<String>(
@@ -944,16 +941,61 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               initialValue: categoryFilter ?? 'Alle',
               onSelected: (value) => setState(() => categoryFilter = value == 'Alle' ? null : value),
               icon: const Icon(Icons.category_outlined, color: AppDesign.iconGold),
-              itemBuilder: (_) => const [
-                PopupMenuItem(value: 'Alle', child: Text('Alle Rezeptarten')),
-                PopupMenuItem(value: 'Hauptgericht', child: Text('Hauptgericht')),
-                PopupMenuItem(value: 'Süßspeise', child: Text('Süßspeise')),
-                PopupMenuItem(value: 'Beilage', child: Text('Beilage')),
-                PopupMenuItem(value: 'Salat', child: Text('Salat')),
-                PopupMenuItem(value: 'Suppe', child: Text('Suppe')),
-                PopupMenuItem(value: 'Snack', child: Text('Snack')),
-                PopupMenuItem(value: 'Frühstück', child: Text('Frühstück')),
-              ],
+              color: Theme.of(context).colorScheme.surface,
+              surfaceTintColor: Colors.transparent,
+              elevation: 8,
+              shadowColor: Colors.black.withValues(alpha: .12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
+                ),
+              ),
+              constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+              menuPadding: const EdgeInsets.symmetric(vertical: 8),
+              itemBuilder: (_) {
+                const values = ['Alle', 'Hauptgericht', 'Süßspeise', 'Beilage', 'Salat', 'Suppe', 'Snack', 'Frühstück'];
+                return values.map((value) {
+                  final isSelected = (categoryFilter ?? 'Alle') == value;
+                  return PopupMenuItem<String>(
+                    value: value,
+                    enabled: false,
+                    height: 48,
+                    padding: EdgeInsets.zero,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() => categoryFilter = value == 'Alle' ? null : value);
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 24, height: 24),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                value == 'Alle' ? 'Alle Rezeptarten' : value,
+                                style: TextStyle(
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList();
+              },
             ),
           ],
         ),
