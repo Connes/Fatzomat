@@ -2231,6 +2231,7 @@ class _IngredientDraft {
   final amount = TextEditingController();
   final unit = TextEditingController();
   bool isQualitative = false;
+  bool quantityIsOptional = false;
   final section = TextEditingController();
 
   _IngredientDraft();
@@ -2240,12 +2241,14 @@ class _IngredientDraft {
     amount.text = ingredient.hidesQuantity ? '' : ingredient.quantity.toString();
     unit.text = ingredient.unit;
     isQualitative = ingredient.isQualitative;
+    quantityIsOptional = ingredient.quantityIsOptional;
     section.text = ingredient.section ?? '';
   }
 
   RecipeIngredient toIngredient() {
     final amountIsBlank = amount.text.trim().isEmpty;
     final unitIsBlank = unit.text.trim().isEmpty;
+    quantityIsOptional = amountIsBlank;
     return RecipeIngredient(
       name: name.text.trim(),
       quantity: amountIsBlank
@@ -2253,6 +2256,7 @@ class _IngredientDraft {
           : (num.tryParse(amount.text.trim().replaceAll(',', '.')) ?? 1),
       unit: unit.text.trim(),
       isQualitative: isQualitative || (amountIsBlank && unitIsBlank),
+      quantityIsOptional: quantityIsOptional,
       section: section.text.trim().isEmpty ? null : section.text.trim(),
     );
   }
