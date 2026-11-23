@@ -466,7 +466,7 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
     if (_recipe.difficulty.trim().isEmpty) missing.add('Schwierigkeitsgrad');
     if (_recipe.category.trim().isEmpty) missing.add('Kategorie');
     if (_recipe.ingredients.isEmpty ||
-        _recipe.ingredients.any((item) => item.name.trim().isEmpty || item.quantity <= 0)) {
+        _recipe.ingredients.any((item) => item.name.trim().isEmpty)) {
       missing.add('vollständige Zutaten');
     }
     if (_recipe.instructions.isEmpty) missing.add('Zubereitungsschritte');
@@ -1468,14 +1468,8 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
       _show('Bitte mindestens eine Zutat eingeben.');
       return;
     }
-    final invalidQuantity = validIngredients.firstWhere(
-      (ingredient) => (num.tryParse(ingredient.amount.text.trim().replaceAll(',', '.')) ?? 0) <= 0,
-      orElse: () => validIngredients.first,
-    );
-    if (validIngredients.any((ingredient) => (num.tryParse(ingredient.amount.text.trim().replaceAll(',', '.')) ?? 0) <= 0)) {
-      _show('Bitte für „${invalidQuantity.name.text.trim()}“ eine positive Menge eingeben.');
-      return;
-    }
+    // Ingredient quantity and unit are optional; an ingredient such as an egg
+    // can be entered without a numeric measurement.
     final validSteps = steps.map((e) => e.text.trim()).where((e) => e.isNotEmpty).toList(growable: false);
     if (validSteps.isEmpty) {
       _show('Bitte mindestens einen Zubereitungsschritt eingeben.');
