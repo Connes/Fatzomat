@@ -450,3 +450,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.
 - Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptprüfung: Zutatenmenge und Einheit optional (2026-11-23)
+
+- Rückmeldung nach Fotoimport: Die Rezeptprüfung bzw. manuelle Rezeptbearbeitung verlangte weiterhin eine positive Zutatenmenge. Das verhinderte z. B. die natürliche Angabe eines Eis ohne Maßeinheit und numerische Menge.
+- In `RecipeImportPreviewPage._missingRequiredFields` wird bei Zutaten nur noch ein nichtleerer Name verlangt. Menge und Einheit sind keine Pflichtfelder mehr.
+- Auch `ManualRecipePage.save` blockiert das Speichern nicht mehr wegen einer fehlenden oder nichtnumerischen Zutatenmenge. Der Zutatenname bleibt erforderlich.
+- Regressionstest in `test/regression/recipe_import_preview_test.dart` stellt sicher, dass Mengen- und Einheitenpflicht nicht wieder eingeführt werden.
+- PR/CI und Gerätetest stehen noch aus.
