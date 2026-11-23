@@ -1395,6 +1395,8 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   final servings = TextEditingController(text: '2');
   String servingsUnit = 'Personen';
   String category = '';
+  final Set<String> foodTags = <String>{};
+  static const availableFoodTags = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
   final prep = TextEditingController();
   final cook = TextEditingController();
   final difficulty = TextEditingController(text: 'Einfach');
@@ -1416,6 +1418,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
     cook.text = initial.cookTimeMinutes.toString();
     difficulty.text = initial.difficulty;
     category = initial.category;
+    foodTags.addAll(initial.foodTags);
     for (final draft in ingredients) {
       draft.dispose();
     }
@@ -1511,6 +1514,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
         cookTimeMinutes: _int(cook.text, fallback: 0, min: 0, max: 1440),
         difficulty: difficulty.text.trim().isEmpty ? 'Einfach' : difficulty.text.trim(),
         category: category,
+        foodTags: foodTags.toList(growable: false),
         instructions: validSteps,
         ingredients: validIngredients.map((i) => i.toIngredient()).toList(growable: false),
       );
@@ -1525,6 +1529,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
           category: recipe.category,
+          foodTags: recipe.foodTags,
           instructions: recipe.instructions,
           ingredients: recipe.ingredients,
           imageUrl: widget.initialRecipe?.imageUrl,
@@ -1543,6 +1548,7 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           cookTimeMinutes: recipe.cookTimeMinutes,
           difficulty: recipe.difficulty,
           category: recipe.category,
+          foodTags: recipe.foodTags,
           instructions: recipe.instructions,
           ingredients: recipe.ingredients,
           imageUrl: widget.initialRecipe!.imageUrl,
@@ -1651,6 +1657,38 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
           _RecipeCategoryField(
             value: category,
             onChanged: saving ? null : (value) => setState(() => category = value ?? ''),
+          ),
+          const SizedBox(height: 12),
+          _RecipeSectionCard(
+            icon: Icons.restaurant_menu_rounded,
+            title: 'Ernährungsart / Hauptzutat (optional)',
+            children: [
+              const Text(
+                'Wähle alle passenden Merkmale. Sie sind unabhängig von der Rezeptart.',
+                style: TextStyle(color: AppDesign.secondaryText),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: availableFoodTags.map((tag) => FilterChip(
+                  label: Text(tag),
+                  selected: foodTags.contains(tag),
+                  onSelected: saving ? null : (selected) => setState(() {
+                    if (selected) {
+                      foodTags.add(tag);
+                      if (tag == 'Vegetarisch') {
+                        foodTags.removeAll({'Schwein', 'Rind', 'Huhn', 'Fisch'});
+                      } else {
+                        foodTags.remove('Vegetarisch');
+                      }
+                    } else {
+                      foodTags.remove(tag);
+                    }
+                  }),
+                )).toList(growable: false),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           _RecipeSectionCard(
