@@ -161,7 +161,7 @@ class TogetherRecipeImporter {
           isUserSelected: item['is_user_selected'] == true,
           isAdditional: item['is_additional'] == true,
           isQualitative: isQualitative || item['is_qualitative'] == true,
-          quantityIsOptional: item['quantity_is_optional'] == true || isQualitative,
+          quantityIsOptional: item['quantity_is_optional'] == true,
           section: section,
         ),
       );
