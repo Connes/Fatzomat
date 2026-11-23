@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/app_feedback.dart';
 import '../../core/recipe_collection_events.dart';
@@ -15,6 +16,7 @@ import '../../data/models/today_plan.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/services/shopping_list_aggregator.dart';
+import '../../data/services/shopping_list_share_service.dart';
 
 /// Personal shopping list aggregated across the next three calendar days.
 class MultiDayShoppingListPage extends StatefulWidget {
@@ -29,6 +31,7 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
   final _collaboration = CollaborationRepository();
   final Set<String> _sharedPlanIds = <String>{};
   final _aggregator = const ShoppingListAggregator();
+  final _shareService = const ShoppingListShareService();
   late List<DateTime> _days;
   DateTime _observedToday = DateTime.now();
   Timer? _dayBoundaryTimer;
@@ -458,6 +461,46 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
     return categories;
   }
 
+  Future<void> _shareShoppingItems({
+    required Iterable<ShoppingItem> items,
+    required String title,
+    String? subtitle,
+  }) async {
+    final text = _shareService.buildText(
+      items: items,
+      title: title,
+      subtitle: subtitle,
+    );
+    if (text.isEmpty) {
+      if (mounted) {
+        AppFeedback.showSnackBar(
+          context,
+          const SnackBar(content: Text('Es gibt keine offenen Zutaten zum Teilen.')),
+        );
+      }
+      return;
+    }
+    try {
+      await SharePlus.instance.share(ShareParams(text: text, subject: title));
+    } catch (error) {
+      if (mounted) {
+        AppFeedback.showSnackBar(
+          context,
+          SnackBar(content: Text('Einkaufsliste konnte nicht geteilt werden: $error')),
+        );
+      }
+    }
+  }
+
+  Future<void> _shareRecipeShoppingList(TodayPlan plan) async {
+    final items = _items.where((item) => item.planId == plan.id);
+    await _shareShoppingItems(
+      items: items,
+      title: 'Einkaufsliste · ${plan.displayTitle}',
+      subtitle: '${plan.servings} Personen',
+    );
+  }
+
   Future<void> _updatePlanServings(TodayPlan plan, int servings) async {
     if (servings < 1) return;
     try {
@@ -885,6 +928,16 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               IconButton(
+                                                tooltip: 'Offene Zutaten dieses Rezepts teilen',
+                                                onPressed: _items.any((item) =>
+                                                        item.planId == plan.id && !item.checked)
+                                                    ? () => _shareRecipeShoppingList(plan)
+                                                    : null,
+                                                icon: const Icon(Icons.share_rounded),
+                                                color: AppDesign.primaryDark,
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                              IconButton(
                                                 tooltip: 'Eine Person weniger',
                                                 onPressed: plan.servings <= 1
                                                     ? null
@@ -927,13 +980,38 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Zusammengefasste Zutaten',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                        color: AppDesign.text,
-                                        fontWeight: FontWeight.w700,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Zusammengefasste Zutaten',
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                              color: AppDesign.text,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       ),
+                                    ),
+                                    IconButton(
+                                      tooltip: 'Alle offenen Zutaten teilen',
+                                      onPressed: aggregated.any((item) => !item.checked)
+                                          ? () {
+                                              final recipeNames = selectedDays
+                                                  .expand(_plansFor)
+                                                  .where((plan) => plan.isRecipe)
+                                                  .map((plan) => plan.displayTitle)
+                                                  .toSet()
+                                                  .join(', ');
+                                              _shareShoppingItems(
+                                                items: visibleItems,
+                                                title: 'Meine Einkaufsliste',
+                                                subtitle: recipeNames.isEmpty ? null : recipeNames,
+                                              );
+                                            }
+                                          : null,
+                                      icon: const Icon(Icons.share_rounded),
+                                      color: AppDesign.primaryDark,
+                                    ),
+                                  ],
                                 ),
                               const SizedBox(height: 10),
                               if (aggregated.isNotEmpty) ...[
