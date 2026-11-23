@@ -1123,7 +1123,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 child: Image.asset(
                   FoodChoiceAssetService.assetFor(FoodMode.dineOut, cuisine ?? '') ??
                       'assets/together/clean/icons/icon_restaurant.png',
-                  height: imageHeight,
+                  height: 180,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -1165,13 +1165,13 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(22),
                 child: orderCategory == null
                     ? (share.imageUrl != null && share.imageUrl!.trim().isNotEmpty
-                        ? Image.network(share.imageUrl!, height: imageHeight, width: double.infinity, fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: imageHeight, width: double.infinity, fit: BoxFit.contain))
-                        : Image.asset('assets/together/clean/icons/icon_delivery.png', height: imageHeight, width: double.infinity, fit: BoxFit.contain))
+                        ? Image.network(share.imageUrl!, height: 180, width: double.infinity, fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain))
+                        : Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain))
                     : Image.asset(
                         FoodChoiceAssetService.assetFor(FoodMode.order, orderCategory) ?? 'assets/together/clean/icons/icon_delivery.png',
-                        height: imageHeight, width: double.infinity, fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: imageHeight, width: double.infinity, fit: BoxFit.contain)),
+                        height: 180, width: double.infinity, fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Image.asset('assets/together/clean/icons/icon_delivery.png', height: 180, width: double.infinity, fit: BoxFit.contain)),
               ),
               const SizedBox(height: 12),
               if (orderCategory != null)
@@ -1196,7 +1196,7 @@ class _IncomingDecisionShareCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(18),
                   child: Image.network(
                     share.imageUrl!,
-                    height: imageHeight,
+                    height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => const SizedBox.shrink(),
