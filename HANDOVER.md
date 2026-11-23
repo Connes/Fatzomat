@@ -508,4 +508,5 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Interne Variablen, Python-Code, Python-Dictionary-Ausgaben und Rezeptdaten dürfen nicht im Chat erscheinen. Nach erfolgreicher Erstellung soll die Chatantwort nur eine kurze Bestätigung und den anklickbaren Download-Anhang enthalten.
 - Wenn keine echte Datei erstellt/angehängt werden kann, darf ChatGPT nicht auf Code oder Rezeptdaten im Chat ausweichen, sondern muss die technische Einschränkung kurz melden.
 - Regressionstest prüft den Download-only-Vertrag und die expliziten Verbote der sichtbaren Python-Darstellung.
-- Die ursprünglichen CI-Läufe auf dem alten PR-Head waren erfolgreich; die Pflichtprüfungen auf der aktualisierten Mainline-Basis müssen nach PR-Erstellung erneut vollständig grün sein. Ein echter Test mit ChatGPT-Fotoimport und Geräteprüfung stehen weiterhin aus.
+- PR #455 wurde nach vollständig grünen Pflichtprüfungen (Flutter Quality Gate mit iOS Build und Quality Gate mit Analyze/Tests) per Squash-Merge integriert. Merge-Commit auf `main`: `c6d393f519baac9d608228b41e19e3dc4afe43fd`.
+- Die Post-Merge-Workflows auf `main` wurden gestartet; ihren Abschluss/Erfolg vor einer Erledigt-Meldung prüfen. Ein echter Test mit ChatGPT-Fotoimport und Geräteprüfung stehen weiterhin aus.
