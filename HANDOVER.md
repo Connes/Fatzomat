@@ -461,5 +461,6 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Manuelle Rezeptbearbeitung bietet Mehrfachauswahl der Merkmale. Rezeptkarten zeigen Rezeptart und Merkmale.
 - Bibliotheksfilter sind getrennt: Rezeptart und Ernährungsart/Hauptzutat. Beide können kombiniert werden (UND-Verknüpfung). Fehlende Tags werden nicht automatisch geraten.
 - Die bisherige Pflichtprüfung auf positive Zutatenmengen wurde im selben Feature-Branch ebenfalls entfernt, damit die offene Korrektur für Eier/Zutaten ohne Menge mit ausgeliefert wird.
+- Fehlende Zutatenmengen aus dem Import werden intern als qualitative Menge mit neutralem Speicherwert 1 behandelt, damit das bestehende positive Mengen-Datenbankschema erhalten bleibt; die Anzeige blendet den Zahlenwert bei qualitativen Zutaten aus.
 - Regressionstests für Modell, Import/Export, kombinierte Filter, Prompt-Regeln und optionale Zutatenmengen hinzugefügt.
 - PR und CI stehen noch aus; Supabase-Schema und Backfill sind live angewendet und per SELECT verifiziert.
