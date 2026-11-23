@@ -32,6 +32,8 @@ void main() {
     expect(prompt, contains('höchstens 40 Zeichen'));
     expect(prompt, contains('recipe.title in der späteren JSON-Datei'));
     expect(prompt, contains('höchstens 40 Zeichen enthalten'));
+    expect(prompt, contains('Eine Einheit ist für Zutaten optional.'));
+    expect(prompt, contains('Erfinde keine Einheit'));
   });
 
   test('strict selected-food mode allows only spices and herbs as additions', () {
@@ -113,6 +115,8 @@ void main() {
 
     expect(prompt, contains('together_recipe.json'));
     expect(prompt, contains('Das Ergebnis muss syntaktisch gültiges JSON sein.'));
+    expect(prompt, contains('Eine Einheit ist optional.'));
+    expect(prompt, contains('setze "unit": ""'));
     expect(prompt, contains('Stelle ausschließlich die erzeugte JSON-Datei als herunterladbaren Dateianhang bereit.'));
     expect(prompt, contains('Gib den JSON-Inhalt niemals im Chat aus'));
     expect(prompt, isNot(contains('Gib nur das JSON bzw. die erzeugte Datei zurück.')));

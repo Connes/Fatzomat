@@ -124,14 +124,15 @@ Regeln:
 }
 9. Setze "food_id" nur dann, wenn du eine passende ID sicher kennst. Sonst muss es null sein.
 10. Mengen müssen als Zahlen oder null vorliegen, nicht als Text.
-11. "servings", "prep_time_minutes" und "cook_time_minutes" müssen ganze Zahlen sein.
-12. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
-13. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
-14. Fülle recipe.category zwingend mit einer passenden Kategorie: „Hauptgericht“, „Süßspeise“, „Beilage“, „Salat“, „Suppe“, „Snack“ oder „Frühstück“. Kuchen, Torten, Cake Pops, Kekse, Gebäck, Desserts, Pudding und Eis sind immer „Süßspeise“. Der Rezeptname im Feld recipe.title darf höchstens 40 Zeichen enthalten. Prüfe die Länge vor der Ausgabe und kürze ihn nötigenfalls sinnvoll auf maximal 40 Zeichen. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, category, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
-15. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle ausschließlich diese Datei als herunterladbaren Dateianhang bereit. Prüfe intern, dass die Datei gültiges JSON im together_recipe-Format Version 1 enthält. Gib den JSON-Inhalt niemals im Chat aus, auch nicht ersatzweise, nicht als Codeblock, Klartext, Python-Dictionary oder Vorschau. Falls die Dateierstellung technisch nicht möglich ist, erkläre kurz, dass die Datei gerade nicht erstellt werden konnte, und bitte um einen erneuten Versuch. Gib keinesfalls den Dateiinhalt aus.
-16. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
-17. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.
-18. WICHTIG: Diese Anfrage dient ausschließlich der Rezept- und Dateierstellung. Generiere kein Bild und rufe keine Bildgenerierung auf. Die Bildgenerierung wird in einem getrennten Schritt angefordert, nachdem das Rezept vorliegt.
+11. Eine Einheit ist für Zutaten optional. Wenn die Quelle keine Einheit nennt oder eine Zutat sinnvoll ohne Einheit angegeben wird, setze "unit": "" und übernimm die Zutat trotzdem. Erfinde keine Einheit und lasse eine Zutat niemals allein wegen einer fehlenden Einheit weg.
+12. "servings", "prep_time_minutes" und "cook_time_minutes" müssen ganze Zahlen sein.
+13. Bewahre bei Zutatenabschnitten die sichtbare Gruppierung. Jede Zutat erhält in „section“ den exakten bzw. sinngemäßen Abschnittsnamen; ohne Abschnitt ist „section“ null.
+14. Prüfe vor dem Bereitstellen der Datei, dass das JSON syntaktisch gültig ist, mit { beginnt und mit } endet und dem together_recipe-Format Version 1 entspricht.
+15. Fülle recipe.category zwingend mit einer passenden Kategorie: „Hauptgericht“, „Süßspeise“, „Beilage“, „Salat“, „Suppe“, „Snack“ oder „Frühstück“. Kuchen, Torten, Cake Pops, Kekse, Gebäck, Desserts, Pudding und Eis sind immer „Süßspeise“. Der Rezeptname im Feld recipe.title darf höchstens 40 Zeichen enthalten. Prüfe die Länge vor der Ausgabe und kürze ihn nötigenfalls sinnvoll auf maximal 40 Zeichen. Erst nach meiner Auswahl: Gib das vollständige Rezept gemäß dem oben definierten Schema aus. Fülle recipe.title, recipe.description, servings, prep_time_minutes, cook_time_minutes, difficulty, category, ingredients und steps sinnvoll aus. Lasse kein Feld und keine Zubereitungsschritte weg.
+16. Erst nach meiner Auswahl: Erzeuge „together_recipe.json“ und stelle ausschließlich diese Datei als herunterladbaren Dateianhang bereit. Prüfe intern, dass die Datei gültiges JSON im together_recipe-Format Version 1 enthält. Gib den JSON-Inhalt niemals im Chat aus, auch nicht ersatzweise, nicht als Codeblock, Klartext, Python-Dictionary oder Vorschau. Falls die Dateierstellung technisch nicht möglich ist, erkläre kurz, dass die Datei gerade nicht erstellt werden konnte, und bitte um einen erneuten Versuch. Gib keinesfalls den Dateiinhalt aus.
+17. Behandle jedes Lebensmittel in der Liste „NICHT mag“ als verboten. Verwende es nicht als Zutat und schlage keinen direkten Ersatz vor, der dasselbe Lebensmittel enthält. Prüfe alle Zutaten einschließlich Saucen, Marinaden, Gewürzmischungen und optionaler Bestandteile vor der Ausgabe.
+18. Bevorzuge Lebensmittel aus der Liste „mag ich“, sofern sie zum Rezept passen und nicht mit der Hauptauswahl oder anderen Regeln kollidieren. Du musst nicht alle Lieblingslebensmittel verwenden.
+19. WICHTIG: Diese Anfrage dient ausschließlich der Rezept- und Dateierstellung. Generiere kein Bild und rufe keine Bildgenerierung auf. Die Bildgenerierung wird in einem getrennten Schritt angefordert, nachdem das Rezept vorliegt.
 ''';
   }
 
@@ -153,6 +154,7 @@ WICHTIG:
 - Erfinde keine Abschnittsnamen, wenn das Foto keinen solchen Abschnitt erkennen lässt.
 - Übernimm den Rezeptnamen und die Beschreibung so genau wie möglich.
 - Mengen müssen Zahlen oder null sein, niemals ausgeschriebener Text.
+- Eine Einheit ist optional. Wenn auf dem Foto keine Einheit angegeben ist, setze "unit": "" und übernimm die Zutat trotzdem. Erfinde keine Einheit und lasse keine Zutat wegen einer fehlenden Einheit weg.
 - food_id muss null sein, sofern keine sichere Schmackofatz-ID bekannt ist.
 - Verwende is_user_selected=false und is_additional=false, sofern diese Information nicht ausdrücklich aus dem Foto hervorgeht.
 - Verwende is_qualitative=true für qualitative Mengen wie „Prise“, wenn keine numerische Menge angegeben ist.
