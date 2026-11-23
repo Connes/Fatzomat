@@ -2223,7 +2223,9 @@ class _StepDraftRow extends StatelessWidget {
 
 class _IngredientDraft {
   final name = TextEditingController();
-  final amount = TextEditingController(text: '1');
+  // Both amount and unit are optional. Keep a blank amount blank when the
+  // recipe is reopened; the database stores a neutral quantity of 1 for it.
+  final amount = TextEditingController();
   final unit = TextEditingController();
   bool isQualitative = false;
   final section = TextEditingController();
@@ -2232,19 +2234,25 @@ class _IngredientDraft {
 
   _IngredientDraft.fromIngredient(RecipeIngredient ingredient) {
     name.text = ingredient.name;
-    amount.text = ingredient.quantity.toString();
+    amount.text = ingredient.hidesQuantity ? '' : ingredient.quantity.toString();
     unit.text = ingredient.unit;
     isQualitative = ingredient.isQualitative;
     section.text = ingredient.section ?? '';
   }
 
-  RecipeIngredient toIngredient() => RecipeIngredient(
-        name: name.text.trim(),
-        quantity: num.tryParse(amount.text.trim().replaceAll(',', '.')) ?? 1,
-        unit: unit.text.trim(),
-        isQualitative: isQualitative,
-        section: section.text.trim().isEmpty ? null : section.text.trim(),
-      );
+  RecipeIngredient toIngredient() {
+    final amountIsBlank = amount.text.trim().isEmpty;
+    final unitIsBlank = unit.text.trim().isEmpty;
+    return RecipeIngredient(
+      name: name.text.trim(),
+      quantity: amountIsBlank
+          ? 1
+          : (num.tryParse(amount.text.trim().replaceAll(',', '.')) ?? 1),
+      unit: unit.text.trim(),
+      isQualitative: isQualitative || (amountIsBlank && unitIsBlank),
+      section: section.text.trim().isEmpty ? null : section.text.trim(),
+    );
+  }
 
   void dispose() {
     name.dispose();
