@@ -113,7 +113,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
           ]),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             isExpanded: true,
             decoration: const InputDecoration(labelText: 'Rezept auswählen', border: OutlineInputBorder()),
             hint: const Text('Kein Gang ausgewählt'),
