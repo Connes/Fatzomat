@@ -927,6 +927,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   }).toList();
                 },
               ),
+              ),
             ),
             PopupMenuButton<String>(
               tooltip: 'Nach Rezeptart filtern',
