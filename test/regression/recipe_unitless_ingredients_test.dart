@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:food_app_mvp/data/models/recipe.dart';
 import 'package:food_app_mvp/data/models/together_recipe_importer.dart';
 
 void main() {
@@ -53,6 +54,30 @@ void main() {
     expect(sql, contains("      1"));
     expect(sql, isNot(contains('Eine Zutat benötigt eine Einheit.')));
     expect(sql, contains("if ingredient_name = '' then raise exception 'Eine Zutat benötigt einen Namen.'; end if;"));
+  });
+
+  test('optional amount stays hidden independently from its unit', () {
+    const ingredient = RecipeIngredient(
+      name: 'Mehl',
+      quantity: 1,
+      unit: 'g',
+      quantityIsOptional: true,
+    );
+
+    expect(ingredient.hidesQuantity, isTrue);
+    final restored = RecipeIngredient.fromMap(ingredient.toMap());
+    expect(restored.quantityIsOptional, isTrue);
+    expect(restored.hidesQuantity, isTrue);
+    expect(restored.unit, 'g');
+  });
+
+  test('optional quantity flag is stored by both recipe RPCs', () {
+    final migration = File(
+      'supabase/migrations/20261123175448_allow_optional_recipe_ingredient_units_after_type_migrations.sql',
+    ).readAsStringSync();
+    expect(migration, contains('ADD COLUMN IF NOT EXISTS quantity_is_optional boolean NOT NULL DEFAULT false'));
+    expect('recipe_id, food_id, name, quantity, unit,\\n      is_user_selected, is_additional, is_qualitative, quantity_is_optional, section'.allMatches(migration).length, 2);
+    expect(migration, contains("coalesce((item->>'quantity_is_optional')::boolean,false)"));
   });
 
 }
