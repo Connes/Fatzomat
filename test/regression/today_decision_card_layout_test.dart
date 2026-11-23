@@ -19,7 +19,7 @@ void main() {
     final content = source.substring(contentStart, actionsStart);
     final actions = source.substring(actionsStart);
 
-    expect(card, contains('height: _todayDecisionCardHeight(context) + (plan.menuCourses.isEmpty ? 0 : 156)'));
+    expect(card, contains('height: (MediaQuery.sizeOf(context).height - 285).clamp(480.0, 900.0)'));
     expect(card, contains('_TodayDecisionCardHeader('));
     expect(card, contains('Expanded('));
     expect(card, contains('_TodayDecisionCardContent('));
