@@ -916,15 +916,27 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                     .where((plan) => plan.isRecipe && plan.status == 'planned')
                                     .map((plan) => ListTile(
                                           contentPadding: EdgeInsets.zero,
-                                          leading: const Icon(
-                                            Icons.restaurant_menu_rounded,
-                                            color: AppDesign.iconGold,
-                                          ),
-                                          title: Text(
-                                            plan.displayTitle,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(color: AppDesign.text),
+                                          title: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  plan.displayTitle,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(color: AppDesign.text),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                tooltip: 'Offene Zutaten dieses Rezepts teilen',
+                                                onPressed: _items.any((item) =>
+                                                        item.planId == plan.id && !item.checked)
+                                                    ? () => _shareRecipeShoppingList(plan)
+                                                    : null,
+                                                icon: const Icon(Icons.share_rounded),
+                                                color: AppDesign.iconGold,
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                            ],
                                           ),
                                           subtitle: Row(
                                             children: [
@@ -952,16 +964,6 @@ class _MultiDayShoppingListPageState extends State<MultiDayShoppingListPage> wit
                                                 padding: EdgeInsets.zero,
                                               ),
                                             ],
-                                          ),
-                                          trailing: IconButton(
-                                            tooltip: 'Offene Zutaten dieses Rezepts teilen',
-                                            onPressed: _items.any((item) =>
-                                                    item.planId == plan.id && !item.checked)
-                                                ? () => _shareRecipeShoppingList(plan)
-                                                : null,
-                                            icon: const Icon(Icons.share_rounded),
-                                            color: AppDesign.iconGold,
-                                            visualDensity: VisualDensity.compact,
                                           ),
                                         ))
                                     .toList(),
