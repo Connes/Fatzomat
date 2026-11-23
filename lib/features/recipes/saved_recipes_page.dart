@@ -846,8 +846,9 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(width: 12),
-            Theme(
+            Transform.translate(
+              offset: const Offset(12, 0),
+              child: Theme(
               data: Theme.of(context).copyWith(
                 hoverColor: Colors.transparent,
                 focusColor: Colors.transparent,
@@ -927,7 +928,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                 },
               ),
             ),
-            const SizedBox(width: 0),
             PopupMenuButton<String>(
               tooltip: 'Nach Rezeptart filtern',
               initialValue: categoryFilter ?? 'Alle',
@@ -951,30 +951,38 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                   final isSelected = (categoryFilter ?? 'Alle') == value;
                   return PopupMenuItem<String>(
                     value: value,
+                    enabled: false,
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 24, height: 24),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              value == 'Alle' ? 'Alle Rezeptarten' : value,
-                              style: TextStyle(
-                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
+                    padding: EdgeInsets.zero,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() => categoryFilter = value == 'Alle' ? null : value);
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 24, height: 24),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                value == 'Alle' ? 'Alle Rezeptarten' : value,
+                                style: TextStyle(
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
+                                ),
                               ),
                             ),
-                          ),
-                          if (isSelected)
-                            const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
-                        ],
+                            if (isSelected)
+                              const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
+                          ],
+                        ),
                       ),
                     ),
                   );
