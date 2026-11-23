@@ -41,4 +41,18 @@ void main() {
     expect(sql, isNot(contains("ingredient_name='' or ingredient_unit='' or ingredient_quantity<=0")));
     expect(sql, contains("if ingredient_name='' then raise exception 'Eine Zutat benötigt einen Namen.'"));
   });
+  test('latest recipe RPC migration keeps both amount and unit optional', () {
+    final migration = File(
+      'supabase/migrations/20261123175448_allow_optional_recipe_ingredient_units_after_type_migrations.sql',
+    );
+    expect(migration.existsSync(), isTrue);
+    final sql = migration.readAsStringSync();
+    expect(sql, contains('create or replace function public.create_shared_recipe'));
+    expect(sql, contains('create or replace function public.update_shared_recipe'));
+    expect(sql, contains("ingredient_quantity := coalesce("));
+    expect(sql, contains("      1"));
+    expect(sql, isNot(contains('Eine Zutat benötigt eine Einheit.')));
+    expect(sql, contains("if ingredient_name = '' then raise exception 'Eine Zutat benötigt einen Namen.'; end if;"));
+  });
+
 }
