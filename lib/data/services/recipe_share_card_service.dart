@@ -91,7 +91,7 @@ class RecipeShareCardService {
         final value = amount.isEmpty ? ingredient.name : '$amount ${ingredient.name}';
         return _formatBulletItem(value);
       }).join('\n');
-      return '${entry.key}:\n$lines';
+      return '_${entry.key}:_\n$lines';
     }).join('\n\n');
     final steps = recipe.instructions.asMap().entries
         .map((entry) => '${entry.key + 1}. ${entry.value}')
@@ -147,7 +147,7 @@ class RecipeShareCardService {
       textAlign: TextAlign.center,
       maxLines: maxLines,
       ellipsis: '…',
-    )..layout(maxWidth: bounds.width);
+    )..layout(minWidth: bounds.width, maxWidth: bounds.width);
     painter.paint(canvas, Offset(bounds.left, bounds.top + (bounds.height - painter.height) / 2));
     painter.dispose();
   }
