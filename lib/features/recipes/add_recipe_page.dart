@@ -2053,10 +2053,7 @@ class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
               );
             }).toList(growable: false);
           },
-          child: InkWell(
-            borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-            onTap: null,
-            child: Row(
+          child: Row(
               children: [
                 Container(
                   width: 54,
@@ -2094,7 +2091,6 @@ class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
                 ),
                 const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
               ],
-            ),
           ),
         ),
       ),
