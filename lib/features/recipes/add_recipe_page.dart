@@ -1808,58 +1808,18 @@ class _RecipeCategoryField extends StatelessWidget {
   const _RecipeCategoryField({required this.value, required this.onChanged});
 
   static const categories = <String>[
-    'Hauptgericht',
-    'Süßspeise',
-    'Beilage',
-    'Salat',
-    'Suppe',
-    'Snack',
-    'Frühstück',
+    'Hauptgericht', 'Süßspeise', 'Beilage', 'Salat', 'Suppe', 'Snack', 'Frühstück',
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-      decoration: BoxDecoration(
-        color: AppDesign.surface.withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(AppDesign.radiusXl),
-        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
-      ),
-      child: PopupMenuButton<String>(
-        enabled: onChanged != null,
-        onSelected: onChanged,
-        itemBuilder: (context) => categories
-            .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
-            .toList(),
-        child: Row(
-          children: [
-            Container(
-              width: 54,
-              height: 54,
-              margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                color: AppDesign.primarySoft,
-                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-              ),
-              child: const Icon(Icons.category_outlined, color: AppDesign.iconGold, size: 28),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Rezeptkategorie *', style: TextStyle(color: AppDesign.secondaryText, fontSize: 14, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(value.isEmpty ? 'Kategorie auswählen' : value, style: const TextStyle(fontSize: 18, color: AppDesign.text)),
-                ],
-              ),
-            ),
-            const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => _RecipeDropdownField(
+    title: 'Rezeptkategorie *',
+    icon: Icons.category_outlined,
+    options: categories,
+    selectedValues: value.isEmpty ? const <String>{} : {value},
+    enabled: onChanged != null,
+    onChanged: (values) => onChanged?.call(values.isEmpty ? null : values.first),
+  );
 }
 
 class _RecipeDifficultyField extends StatelessWidget {
@@ -1876,50 +1836,16 @@ class _RecipeDifficultyField extends StatelessWidget {
   static const options = <String>['Einfach', 'Mittel', 'Schwer'];
 
   @override
-  Widget build(BuildContext context) {
-    final selected = options.contains(value) ? value : 'Einfach';
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-      decoration: BoxDecoration(
-        color: AppDesign.surface.withValues(alpha: 0.96),
-        borderRadius: BorderRadius.circular(AppDesign.radiusXl),
-        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
-      ),
-      child: PopupMenuButton<String>(
-        enabled: enabled,
-        onSelected: onChanged,
-        itemBuilder: (context) => options
-            .map((item) => PopupMenuItem<String>(value: item, child: Text(item)))
-            .toList(),
-        child: Row(
-          children: [
-            Container(
-              width: 54,
-              height: 54,
-              margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                color: AppDesign.primarySoft,
-                borderRadius: BorderRadius.circular(AppDesign.radiusLg),
-              ),
-              child: const Icon(Icons.bar_chart_rounded, color: AppDesign.iconGold, size: 28),
-            ),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Schwierigkeit', style: TextStyle(color: AppDesign.secondaryText, fontSize: 14, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 4),
-                ],
-              ),
-            ),
-            Text(selected, style: const TextStyle(fontSize: 18, color: AppDesign.text)),
-            const SizedBox(width: 8),
-            const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => _RecipeDropdownField(
+    title: 'Schwierigkeit',
+    icon: Icons.bar_chart_rounded,
+    options: options,
+    selectedValues: {options.contains(value) ? value : 'Einfach'},
+    enabled: enabled,
+    onChanged: (values) {
+      if (values.isNotEmpty) onChanged(values.first);
+    },
+  );
 }
 
 class _RecipeFoodTagsField extends StatelessWidget {
@@ -1935,8 +1861,8 @@ class _RecipeFoodTagsField extends StatelessWidget {
 
   static const options = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
 
-  void _toggle(String tag) {
-    final next = Set<String>.from(selectedTags);
+  Set<String> _toggle(String tag, Set<String> current) {
+    final next = Set<String>.from(current);
     if (next.contains(tag)) {
       next.remove(tag);
     } else if (tag == 'Vegetarisch') {
@@ -1948,68 +1874,229 @@ class _RecipeFoodTagsField extends StatelessWidget {
         ..remove('Vegetarisch')
         ..add(tag);
     }
-    onChanged(next);
+    return next;
+  }
+
+  @override
+  Widget build(BuildContext context) => _RecipeDropdownField(
+    title: 'Ernährungsart / Hauptzutat',
+    icon: Icons.restaurant_menu_rounded,
+    options: options,
+    selectedValues: selectedTags,
+    enabled: enabled,
+    multiSelect: true,
+    onChanged: (values) {
+      // Preserve the existing exclusive Vegetarian selection rule.
+      if (values.contains('Vegetarisch')) {
+        onChanged({'Vegetarisch'});
+      } else {
+        onChanged(values);
+      }
+    },
+    onToggle: _toggle,
+  );
+}
+
+/// Shared popup styling and selection behavior matching the recipe-library
+/// filters. Multi-select menus stay open while single-select menus close.
+class _RecipeDropdownField extends StatefulWidget {
+  final String title;
+  final IconData icon;
+  final List<String> options;
+  final Set<String> selectedValues;
+  final bool enabled;
+  final bool multiSelect;
+  final ValueChanged<Set<String>> onChanged;
+  final Set<String> Function(String, Set<String>)? onToggle;
+
+  const _RecipeDropdownField({
+    required this.title,
+    required this.icon,
+    required this.options,
+    required this.selectedValues,
+    required this.enabled,
+    required this.onChanged,
+    this.multiSelect = false,
+    this.onToggle,
+  });
+
+  @override
+  State<_RecipeDropdownField> createState() => _RecipeDropdownFieldState();
+}
+
+class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
+  ValueNotifier<Set<String>>? _menuSelection;
+
+  @override
+  void dispose() {
+    _menuSelection?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final summary = options.where(selectedTags.contains).join(' · ');
+    final summary = widget.options
+        .where(widget.selectedValues.contains)
+        .join(' · ');
+    final displayValue = summary.isEmpty
+        ? (widget.multiSelect ? 'Merkmale auswählen' : 'Auswählen')
+        : summary;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       decoration: BoxDecoration(
-        color: AppDesign.surface.withValues(alpha: 0.96),
+        color: AppDesign.surface.withValues(alpha: .96),
         borderRadius: BorderRadius.circular(AppDesign.radiusXl),
-        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+        boxShadow: const [
+          BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4)),
+        ],
       ),
-      child: MenuAnchor(
-        menuChildren: options.map((tag) => MenuItemButton(
-          closeOnActivate: false,
-          onPressed: enabled ? () => _toggle(tag) : null,
-          leadingIcon: Icon(
-            selectedTags.contains(tag) ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
-            color: selectedTags.contains(tag) ? AppDesign.primaryDark : AppDesign.secondaryText,
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: PopupMenuButton<String>(
+          enabled: widget.enabled,
+          onSelected: null,
+          color: Theme.of(context).colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          elevation: 8,
+          shadowColor: Colors.black.withValues(alpha: .12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
+            ),
           ),
-          child: Text(tag),
-        )).toList(growable: false),
-        builder: (context, controller, child) => InkWell(
-          onTap: enabled
-              ? () => controller.isOpen ? controller.close() : controller.open()
-              : null,
-          borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+          constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+          menuPadding: const EdgeInsets.symmetric(vertical: 8),
+          onCanceled: () {
+            _menuSelection?.dispose();
+            _menuSelection = null;
+          },
+          itemBuilder: (menuContext) {
+            _menuSelection?.dispose();
+            _menuSelection = ValueNotifier<Set<String>>(
+              Set<String>.from(widget.selectedValues),
+            );
+            return widget.options.map((value) {
+              return PopupMenuItem<String>(
+                value: value,
+                enabled: false,
+                height: 48,
+                padding: EdgeInsets.zero,
+                child: ValueListenableBuilder<Set<String>>(
+                  valueListenable: _menuSelection!,
+                  builder: (context, selected, _) {
+                    final isSelected = selected.contains(value);
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        final next = <String>{};
+                        if (widget.multiSelect) {
+                          next.addAll(widget.onToggle?.call(value, selected) ?? selected);
+                          if (widget.onToggle == null) {
+                            if (isSelected) {
+                              next.remove(value);
+                            } else {
+                              next.add(value);
+                            }
+                          }
+                        } else {
+                          next.add(value);
+                        }
+                        _menuSelection!.value = next;
+                        widget.onChanged(next);
+                        if (!widget.multiSelect) {
+                          Future<void>.delayed(const Duration(milliseconds: 200), () {
+                            if (menuContext.mounted) Navigator.of(menuContext).pop();
+                            // PopupMenuButton.onCanceled owns notifier cleanup.
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Center(
+                                child: Icon(
+                                  widget.multiSelect
+                                      ? (isSelected ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded)
+                                      : widget.icon,
+                                  size: widget.multiSelect ? 20 : 18,
+                                  color: isSelected ? AppDesign.primaryDark : AppDesign.iconGold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            if (isSelected && !widget.multiSelect)
+                              const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }).toList(growable: false);
+          },
           child: Row(
-            children: [
-              Container(
-                width: 54,
-                height: 54,
-                margin: const EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                  color: AppDesign.primarySoft,
-                  borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+              children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  margin: const EdgeInsets.only(right: 10),
+                  decoration: BoxDecoration(
+                    color: AppDesign.primarySoft,
+                    borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+                  ),
+                  child: Icon(widget.icon, color: AppDesign.iconGold, size: 28),
                 ),
-                child: const Icon(Icons.restaurant_menu_rounded, color: AppDesign.iconGold, size: 28),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Ernährungsart / Hauptzutat (optional)',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: AppDesign.secondaryText, fontSize: 14, fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      summary.isEmpty ? 'Merkmale auswählen' : summary,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 18, color: AppDesign.text),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppDesign.secondaryText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        displayValue,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 18, color: AppDesign.text),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
-            ],
+                const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
+              ],
           ),
         ),
       ),
@@ -2138,28 +2225,40 @@ class _StepDraftRow extends StatelessWidget {
 
 class _IngredientDraft {
   final name = TextEditingController();
-  final amount = TextEditingController(text: '1');
+  // Both amount and unit are optional. Keep a blank amount blank when the
+  // recipe is reopened; the database stores a neutral quantity of 1 for it.
+  final amount = TextEditingController();
   final unit = TextEditingController();
   bool isQualitative = false;
+  bool quantityIsOptional = false;
   final section = TextEditingController();
 
   _IngredientDraft();
 
   _IngredientDraft.fromIngredient(RecipeIngredient ingredient) {
     name.text = ingredient.name;
-    amount.text = ingredient.quantity.toString();
+    amount.text = ingredient.hidesQuantity ? '' : ingredient.quantity.toString();
     unit.text = ingredient.unit;
     isQualitative = ingredient.isQualitative;
+    quantityIsOptional = ingredient.quantityIsOptional;
     section.text = ingredient.section ?? '';
   }
 
-  RecipeIngredient toIngredient() => RecipeIngredient(
-        name: name.text.trim(),
-        quantity: num.tryParse(amount.text.trim().replaceAll(',', '.')) ?? 1,
-        unit: unit.text.trim(),
-        isQualitative: isQualitative,
-        section: section.text.trim().isEmpty ? null : section.text.trim(),
-      );
+  RecipeIngredient toIngredient() {
+    final amountIsBlank = amount.text.trim().isEmpty;
+    final unitIsBlank = unit.text.trim().isEmpty;
+    quantityIsOptional = amountIsBlank;
+    return RecipeIngredient(
+      name: name.text.trim(),
+      quantity: amountIsBlank
+          ? 1
+          : (num.tryParse(amount.text.trim().replaceAll(',', '.')) ?? 1),
+      unit: unit.text.trim(),
+      isQualitative: isQualitative || (amountIsBlank && unitIsBlank),
+      quantityIsOptional: quantityIsOptional,
+      section: section.text.trim().isEmpty ? null : section.text.trim(),
+    );
+  }
 
   void dispose() {
     name.dispose();
