@@ -215,6 +215,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   Map<String, String> foodPreferences = const <String, String>{};
   String query = '';
   String? mainIngredientFilter;
+  String? categoryFilter;
   TodayPlan? todayPlan;
   RealtimeChannel? realtimeChannel;
 
@@ -615,12 +616,10 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           !recipe.description.toLowerCase().contains(normalizedQuery)) {
         return false;
       }
-      if (mainIngredientFilter == 'Süßspeise' && recipe.category.trim() != 'Süßspeise') return false;
-      if (mainIngredientFilter != null && mainIngredientFilter != 'Süßspeise' &&
-          !recipeModelMatchesSelection(
-            recipe,
-            mainChoice: mainIngredientFilter,
-          )) {
+      if (categoryFilter != null && recipe.category.trim() != categoryFilter) return false;
+      if (mainIngredientFilter != null &&
+          !(recipe.foodTags.contains(mainIngredientFilter) ||
+            recipeModelMatchesSelection(recipe, mainChoice: mainIngredientFilter))) {
         return false;
       }
       if (FoodPreferenceRecipeGuard.findDislikedIngredients(
@@ -879,7 +878,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               )),
               ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
               ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
-              ('Süßspeise', const Icon(Icons.cake_rounded, color: AppDesign.iconGold)),
             ];
             final selected = mainIngredientFilter ?? 'Alle';
             return options.map((option) {
@@ -930,6 +928,27 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         ),
         title: const Text('Meine Rezepte'),
         actions: [
+          PopupMenuButton<String>(
+            tooltip: 'Nach Rezeptart filtern',
+            initialValue: categoryFilter ?? 'Alle',
+            onSelected: (value) => setState(() => categoryFilter = value == 'Alle' ? null : value),
+            icon: Icon(
+              Icons.category_outlined,
+              color: categoryFilter == null
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : Theme.of(context).colorScheme.primary,
+            ),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'Alle', child: Text('Alle Rezeptarten')),
+              PopupMenuItem(value: 'Hauptgericht', child: Text('Hauptgericht')),
+              PopupMenuItem(value: 'Süßspeise', child: Text('Süßspeise')),
+              PopupMenuItem(value: 'Beilage', child: Text('Beilage')),
+              PopupMenuItem(value: 'Salat', child: Text('Salat')),
+              PopupMenuItem(value: 'Suppe', child: Text('Suppe')),
+              PopupMenuItem(value: 'Snack', child: Text('Snack')),
+              PopupMenuItem(value: 'Frühstück', child: Text('Frühstück')),
+            ],
+          ),
           IconButton(
             tooltip: 'Rezept hinzufügen',
             onPressed: loading ? null : addFavorite,
