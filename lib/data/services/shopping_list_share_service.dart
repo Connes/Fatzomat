@@ -9,6 +9,7 @@ class ShoppingListShareService {
     required Iterable<ShoppingItem> items,
     required String title,
     String? subtitle,
+    int? servings,
   }) {
     final openItems = const ShoppingListAggregator().aggregate(
       items.where((item) => !item.checked),
@@ -37,18 +38,18 @@ class ShoppingListShareService {
             : '';
         return '• $quantity${item.name}';
       });
-      sections.add('$category\n${lines.join('\n')}');
+      sections.add('_${category}_\n${lines.join('\n')}');
     }
 
     return [
       '🛒 $title',
-      if (subtitle != null && subtitle.trim().isNotEmpty) subtitle.trim(),
       '',
-      'Offene Zutaten',
+      if (subtitle != null && subtitle.trim().isNotEmpty) subtitle.trim(),
+      if (servings != null) '$servings Personen',
+      if ((subtitle != null && subtitle.trim().isNotEmpty) || servings != null) '',
+      '*Offene Zutaten*',
       '',
       sections.join('\n\n'),
-      '',
-      'Geteilt mit Fatzomat',
     ].join('\n');
   }
 

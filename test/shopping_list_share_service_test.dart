@@ -6,10 +6,11 @@ void main() {
   group('ShoppingListShareService', () {
     const service = ShoppingListShareService();
 
-    test('shares only unchecked items and keeps grouped categories', () {
+    test('formats recipe title, servings, bold heading and italic categories', () {
       final text = service.buildText(
-        title: 'Einkaufsliste',
-        subtitle: 'Cremige Gnocchi-Pfanne · 2 Personen',
+        title: 'Meine Einkaufsliste',
+        subtitle: 'Cremige Gnocchi-Pfanne',
+        servings: 2,
         items: const [
           ShoppingItem(
             id: '1',
@@ -25,7 +26,7 @@ void main() {
             quantity: 500,
             unit: 'g',
             checked: false,
-            category: 'Teigwaren',
+            category: 'Weitere Zutaten',
           ),
           ShoppingItem(
             id: '3',
@@ -38,17 +39,43 @@ void main() {
         ],
       );
 
-      expect(text, contains('🛒 Einkaufsliste'));
-      expect(text, contains('Cremige Gnocchi-Pfanne · 2 Personen'));
-      expect(text, contains('Gemüse\n• 200 g Babyspinat'));
-      expect(text, contains('Teigwaren\n• 500 g Gnocchi'));
+      expect(
+        text,
+        '🛒 Meine Einkaufsliste\n\n'
+        'Cremige Gnocchi-Pfanne\n'
+        '2 Personen\n\n'
+        '*Offene Zutaten*\n\n'
+        '_Gemüse_\n'
+        '• 200 g Babyspinat\n\n'
+        '_Weitere Zutaten_\n'
+        '• 500 g Gnocchi',
+      );
       expect(text, isNot(contains('Parmesan')));
-      expect(text, isNot(contains('Milchprodukte')));
+      expect(text, isNot(contains('Geteilt mit')));
+    });
+
+    test('does not add recipe metadata for a combined list', () {
+      final text = service.buildText(
+        title: 'Meine Einkaufsliste',
+        items: const [
+          ShoppingItem(
+            id: '1',
+            name: 'Tomaten',
+            quantity: 200,
+            unit: 'g',
+            checked: false,
+            category: 'Gemüse',
+          ),
+        ],
+      );
+
+      expect(text, contains('🛒 Meine Einkaufsliste\n\n*Offene Zutaten*'));
+      expect(text, isNot(contains('Personen')));
     });
 
     test('merges duplicate open ingredients and excludes checked duplicates', () {
       final text = service.buildText(
-        title: 'Einkaufsliste',
+        title: 'Meine Einkaufsliste',
         items: const [
           ShoppingItem(
             id: '1',
@@ -83,7 +110,7 @@ void main() {
 
     test('returns empty text when there are no open ingredients', () {
       final text = service.buildText(
-        title: 'Einkaufsliste',
+        title: 'Meine Einkaufsliste',
         items: const [
           ShoppingItem(
             id: '1',
