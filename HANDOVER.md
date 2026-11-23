@@ -539,3 +539,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Oberer und unterer Scroll-Außenabstand sind auf jeweils 18 px vereinheitlicht, damit die Karte mit gleichem Abstand zum AppBar-Bereich und zur unteren Navigation sitzt.
 - Regressionstests für die viewportabhängige Kartenhöhe aktualisiert; zwei bestehende Layouttests waren noch auf die frühere feste Höhenfunktion festgelegt und wurden entsprechend angepasst.
 - Feature-Branch: `fix/today-menu-card-overflow`. Pflicht-CI und erneuter Android-Gerätetest stehen aus.
+
+
+## Heute-Seite: einheitliche Kartenhöhe und kompakter Menüinhalt (2026-11-23)
+
+- Auswahlkarte und Ergebniskarte verwenden dieselbe responsive Höhenfunktion `_todayDecisionCardHeight(context)`; Kochen, Bestellen, Essen gehen und die noch offene Auswahl haben damit dieselbe äußere Kartenhöhe.
+- Auf der Ergebniskarte skaliert der Inhalt auf kleineren Displays kompakter: Rezeptbild, Rezeptname, Zusatzgangzeilen und Menü-Bearbeiten-Aktion werden angepasst. Es wird ausdrücklich kein Scrollbereich ergänzt.
+- Die Aktionsleiste bleibt außerhalb des flexiblen Inhaltsbereichs und vollständig sichtbar.
+- Regressionstests für identische Kartenhöhen und die kompakte Darstellung aktualisiert.
+- PR und Pflicht-CI stehen noch aus. Kein Geräte-/Simulator-Test durchgeführt.
