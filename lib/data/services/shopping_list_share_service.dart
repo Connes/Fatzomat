@@ -38,7 +38,7 @@ class ShoppingListShareService {
             : '';
         return '• $quantity${item.name}';
       });
-      sections.add('_$category_\n${lines.join('\n')}');
+      sections.add('_${category}_\n${lines.join('\n')}');
     }
 
     return [
