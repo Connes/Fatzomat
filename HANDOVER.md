@@ -537,5 +537,5 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Rückmeldung nach PR #457 mit Android-Screenshots: Die Heute-Ergebniskarte lief bei einem Hauptgericht um 20 px über; bei Vorspeise und Nachtisch war die Karte am unteren Rand abgeschnitten.
 - Die Ergebniskarte verwendet jetzt eine an der verfügbaren Gerätehöhe orientierte Höhe statt der bisherigen festen Basis plus pauschalen 156 px für Zusatzgänge. So bleibt der Inhalt innerhalb der Karte und die flexible Inhaltsfläche nimmt den verbleibenden Raum auf.
 - Oberer und unterer Scroll-Außenabstand sind auf jeweils 18 px vereinheitlicht, damit die Karte mit gleichem Abstand zum AppBar-Bereich und zur unteren Navigation sitzt.
-- Regressionstest für die neue Höhenberechnung aktualisiert.
+- Regressionstests für die viewportabhängige Kartenhöhe aktualisiert; zwei bestehende Layouttests waren noch auf die frühere feste Höhenfunktion festgelegt und wurden entsprechend angepasst.
 - Feature-Branch: `fix/today-menu-card-overflow`. Pflicht-CI und erneuter Android-Gerätetest stehen aus.
