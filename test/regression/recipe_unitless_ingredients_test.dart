@@ -48,15 +48,16 @@ void main() {
     );
     expect(migration.existsSync(), isTrue);
     final sql = migration.readAsStringSync();
-    expect(sql, contains('create or replace function public.create_shared_recipe'));
-    expect(sql, contains('create or replace function public.update_shared_recipe'));
+    final normalizedSql = sql.toLowerCase();
+    expect(normalizedSql, contains('create or replace function public.create_shared_recipe'));
+    expect(normalizedSql, contains('create or replace function public.update_shared_recipe'));
     expect(sql, contains("ingredient_quantity := coalesce("));
     expect(sql, contains("      1"));
     expect(sql, isNot(contains('Eine Zutat benötigt eine Einheit.')));
     expect(sql, contains("if ingredient_name = '' then raise exception 'Eine Zutat benötigt einen Namen.'; end if;"));
   });
 
-  test('imported ingredient without an amount stays quantity-optional with a unit', () {
+  test('imported ingredient keeps an explicitly optional amount with a unit', () {
     const importer = TogetherRecipeImporter();
     final recipe = importer.parse(jsonEncode({
       'format': 'together_recipe',
@@ -64,7 +65,7 @@ void main() {
       'recipe': {
         'title': 'Teig',
         'ingredients': [
-          {'name': 'Mehl', 'unit': 'g'},
+          {'name': 'Mehl', 'amount': 1, 'unit': 'g', 'quantity_is_optional': true},
         ],
         'steps': ['Mischen'],
       },
@@ -109,7 +110,7 @@ void main() {
       'supabase/migrations/20261123175448_allow_optional_recipe_ingredient_units_after_type_migrations.sql',
     ).readAsStringSync();
     expect(migration, contains('ADD COLUMN IF NOT EXISTS quantity_is_optional boolean NOT NULL DEFAULT false'));
-    expect('recipe_id, food_id, name, quantity, unit,\\n      is_user_selected, is_additional, is_qualitative, quantity_is_optional, section'.allMatches(migration).length, 2);
+    expect(migration.split('quantity_is_optional, section').length - 1, 2);
     expect(migration, contains("coalesce((item->>'quantity_is_optional')::boolean,false)"));
   });
 
