@@ -69,6 +69,20 @@ void main() {
     expect(restored.quantityIsOptional, isTrue);
     expect(restored.hidesQuantity, isTrue);
     expect(restored.unit, 'g');
+
+    final recipe = Recipe(
+      name: 'Mehlteig',
+      description: '',
+      servings: 1,
+      prepTimeMinutes: 1,
+      cookTimeMinutes: 1,
+      difficulty: 'Einfach',
+      instructions: const ['Rühren'],
+      ingredients: const [ingredient],
+    );
+    final exported = recipe.toTogetherRecipeJson()['recipe'] as Map<String, dynamic>;
+    final exportedIngredients = exported['ingredients'] as List<dynamic>;
+    expect((exportedIngredients.single as Map)['quantity_is_optional'], isTrue);
   });
 
   test('optional quantity flag is stored by both recipe RPCs', () {
