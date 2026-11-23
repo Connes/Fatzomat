@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/app_feedback.dart';
 import 'package:flutter/services.dart';
@@ -1925,6 +1926,30 @@ class _RecipeDropdownField extends StatefulWidget {
 }
 
 class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
+  Widget _foodTagIcon(String value) => switch (value) {
+        'Schwein' => SvgPicture.asset(
+            'assets/icons/pig_head.svg',
+            width: 24,
+            height: 24,
+            color: AppDesign.iconGold,
+          ),
+        'Rind' => SvgPicture.asset(
+            'assets/icons/cow_head.svg',
+            width: 24,
+            height: 24,
+            color: AppDesign.iconGold,
+          ),
+        'Huhn' => SvgPicture.asset(
+            'assets/icons/rooster.svg',
+            width: 24,
+            height: 24,
+            color: AppDesign.iconGold,
+          ),
+        'Vegetarisch' => const Icon(Icons.eco_rounded, color: AppDesign.iconGold),
+        'Fisch' => const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold),
+        _ => Icon(widget.icon, color: AppDesign.iconGold),
+      };
+
   ValueNotifier<Set<String>>? _menuSelection;
 
   @override
@@ -2029,13 +2054,9 @@ class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
                               width: 24,
                               height: 24,
                               child: Center(
-                                child: Icon(
-                                  widget.multiSelect
-                                      ? (isSelected ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded)
-                                      : widget.icon,
-                                  size: widget.multiSelect ? 20 : 18,
-                                  color: isSelected ? AppDesign.primaryDark : AppDesign.iconGold,
-                                ),
+                                child: widget.multiSelect
+                                    ? _foodTagIcon(value)
+                                    : Icon(widget.icon, size: 18, color: AppDesign.iconGold),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -2048,7 +2069,7 @@ class _RecipeDropdownFieldState extends State<_RecipeDropdownField> {
                                 ),
                               ),
                             ),
-                            if (isSelected && !widget.multiSelect)
+                            if (isSelected)
                               const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
                           ],
                         ),
