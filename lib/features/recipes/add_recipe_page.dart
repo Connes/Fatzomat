@@ -1396,7 +1396,6 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
   String servingsUnit = 'Personen';
   String category = '';
   final Set<String> foodTags = <String>{};
-  static const availableFoodTags = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
   final prep = TextEditingController();
   final cook = TextEditingController();
   final difficulty = TextEditingController(text: 'Einfach');
@@ -1593,7 +1592,6 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
             label: 'Beschreibung (optional)',
             hint: 'z. B. Ein schnelles und leckeres Rezept …',
             controller: description,
-            maxLines: null,
           ),
           const SizedBox(height: 12),
           _RecipeFieldCard(
@@ -1653,36 +1651,14 @@ class _ManualRecipePageState extends State<ManualRecipePage> {
             onChanged: saving ? null : (value) => setState(() => category = value ?? ''),
           ),
           const SizedBox(height: 12),
-          _RecipeSectionCard(
-            icon: Icons.restaurant_menu_rounded,
-            title: 'Ernährungsart / Hauptzutat (optional)',
-            children: [
-              const Text(
-                'Wähle alle passenden Merkmale. Sie sind unabhängig von der Rezeptart.',
-                style: TextStyle(color: AppDesign.secondaryText),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: availableFoodTags.map((tag) => FilterChip(
-                  label: Text(tag),
-                  selected: foodTags.contains(tag),
-                  onSelected: saving ? null : (selected) => setState(() {
-                    if (selected) {
-                      foodTags.add(tag);
-                      if (tag == 'Vegetarisch') {
-                        foodTags.removeAll({'Schwein', 'Rind', 'Huhn', 'Fisch'});
-                      } else {
-                        foodTags.remove('Vegetarisch');
-                      }
-                    } else {
-                      foodTags.remove(tag);
-                    }
-                  }),
-                )).toList(growable: false),
-              ),
-            ],
+          _RecipeFoodTagsField(
+            selectedTags: foodTags,
+            enabled: !saving,
+            onChanged: (nextTags) => setState(() {
+              foodTags
+                ..clear()
+                ..addAll(nextTags);
+            }),
           ),
           const SizedBox(height: 16),
           _RecipeSectionCard(
@@ -1767,7 +1743,6 @@ class _RecipeFieldCard extends StatelessWidget {
   final String? hint;
   final TextEditingController controller;
   final TextInputType? keyboardType;
-  final int? maxLines;
 
   const _RecipeFieldCard({
     required this.icon,
@@ -1775,7 +1750,6 @@ class _RecipeFieldCard extends StatelessWidget {
     this.hint,
     required this.controller,
     this.keyboardType,
-    this.maxLines = 1,
   });
 
   @override
@@ -1788,7 +1762,7 @@ class _RecipeFieldCard extends StatelessWidget {
         boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Row(
-        crossAxisAlignment: maxLines == null || maxLines! > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             width: 54,
@@ -1804,8 +1778,7 @@ class _RecipeFieldCard extends StatelessWidget {
             child: TextField(
               controller: controller,
               keyboardType: keyboardType,
-              minLines: maxLines == null ? 1 : null,
-              maxLines: maxLines,
+              maxLines: 1,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
                 labelText: label,
@@ -1943,6 +1916,101 @@ class _RecipeDifficultyField extends StatelessWidget {
             const SizedBox(width: 8),
             const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RecipeFoodTagsField extends StatelessWidget {
+  final Set<String> selectedTags;
+  final bool enabled;
+  final ValueChanged<Set<String>> onChanged;
+
+  const _RecipeFoodTagsField({
+    required this.selectedTags,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  static const options = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
+
+  void _toggle(String tag) {
+    final next = Set<String>.from(selectedTags);
+    if (next.contains(tag)) {
+      next.remove(tag);
+    } else if (tag == 'Vegetarisch') {
+      next
+        ..removeAll({'Schwein', 'Rind', 'Huhn', 'Fisch'})
+        ..add(tag);
+    } else {
+      next
+        ..remove('Vegetarisch')
+        ..add(tag);
+    }
+    onChanged(next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = options.where(selectedTags.contains).join(' · ');
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      decoration: BoxDecoration(
+        color: AppDesign.surface.withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(AppDesign.radiusXl),
+        boxShadow: const [BoxShadow(color: Color(0x16000000), blurRadius: 12, offset: Offset(0, 4))],
+      ),
+      child: MenuAnchor(
+        menuChildren: options.map((tag) => MenuItemButton(
+          closeOnActivate: false,
+          onPressed: enabled ? () => _toggle(tag) : null,
+          leadingIcon: Icon(
+            selectedTags.contains(tag) ? Icons.check_box_rounded : Icons.check_box_outline_blank_rounded,
+            color: selectedTags.contains(tag) ? AppDesign.primaryDark : AppDesign.secondaryText,
+          ),
+          child: Text(tag),
+        )).toList(growable: false),
+        builder: (context, controller, child) => InkWell(
+          onTap: enabled
+              ? () => controller.isOpen ? controller.close() : controller.open()
+              : null,
+          borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                margin: const EdgeInsets.only(right: 10),
+                decoration: BoxDecoration(
+                  color: AppDesign.primarySoft,
+                  borderRadius: BorderRadius.circular(AppDesign.radiusLg),
+                ),
+                child: const Icon(Icons.restaurant_menu_rounded, color: AppDesign.iconGold, size: 28),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Ernährungsart / Hauptzutat (optional)',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: AppDesign.secondaryText, fontSize: 14, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      summary.isEmpty ? 'Merkmale auswählen' : summary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 18, color: AppDesign.text),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.keyboard_arrow_down_rounded, color: AppDesign.secondaryText),
+            ],
+          ),
         ),
       ),
     );

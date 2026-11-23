@@ -473,3 +473,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Korrektur-Commit: `49e7710053ba31083070399acf4c7c91285ef727`. CI für diesen neuen Head muss vollständig erneut geprüft werden; bis dahin kein Merge.
 
 - Der nächste Lauf zeigte, dass innerhalb der ListView zusätzlich Scrollables der Textfelder liegen. Der Finder ist deshalb weiter eingegrenzt auf den vertikalen Scrollable und nimmt den ersten Treffer (äußerer Listen-Scroller). Korrektur-Commit `b4ac8b8ec2d2c9402822cb7fb9f68f76c814cae1`; erneute CI-Prüfung läuft.
+
+
+## Rezeptfilter und Rezepteditor: kompaktere Auswahlfelder (2026-11-23)
+
+- Im Ernährungs-/Hauptzutatenfilter ist die Material-Hinterlegung des aktiven Menüeintrags transparent; die bestehende hellgrüne Markierung und der Haken bleiben als einzige Auswahlindikatoren.
+- Filter für Hauptzutat und Rezeptart stehen links nebeneinander vor dem zentrierten Titel. Beide Symbole verwenden das zentrale Gold-Token `AppDesign.iconGold`; der Plus-Button bleibt rechts.
+- Das Beschreibungsfeld im manuellen Rezepteditor verwendet dieselbe einzeilige Feldhöhe wie Rezeptname und Personenzahl; der Beispieltext wird nicht mehr über mehrere Zeilen umbrochen.
+- Ernährungsart/Hauptzutat ist jetzt eine kompakte Auswahlkarte im Stil des Rezeptkategoriefelds. Ein Dropdown-Pfeil öffnet die Mehrfachauswahl; mehrere Tags bleiben auswählbar, und Vegetarisch schließt Fleisch-/Fisch-Tags weiterhin gegenseitig aus.
+- Regressionstests und Pflicht-CI für den Folge-PR stehen noch aus. Keine Geräteprüfung durchgeführt.

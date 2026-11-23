@@ -842,19 +842,19 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
       appBar: TogetherAppBar(
-        leading: PopupMenuButton<String>(
+        leadingWidth: 112,
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Theme(
+              data: Theme.of(context).copyWith(hoverColor: Colors.transparent, focusColor: Colors.transparent, splashColor: Colors.transparent, highlightColor: Colors.transparent),
+              child: PopupMenuButton<String>(
           tooltip: 'Rezepte nach Hauptzutat filtern',
           initialValue: mainIngredientFilter ?? 'Alle',
           onSelected: (value) => setState(
             () => mainIngredientFilter = value == 'Alle' ? null : value,
           ),
-          icon: Icon(
-            Icons.tune_rounded,
-            size: 22,
-            color: mainIngredientFilter == null
-                ? Theme.of(context).colorScheme.onSurfaceVariant
-                : Theme.of(context).colorScheme.primary,
-          ),
+          icon: const Icon(Icons.tune_rounded, size: 22, color: AppDesign.iconGold),
           color: Theme.of(context).colorScheme.surface,
           surfaceTintColor: Colors.transparent,
           elevation: 8,
@@ -937,30 +937,28 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               );
             }).toList();
           },
+              ),
+            ),
+            PopupMenuButton<String>(
+              tooltip: 'Nach Rezeptart filtern',
+              initialValue: categoryFilter ?? 'Alle',
+              onSelected: (value) => setState(() => categoryFilter = value == 'Alle' ? null : value),
+              icon: const Icon(Icons.category_outlined, color: AppDesign.iconGold),
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'Alle', child: Text('Alle Rezeptarten')),
+                PopupMenuItem(value: 'Hauptgericht', child: Text('Hauptgericht')),
+                PopupMenuItem(value: 'Süßspeise', child: Text('Süßspeise')),
+                PopupMenuItem(value: 'Beilage', child: Text('Beilage')),
+                PopupMenuItem(value: 'Salat', child: Text('Salat')),
+                PopupMenuItem(value: 'Suppe', child: Text('Suppe')),
+                PopupMenuItem(value: 'Snack', child: Text('Snack')),
+                PopupMenuItem(value: 'Frühstück', child: Text('Frühstück')),
+              ],
+            ),
+          ],
         ),
         title: const Text('Meine Rezepte'),
         actions: [
-          PopupMenuButton<String>(
-            tooltip: 'Nach Rezeptart filtern',
-            initialValue: categoryFilter ?? 'Alle',
-            onSelected: (value) => setState(() => categoryFilter = value == 'Alle' ? null : value),
-            icon: Icon(
-              Icons.category_outlined,
-              color: categoryFilter == null
-                  ? Theme.of(context).colorScheme.onSurfaceVariant
-                  : Theme.of(context).colorScheme.primary,
-            ),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'Alle', child: Text('Alle Rezeptarten')),
-              PopupMenuItem(value: 'Hauptgericht', child: Text('Hauptgericht')),
-              PopupMenuItem(value: 'Süßspeise', child: Text('Süßspeise')),
-              PopupMenuItem(value: 'Beilage', child: Text('Beilage')),
-              PopupMenuItem(value: 'Salat', child: Text('Salat')),
-              PopupMenuItem(value: 'Suppe', child: Text('Suppe')),
-              PopupMenuItem(value: 'Snack', child: Text('Snack')),
-              PopupMenuItem(value: 'Frühstück', child: Text('Frühstück')),
-            ],
-          ),
           IconButton(
             tooltip: 'Rezept hinzufügen',
             onPressed: loading ? null : addFavorite,
