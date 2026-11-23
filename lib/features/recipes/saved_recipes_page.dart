@@ -1070,13 +1070,36 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                         Expanded(
                                           child: Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              (recipe.name.length > 40
-                                                  ? '${recipe.name.substring(0, 40).trimRight()}…'
-                                                  : recipe.name),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  (recipe.name.length > 40
+                                                      ? '${recipe.name.substring(0, 40).trimRight()}…'
+                                                      : recipe.name),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: Theme.of(context).textTheme.titleMedium,
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  [
+                                                    if (recipe.category.trim().isNotEmpty) recipe.category,
+                                                    ...recipe.foodTags,
+                                                  ].join(' · ').isEmpty
+                                                      ? 'Noch nicht eingeordnet'
+                                                      : [
+                                                          if (recipe.category.trim().isNotEmpty) recipe.category,
+                                                          ...recipe.foodTags,
+                                                        ].join(' · '),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                    color: AppDesign.secondaryText,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
