@@ -174,12 +174,13 @@ begin
 
     insert into public.recipe_ingredients(
       recipe_id, food_id, name, quantity, unit,
-      is_user_selected, is_additional, is_qualitative, section
+      is_user_selected, is_additional, is_qualitative, quantity_is_optional, section
     ) values (
       p_recipe_id, nullif(item->>'food_id',''), ingredient_name, ingredient_quantity, ingredient_unit,
       coalesce((item->>'is_user_selected')::boolean,false),
       coalesce((item->>'is_additional')::boolean,false),
       coalesce((item->>'is_qualitative')::boolean,false),
+      coalesce((item->>'quantity_is_optional')::boolean,false),
       nullif(trim(coalesce(item->>'section','')),'')
     );
   end loop;
