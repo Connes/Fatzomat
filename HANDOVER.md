@@ -482,3 +482,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Das Beschreibungsfeld im manuellen Rezepteditor verwendet dieselbe einzeilige Feldhöhe wie Rezeptname und Personenzahl; der Beispieltext wird nicht mehr über mehrere Zeilen umbrochen.
 - Ernährungsart/Hauptzutat ist jetzt eine kompakte Auswahlkarte im Stil des Rezeptkategoriefelds. Ein Dropdown-Pfeil öffnet die Mehrfachauswahl; mehrere Tags bleiben auswählbar, und Vegetarisch schließt Fleisch-/Fisch-Tags weiterhin gegenseitig aus.
 - Regressionstests und Pflicht-CI für den Folge-PR stehen noch aus. Keine Geräteprüfung durchgeführt.
+
+
+## Rezeptfilter: Auswahl sichtbar halten und Icons ausrichten (2026-11-23)
+
+- Das linke Filtermenü für Ernährungsart/Hauptzutat aktualisiert die Auswahl sofort, hält das Menü aber weitere 200 ms geöffnet. Die neue Markierung mit Häkchen bleibt dadurch kurz sichtbar, bevor sich das Menü schließt.
+- Der rechte Rezeptartfilter verwendet jetzt dieselbe helle Menükarte, abgerundete Auswahlflächen, dezente Kontur und ausgewählte Markierung wie der linke Filter.
+- Das linke Filter-Icon ist visuell um 12 px nach rechts versetzt. Der rechte Filter bleibt an seiner bisherigen Position; dadurch wird der Abstand zwischen den Symbolen kleiner.
+- Regressionstest in `test/regression/saved_recipes_menu_test.dart` sichert Verzögerung, Icon-Versatz und Menügestaltung ab.
+- PR/CI und Geräteprüfung stehen noch aus.
