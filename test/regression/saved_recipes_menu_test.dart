@@ -25,6 +25,18 @@ void main() {
     expect(source, contains('recipe.foodTags'));
   });
 
+  test('recipe filter selection remains visible briefly and both menus share one design', () {
+    final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+
+    expect(source, contains('offset: const Offset(12, 0)'));
+    expect(source, contains('Future<void>.delayed(const Duration(milliseconds: 200)'));
+    expect(source, contains('if (menuContext.mounted) Navigator.of(menuContext).pop()'));
+    expect(source, contains('enabled: false'));
+    expect(source, contains('BorderRadius.circular(20)'));
+    expect(source, contains('AppDesign.secondarySurface'));
+    expect(source, contains('tooltip: \'Nach Rezeptart filtern\''));
+  });
+
   test('V86 keeps the saved recipe overflow menu focused on recipe actions', () {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
