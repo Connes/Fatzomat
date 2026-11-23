@@ -1530,7 +1530,7 @@ class _TodayResultCard extends StatelessWidget {
 
 
     return SizedBox(
-      height: (MediaQuery.sizeOf(context).height - 320).clamp(480.0, 900.0),
+      height: (MediaQuery.sizeOf(context).height - 285).clamp(480.0, 900.0),
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
