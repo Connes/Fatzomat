@@ -46,7 +46,7 @@ class ShoppingListShareService {
       '',
       if (subtitle != null && subtitle.trim().isNotEmpty) subtitle.trim(),
       if (servings != null) '$servings Personen',
-      '',
+      if ((subtitle != null && subtitle.trim().isNotEmpty) || servings != null) '',
       '*Offene Zutaten*',
       '',
       sections.join('\n\n'),
