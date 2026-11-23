@@ -754,7 +754,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                   child: SingleChildScrollView(
                     key: ValueKey<DateTime>(_displayedDate),
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
+                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -1530,7 +1530,7 @@ class _TodayResultCard extends StatelessWidget {
 
 
     return SizedBox(
-      height: _todayDecisionCardHeight(context) + (plan.menuCourses.isEmpty ? 0 : 156),
+      height: (MediaQuery.sizeOf(context).height - 285).clamp(480.0, 900.0),
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
