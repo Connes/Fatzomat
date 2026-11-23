@@ -74,7 +74,7 @@ void main() {
     expect(page, contains('AppSurface(\n                          color: AppDesign.surface'));
     expect(page, contains('for (final day in activeDays)'));
     expect(page, contains('title: Row(\n                                  children: ['));
-    expect(page, contains("'Zusammengefasste Zutaten',\n                                  textAlign: TextAlign.center"));
+    expect(page, contains("'Zusammengefasste Zutaten',\n                                        style:"));
     expect(page, contains("label: const Text('Einkaufsliste erledigen')"));
     expect(page, contains('_temporarilyVisibleChecked.contains(item.key)'));
     expect(page, contains('Timer(const Duration(milliseconds: 700)'));
