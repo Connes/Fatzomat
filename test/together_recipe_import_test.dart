@@ -93,6 +93,27 @@ void main() {
     expect(recipe.ingredients[2].unit, 'g');
   });
 
+  test('imports ingredients without a unit', () {
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': 'Einfaches Gemüse',
+        'ingredients': [
+          {'name': 'Zwiebel', 'amount': 1, 'unit': ''},
+          {'name': 'Knoblauch', 'amount': 2},
+          {'name': 'Olivenöl', 'amount': 2, 'unit': 'EL'},
+        ],
+        'steps': ['Gemüse vorbereiten.'],
+      },
+    }));
+
+    expect(recipe.ingredients, hasLength(3));
+    expect(recipe.ingredients[0].unit, isEmpty);
+    expect(recipe.ingredients[1].unit, isEmpty);
+    expect(recipe.ingredients[2].unit, 'EL');
+  });
+
   test('accepts null amount for qualitative ingredients', () {
     final recipe = importer.parse(jsonEncode({
       'format': 'together_recipe',
