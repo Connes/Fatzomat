@@ -35,6 +35,20 @@ void main() {
     expect(source, contains('BorderRadius.circular(20)'));
     expect(source, contains('AppDesign.secondarySurface'));
     expect(source, contains('tooltip: \'Nach Rezeptart filtern\''));
+    expect(source, contains('Future<void>.delayed(const Duration(milliseconds: 200)'));
+    expect(source, contains('selectedValue.value = value'));
+    expect(source, contains('highlightColor: Colors.transparent'));
+  });
+
+  test('leaving the recipes tab resets both library filters', () {
+    final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+    final shell = File('lib/core/app_shell.dart').readAsStringSync();
+
+    expect(source, contains('void resetFilters()'));
+    expect(source, contains('mainIngredientFilter = null;'));
+    expect(source, contains('categoryFilter = null;'));
+    expect(shell, contains('_resetRecipeFiltersWhenLeaving(value)'));
+    expect(shell, contains('_savedRecipesKey.currentState?.resetFilters()'));
   });
 
   test('V86 keeps the saved recipe overflow menu focused on recipe actions', () {

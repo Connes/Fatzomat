@@ -491,3 +491,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Das linke Filter-Icon ist visuell um 12 px nach rechts versetzt. Der rechte Filter bleibt an seiner bisherigen Position; dadurch wird der Abstand zwischen den Symbolen kleiner.
 - Regressionstest in `test/regression/saved_recipes_menu_test.dart` sichert Verzögerung, Icon-Versatz und Menügestaltung ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptfilter: einheitliche Auswahl und Reset beim Verlassen (2026-11-23)
+
+- Der rechte Rezeptartfilter verwendet jetzt exakt dasselbe Interaktionsmuster wie der linke Hauptzutatenfilter: transparente Material-Hover-/Highlight-Zustände, sofortige eigene Auswahlmarkierung mit Häkchen und automatisches Schließen nach 200 ms.
+- Beim Verlassen des Rezepte-Tabs werden Hauptzutaten- und Rezeptartfilter zurückgesetzt. Beim erneuten Öffnen erscheinen dadurch wieder alle gespeicherten Rezepte. Das gilt auch für Navigation über Heute, Einkauf, Profil und die Zurück-Navigation.
+- Regressionstests sichern das einheitliche Menüverhalten und den Reset beider Filter ab.
+- PR/CI und Geräteprüfung stehen noch aus.
