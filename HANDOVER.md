@@ -441,3 +441,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Die Teilen-Schaltfläche sitzt innerhalb dieses rechten Innenabstands mit kompakter 40-Pixel-Trefferfläche; ihr Symbol ist auf die rechte Flucht des Ausklapppfeils ausgerichtet.
 - Regressionstest in `test/regression/shopping_list_test.dart` prüft den horizontalen Innenabstand und die kompakte Teilen-Schaltfläche.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptimport: Einheiten sind optional (2026-11-23)
+
+- Zutaten im `together_recipe`-Import dürfen eine leere oder fehlende `unit` haben. Der Importer übernimmt sie mit leerer Einheit.
+- Die Rezeptprüfung verlangt weiterhin einen gültigen Zutatenname und eine Menge, aber keine Einheit. Die Prüfung in `RecipeImportPreviewPage._missingRequiredFields` enthält bereits keine Einheitenpflicht; sie bleibt bewusst so.
+- ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.
+- Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
+- PR/CI und Geräteprüfung stehen noch aus.
