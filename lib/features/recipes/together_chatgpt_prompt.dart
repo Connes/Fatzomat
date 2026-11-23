@@ -196,11 +196,13 @@ Verwende exakt dieses JSON-Format:
 }
 
 Zusätzliche Regeln:
-1. Das Ergebnis muss syntaktisch gültiges JSON sein.
-2. Keine Markdown-Codeblöcke.
-3. Keine Einleitung und keine Erklärung außerhalb des JSON.
-4. Die Datei soll „together_recipe.json“ heißen.
-5. Prüfe vor der Ausgabe, dass das Ergebnis dem together_recipe-Format Version 1 entspricht.
-6. Stelle ausschließlich die erzeugte JSON-Datei als herunterladbaren Dateianhang bereit. Gib den JSON-Inhalt niemals im Chat aus, weder als Codeblock noch als Klartext, Python-Dictionary oder Vorschau. Falls die Dateierstellung technisch nicht möglich ist, erkläre kurz den Fehler und bitte um einen erneuten Versuch, statt den JSON-Inhalt auszugeben.''';
+1. Das Ergebnis muss syntaktisch gültiges JSON gemäß together_recipe-Format Version 1 sein.
+2. Erzeuge die Datei „together_recipe.json“ tatsächlich als Datei-Anhang. Es reicht NICHT, den JSON-Inhalt nur in einer Variable, im Arbeitsspeicher oder als Text zu erzeugen.
+3. Verwende zum Erstellen der Datei ein verfügbares Datei-/Python-Werkzeug. Serialisiere die Rezeptdaten als echtes JSON (UTF-8), z. B. mit json.dump(..., ensure_ascii=False, indent=2). Die Datei muss mit einem JSON-Parser lesbar sein.
+4. Gib niemals interne Zwischenschritte, Variablen, Python-Code, Python-Dictionary-Darstellungen oder JSON-Inhalte im Chat aus. Insbesondere darf die Chatantwort keine Zeile wie „recipe_data =“, keine Werte wie None/False/True in einer Datenstruktur und keinen Codeblock enthalten.
+5. Nach erfolgreicher Dateierstellung besteht deine gesamte Chatantwort ausschließlich aus einer sehr kurzen Bestätigung und dem anklickbaren Download-Link/Dateianhang zu „together_recipe.json“. Liste die Zutaten oder Rezeptdaten nicht zusätzlich im Chat auf.
+6. Keine Markdown-Codeblöcke und keine Einleitung mit Rezeptdaten.
+7. Prüfe vor dem Anhängen, dass die Datei existiert, gültiges JSON enthält und dem together_recipe-Format Version 1 entspricht.
+8. Falls du in dieser Sitzung keine echte Datei erstellen oder anhängen kannst, gib keinesfalls ersatzweise den Rezeptinhalt, Code oder eine Python-Darstellung aus. Antworte nur kurz, dass die Datei technisch nicht erstellt werden konnte.''';
   }
 }

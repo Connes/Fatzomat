@@ -499,3 +499,13 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Beim Verlassen des Rezepte-Tabs werden Hauptzutaten- und Rezeptartfilter zurückgesetzt. Beim erneuten Öffnen erscheinen dadurch wieder alle gespeicherten Rezepte. Das gilt auch für Navigation über Heute, Einkauf, Profil und die Zurück-Navigation.
 - Regressionstests sichern das einheitliche Menüverhalten und den Reset beider Filter ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Foto-Rezeptimport: ausschließlich echten Datei-Download ausgeben (2026-11-23)
+
+- Anlass: Beim Fotoimport wurde statt eines Datei-Anhangs eine Python-Dictionary-Darstellung direkt im Chat ausgegeben. Das ist weder gültiges JSON noch der gewünschte Download-Workflow.
+- `buildPhotoImportPrompt` verlangt jetzt ausdrücklich, `together_recipe.json` als echte UTF-8-Datei mit einem Datei-/Python-Werkzeug zu erzeugen und als gültiges JSON zu serialisieren.
+- Interne Variablen, Python-Code, Python-Dictionary-Ausgaben und Rezeptdaten dürfen nicht im Chat erscheinen. Nach erfolgreicher Erstellung soll die Chatantwort nur eine kurze Bestätigung und den anklickbaren Download-Anhang enthalten.
+- Wenn keine echte Datei erstellt/angehängt werden kann, darf ChatGPT nicht auf Code oder Rezeptdaten im Chat ausweichen, sondern muss die technische Einschränkung kurz melden.
+- Regressionstest prüft den Download-only-Vertrag und die expliziten Verbote der sichtbaren Python-Darstellung.
+- Die ursprünglichen CI-Läufe auf dem alten PR-Head waren erfolgreich; die Pflichtprüfungen auf der aktualisierten Mainline-Basis müssen nach PR-Erstellung erneut vollständig grün sein. Ein echter Test mit ChatGPT-Fotoimport und Geräteprüfung stehen weiterhin aus.
