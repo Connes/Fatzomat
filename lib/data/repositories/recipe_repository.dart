@@ -83,6 +83,7 @@ class RecipeRepository {
     }
     final id = map['recipe_id']?.toString().trim() ?? '';
     if (id.isEmpty) throw const BackendException('Das gespeicherte Rezept hat keine gültige ID.');
+    await client.from('recipes').update({'food_tags': recipe.foodTags}).eq('id', id);
     RecipeCollectionEvents.notifyChanged();
     return id;
   }
@@ -108,6 +109,7 @@ class RecipeRepository {
     );
     final updatedId = result?.toString().trim() ?? '';
     if (updatedId.isEmpty) throw const BackendException('Das Rezept konnte nicht aktualisiert werden.');
+    await client.from('recipes').update({'food_tags': recipe.foodTags}).eq('id', id);
     RecipeCollectionEvents.notifyChanged();
     return updatedId;
   }
