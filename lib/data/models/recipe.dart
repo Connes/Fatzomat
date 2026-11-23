@@ -168,6 +168,7 @@ class RecipeIngredient {
   final bool isUserSelected;
   final bool isAdditional;
   final bool isQualitative;
+  final bool quantityIsOptional;
   final String? section;
 
   const RecipeIngredient({
@@ -178,6 +179,7 @@ class RecipeIngredient {
     this.isUserSelected = false,
     this.isAdditional = false,
     this.isQualitative = false,
+    this.quantityIsOptional = false,
     this.section,
   });
 
@@ -189,13 +191,14 @@ class RecipeIngredient {
         isUserSelected: map['is_user_selected'] == true,
         isAdditional: map['is_additional'] == true,
         isQualitative: map['is_qualitative'] == true,
+        quantityIsOptional: map['quantity_is_optional'] == true,
         section: map['section']?.toString().trim().isEmpty == true ? null : map['section']?.toString().trim(),
       );
 
   /// A qualitative flag must not hide an explicitly measured ingredient.
   /// Legacy imports sometimes set is_qualitative while still storing a unit
   /// such as EL or g; in that case the numeric amount is meaningful.
-  bool get hidesQuantity => isQualitative && unit.trim().isEmpty;
+  bool get hidesQuantity => quantityIsOptional || (isQualitative && unit.trim().isEmpty);
 
   RecipeIngredient scaledTo(num factor) => RecipeIngredient(
         foodId: foodId,
@@ -205,6 +208,7 @@ class RecipeIngredient {
         isUserSelected: isUserSelected,
         isAdditional: isAdditional,
         isQualitative: isQualitative,
+        quantityIsOptional: quantityIsOptional,
         section: section,
       );
 
@@ -216,6 +220,7 @@ class RecipeIngredient {
         'is_user_selected': isUserSelected,
         'is_additional': isAdditional,
         'is_qualitative': isQualitative,
+        'quantity_is_optional': quantityIsOptional,
         'section': section,
       };
 }
