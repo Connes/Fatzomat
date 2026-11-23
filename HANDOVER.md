@@ -450,3 +450,26 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.
 - Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptarten und unabhängige Ernährungs-/Hauptzutatenmerkmale (2026-11-23)
+
+- Rezeptart bleibt ein einzelnes Feld `recipes.category`: Hauptgericht, Süßspeise, Beilage, Salat, Suppe, Snack oder Frühstück.
+- Neue unabhängige Spalte `recipes.food_tags text[] not null default '{}'` speichert optionale Merkmale: Schwein, Rind, Huhn, Fisch und Vegetarisch. Vegetarisch wird nicht zusammen mit Fleisch-/Fisch-Tags gespeichert.
+- Supabase-Migrationen `20261123140756_recipe_food_tags` und `20261123141435_backfill_existing_recipe_types` wurden auf Projekt `oidxezjdwqktpxuypbfb` angewendet. Die vorhandenen Rezepte wurden anhand erkennbarer Zutaten konservativ klassifiziert; bekannte Dessertnamen als Süßspeise und klare Mahlzeiten als Hauptgericht.
+- Flutter-Modell, Repository, JSON-Import/-Export und ChatGPT-Prompts lesen bzw. speichern `food_tags` unabhängig von `category`. Das together_recipe-Format Version 1 erhält nur ein optionales Feld, keine neue Pflichtangabe.
+- Manuelle Rezeptbearbeitung bietet Mehrfachauswahl der Merkmale. Rezeptkarten zeigen Rezeptart und Merkmale.
+- Bibliotheksfilter sind getrennt: Rezeptart und Ernährungsart/Hauptzutat. Beide können kombiniert werden (UND-Verknüpfung). Fehlende Tags werden nicht automatisch geraten.
+- Die bisherige Pflichtprüfung auf positive Zutatenmengen wurde im selben Feature-Branch ebenfalls entfernt, damit die offene Korrektur für Eier/Zutaten ohne Menge mit ausgeliefert wird.
+- Fehlende Zutatenmengen aus dem Import werden intern als qualitative Menge mit neutralem Speicherwert 1 behandelt, damit das bestehende positive Mengen-Datenbankschema erhalten bleibt; die Anzeige blendet den Zahlenwert bei qualitativen Zutaten aus.
+- Regressionstests für Modell, Import/Export, kombinierte Filter, Prompt-Regeln und optionale Zutatenmengen hinzugefügt.
+- PR und CI stehen noch aus; Supabase-Schema und Backfill sind live angewendet und per SELECT verifiziert.
+
+
+## CI-Korrektur Rezeptarten-PR #450 (2026-11-23)
+
+- Der erste CI-Lauf auf PR-Head `426cc1c23599e79d2a2e8a1b32eef0fefaece9c6` meldete einen Fehler im Widgettest `Rezept bearbeiten verwendet die bestehende responsive Editor-Struktur`: `scrollUntilVisible` erhielt versehentlich den Finder der `ListView` statt den darin liegenden `Scrollable`.
+- Der Test ermittelt nun den `Scrollable` als Nachfahren der `ListView`, prüft dessen Eindeutigkeit und übergibt diesen Finder an `scrollUntilVisible`.
+- Korrektur-Commit: `49e7710053ba31083070399acf4c7c91285ef727`. CI für diesen neuen Head muss vollständig erneut geprüft werden; bis dahin kein Merge.
+
+- Der nächste Lauf zeigte, dass innerhalb der ListView zusätzlich Scrollables der Textfelder liegen. Der Finder ist deshalb weiter eingegrenzt auf den vertikalen Scrollable und nimmt den ersten Treffer (äußerer Listen-Scroller). Korrektur-Commit `b4ac8b8ec2d2c9402822cb7fb9f68f76c814cae1`; erneute CI-Prüfung läuft.

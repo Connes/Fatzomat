@@ -19,7 +19,10 @@ void main() {
     expect(source, contains("('Vegetarisch', const Icon("));
     expect(source, contains("('Fisch', const Icon("));
     expect(source, contains('mainIngredientFilter'));
-    expect(source, contains('mainChoice: mainIngredientFilter'));
+    expect(source, contains('tooltip: \'Nach Rezeptart filtern\''));
+    expect(source, contains('foodTag: mainIngredientFilter'));
+    expect(source, contains('category: categoryFilter'));
+    expect(source, contains('recipe.foodTags'));
   });
 
   test('V86 keeps the saved recipe overflow menu focused on recipe actions', () {

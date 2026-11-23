@@ -8,6 +8,7 @@ class Recipe {
   final int cookTimeMinutes;
   final String difficulty;
   final String category;
+  final List<String> foodTags;
   final List<String> instructions;
   final List<RecipeIngredient> ingredients;
   final String? imageUrl;
@@ -27,6 +28,7 @@ class Recipe {
     required this.cookTimeMinutes,
     required this.difficulty,
     this.category = '',
+    this.foodTags = const <String>[],
     required this.instructions,
     required this.ingredients,
     this.imageUrl,
@@ -47,6 +49,7 @@ class Recipe {
         cookTimeMinutes: _int(map['cook_time_minutes']),
         difficulty: map['difficulty']?.toString() ?? 'Einfach',
         category: map['category']?.toString().trim() ?? '',
+        foodTags: normalizeFoodTags(map['food_tags'] ?? map['foodTags']),
         instructions: _strings(map['instructions'] ?? map['steps']),
         ingredients: ((map['ingredients'] ?? map['recipe_ingredients']) as List? ?? const [])
             .whereType<Map>()
@@ -73,6 +76,7 @@ class Recipe {
       cookTimeMinutes: cookTimeMinutes,
       difficulty: difficulty,
       category: category,
+      foodTags: List<String>.from(foodTags),
       instructions: List<String>.from(instructions),
       ingredients: ingredients.map((ingredient) => ingredient.scaledTo(target / base)).toList(),
       imageUrl: imageUrl,
@@ -97,6 +101,7 @@ class Recipe {
           'cook_time_minutes': cookTimeMinutes,
           'difficulty': difficulty,
           'category': category,
+          'food_tags': foodTags,
           'ingredients': ingredients
               .map((ingredient) => {
                     'food_id': ingredient.foodId,
@@ -124,10 +129,25 @@ class Recipe {
         'cook_time_minutes': cookTimeMinutes,
         'difficulty': difficulty,
         'category': category,
+        'food_tags': foodTags,
         'instructions': instructions,
         'image_url': imageUrl,
         'ingredients': ingredients.map((e) => e.toMap()).toList(),
       };
+
+  static const supportedFoodTags = <String>['Schwein', 'Rind', 'Huhn', 'Fisch', 'Vegetarisch'];
+
+  static List<String> normalizeFoodTags(dynamic value) {
+    if (value is! List) return const <String>[];
+    final normalized = value
+        .map((item) => item.toString().trim())
+        .where((item) => supportedFoodTags.contains(item))
+        .toSet();
+    if (normalized.contains('Vegetarisch')) {
+      normalized.removeAll({'Schwein', 'Rind', 'Huhn', 'Fisch'});
+    }
+    return supportedFoodTags.where(normalized.contains).toList(growable: false);
+  }
 
   static String _normalizeServingsUnit(dynamic value) {
     final unit = value?.toString().trim().toLowerCase();

@@ -67,7 +67,7 @@ PHASE 2 – NACH MEINER AUSWAHL:
 - Wenn eine Mengenangabe in der Quelle „n. B.“ / „nach Belieben“ lautet oder keine konkrete Menge angegeben ist, bilde das korrekt als qualitative Menge ab: amount: null, unit: "", is_qualitative: true. Lasse niemals eine Zutat ohne Mengenfeld aus und erfinde für qualitative Quellmengen keine Gramm-, Milliliter- oder Löffelangabe. Wenn die Menge in der Quelle konkret ist, übernimm sie korrekt und skaliere sie bei einer Portionsanpassung rechnerisch; kennzeichne eine Umrechnung nicht in der Beschreibung.
 - Wenn die Originalseite nicht geöffnet werden kann (z. B. wegen Chefkoch-Zugriffsschutz), brich nicht sofort ab. Führe einen begrenzten Fallback aus: (1) suche nach dem exakten Rezepttitel in der Websuche, (2) prüfe, ob eine andere zugängliche Seite dasselbe Rezept mit Zutaten und Mengen wiedergibt, (3) nutze nur tatsächlich sichtbare und verifizierbare Angaben. Bevorzuge eine alternative zugängliche Quelle mit direktem Link und nenne klar, dass die Originalseite nicht erreichbar war. Behaupte niemals, die blockierte Originalseite selbst gelesen zu haben.\n- Falls nur ein Teil der Zutaten oder Mengen über Suchtreffer/Snippets sichtbar ist, verwende diese Angaben nicht als vollständige Zutatenliste. Versuche eine zweite zugängliche Quelle. Wenn die wesentlichen Angaben weiterhin nicht verifizierbar sind, erfinde sie nicht und erstelle keine Datei, die Vollständigkeit vortäuscht; bitte mich gezielt um Screenshots/Text der fehlenden Zutatenliste oder Zubereitung. Erkläre genau, welche Information fehlt, statt pauschal die gesamte Aufgabe abzulehnen.\n- Sobald eine zugängliche Quelle die Zutaten und Mengen ausreichend belegt, erstelle daraus das importierbare Rezept in eigenen Worten und speichere die tatsächlich verwendete Quell-URL ausschließlich in recipe.source_url, niemals in recipe.description. Verweigere die Datei nicht allein deshalb, weil die ursprüngliche Quelle ein Internetrezept ist.
 - Wenn ich eine eigene Rezeptidee auswähle, erstelle dafür das vollständige Rezept nach den Regeln und Zutatenbeschränkungen unten.
-- Bei Süßspeisen ist cook_time_minutes die Backzeit (nicht Kochzeit). Bei allen anderen Rezepten ist cook_time_minutes die Kochzeit. Wenn keine Koch- bzw. Backzeit anfällt, setze den Wert auf 0.\n- Ordne jedes Rezept genau einer passenden Kategorie zu. Verwende bevorzugt die Kategorien „Hauptgericht“, „Süßspeise“, „Beilage“, „Salat“, „Suppe“, „Snack“ oder „Frühstück“. Kuchen, Torten, Cake Pops, Kekse, Gebäck, Desserts, Pudding, Eis und andere süße Nachspeisen müssen die Kategorie „Süßspeise“ erhalten. Schreibe die Kategorie in recipe.category.\n- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann. Das bestehende JSON-Schema Version 1 darf nicht geändert oder um neue Pflichtfelder erweitert werden.
+- Bei Süßspeisen ist cook_time_minutes die Backzeit (nicht Kochzeit). Bei allen anderen Rezepten ist cook_time_minutes die Kochzeit. Wenn keine Koch- bzw. Backzeit anfällt, setze den Wert auf 0.\n- Ordne jedes Rezept genau einer passenden Kategorie zu. Verwende bevorzugt die Kategorien „Hauptgericht“, „Süßspeise“, „Beilage“, „Salat“, „Suppe“, „Snack“ oder „Frühstück“. Kuchen, Torten, Cake Pops, Kekse, Gebäck, Desserts, Pudding, Eis und andere süße Nachspeisen müssen die Kategorie „Süßspeise“ erhalten. Schreibe die Kategorie in recipe.category. Ergänze unabhängig davon recipe.food_tags als Liste mit passenden Werten aus „Schwein“, „Rind“, „Huhn“, „Fisch“ und „Vegetarisch“. Mehrere Fleisch-/Fischmerkmale sind möglich, wenn sie tatsächlich im Rezept vorkommen. „Vegetarisch“ darf nicht zusammen mit Schwein, Rind, Huhn oder Fisch gesetzt werden. Wenn die Zuordnung nicht sicher ist, verwende eine leere Liste statt zu raten.\n- Erstelle zusätzlich eine echte Datei „together_recipe.json“ im unten definierten Format Version 1, damit ich sie in der App Schmackofatz über „Rezeptdatei importieren“ auswählen kann. Das bestehende JSON-Schema Version 1 darf nicht geändert oder um neue Pflichtfelder erweitert werden.
 - Erzeuge eine echte JSON-Datei und stelle ausschließlich diese Datei als herunterladbaren Anhang bereit. Gib den JSON-Inhalt niemals zusätzlich im Chat aus, weder als Codeblock noch als Klartext, Python-Dictionary oder Vorschau. Der Chattext darf nur eine kurze Bestätigung mit dem Download-Link bzw. Dateianhang enthalten.
 - Generiere in keiner Phase ein Bild und starte keine Bildgenerierung.
 
@@ -106,6 +106,7 @@ Regeln:
     "cook_time_minutes": 20,
     "difficulty": "Einfach",
     "category": "Süßspeise",
+    "food_tags": ["Rind"],
     "ingredients": [
       {
         "food_id": null,
@@ -159,6 +160,8 @@ WICHTIG:
 - Verwende is_user_selected=false und is_additional=false, sofern diese Information nicht ausdrücklich aus dem Foto hervorgeht.
 - Verwende is_qualitative=true für qualitative Mengen wie „Prise“, wenn keine numerische Menge angegeben ist.
 - Verwende für einzelne Stücke keine Einheit. "1 Stück Zwiebel" wird als amount=1 und unit="" ausgegeben. Verwende niemals "Stück", "Stk." oder "Stk" als Einheit.
+- Ordne das Rezept genau einer Rezeptart zu: Hauptgericht, Süßspeise, Beilage, Salat, Suppe, Snack oder Frühstück.
+- Ergänze unabhängig davon food_tags als Liste mit passenden Werten aus „Schwein“, „Rind“, „Huhn“, „Fisch“ und „Vegetarisch“. Mehrere passende Fleisch-/Fischmerkmale sind möglich. „Vegetarisch“ darf nicht mit Schwein, Rind, Huhn oder Fisch kombiniert werden. Wenn die Fotos keine sichere Zuordnung erlauben, verwende eine leere Liste.
 
 Verwende exakt dieses JSON-Format:
 {
@@ -172,6 +175,8 @@ Verwende exakt dieses JSON-Format:
     "prep_time_minutes": 10,
     "cook_time_minutes": 20,
     "difficulty": "Einfach",
+    "category": "Hauptgericht",
+    "food_tags": [],
     "ingredients": [
       {
         "food_id": null,

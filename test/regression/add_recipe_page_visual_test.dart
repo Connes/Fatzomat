@@ -81,7 +81,13 @@ void main() {
     // of the lazy ListView. Scroll before asserting their widgets exist.
     final listView = find.byType(ListView);
     expect(listView, findsOneWidget);
-    await tester.drag(listView, const Offset(0, -700));
+    final scrollable = find.descendant(
+      of: listView,
+      matching: find.byWidgetPredicate(
+        (widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down,
+      ),
+    ).first;
+    await tester.scrollUntilVisible(find.text('Zubereitung'), 240, scrollable: scrollable);
     await tester.pumpAndSettle();
 
     expect(find.text('Zutaten'), findsOneWidget);

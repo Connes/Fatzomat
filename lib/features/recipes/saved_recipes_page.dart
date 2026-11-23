@@ -29,6 +29,17 @@ import 'recipe_detail_page.dart';
 import '../../data/services/recipe_image_service.dart';
 import '../../data/services/recipe_share_card_service.dart';
 
+/// Applies the two independent saved-recipe filters together.
+bool recipeMatchesLibraryFilters(
+  Recipe recipe, {
+  String? category,
+  String? foodTag,
+}) {
+  if (category != null && recipe.category.trim() != category) return false;
+  if (foodTag != null && !recipe.foodTags.contains(foodTag)) return false;
+  return true;
+}
+
 /// Filters a saved recipe against the cooking summary selection.
 ///
 /// Recipes carry their ingredients in `recipe_ingredients`. The main choice is
@@ -215,6 +226,7 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   Map<String, String> foodPreferences = const <String, String>{};
   String query = '';
   String? mainIngredientFilter;
+  String? categoryFilter;
   TodayPlan? todayPlan;
   RealtimeChannel? realtimeChannel;
 
@@ -615,12 +627,11 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
           !recipe.description.toLowerCase().contains(normalizedQuery)) {
         return false;
       }
-      if (mainIngredientFilter == 'Süßspeise' && recipe.category.trim() != 'Süßspeise') return false;
-      if (mainIngredientFilter != null && mainIngredientFilter != 'Süßspeise' &&
-          !recipeModelMatchesSelection(
-            recipe,
-            mainChoice: mainIngredientFilter,
-          )) {
+      if (!recipeMatchesLibraryFilters(
+        recipe,
+        category: categoryFilter,
+        foodTag: mainIngredientFilter,
+      )) {
         return false;
       }
       if (FoodPreferenceRecipeGuard.findDislikedIngredients(
@@ -879,7 +890,6 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               )),
               ('Vegetarisch', const Icon(Icons.eco_rounded, color: AppDesign.iconGold)),
               ('Fisch', const Icon(Icons.set_meal_rounded, color: AppDesign.iconGold)),
-              ('Süßspeise', const Icon(Icons.cake_rounded, color: AppDesign.iconGold)),
             ];
             final selected = mainIngredientFilter ?? 'Alle';
             return options.map((option) {
@@ -930,6 +940,27 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
         ),
         title: const Text('Meine Rezepte'),
         actions: [
+          PopupMenuButton<String>(
+            tooltip: 'Nach Rezeptart filtern',
+            initialValue: categoryFilter ?? 'Alle',
+            onSelected: (value) => setState(() => categoryFilter = value == 'Alle' ? null : value),
+            icon: Icon(
+              Icons.category_outlined,
+              color: categoryFilter == null
+                  ? Theme.of(context).colorScheme.onSurfaceVariant
+                  : Theme.of(context).colorScheme.primary,
+            ),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'Alle', child: Text('Alle Rezeptarten')),
+              PopupMenuItem(value: 'Hauptgericht', child: Text('Hauptgericht')),
+              PopupMenuItem(value: 'Süßspeise', child: Text('Süßspeise')),
+              PopupMenuItem(value: 'Beilage', child: Text('Beilage')),
+              PopupMenuItem(value: 'Salat', child: Text('Salat')),
+              PopupMenuItem(value: 'Suppe', child: Text('Suppe')),
+              PopupMenuItem(value: 'Snack', child: Text('Snack')),
+              PopupMenuItem(value: 'Frühstück', child: Text('Frühstück')),
+            ],
+          ),
           IconButton(
             tooltip: 'Rezept hinzufügen',
             onPressed: loading ? null : addFavorite,
@@ -1051,13 +1082,36 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
                                         Expanded(
                                           child: Align(
                                             alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              (recipe.name.length > 40
-                                                  ? '${recipe.name.substring(0, 40).trimRight()}…'
-                                                  : recipe.name),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: Theme.of(context).textTheme.titleMedium,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  (recipe.name.length > 40
+                                                      ? '${recipe.name.substring(0, 40).trimRight()}…'
+                                                      : recipe.name),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: Theme.of(context).textTheme.titleMedium,
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  [
+                                                    if (recipe.category.trim().isNotEmpty) recipe.category,
+                                                    ...recipe.foodTags,
+                                                  ].join(' · ').isEmpty
+                                                      ? 'Noch nicht eingeordnet'
+                                                      : [
+                                                          if (recipe.category.trim().isNotEmpty) recipe.category,
+                                                          ...recipe.foodTags,
+                                                        ].join(' · '),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                                    color: AppDesign.secondaryText,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),

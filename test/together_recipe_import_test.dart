@@ -147,7 +147,8 @@ void main() {
 
     expect(recipe.ingredients, hasLength(1));
     expect(recipe.ingredients.single.name, 'Salz');
-    expect(recipe.ingredients.single.quantity, 0);
+    expect(recipe.ingredients.single.quantity, 1);
+    expect(recipe.ingredients.single.hidesQuantity, isFalse);
   });
 
   test('accepts incomplete recipe metadata and missing ingredient and step lists', () {
@@ -264,5 +265,27 @@ void main() {
     final recipe = const TogetherRecipeImporter().parse(source);
     expect(recipe.imageUrl, isNull);
     expect(recipe.imagePath, isNull);
+  });
+
+  test('imports independent recipe type and food tags', () {
+    final recipe = importer.parse(jsonEncode({
+      'format': 'together_recipe',
+      'version': 1,
+      'recipe': {
+        'title': 'Rindergulasch',
+        'category': 'Hauptgericht',
+        'food_tags': ['Rind'],
+        'ingredients': [
+          {'name': 'Rindfleisch', 'amount': 500, 'unit': 'g'},
+        ],
+        'steps': ['Schmoren.'],
+      },
+    }));
+
+    expect(recipe.category, 'Hauptgericht');
+    expect(recipe.foodTags, ['Rind']);
+    final exported = recipe.toTogetherRecipeJson()['recipe'] as Map;
+    expect(exported['category'], 'Hauptgericht');
+    expect(exported['food_tags'], ['Rind']);
   });
 }

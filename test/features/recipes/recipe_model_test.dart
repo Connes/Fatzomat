@@ -43,4 +43,42 @@ void main() {
   expect(scaled.ingredients[1].quantity, 2);
   });
 
+
+  test('Recipe parses and preserves independent food tags', () {
+    final recipe = Recipe.fromMap({
+      'id': 'r-tags',
+      'name': 'Rindergulasch',
+      'description': '',
+      'servings': 4,
+      'prep_time_minutes': 15,
+      'cook_time_minutes': 90,
+      'difficulty': 'Mittel',
+      'category': 'Hauptgericht',
+      'food_tags': ['Rind', 'Fisch', 'unknown'],
+      'instructions': ['Schmoren'],
+      'ingredients': [
+        {'name': 'Rinderhack', 'quantity': 500, 'unit': 'g'},
+      ],
+    });
+
+    expect(recipe.category, 'Hauptgericht');
+    expect(recipe.foodTags, ['Rind', 'Fisch']);
+    expect(recipe.scaledTo(8).foodTags, ['Rind', 'Fisch']);
+    expect(recipe.toMap()['food_tags'], ['Rind', 'Fisch']);
+  });
+
+  test('Vegetarian tag cannot coexist with meat or fish tags', () {
+    final recipe = Recipe.fromMap({
+      'name': 'Gemüsecurry',
+      'servings': 2,
+      'prep_time_minutes': 10,
+      'cook_time_minutes': 20,
+      'difficulty': 'Einfach',
+      'food_tags': ['Vegetarisch', 'Rind'],
+      'instructions': [],
+      'ingredients': [],
+    });
+
+    expect(recipe.foodTags, ['Vegetarisch']);
+  });
 }

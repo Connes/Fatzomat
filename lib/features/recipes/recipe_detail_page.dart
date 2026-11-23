@@ -240,7 +240,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           setState(() {
             recipe = Recipe(
               id: recipe!.id, name: recipe!.name, description: recipe!.description, servings: recipe!.servings, servingsUnit: recipe!.servingsUnit,
-              prepTimeMinutes: recipe!.prepTimeMinutes, cookTimeMinutes: recipe!.cookTimeMinutes, difficulty: recipe!.difficulty, category: recipe!.category,
+              prepTimeMinutes: recipe!.prepTimeMinutes, cookTimeMinutes: recipe!.cookTimeMinutes, difficulty: recipe!.difficulty, category: recipe!.category, foodTags: recipe!.foodTags,
               instructions: recipe!.instructions, ingredients: recipe!.ingredients, imageUrl: null, imagePath: null,
               createdBy: recipe!.createdBy, savedBy: recipe!.savedBy, savedAt: recipe!.savedAt, updatedAt: recipe!.updatedAt,
             );

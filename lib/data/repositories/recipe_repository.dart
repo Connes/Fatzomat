@@ -29,6 +29,7 @@ class RecipeRepository {
         'cook_time_minutes': recipe.cookTimeMinutes,
         'difficulty': recipe.difficulty,
         'category': recipe.category,
+        'food_tags': recipe.foodTags,
         'instructions': recipe.instructions,
         'image_url': recipe.imagePath == null ? recipe.imageUrl : null,
       };
@@ -82,6 +83,7 @@ class RecipeRepository {
     }
     final id = map['recipe_id']?.toString().trim() ?? '';
     if (id.isEmpty) throw const BackendException('Das gespeicherte Rezept hat keine gültige ID.');
+    await client.from('recipes').update({'food_tags': recipe.foodTags}).eq('id', id);
     RecipeCollectionEvents.notifyChanged();
     return id;
   }
@@ -107,6 +109,7 @@ class RecipeRepository {
     );
     final updatedId = result?.toString().trim() ?? '';
     if (updatedId.isEmpty) throw const BackendException('Das Rezept konnte nicht aktualisiert werden.');
+    await client.from('recipes').update({'food_tags': recipe.foodTags}).eq('id', id);
     RecipeCollectionEvents.notifyChanged();
     return updatedId;
   }
@@ -156,7 +159,7 @@ class RecipeRepository {
     if (userId == null) return const [];
     final rows = await client
         .from('recipes')
-        .select('id,created_by,name,description,servings,servings_unit,prep_time_minutes,cook_time_minutes,difficulty,category,instructions,image_url,image_path,created_at,recipe_ingredients(*)')
+        .select('id,created_by,name,description,servings,servings_unit,prep_time_minutes,cook_time_minutes,difficulty,category,food_tags,instructions,image_url,image_path,created_at,recipe_ingredients(*)')
         // Keep the collection compatible with currently deployed databases.
         // `recipes.updated_at` is introduced by the later shared-recipe
         // collection migration and is not required to display saved recipes.
@@ -196,6 +199,7 @@ class RecipeRepository {
       cookTimeMinutes: recipe.cookTimeMinutes,
       difficulty: recipe.difficulty,
       category: recipe.category,
+      foodTags: recipe.foodTags,
       instructions: recipe.instructions,
       ingredients: recipe.ingredients,
       imageUrl: signedUrl ?? recipe.imageUrl,
