@@ -194,6 +194,7 @@ class TogetherRecipeImporter {
       cookTimeMinutes: _nonNegativeInt(recipe['cook_time_minutes'] ?? recipe['cookTimeMinutes']) ?? 0,
       difficulty: recipe['difficulty']?.toString().trim() ?? '',
       category: recipe['category']?.toString().trim() ?? '',
+      foodTags: Recipe.normalizeFoodTags(recipe['food_tags'] ?? recipe['foodTags']),
       instructions: steps,
       ingredients: ingredients,
       imageUrl: imageUrl == null || imageUrl.isEmpty ? null : imageUrl,
