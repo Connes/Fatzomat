@@ -19,12 +19,15 @@ void main() {
     final content = source.substring(contentStart, actionsStart);
     final actions = source.substring(actionsStart);
 
-    expect(card, contains('height: (MediaQuery.sizeOf(context).height - 285).clamp(480.0, 900.0)'));
+    expect(card, contains('height: _todayDecisionCardHeight(context)'));
     expect(card, contains('_TodayDecisionCardHeader('));
     expect(card, contains('Expanded('));
     expect(card, contains('_TodayDecisionCardContent('));
     expect(card, contains('_TodayDecisionCardActions('));
-    expect(card, contains('height: 180'));
+    expect(card, contains('final compactScale = (screenHeight / 760).clamp(0.82, 1.0).toDouble()'));
+    expect(card, contains('final imageHeight = (width >= 700 ? 180.0 : 148.0) * compactScale'));
+    expect(card, contains('compactScale: compactScale'));
+    expect(card, contains('height: imageHeight'));
     expect(header, contains('modeLabel'));
     expect(header, contains('child: image'));
     expect(content, contains('categoryLabel'));
@@ -32,6 +35,8 @@ void main() {
     expect(header, isNot(contains('onTap:')));
     expect(content, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
     expect(content, contains('menuCourses'));
+    expect(content, contains('compactScale'));
+    expect(content, contains('VisualDensity.compact'));
     expect(content, contains('onManageMenu'));
     expect(content, contains('Vorspeise'));
     expect(content, contains('Nachtisch'));
