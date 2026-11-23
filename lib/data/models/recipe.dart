@@ -111,6 +111,7 @@ class Recipe {
                     'is_user_selected': ingredient.isUserSelected,
                     'is_additional': ingredient.isAdditional,
                     'is_qualitative': ingredient.isQualitative,
+                    'quantity_is_optional': ingredient.quantityIsOptional,
                     'section': ingredient.section,
                   })
               .toList(growable: false),
