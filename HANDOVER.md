@@ -450,3 +450,13 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.
 - Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Foto-Rezeptimport: ausschließlich echten Datei-Download ausgeben (2026-11-23)
+
+- Anlass: Der Screenshot zeigte, dass ChatGPT beim Fotoimport statt eines Datei-Anhangs eine Python-Dictionary-Darstellung mit `recipe_data =`, `None` und `False` direkt im Chat ausgab. Das ist weder gültiges JSON noch der gewünschte Download-Workflow.
+- `buildPhotoImportPrompt` weist jetzt ausdrücklich an, `together_recipe.json` als echte UTF-8-Datei mit einem Datei-/Python-Werkzeug zu erzeugen und als gültiges JSON zu serialisieren.
+- Interne Variablen, Python-Code, Python-Dictionary-Ausgaben und Rezeptdaten dürfen nicht im Chat erscheinen. Nach erfolgreicher Erstellung soll die Chatantwort nur eine kurze Bestätigung und den anklickbaren Download-Anhang enthalten.
+- Wenn keine echte Datei erstellt/angehängt werden kann, darf ChatGPT nicht auf Code oder Rezeptdaten im Chat ausweichen, sondern muss die technische Einschränkung kurz melden.
+- Regressionstest prüft den Download-only-Vertrag und die expliziten Verbote der sichtbaren Python-Darstellung.
+- PR/CI und echter Test mit ChatGPT-Fotoimport stehen noch aus.
