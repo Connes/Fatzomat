@@ -212,10 +212,10 @@ class SavedRecipesPage extends StatefulWidget {
   });
 
   @override
-  State<SavedRecipesPage> createState() => _SavedRecipesPageState();
+  State<SavedRecipesPage> createState() => SavedRecipesPageState();
 }
 
-class _SavedRecipesPageState extends State<SavedRecipesPage> {
+class SavedRecipesPageState extends State<SavedRecipesPage> {
   late final RecipeRepository repo = widget.repository ?? RecipeRepository();
   final collaboration = CollaborationRepository();
   final personalToday = PersonalTodayRepository();
@@ -229,6 +229,15 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
   String? categoryFilter;
   TodayPlan? todayPlan;
   RealtimeChannel? realtimeChannel;
+
+  /// Clears both library filters when the user leaves the Recipes tab.
+  void resetFilters() {
+    if (!mounted || (mainIngredientFilter == null && categoryFilter == null)) return;
+    setState(() {
+      mainIngredientFilter = null;
+      categoryFilter = null;
+    });
+  }
 
   @override
   void initState() {
@@ -936,66 +945,84 @@ class _SavedRecipesPageState extends State<SavedRecipesPage> {
               ),
               ),
             ),
-            PopupMenuButton<String>(
-              tooltip: 'Nach Rezeptart filtern',
-              initialValue: categoryFilter ?? 'Alle',
-              onSelected: (value) => setState(() => categoryFilter = value == 'Alle' ? null : value),
-              icon: const Icon(Icons.category_outlined, color: AppDesign.iconGold),
-              color: Theme.of(context).colorScheme.surface,
-              surfaceTintColor: Colors.transparent,
-              elevation: 8,
-              shadowColor: Colors.black.withValues(alpha: .12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
-                ),
+            Theme(
+              data: Theme.of(context).copyWith(
+                hoverColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
               ),
-              constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
-              menuPadding: const EdgeInsets.symmetric(vertical: 8),
-              itemBuilder: (_) {
-                const values = ['Alle', 'Hauptgericht', 'Süßspeise', 'Beilage', 'Salat', 'Suppe', 'Snack', 'Frühstück'];
-                return values.map((value) {
-                  final isSelected = (categoryFilter ?? 'Alle') == value;
-                  return PopupMenuItem<String>(
-                    value: value,
-                    enabled: false,
-                    height: 48,
-                    padding: EdgeInsets.zero,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        setState(() => categoryFilter = value == 'Alle' ? null : value);
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 24, height: 24),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                value == 'Alle' ? 'Alle Rezeptarten' : value,
-                                style: TextStyle(
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                  color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
-                                ),
+              child: PopupMenuButton<String>(
+                tooltip: 'Nach Rezeptart filtern',
+                initialValue: categoryFilter ?? 'Alle',
+                onSelected: null,
+                icon: const Icon(Icons.category_outlined, color: AppDesign.iconGold),
+                color: Theme.of(context).colorScheme.surface,
+                surfaceTintColor: Colors.transparent,
+                elevation: 8,
+                shadowColor: Colors.black.withValues(alpha: .12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: .65),
+                  ),
+                ),
+                constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+                menuPadding: const EdgeInsets.symmetric(vertical: 8),
+                itemBuilder: (menuContext) {
+                  const values = ['Alle', 'Hauptgericht', 'Süßspeise', 'Beilage', 'Salat', 'Suppe', 'Snack', 'Frühstück'];
+                  final selectedValue = ValueNotifier<String>(categoryFilter ?? 'Alle');
+                  return values.map((value) {
+                    return PopupMenuItem<String>(
+                      value: value,
+                      enabled: false,
+                      height: 48,
+                      padding: EdgeInsets.zero,
+                      child: ValueListenableBuilder<String>(
+                        valueListenable: selectedValue,
+                        builder: (context, selected, _) {
+                          final isSelected = selected == value;
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              selectedValue.value = value;
+                              setState(() => categoryFilter = value == 'Alle' ? null : value);
+                              Future<void>.delayed(const Duration(milliseconds: 200), () {
+                                if (menuContext.mounted) Navigator.of(menuContext).pop();
+                                selectedValue.dispose();
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppDesign.secondarySurface : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 24, height: 24),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      value == 'Alle' ? 'Alle Rezeptarten' : value,
+                                      style: TextStyle(
+                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                        color: isSelected ? AppDesign.primaryDark : Theme.of(context).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
+                                ],
                               ),
                             ),
-                            if (isSelected)
-                              const Icon(Icons.check_rounded, size: 18, color: AppDesign.primaryDark),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    ),
-                  );
-                }).toList();
-              },
+                    );
+                  }).toList();
+                },
+              ),
             ),
           ],
         ),
