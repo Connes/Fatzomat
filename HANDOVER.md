@@ -510,3 +510,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Regressionstest prüft den Download-only-Vertrag und die expliziten Verbote der sichtbaren Python-Darstellung.
 - PR #455 wurde nach vollständig grünen Pflichtprüfungen (Flutter Quality Gate mit iOS Build und Quality Gate mit Analyze/Tests) per Squash-Merge integriert. Merge-Commit auf `main`: `c6d393f519baac9d608228b41e19e3dc4afe43fd`.
 - Die Post-Merge-Workflows auf `main` wurden gestartet; ihren Abschluss/Erfolg vor einer Erledigt-Meldung prüfen. Ein echter Test mit ChatGPT-Fotoimport und Geräteprüfung stehen weiterhin aus.
+
+
+## Rezepteditor: Ernährungs-Dropdown an Rezeptfilter angleichen (2026-11-23)
+
+- Das Mehrfachauswahl-Dropdown „Ernährungsart / Hauptzutat“ im Rezepteditor verwendet jetzt dieselben goldenen Symbole wie der Hauptzutatenfilter: Schwein, Rind, Huhn, Vegetarisch und Fisch.
+- Die Einträge sind in derselben Reihenfolge wie im Filter angeordnet. Ausgewählte Einträge erhalten rechts ein grünes Häkchen und dieselbe hellgrüne Hervorhebung/Schriftfarbe; die quadratischen Checkbox-Symbole entfallen.
+- Mehrfachauswahl und die bestehende Exklusivregel für „Vegetarisch“ bleiben unverändert.
+- Regressionstest in `test/regression/add_recipe_page_visual_test.dart` prüft Symbole, Häkchen und das Fehlen der Checkboxen.
+- PR/CI und Geräteprüfung stehen noch aus.
