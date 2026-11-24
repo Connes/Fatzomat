@@ -1585,6 +1585,7 @@ class _TodayResultCard extends StatelessWidget {
                   menuCourses: plan.menuCourses,
                   onManageMenu: onManageMenu,
                   onOpenCourse: onOpenCourse,
+                  centerSelection: plan.decisionType == 'order' || plan.decisionType == 'dine_out',
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1684,6 +1685,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final double compactScale;
   final VoidCallback onTitleTap;
   final ValueChanged<String> onOpenCourse;
+  final bool centerSelection;
   final List<Map<String, dynamic>> menuCourses;
   final VoidCallback? onManageMenu;
 
@@ -1694,15 +1696,14 @@ class _TodayDecisionCardContent extends StatelessWidget {
     required this.compactScale,
     required this.onTitleTap,
     required this.onOpenCourse,
+    required this.centerSelection,
     required this.menuCourses,
     required this.onManageMenu,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isCenteredSelection = categoryLabel == 'WÄHLE DEINEN LIEFERDIENST' ||
-        categoryLabel == null ||
-        (categoryLabel?.trim().isNotEmpty == true && menuCourses.isEmpty && title != '');
+    final isCenteredSelection = centerSelection;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6 * compactScale),
       child: Column(
