@@ -17,7 +17,8 @@ void main() {
     final card = source.substring(source.indexOf('class _TodayResultCard'), headerStart);
     expect(header, contains('fontSize: 18,'));
     expect(header, contains('child: image'));
-    expect(card, contains('height: 180'));
+    expect(card, contains('height: imageHeight'));
+    expect(card, contains('final compactScale = (screenHeight / 760).clamp(0.82, 1.0).toDouble()'));
     expect(content, contains('maxLines: 2'));
     expect(content, contains('TextOverflow.ellipsis'));
   });

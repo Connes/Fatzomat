@@ -1466,7 +1466,10 @@ class _TodayResultCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final titleSize = width >= 700 ? 38.0 : 32.0;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final compactScale = (screenHeight / 760).clamp(0.82, 1.0).toDouble();
+    final titleSize = (width >= 700 ? 38.0 : 29.0) * compactScale;
+    final imageHeight = (width >= 700 ? 180.0 : 148.0) * compactScale;
     final modeLabel = switch (plan.decisionType) {
       'order' => 'HEUTE BESTELLEN',
       'dine_out' => 'HEUTE ESSEN GEHEN',
@@ -1490,19 +1493,19 @@ class _TodayResultCard extends StatelessWidget {
         ? (plan.imageUrl != null && plan.imageUrl!.trim().isNotEmpty
             ? Image.network(
                 plan.imageUrl!,
-                height: 180,
+                height: imageHeight,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Image.asset(
                   'assets/together/clean/background/recipe_detail_background.png',
-                  height: 180,
+                  height: imageHeight,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               )
             : Image.asset(
                 'assets/together/clean/background/recipe_detail_background.png',
-                height: 180,
+                height: imageHeight,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ))
@@ -1513,7 +1516,7 @@ class _TodayResultCard extends StatelessWidget {
                       plan.decisionValue ?? '',
                     ) ??
                     'assets/together/clean/icons/icon_delivery.png',
-                height: 180,
+                height: imageHeight,
                 width: double.infinity,
                 fit: BoxFit.cover,
               )
@@ -1523,14 +1526,14 @@ class _TodayResultCard extends StatelessWidget {
                       plan.restaurantCuisine ?? '',
                     ) ??
                     'assets/together/clean/icons/icon_restaurant.png',
-                height: 180,
+                height: imageHeight,
                 width: double.infinity,
                 fit: BoxFit.cover,
               );
 
 
     return SizedBox(
-      height: (MediaQuery.sizeOf(context).height - 285).clamp(480.0, 900.0),
+      height: _todayDecisionCardHeight(context),
       child: Card(
         color: AppDesign.surface.withValues(alpha: 0.97),
         clipBehavior: Clip.antiAlias,
@@ -1559,6 +1562,7 @@ class _TodayResultCard extends StatelessWidget {
                   categoryLabel: categoryLabel,
                   title: title,
                   titleSize: titleSize,
+                  compactScale: compactScale,
                   onTitleTap: onOpenDecisionTitle,
                   menuCourses: plan.menuCourses,
                   onManageMenu: onManageMenu,
@@ -1643,6 +1647,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String? categoryLabel;
   final String title;
   final double titleSize;
+  final double compactScale;
   final VoidCallback onTitleTap;
   final List<Map<String, dynamic>> menuCourses;
   final VoidCallback? onManageMenu;
@@ -1651,6 +1656,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
     required this.categoryLabel,
     required this.title,
     required this.titleSize,
+    required this.compactScale,
     required this.onTitleTap,
     required this.menuCourses,
     required this.onManageMenu,
@@ -1659,12 +1665,12 @@ class _TodayDecisionCardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6 * compactScale),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
               if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
-                const SizedBox(height: 16),
+                SizedBox(height: 12 * compactScale),
                 Text(
                   categoryLabel!.trim().toUpperCase(),
                   textAlign: TextAlign.center,
@@ -1676,10 +1682,10 @@ class _TodayDecisionCardContent extends StatelessWidget {
                         letterSpacing: 1.3,
                       ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 6 * compactScale),
               ],
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3 * compactScale),
                 child: InkWell(
                   onTap: onTitleTap,
                   borderRadius: BorderRadius.circular(12),
@@ -1698,22 +1704,25 @@ class _TodayDecisionCardContent extends StatelessWidget {
                 ),
               ),
               if (menuCourses.isNotEmpty) ...[
-                const SizedBox(height: 8),
+                SizedBox(height: 5 * compactScale),
                 for (final course in menuCourses)
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    padding: EdgeInsets.symmetric(vertical: 1.5 * compactScale),
                     child: Row(children: [
                       Icon(
                         course['course'] == 'starter' ? Icons.soup_kitchen_rounded : Icons.cake_rounded,
                         color: AppDesign.iconGold,
-                        size: 19,
+                        size: 17 * compactScale,
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 7 * compactScale),
                       Expanded(child: Text(
                         '${course['course'] == 'starter' ? 'Vorspeise' : 'Nachtisch'} · ${course['name'] ?? 'Rezept'}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 14 * compactScale,
+                          fontWeight: FontWeight.w700,
+                        ),
                       )),
                     ]),
                   ),
@@ -1725,7 +1734,12 @@ class _TodayDecisionCardContent extends StatelessWidget {
                     onPressed: onManageMenu,
                     icon: const Icon(Icons.restaurant_menu_rounded, size: 18),
                     label: Text(menuCourses.isEmpty ? 'Vorspeise oder Nachtisch ergänzen' : 'Menü bearbeiten'),
-                    style: TextButton.styleFrom(foregroundColor: AppDesign.primaryDark),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppDesign.primaryDark,
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4 * compactScale),
+                      textStyle: TextStyle(fontSize: 13 * compactScale),
+                    ),
                   ),
                 ),
         ],

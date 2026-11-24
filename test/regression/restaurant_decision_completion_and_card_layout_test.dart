@@ -58,12 +58,13 @@ void main() {
   test('decision card has fixed header and action sections with flexible content', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     final card = source.substring(source.indexOf('class _TodayResultCard'));
-    expect(card, contains('height: (MediaQuery.sizeOf(context).height - 285).clamp(480.0, 900.0)'));
+    expect(card, contains('height: _todayDecisionCardHeight(context)'));
     expect(card, contains('_TodayDecisionCardHeader('));
     expect(card, contains('Expanded('));
     expect(card, contains('_TodayDecisionCardContent('));
     expect(card, contains('_TodayDecisionCardActions('));
-    expect(card, contains('height: 180'));
+    expect(card, contains('height: imageHeight'));
+    expect(card, contains('compactScale: compactScale'));
 
     final header = source.substring(
       source.indexOf('class _TodayDecisionCardHeader'),
