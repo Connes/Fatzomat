@@ -152,7 +152,12 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
     body: SafeArea(
       child: _loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 24), children: [
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    children: [
               _picker(
                 title: 'Hauptgericht',
                 subtitle: 'Pflichtgang · kann geändert werden',
@@ -189,14 +194,28 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
                   if (value != null && _starterId == value) _starterId = null;
                 }),
               ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: _saving || _mainRecipeId == null ? null : _save,
-                icon: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_rounded),
-                label: Text(_saving ? 'Wird gespeichert …' : 'Menü speichern'),
-                style: FilledButton.styleFrom(backgroundColor: AppDesign.primaryDark, minimumSize: const Size.fromHeight(54)),
-              ),
-            ]),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _saving || _mainRecipeId == null ? null : _save,
+                      icon: _saving
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(Icons.check_rounded),
+                      label: Text(_saving ? 'Wird gespeichert …' : 'Menü speichern'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppDesign.primaryDark,
+                        minimumSize: const Size.fromHeight(54),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
     ),
   );
 }

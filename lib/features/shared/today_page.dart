@@ -1584,7 +1584,7 @@ class _TodayResultCard extends StatelessWidget {
                   onTitleTap: onOpenDecisionTitle,
                   menuCourses: plan.menuCourses,
                   onOpenCourse: onOpenCourse,
-                  centerSelection: plan.decisionType == 'order' || plan.decisionType == 'dine_out',
+                  centerSelection: plan.decisionType == 'order' || plan.decisionType == 'dine_out' || (plan.isRecipe && plan.menuCourses.isEmpty),
                 ),
               ),
               _TodayDecisionCardActions(

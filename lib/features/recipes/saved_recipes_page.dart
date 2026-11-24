@@ -456,16 +456,23 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
   Future<bool?> _askToAddMenuCourses() => showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Menü ergänzen?'),
+          title: const Text('Menü ergänzen?', textAlign: TextAlign.center),
           content: const Text('Möchtest du eine Vorspeise oder einen Nachtisch hinzufügen?'),
+          actionsAlignment: MainAxisAlignment.start,
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Nein, danke'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Menü zusammenstellen'),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: const Text('Nein, danke'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: const Text('Menü zusammenstellen'),
+                ),
+              ],
             ),
           ],
         ),

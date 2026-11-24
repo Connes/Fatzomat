@@ -576,3 +576,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Nach Bestätigung der Personenzahl bei der Auswahl eines Rezepts fragt die App, ob eine Vorspeise oder ein Nachtisch ergänzt werden soll. Bei Zustimmung öffnet sich der Menüeditor; bei Ablehnung geht der bisherige Auswahlablauf weiter. Gemeinsame Entscheidungsanfragen bleiben unverändert.
 - Regressionstests prüfen die drei auswählbaren Gänge sowie den zusätzlichen optionalen Abfrageschritt.
 - PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Menüimport und Menüeditor: Dialog und Kartenlayout (2026-11-24)
+
+- Auch der direkte Ablauf „mit ChatGPT erstelltes Rezept importieren und beim Speichern für Heute festlegen“ fragt nach dem Speichern des persönlichen Plans, ob Vorspeise und/oder Nachtisch ergänzt werden sollen. Bei Zustimmung öffnet sich derselbe Menüeditor; bei Ablehnung läuft der Importabschluss normal weiter. Der bestehende Ablauf über „Für heute auswählen“ in der Rezeptsammlung bleibt ebenfalls erhalten.
+- Der Dialogtitel „Menü ergänzen?“ ist zentriert. „Nein, danke“ und „Menü zusammenstellen“ stehen untereinander linksbündig.
+- Im Menüeditor bleibt die Rezeptauswahl scrollbar; „Menü speichern“ sitzt als fester Footer mit kleinem Abstand direkt oberhalb der unteren Navigation.
+- Wenn ein Heute-Plan ausschließlich aus einem Hauptgericht besteht, wird der Rezeptname im freien Inhaltsbereich der Heute-Karte vertikal zentriert. Sobald Zusatzgänge vorhanden sind, bleibt deren bisherige gemeinsame Darstellung erhalten.
+- Regressionstests und Pflicht-CI für diese Folgeänderung stehen aus; Android-Geräteprüfung nach Merge erforderlich.
