@@ -129,14 +129,16 @@ class PersonalTodayRepository {
     return parsed == null ? null : DateTime(parsed.year, parsed.month, parsed.day);
   }
 
-  Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date}) async {
+  Future<String> selectRecipeForToday(String recipeId, {int? servings, DateTime? date, bool replaceExisting = false}) async {
     if (client.auth.currentUser == null) throw const AuthenticationException();
     if (recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
     final planDate = _dateOnly(date ?? DateTime.now());
     // Use the date-aware RPC for every day, including today. It serializes
     // competing selections and rejects an already occupied day instead of
     // silently replacing the existing decision.
-    final result = await client.rpc('set_personal_plan_for_date', params: {
+    final result = await client.rpc(
+      replaceExisting ? 'replace_personal_plan_for_date' : 'set_personal_plan_for_date',
+      params: {
       'p_plan_date': planDate,
       'p_decision_type': 'recipe',
       'p_recipe_id': recipeId,
@@ -160,6 +162,7 @@ class PersonalTodayRepository {
     String? recipeId,
     int? servings,
     DateTime? date,
+    bool replaceExisting = false,
   }) async {
     final normalizedType = type.trim();
     if (!{'recipe', 'order', 'dine_out', 'surprise'}.contains(normalizedType)) {
@@ -167,7 +170,7 @@ class PersonalTodayRepository {
     }
     if (normalizedType == 'recipe') {
       if (recipeId == null || recipeId.trim().isEmpty) throw StateError('Keine Recipe-ID vorhanden.');
-      return selectRecipeForToday(recipeId, servings: servings, date: date);
+      return selectRecipeForToday(recipeId, servings: servings, date: date, replaceExisting: replaceExisting);
     }
     if (value.trim().isEmpty) throw StateError('Die Auswahl darf nicht leer sein.');
     final localDecision = {
@@ -196,7 +199,13 @@ class PersonalTodayRepository {
 
     if (client.auth.currentUser == null) throw const AuthenticationException();
     try {
-      final result = isToday
+      final result = replaceExisting
+          ? await client.rpc('replace_personal_plan_for_date', params: {
+              'p_plan_date': planDate,
+              'p_decision_type': normalizedType,
+              'p_decision_value': value.trim(),
+            })
+          : isToday
           ? await client.rpc('set_personal_today_decision', params: {
               'p_decision_type': normalizedType,
               'p_decision_value': value.trim(),

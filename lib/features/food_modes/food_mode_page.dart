@@ -23,6 +23,7 @@ class FoodModePage extends StatefulWidget {
   final VoidCallback? onNavigateToToday;
   final String? decisionRequestId;
   final bool selectForToday;
+  final bool replaceExistingDecision;
 
   const FoodModePage({
     super.key,
@@ -31,6 +32,7 @@ class FoodModePage extends StatefulWidget {
     this.onNavigateToToday,
     this.decisionRequestId,
     this.selectForToday = true,
+    this.replaceExistingDecision = false,
   });
 
   @override
@@ -85,6 +87,7 @@ class _FoodModePageState extends State<FoodModePage> {
             type: 'order',
             value: choice,
             date: widget.planDate,
+            replaceExisting: widget.replaceExistingDecision,
           );
         }
         if (!context.mounted) return;
@@ -115,6 +118,7 @@ class _FoodModePageState extends State<FoodModePage> {
           planDate: widget.planDate,
           initialCuisine: cuisine,
           autoOpenChatGpt: true,
+          replaceExistingDecision: widget.replaceExistingDecision,
         ),
       ),
     );
@@ -143,6 +147,7 @@ class _FoodModePageState extends State<FoodModePage> {
           'restaurant': restaurant,
         }),
         date: widget.planDate,
+        replaceExisting: widget.replaceExistingDecision,
       );
       if (!context.mounted) return;
 

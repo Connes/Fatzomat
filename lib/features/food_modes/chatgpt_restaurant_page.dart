@@ -29,11 +29,13 @@ class ChatGptRestaurantPage extends StatefulWidget {
   final DateTime? planDate;
   final String initialCuisine;
   final bool autoOpenChatGpt;
+  final bool replaceExistingDecision;
   const ChatGptRestaurantPage({
     super.key,
     this.planDate,
     this.initialCuisine = 'Griechisch',
     this.autoOpenChatGpt = false,
+    this.replaceExistingDecision = false,
   });
 
   @override
@@ -315,6 +317,7 @@ name, cuisine und address sind Pflichtfelder und müssen nicht-leere Strings sei
           'restaurant': restaurant,
         }),
         date: widget.planDate,
+        replaceExisting: widget.replaceExistingDecision,
       );
       final preferences = await SharedPreferences.getInstance();
       await preferences.remove('fatzomat_pending_restaurant_import_cuisine');

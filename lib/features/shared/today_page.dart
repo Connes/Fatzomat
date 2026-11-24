@@ -348,10 +348,10 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
 
     switch (current.decisionType) {
       case 'order':
-        await _openMode(FoodMode.order);
+        await _openMode(FoodMode.order, replaceExistingDecision: true);
         break;
       case 'dine_out':
-        await _openMode(FoodMode.dineOut);
+        await _openMode(FoodMode.dineOut, replaceExistingDecision: true);
         break;
       default:
         await _openMenuBuilder();
@@ -369,13 +369,14 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _openMode(FoodMode mode) async {
+  Future<void> _openMode(FoodMode mode, {bool replaceExistingDecision = false}) async {
     final selected = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => FoodModePage(
           mode: mode,
           planDate: _selectedDate,
+          replaceExistingDecision: replaceExistingDecision,
           onNavigateToToday: widget.onNavigateToToday ??
               (widget.onNavigateToTab == null ? null : () => widget.onNavigateToTab!(0)),
         ),
