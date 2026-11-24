@@ -605,3 +605,21 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Neue Regressionstests prüfen die explizite Ersatzroute für Hauptgericht, Bestellung und Restaurant sowie die Datenbank-Schutzbedingungen.
 - Neue Migration: `20261124170000_replace_existing_personal_decision.sql`. Sie muss auf Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet und anschließend durch einen Test der RPC-/Schema-Definition verifiziert werden.
 - Branch `fix/edit-existing-today-decisions`; PR und CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
+
+
+## Rezeptbearbeitung: Verfügbarkeitsprüfung an Rezeptsammlung angleichen (2026-11-24)
+
+- Ursache der Meldung „Dieses Rezept ist nicht mehr verfügbar“ beim Ändern des Hauptgerichts: Live-Postgres-Logs vom 24.11.2026 um 17:22:31 und 17:23:50 UTC zeigen den Fehler in der Funktion replace_personal_plan_for_date (PL/pgSQL-Zeile 24). Die Funktion verlangte zusätzlich zu einer existierenden Rezept-ID entweder recipes.created_by = auth.uid() oder einen Eintrag in recipe_saves.
+- Der Rezeptauswahldialog lädt dagegen die sichtbare Rezeptsammlung direkt aus recipes über RecipeRepository.savedRecipeModels(). Damit konnte ein Rezept auswählbar sein, obwohl es die zusätzliche, engere Datenbankprüfung nicht erfüllte.
+- Migration 20261124183000_align_recipe_edit_availability.sql passt die Prüfung an: Für die explizite Bearbeitung muss das Rezept in recipes existieren; Anmeldung, gültige Rezept-ID, Personenzahl, bestehender persönlicher Plan und Schutz gemeinsamer Pläne bleiben geprüft.
+- Migration wurde auf Supabase-Projekt oidxezjdwqktpxuypbfb live angewendet. Verifiziert: kein zusätzliches recipe_saves-Erfordernis, Existenzprüfung aktiv, EXECUTE für authenticated erlaubt und für anon gesperrt.
+- Regressionstest test/regression/recipe_edit_availability_test.dart ergänzt.
+- Branch fix/recipe-availability-edit-validation; PR und CI stehen noch aus. Android-Gerätetest nach Merge erforderlich.
+
+
+## Rezeptbearbeitung: RLS für Menü-Metadaten angleichen (2026-11-24)
+
+- Neuer Live-Fehler „Keine Berechtigung für diese Aktion“ nach erfolgreichem Rezeptwechsel: Postgres-Logs zeigen, dass `replace_personal_plan_for_date` mit HTTP 200 erfolgreich war. Anschließend scheiterte ein separater REST-UPDATE auf `personal_today_plans.decision_value` mit SQLSTATE 42501 („new row violates row-level security policy“).
+- Ursache: Die UPDATE-Policy verlangte weiterhin `recipes.created_by = auth.uid()` oder einen `recipe_saves`-Eintrag. Das blockierte die Metadatenänderung für ein Rezept, das bereits über die validierte Bearbeitungs-RPC dem persönlichen Plan zugeordnet und dadurch für den Nutzer sichtbar war.
+- Die UPDATE-Policy prüft jetzt Eigentümerschaft des Plans und dass das zugeordnete Rezept über die bestehende Rezept-Sichtbarkeits-Policy lesbar ist. Die strengere INSERT-Policy bleibt unverändert; Rezeptwechsel selbst läuft weiter über `replace_personal_plan_for_date`.
+- Migration `20261124184500_allow_visible_recipe_plan_metadata_updates.sql` wurde auf Supabase `oidxezjdwqktpxuypbfb` live angewendet. Schema-/Policy-Definition anschließend prüfen; Regressionstest und CI laufen über PR #466.
