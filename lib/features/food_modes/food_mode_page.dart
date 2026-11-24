@@ -134,10 +134,7 @@ class _FoodModePageState extends State<FoodModePage> {
     final restaurant = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (_) => RestaurantFavoritesPage(
-          selectForToday: true,
-          replaceExistingDecision: widget.replaceExistingDecision,
-        ),
+        builder: (_) => const RestaurantFavoritesPage(selectForToday: true),
       ),
     );
     if (restaurant == null || !context.mounted) return;
