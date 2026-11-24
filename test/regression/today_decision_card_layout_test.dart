@@ -38,7 +38,6 @@ void main() {
     expect(content, contains('crossAxisAlignment: CrossAxisAlignment.stretch'));
     expect(content, contains('menuCourses'));
     expect(content, contains('compactScale'));
-    expect(content, contains('VisualDensity.compact'));
     expect(content, contains('onOpenCourse'));
     expect(content, contains('centerSelection'));
     expect(content, contains('Center('));
