@@ -585,3 +585,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Im Menüeditor bleibt die Rezeptauswahl scrollbar; „Menü speichern“ sitzt als fester Footer mit kleinem Abstand direkt oberhalb der unteren Navigation.
 - Wenn ein Heute-Plan ausschließlich aus einem Hauptgericht besteht, wird der Rezeptname im freien Inhaltsbereich der Heute-Karte vertikal zentriert. Sobald Zusatzgänge vorhanden sind, bleibt deren bisherige gemeinsame Darstellung erhalten.
 - Regressionstests und Pflicht-CI für diese Folgeänderung stehen aus; Android-Geräteprüfung nach Merge erforderlich.
+
+
+## Tagesentscheidung auf der Heute-Karte bearbeiten (2026-11-24)
+
+- Das Stiftsymbol oben rechts auf der Ergebnis-Tageskarte ist nicht mehr auf Koch-/Rezeptentscheidungen beschränkt.
+- Bei „Wir bestellen“ öffnet es erneut den Bestellmodus; bei „Wir gehen essen“ erneut den Restaurantmodus. Die jeweilige Auswahl läuft über den bestehenden datumsbezogenen Auswahlablauf und aktualisiert anschließend die Heute-Karte.
+- Bei Rezept-/Kochentscheidungen öffnet es weiterhin den Menüeditor, damit Hauptgericht und optionale Gänge bearbeitet werden können.
+- Regressionstests prüfen die Zuordnung der Entscheidungstypen und die sichtbare Bearbeiten-Aktion.
+- PR/CI und Android-Geräteprüfung stehen noch aus.
