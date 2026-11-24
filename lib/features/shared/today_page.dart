@@ -1583,7 +1583,6 @@ class _TodayResultCard extends StatelessWidget {
                   compactScale: compactScale,
                   onTitleTap: onOpenDecisionTitle,
                   menuCourses: plan.menuCourses,
-                  onManageMenu: onManageMenu,
                   onOpenCourse: onOpenCourse,
                   centerSelection: plan.decisionType == 'order' || plan.decisionType == 'dine_out',
                 ),
@@ -1628,15 +1627,18 @@ class _TodayDecisionCardHeader extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Text(
-                  modeLabel,
-                  textAlign: TextAlign.center,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: onManageMenu != null ? 34 : 8),
+                  child: Text(
+                    modeLabel,
+                    textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: AppDesign.secondaryText,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.3,
                       ),
+                  ),
                 ),
                 if (onManageMenu != null)
                   Align(
@@ -1687,7 +1689,6 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final ValueChanged<String> onOpenCourse;
   final bool centerSelection;
   final List<Map<String, dynamic>> menuCourses;
-  final VoidCallback? onManageMenu;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
@@ -1698,7 +1699,6 @@ class _TodayDecisionCardContent extends StatelessWidget {
     required this.onOpenCourse,
     required this.centerSelection,
     required this.menuCourses,
-    required this.onManageMenu,
   });
 
   @override
