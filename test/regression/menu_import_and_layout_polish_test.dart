@@ -39,6 +39,6 @@ void main() {
   test('Today recipe title is centered vertically when there are no optional courses', () {
     final source = File('lib/features/shared/today_page.dart').readAsStringSync();
     expect(source, contains("(plan.isRecipe && plan.menuCourses.isEmpty)"));
-    expect(source, contains('Expanded(\n              child: Center(child: _buildTitle(context))'));
+    expect(source, contains('Expanded(\n              child: Center(\n                child: Column('));
   });
 }
