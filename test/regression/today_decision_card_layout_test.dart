@@ -40,7 +40,12 @@ void main() {
     expect(content, contains('compactScale'));
     expect(content, contains('onOpenCourse'));
     expect(content, contains('centerSelection'));
+    expect(content, contains('supportingLines'));
+    expect(content, contains('for (final line in supportingLines)'));
+    expect(content, contains('fontSize: 14 * compactScale'));
     expect(content, contains('Center('));
+    expect(card, contains('plan.restaurantAddress'));
+    expect(card, contains('plan.restaurantCity'));
     expect(content, contains('today_menu_course_'));
     expect(content, contains('recipe_id'));
     expect(content, contains('Vorspeise'));
