@@ -1799,7 +1799,6 @@ class _TodayDecisionCardContent extends StatelessWidget {
       ),
     ),
   );
-  }
 }
 
 class _TodayDecisionCardActions extends StatelessWidget {
