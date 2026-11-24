@@ -86,7 +86,7 @@ void main() {
     expect(actions, contains('tapTargetSize: MaterialTapTargetSize.shrinkWrap'));
     expect(actions, contains('Container(width: 1, height: 43'));
     expect(actions, contains('visualDensity: VisualDensity.compact'));
-    expect(actions, contains('Container(width: 1, height: 58, color: AppDesign.divider)'));
+    expect(actions, contains('Container(width: 1, height: 43, color: AppDesign.divider)'));
     expect(actions, contains('Divider(height: 1, thickness: 1, color: AppDesign.divider)'));
   });
 }
