@@ -1599,6 +1599,13 @@ class _TodayResultCard extends StatelessWidget {
                   title: title,
                   titleSize: titleSize,
                   compactScale: compactScale,
+                  supportingLines: plan.decisionType == 'dine_out'
+                      ? [plan.restaurantAddress, plan.restaurantCity]
+                          .whereType<String>()
+                          .map((line) => line.trim())
+                          .where((line) => line.isNotEmpty)
+                          .toList(growable: false)
+                      : const <String>[] ,
                   onTitleTap: onOpenDecisionTitle,
                   menuCourses: plan.menuCourses,
                   onOpenCourse: onOpenCourse,
@@ -1703,6 +1710,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final String title;
   final double titleSize;
   final double compactScale;
+  final List<String> supportingLines;
   final VoidCallback onTitleTap;
   final ValueChanged<String> onOpenCourse;
   final bool centerSelection;
@@ -1713,6 +1721,7 @@ class _TodayDecisionCardContent extends StatelessWidget {
     required this.title,
     required this.titleSize,
     required this.compactScale,
+    required this.supportingLines,
     required this.onTitleTap,
     required this.onOpenCourse,
     required this.centerSelection,
@@ -1743,7 +1752,33 @@ class _TodayDecisionCardContent extends StatelessWidget {
           ],
           if (isCenteredSelection)
             Expanded(
-              child: Center(child: _buildTitle(context)),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildTitle(context),
+                    if (supportingLines.isNotEmpty) ...[
+                      SizedBox(height: 10 * compactScale),
+                      for (final line in supportingLines)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 1 * compactScale),
+                          child: Text(
+                            line,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppDesign.secondaryText,
+                              fontSize: 14 * compactScale,
+                              fontWeight: FontWeight.w500,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ],
+                ),
+              ),
             )
           else ...[
             SizedBox(height: 6 * compactScale),
