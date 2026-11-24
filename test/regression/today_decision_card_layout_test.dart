@@ -43,6 +43,10 @@ void main() {
     expect(content, contains('supportingLines'));
     expect(content, contains('for (final line in supportingLines)'));
     expect(content, contains('fontSize: 14 * compactScale'));
+    expect(content, contains('FittedBox('));
+    expect(content, contains('fit: BoxFit.scaleDown'));
+    expect(content, contains('softWrap: false'));
+    expect(content, contains('maxLines: 1'));
     expect(content, contains('Center('));
     expect(card, contains('plan.restaurantAddress'));
     expect(card, contains('plan.restaurantCity'));
