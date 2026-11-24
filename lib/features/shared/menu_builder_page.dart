@@ -90,6 +90,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
               _mainRecipeId!,
               servings: widget.plan.servings,
               date: widget.planDate,
+              replaceExisting: true,
             );
       await _today.saveMenuCourses(planId, _courses());
       if (mounted) Navigator.pop(context, true);
