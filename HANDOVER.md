@@ -556,4 +556,5 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Die untere Aktionsleiste „Teilen“/„Entfernen“ wird von 58 px auf 43 px reduziert. Beide Schaltflächen erhalten kompakte vertikale Abstände, kompakte VisualDensity und eine explizite Mindesthöhe von 43 px; die Trennlinie passt sich ebenfalls an.
 - Dadurch werden genau 15 px zusätzlicher vertikaler Platz im Karteninhalt frei, ohne Scrollbereich und ohne die Kartenhöhe zu verändern.
 - Regressionstest prüft Footerhöhe, Button-Mindesthöhe und kompakte Touch-Target-Konfiguration.
+- Die erste CI-Runde fand eine weitere veraltete 58-Pixel-Erwartung im Regressionstest `restaurant_decision_completion_and_card_layout_test.dart`; auf 43 Pixel aktualisiert.
 - PR/CI und erneuter Android-Gerätetest stehen aus.
