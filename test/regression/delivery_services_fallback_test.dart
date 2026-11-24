@@ -8,6 +8,7 @@ void main() {
     final bolt = source.substring(source.indexOf("name: 'Bolt'"), source.indexOf("name: 'Wolt'"));
     expect(bolt, contains("url: 'https://bolt.eu/de-de/food/'"));
     expect(bolt, contains("appUrl: 'boltfood://home'"));
+    expect(bolt, contains('logoIsText: true'));
 
     final open = source.substring(
       source.indexOf('Future<void> _openService'),
@@ -22,7 +23,7 @@ void main() {
       source.indexOf('class _DeliveryService {'),
     );
     expect(card, contains('SvgPicture.network'));
-    expect(card, contains('errorBuilder:'));
+    expect(card, contains('logoIsText'));
     expect(card, contains('service.name'));
   });
 }
