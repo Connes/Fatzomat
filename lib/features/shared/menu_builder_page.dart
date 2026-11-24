@@ -158,7 +158,11 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
                 value: _mainRecipeId,
                 icon: Icons.restaurant_menu_rounded,
                 excludedRecipeIds: {_starterId ?? '', _dessertId ?? ''},
-                onChanged: (value) => setState(() => _mainRecipeId = value),
+                onChanged: (value) => setState(() {
+                  _mainRecipeId = value;
+                  if (_starterId == value) _starterId = null;
+                  if (_dessertId == value) _dessertId = null;
+                }),
               ),
               const SizedBox(height: 12),
               _picker(
@@ -167,7 +171,10 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
                 value: _starterId,
                 icon: Icons.soup_kitchen_rounded,
                 excludedRecipeIds: {_mainRecipeId ?? '', _dessertId ?? ''},
-                onChanged: (value) => setState(() => _starterId = value),
+                onChanged: (value) => setState(() {
+                  _starterId = value;
+                  if (value != null && _dessertId == value) _dessertId = null;
+                }),
               ),
               const SizedBox(height: 10),
               _picker(
@@ -176,7 +183,10 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
                 value: _dessertId,
                 icon: Icons.cake_rounded,
                 excludedRecipeIds: {_mainRecipeId ?? '', _starterId ?? ''},
-                onChanged: (value) => setState(() => _dessertId = value),
+                onChanged: (value) => setState(() {
+                  _dessertId = value;
+                  if (value != null && _starterId == value) _starterId = null;
+                }),
               ),
               const SizedBox(height: 16),
               FilledButton.icon(
