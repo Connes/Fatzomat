@@ -565,5 +565,5 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Die Aktion „Menü bearbeiten“ sitzt als Stift-Schaltfläche oben rechts im Kopf der Heute-Ergebniskarte. Dadurch entfällt die zusätzliche Aktionszeile unter den Gängen.
 - Vorspeise und Nachtisch werden mittig unter dem Hauptgericht mit größerem Abstand dargestellt. Beide Gangzeilen sind anklickbar und öffnen über ihre gespeicherte `recipe_id` die jeweilige `RecipeDetailPage`; Rückkehr lädt den Heute-Plan erneut.
 - Bei Bestell- und Restaurantentscheidungen wird die gewählte Kategorie im flexiblen Bereich zwischen Untertitel und Kartenfuß vertikal zentriert. Die Kochansicht bleibt unverändert.
-- Bolt-Food-Logo: SVG-Ladefehler erhalten nun einen Text-Fallback. Beim Öffnen wird ein Fehler eines optionalen App-URL-Schemas abgefangen und anschließend die Webadresse versucht; fehlgeschlagene Webaufrufe zeigen eine verständliche Meldung.
+- Bolt Food verwendet ein stabiles natives Textlogo statt des zuvor fehleranfälligen externen SVG-Abrufs. Beim Öffnen wird ein Fehler eines optionalen App-URL-Schemas abgefangen und anschließend die Webadresse versucht; fehlgeschlagene Webaufrufe zeigen eine verständliche Meldung.
 - Regressionstests wurden für die Kartenstruktur und die klickbaren Gänge erweitert. Pflicht-CI und Geräteprüfung stehen noch aus.
