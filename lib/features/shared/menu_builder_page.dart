@@ -23,7 +23,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
   final _recipes = RecipeRepository();
   final _today = PersonalTodayRepository();
   List<Recipe> _available = const [];
-  late String? _mainRecipeId = widget.plan.recipeId;
+  String? _mainRecipeId;
   String? _starterId;
   String? _dessertId;
   bool _loading = true;
@@ -32,6 +32,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
   @override
   void initState() {
     super.initState();
+    _mainRecipeId = widget.plan.recipeId;
     for (final course in widget.plan.menuCourses) {
       final id = course['recipe_id']?.toString();
       if (course['course'] == 'starter') _starterId = id;
