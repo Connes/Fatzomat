@@ -30,6 +30,8 @@ void main() {
     expect(card, contains('height: imageHeight'));
     expect(header, contains('modeLabel'));
     expect(header, contains('child: image'));
+    expect(header, contains('onManageMenu'));
+    expect(header, contains('Icons.edit_outlined'));
     expect(content, contains('categoryLabel'));
     expect(content, contains('onTap: onTitleTap'));
     expect(header, isNot(contains('onTap:')));
@@ -37,7 +39,11 @@ void main() {
     expect(content, contains('menuCourses'));
     expect(content, contains('compactScale'));
     expect(content, contains('VisualDensity.compact'));
-    expect(content, contains('onManageMenu'));
+    expect(content, contains('onOpenCourse'));
+    expect(content, contains('centerSelection'));
+    expect(content, contains('Center('));
+    expect(content, contains('today_menu_course_'));
+    expect(content, contains('recipe_id'));
     expect(content, contains('Vorspeise'));
     expect(content, contains('Nachtisch'));
     expect(content, contains('maxLines: 2'));
