@@ -38,7 +38,7 @@ class DeliveryServicesPage extends StatelessWidget {
       logoUrl:
           'https://upload.wikimedia.org/wikipedia/commons/2/28/Vector_logo_of_Bolt.svg',
       brandColor: Color(0xFF34D186),
-      logoIsSvg: true,
+      logoIsText: true,
       appUrl: 'boltfood://home',
     ),
     _DeliveryService(
@@ -199,16 +199,17 @@ class _DeliveryServiceCard extends StatelessWidget {
                               height: 42,
                               child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                             ),
-                            errorBuilder: (_, __, ___) => Text(
-                              service.name,
-                              style: const TextStyle(
-                                color: AppDesign.text,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
                           )
-                        : Image.network(
+                        : service.logoIsText
+                            ? Text(
+                                service.name,
+                                style: const TextStyle(
+                                  color: AppDesign.text,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              )
+                            : Image.network(
                             service.logoUrl,
                             height: 42,
                             fit: BoxFit.contain,
@@ -248,6 +249,7 @@ class _DeliveryService {
   final String logoUrl;
   final Color brandColor;
   final bool logoIsSvg;
+  final bool logoIsText;
   final String? appUrl;
 
   const _DeliveryService({
@@ -256,6 +258,7 @@ class _DeliveryService {
     required this.logoUrl,
     required this.brandColor,
     this.logoIsSvg = false,
+    this.logoIsText = false,
     this.appUrl,
   });
 }
