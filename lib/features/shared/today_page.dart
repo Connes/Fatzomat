@@ -1762,16 +1762,23 @@ class _TodayDecisionCardContent extends StatelessWidget {
                       for (final line in supportingLines)
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 1 * compactScale),
-                          child: Text(
-                            line,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppDesign.secondaryText,
-                              fontSize: 14 * compactScale,
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.center,
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                softWrap: false,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppDesign.secondaryText,
+                                  fontSize: 14 * compactScale,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.2,
+                                ),
+                              ),
                             ),
                           ),
                         ),
