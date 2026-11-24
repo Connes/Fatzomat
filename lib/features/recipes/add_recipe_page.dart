@@ -23,6 +23,7 @@ import '../../data/repositories/food_repository.dart';
 import 'additional_ingredients_page.dart';
 import '../food_modes/food_mode_page.dart';
 import 'recipe_detail_page.dart';
+import '../shared/menu_builder_page.dart';
 import 'together_chatgpt_prompt.dart';
 import 'food_preference_recipe_guard.dart';
 import '../../data/services/together_recipe_file_service.dart';
@@ -396,6 +397,31 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
   bool _imageUploadAttempted = false;
   bool _imageUploadFailed = false;
 
+  Future<bool?> _askToAddMenuCourses() => showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Menü ergänzen?', textAlign: TextAlign.center),
+          content: const Text('Möchtest du eine Vorspeise oder einen Nachtisch hinzufügen?'),
+          actionsAlignment: MainAxisAlignment.start,
+          actions: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: const Text('Nein, danke'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: const Text('Menü zusammenstellen'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
   @override
   void initState() {
     super.initState();
@@ -541,11 +567,28 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       }
 
       if (widget.selectForToday && widget.decisionRequestId == null) {
-        await PersonalTodayRepository().selectRecipeForToday(
+        final personalToday = PersonalTodayRepository();
+        final planId = await personalToday.selectRecipeForToday(
           recipeId,
           servings: _recipe.servings.clamp(1, 999).toInt(),
           date: widget.planDate,
         );
+        if (!mounted) return;
+        final selectedPlan = await personalToday.todayPlan(date: widget.planDate);
+        if (selectedPlan != null && selectedPlan.id == planId) {
+          final addCourses = await _askToAddMenuCourses();
+          if (addCourses == true && mounted) {
+            await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MenuBuilderPage(
+                  plan: selectedPlan,
+                  planDate: widget.planDate,
+                ),
+              ),
+            );
+          }
+        }
       }
 
       if (!mounted) return;
