@@ -632,3 +632,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Bei fehlenden Adressfeldern werden nur vorhandene Zeilen angezeigt; andere Entscheidungstypen bleiben unverändert.
 - Regressionstest in `test/regression/today_decision_card_layout_test.dart` erweitert.
 - Branch `feat/today-restaurant-address-card`; PR/CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
+
+
+## Restaurantadresse immer einzeilig darstellen (2026-11-24)
+
+- Die Adresszeile auf der Heute-Restaurantkarte verwendet jetzt `FittedBox(fit: BoxFit.scaleDown)` mit nicht umbrechendem Text und einer Zeile.
+- Lange Straßen-/Ortsangaben werden dadurch proportional verkleinert, bis sie in die verfügbare Kartenbreite passen; das bisherige Abschneiden mit Auslassungspunkten entfällt.
+- Name und Adresse bleiben als gemeinsamer Block vertikal zentriert. Regressionstest prüft die Skalierungs- und Einzeilen-Konfiguration.
+- Branch `fix/fit-restaurant-address-single-line`; PR/CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
