@@ -861,6 +861,21 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                                       if (mounted) await load();
                                     }
                                   : null,
+                              onOpenCourse: (recipeId) async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => RecipeDetailPage(
+                                      recipeId: recipeId,
+                                      canMarkCooked: _isSelectedDateToday && plan!.status != 'cooked',
+                                      viewingTodaySelection: true,
+                                      planDate: _selectedDate,
+                                      onTodayPlanChanged: load,
+                                    ),
+                                  ),
+                                );
+                                if (mounted) await load();
+                              },
                               onOpenDecisionTitle: () {
                                 if (plan!.isRecipe && plan!.recipeId != null) {
                                   Navigator.push(
@@ -1449,6 +1464,7 @@ class _TodayResultCard extends StatelessWidget {
   final VoidCallback? onManageMenu;
   final VoidCallback? onOpenRecipe;
   final VoidCallback? onOpenOrder;
+  final ValueChanged<String> onOpenCourse;
   final VoidCallback onOpenDecisionTitle;
   final VoidCallback onCancel;
   final VoidCallback? onShare;
@@ -1458,6 +1474,7 @@ class _TodayResultCard extends StatelessWidget {
     required this.onManageMenu,
     required this.onOpenRecipe,
     required this.onOpenOrder,
+    required this.onOpenCourse,
     required this.onOpenDecisionTitle,
     required this.onCancel,
     required this.onShare,
@@ -1556,6 +1573,7 @@ class _TodayResultCard extends StatelessWidget {
                 modeLabel: modeLabel,
                 image: image,
                 isShared: plan.isSharedAccepted,
+                onManageMenu: plan.isRecipe ? onManageMenu : null,
               ),
               Expanded(
                 child: _TodayDecisionCardContent(
@@ -1565,7 +1583,8 @@ class _TodayResultCard extends StatelessWidget {
                   compactScale: compactScale,
                   onTitleTap: onOpenDecisionTitle,
                   menuCourses: plan.menuCourses,
-                  onManageMenu: onManageMenu,
+                  onOpenCourse: onOpenCourse,
+                  centerSelection: plan.decisionType == 'order' || plan.decisionType == 'dine_out',
                 ),
               ),
               _TodayDecisionCardActions(
@@ -1586,11 +1605,13 @@ class _TodayDecisionCardHeader extends StatelessWidget {
   final String modeLabel;
   final Widget image;
   final bool isShared;
+  final VoidCallback? onManageMenu;
 
   const _TodayDecisionCardHeader({
     required this.modeLabel,
     required this.image,
     required this.isShared,
+    required this.onManageMenu,
   });
 
   @override
@@ -1606,16 +1627,32 @@ class _TodayDecisionCardHeader extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Text(
-                  modeLabel,
-                  textAlign: TextAlign.center,
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: onManageMenu != null ? 34 : 8),
+                  child: Text(
+                    modeLabel,
+                    textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: AppDesign.secondaryText,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.3,
                       ),
+                  ),
                 ),
+                if (onManageMenu != null)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      tooltip: 'Menü bearbeiten',
+                      onPressed: onManageMenu,
+                      icon: const Icon(Icons.edit_outlined, size: 20),
+                      color: AppDesign.primaryDark,
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints.tightFor(width: 32, height: 28),
+                    ),
+                  ),
                 if (isShared)
                   const Align(
                     alignment: Alignment.centerLeft,
@@ -1649,8 +1686,9 @@ class _TodayDecisionCardContent extends StatelessWidget {
   final double titleSize;
   final double compactScale;
   final VoidCallback onTitleTap;
+  final ValueChanged<String> onOpenCourse;
+  final bool centerSelection;
   final List<Map<String, dynamic>> menuCourses;
-  final VoidCallback? onManageMenu;
 
   const _TodayDecisionCardContent({
     required this.categoryLabel,
@@ -1658,94 +1696,109 @@ class _TodayDecisionCardContent extends StatelessWidget {
     required this.titleSize,
     required this.compactScale,
     required this.onTitleTap,
+    required this.onOpenCourse,
+    required this.centerSelection,
     required this.menuCourses,
-    required this.onManageMenu,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isCenteredSelection = centerSelection;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6 * compactScale),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-              if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
-                SizedBox(height: 12 * compactScale),
-                Text(
-                  categoryLabel!.trim().toUpperCase(),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: AppDesign.secondaryText,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.3,
-                      ),
-                ),
-                SizedBox(height: 6 * compactScale),
-              ],
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3 * compactScale),
-                child: InkWell(
-                  onTap: onTitleTap,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontSize: titleSize,
-                      height: 1.05,
-                      fontWeight: FontWeight.w800,
-                      color: AppDesign.primaryDark,
-                    ),
-                  ),
-                ),
+          if (categoryLabel != null && categoryLabel!.trim().isNotEmpty) ...[
+            SizedBox(height: 12 * compactScale),
+            Text(
+              categoryLabel!.trim().toUpperCase(),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppDesign.secondaryText,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.3,
               ),
-              if (menuCourses.isNotEmpty) ...[
-                SizedBox(height: 5 * compactScale),
-                for (final course in menuCourses)
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 1.5 * compactScale),
-                    child: Row(children: [
-                      Icon(
-                        course['course'] == 'starter' ? Icons.soup_kitchen_rounded : Icons.cake_rounded,
-                        color: AppDesign.iconGold,
-                        size: 17 * compactScale,
-                      ),
-                      SizedBox(width: 7 * compactScale),
-                      Expanded(child: Text(
-                        '${course['course'] == 'starter' ? 'Vorspeise' : 'Nachtisch'} · ${course['name'] ?? 'Rezept'}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 14 * compactScale,
-                          fontWeight: FontWeight.w700,
+            ),
+          ],
+          if (isCenteredSelection)
+            Expanded(
+              child: Center(child: _buildTitle(context)),
+            )
+          else ...[
+            SizedBox(height: 6 * compactScale),
+            _buildTitle(context),
+            if (menuCourses.isNotEmpty) ...[
+              SizedBox(height: 14 * compactScale),
+              for (final course in menuCourses)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4 * compactScale),
+                  child: Center(
+                    child: InkWell(
+                      key: ValueKey('today_menu_course_${course['course']}'),
+                      onTap: () {
+                        final recipeId = course['recipe_id']?.toString();
+                        if (recipeId != null && recipeId.isNotEmpty) onOpenCourse(recipeId);
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              course['course'] == 'starter' ? Icons.soup_kitchen_rounded : Icons.cake_rounded,
+                              color: AppDesign.iconGold,
+                              size: 18 * compactScale,
+                            ),
+                            SizedBox(width: 8 * compactScale),
+                            Flexible(
+                              child: Text(
+                                '${course['course'] == 'starter' ? 'Vorspeise' : 'Nachtisch'} · ${course['name'] ?? 'Rezept'}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 14 * compactScale,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppDesign.primaryDark,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      )),
-                    ]),
-                  ),
-              ],
-              if (onManageMenu != null)
-                Align(
-                  alignment: Alignment.center,
-                  child: TextButton.icon(
-                    onPressed: onManageMenu,
-                    icon: const Icon(Icons.restaurant_menu_rounded, size: 18),
-                    label: Text(menuCourses.isEmpty ? 'Vorspeise oder Nachtisch ergänzen' : 'Menü bearbeiten'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppDesign.primaryDark,
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4 * compactScale),
-                      textStyle: TextStyle(fontSize: 13 * compactScale),
+                      ),
                     ),
                   ),
                 ),
+            ],
+          ],
         ],
       ),
     );
   }
+
+  Widget _buildTitle(BuildContext context) => Padding(
+    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3 * compactScale),
+    child: InkWell(
+      onTap: onTitleTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Text(
+        title,
+        textAlign: TextAlign.center,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+          fontSize: titleSize,
+          height: 1.05,
+          fontWeight: FontWeight.w800,
+          color: AppDesign.primaryDark,
+        ),
+      ),
+    ),
+  );
 }
 
 class _TodayDecisionCardActions extends StatelessWidget {
