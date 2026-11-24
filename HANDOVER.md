@@ -623,3 +623,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Ursache: Die UPDATE-Policy verlangte weiterhin `recipes.created_by = auth.uid()` oder einen `recipe_saves`-Eintrag. Das blockierte die Metadatenänderung für ein Rezept, das bereits über die validierte Bearbeitungs-RPC dem persönlichen Plan zugeordnet und dadurch für den Nutzer sichtbar war.
 - Die UPDATE-Policy prüft jetzt Eigentümerschaft des Plans und dass das zugeordnete Rezept über die bestehende Rezept-Sichtbarkeits-Policy lesbar ist. Die strengere INSERT-Policy bleibt unverändert; Rezeptwechsel selbst läuft weiter über `replace_personal_plan_for_date`.
 - Migration `20261124184500_allow_visible_recipe_plan_metadata_updates.sql` wurde auf Supabase `oidxezjdwqktpxuypbfb` live angewendet. Schema-/Policy-Definition anschließend prüfen; Regressionstest und CI laufen über PR #466.
+
+
+## Restaurantadresse auf der Heute-Entscheidungskarte (2026-11-24)
+
+- Bei der Entscheidung „Heute essen gehen“ zeigt die Karte unter dem Restaurantnamen zusätzlich die Straße und den Ort aus den gespeicherten Restaurantdaten.
+- Die Adresszeilen sind kleiner und dezenter als der Restaurantname gestaltet. Name und Adresse werden als gemeinsamer Inhaltsblock in der verfügbaren Fläche zwischen Küchenrichtung und Aktionsleiste vertikal zentriert.
+- Bei fehlenden Adressfeldern werden nur vorhandene Zeilen angezeigt; andere Entscheidungstypen bleiben unverändert.
+- Regressionstest in `test/regression/today_decision_card_layout_test.dart` erweitert.
+- Branch `feat/today-restaurant-address-card`; PR/CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
