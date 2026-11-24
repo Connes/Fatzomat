@@ -30,7 +30,7 @@ void main() {
     expect(card, contains('height: imageHeight'));
     expect(header, contains('modeLabel'));
     expect(header, contains('child: image'));
-    expect(header, contains('onManageMenu'));
+    expect(header, contains('onEditDecision'));
     expect(header, contains('Icons.edit_outlined'));
     expect(content, contains('categoryLabel'));
     expect(content, contains('onTap: onTitleTap'));
