@@ -342,6 +342,23 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     if (saved == true && mounted) await load();
   }
 
+  Future<void> _editTodayDecision() async {
+    final current = plan;
+    if (current == null) return;
+
+    switch (current.decisionType) {
+      case 'order':
+        await _openMode(FoodMode.order);
+        break;
+      case 'dine_out':
+        await _openMode(FoodMode.dineOut);
+        break;
+      default:
+        await _openMenuBuilder();
+        break;
+    }
+  }
+
   Future<void> _handleSurprise() async {
     final mode = await Navigator.push<FoodMode>(
       context,
@@ -780,7 +797,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
                             )
                           : _TodayResultCard(
                               plan: plan!,
-                              onManageMenu: plan!.isRecipe ? _openMenuBuilder : null,
+                              onEditDecision: _editTodayDecision,
                               onCancel: removeTodayPlan,
                               onShare: plan!.status == 'cooked' || plan!.isShared ? null : _shareTodayDecision,
                               onOpenOrder: plan!.decisionType == 'order' && plan!.status != 'cooked'
@@ -1461,7 +1478,7 @@ class _TodayDecisionCard extends StatelessWidget {
 
 class _TodayResultCard extends StatelessWidget {
   final TodayPlan plan;
-  final VoidCallback? onManageMenu;
+  final VoidCallback? onEditDecision;
   final VoidCallback? onOpenRecipe;
   final VoidCallback? onOpenOrder;
   final ValueChanged<String> onOpenCourse;
@@ -1471,7 +1488,7 @@ class _TodayResultCard extends StatelessWidget {
 
   const _TodayResultCard({
     required this.plan,
-    required this.onManageMenu,
+    required this.onEditDecision,
     required this.onOpenRecipe,
     required this.onOpenOrder,
     required this.onOpenCourse,
@@ -1573,7 +1590,7 @@ class _TodayResultCard extends StatelessWidget {
                 modeLabel: modeLabel,
                 image: image,
                 isShared: plan.isSharedAccepted,
-                onManageMenu: plan.isRecipe ? onManageMenu : null,
+                onEditDecision: onEditDecision,
               ),
               Expanded(
                 child: _TodayDecisionCardContent(
@@ -1605,13 +1622,13 @@ class _TodayDecisionCardHeader extends StatelessWidget {
   final String modeLabel;
   final Widget image;
   final bool isShared;
-  final VoidCallback? onManageMenu;
+  final VoidCallback? onEditDecision;
 
   const _TodayDecisionCardHeader({
     required this.modeLabel,
     required this.image,
     required this.isShared,
-    required this.onManageMenu,
+    required this.onEditDecision,
   });
 
   @override
@@ -1628,7 +1645,7 @@ class _TodayDecisionCardHeader extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: onManageMenu != null ? 34 : 8),
+                  padding: EdgeInsets.symmetric(horizontal: onEditDecision != null ? 34 : 8),
                   child: Text(
                     modeLabel,
                     textAlign: TextAlign.center,
@@ -1640,12 +1657,12 @@ class _TodayDecisionCardHeader extends StatelessWidget {
                       ),
                   ),
                 ),
-                if (onManageMenu != null)
+                if (onEditDecision != null)
                   Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      tooltip: 'Menü bearbeiten',
-                      onPressed: onManageMenu,
+                      tooltip: 'Tagesentscheidung ändern',
+                      onPressed: onEditDecision,
                       icon: const Icon(Icons.edit_outlined, size: 20),
                       color: AppDesign.primaryDark,
                       visualDensity: VisualDensity.compact,
