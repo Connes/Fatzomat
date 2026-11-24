@@ -594,3 +594,14 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Bei Rezept-/Kochentscheidungen öffnet es weiterhin den Menüeditor, damit Hauptgericht und optionale Gänge bearbeitet werden können.
 - Regressionstests prüfen die Zuordnung der Entscheidungstypen und die sichtbare Bearbeiten-Aktion.
 - PR/CI und Android-Geräteprüfung stehen noch aus.
+
+
+## Bestehende Tagesentscheidungen ausdrücklich bearbeiten (2026-11-24)
+
+- Ursache des gemeldeten Fehlers: Die Live-RPC `set_personal_plan_for_date` wurde durch Migration `20261012100000_prevent_overwriting_planned_days` absichtlich so geändert, dass sie bei jedem bereits belegten persönlichen Tag mit „Dieser Tag ist bereits verplant“ abbricht. Der Menüeditor und die Bearbeiten-Aktion verwendeten bisher denselben RPC wie eine neue Planung.
+- Normale Neuauswahl bleibt weiterhin gegen versehentliches Überschreiben geschützt. Für die explizite Bearbeiten-Aktion gibt es jetzt den separaten RPC `replace_personal_plan_for_date`. Er verlangt eine bereits vorhandene persönliche Entscheidung des angemeldeten Nutzers, sperrt den Datensatz während der Änderung, erhält dessen Plan-ID und synchronisiert die Rezept-Einkaufsliste.
+- Der Menüeditor verwendet den Ersatz-RPC nur dann, wenn das Hauptgericht tatsächlich geändert wird. Bestell- und Restaurantbearbeitung geben den expliziten Bearbeitungsmodus durch die Navigation bis zur Speicherung weiter. Normale Auswahlabläufe verwenden weiterhin die bisherigen geschützten RPCs.
+- Gemeinsame Essenspläne bleiben als Sperrgrund erhalten. Der Ersatz-RPC kann weder einen Tag ohne persönliche Entscheidung anlegen noch einen gemeinsamen Plan überschreiben.
+- Neue Regressionstests prüfen die explizite Ersatzroute für Hauptgericht, Bestellung und Restaurant sowie die Datenbank-Schutzbedingungen.
+- Neue Migration: `20261124170000_replace_existing_personal_decision.sql`. Sie muss auf Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet und anschließend durch einen Test der RPC-/Schema-Definition verifiziert werden.
+- Branch `fix/edit-existing-today-decisions`; PR und CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
