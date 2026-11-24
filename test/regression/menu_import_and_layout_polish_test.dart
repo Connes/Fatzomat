@@ -6,7 +6,7 @@ void main() {
   test('ChatGPT recipe import offers optional courses after selecting the recipe for Today', () {
     final source = File('lib/features/recipes/add_recipe_page.dart').readAsStringSync();
     final save = source.indexOf('Future<void> _save() async');
-    final select = source.indexOf('final planId = await personalToday.selectRecipeForToday(', save);
+    final select = source.indexOf('final planId = await PersonalTodayRepository().selectRecipeForToday(', save);
     final prompt = source.indexOf('final addCourses = await _askToAddMenuCourses()', select);
     final editor = source.indexOf('MenuBuilderPage(', prompt);
 
