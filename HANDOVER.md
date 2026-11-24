@@ -615,3 +615,11 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Migration wurde auf Supabase-Projekt oidxezjdwqktpxuypbfb live angewendet. Verifiziert: kein zusätzliches recipe_saves-Erfordernis, Existenzprüfung aktiv, EXECUTE für authenticated erlaubt und für anon gesperrt.
 - Regressionstest test/regression/recipe_edit_availability_test.dart ergänzt.
 - Branch fix/recipe-availability-edit-validation; PR und CI stehen noch aus. Android-Gerätetest nach Merge erforderlich.
+
+
+## Rezeptbearbeitung: RLS für Menü-Metadaten angleichen (2026-11-24)
+
+- Neuer Live-Fehler „Keine Berechtigung für diese Aktion“ nach erfolgreichem Rezeptwechsel: Postgres-Logs zeigen, dass `replace_personal_plan_for_date` mit HTTP 200 erfolgreich war. Anschließend scheiterte ein separater REST-UPDATE auf `personal_today_plans.decision_value` mit SQLSTATE 42501 („new row violates row-level security policy“).
+- Ursache: Die UPDATE-Policy verlangte weiterhin `recipes.created_by = auth.uid()` oder einen `recipe_saves`-Eintrag. Das blockierte die Metadatenänderung für ein Rezept, das bereits über die validierte Bearbeitungs-RPC dem persönlichen Plan zugeordnet und dadurch für den Nutzer sichtbar war.
+- Die UPDATE-Policy prüft jetzt Eigentümerschaft des Plans und dass das zugeordnete Rezept über die bestehende Rezept-Sichtbarkeits-Policy lesbar ist. Die strengere INSERT-Policy bleibt unverändert; Rezeptwechsel selbst läuft weiter über `replace_personal_plan_for_date`.
+- Migration `20261124184500_allow_visible_recipe_plan_metadata_updates.sql` wurde auf Supabase `oidxezjdwqktpxuypbfb` live angewendet. Schema-/Policy-Definition anschließend prüfen; Regressionstest und CI laufen über PR #466.
