@@ -567,3 +567,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Bei Bestell- und Restaurantentscheidungen wird die gewählte Kategorie im flexiblen Bereich zwischen Untertitel und Kartenfuß vertikal zentriert. Die Kochansicht bleibt unverändert.
 - Bolt Food verwendet ein stabiles natives Textlogo statt des zuvor fehleranfälligen externen SVG-Abrufs. Beim Öffnen wird ein Fehler eines optionalen App-URL-Schemas abgefangen und anschließend die Webadresse versucht; fehlgeschlagene Webaufrufe zeigen eine verständliche Meldung.
 - Regressionstests wurden für die Kartenstruktur und die klickbaren Gänge erweitert. Pflicht-CI und Geräteprüfung stehen noch aus.
+
+
+## Vollständige Menüauswahl (2026-11-24)
+
+- Der Menüeditor stellt Hauptgericht, Vorspeise und Nachtisch in gleichartigen Rezept-Auswahlkarten dar. Das Hauptgericht ist ein Pflichtgang und kann wie die optionalen Gänge aus den gespeicherten Rezepten ersetzt werden.
+- Beim Speichern eines geänderten Hauptgerichts wird der bestehende datumsbezogene persönliche Plan über `set_personal_plan_for_date` aktualisiert; dadurch wird die vorhandene Rezept-Einkaufsliste gemäß der bestehenden RPC-Logik synchronisiert. Anschließend werden die optionalen Menü-Gänge wieder als versionierte Metadaten gespeichert.
+- Nach Bestätigung der Personenzahl bei der Auswahl eines Rezepts fragt die App, ob eine Vorspeise oder ein Nachtisch ergänzt werden soll. Bei Zustimmung öffnet sich der Menüeditor; bei Ablehnung geht der bisherige Auswahlablauf weiter. Gemeinsame Entscheidungsanfragen bleiben unverändert.
+- Regressionstests prüfen die drei auswählbaren Gänge sowie den zusätzlichen optionalen Abfrageschritt.
+- PR/CI und Geräteprüfung stehen noch aus.

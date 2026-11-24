@@ -22,6 +22,7 @@ import '../../data/repositories/recipe_repository.dart';
 import '../../data/repositories/collaboration_repository.dart';
 import '../../data/repositories/personal_today_repository.dart';
 import '../shared/today_page.dart';
+import '../shared/menu_builder_page.dart';
 
 import 'add_recipe_page.dart';
 import 'food_preference_recipe_guard.dart';
@@ -452,6 +453,24 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
     }
   }
 
+  Future<bool?> _askToAddMenuCourses() => showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Menü ergänzen?'),
+          content: const Text('Möchtest du eine Vorspeise oder einen Nachtisch hinzufügen?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Nein, danke'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Menü zusammenstellen'),
+            ),
+          ],
+        ),
+      );
+
   Future<void> selectRecipeForToday(Recipe recipe) async {
     if (recipe.id == null) return;
     DateTime? selectedDate = widget.planDate;
@@ -473,11 +492,27 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
           ),
         );
         if (servings == null || !mounted) return;
-        await personalToday.selectRecipeForToday(
+        final planId = await personalToday.selectRecipeForToday(
           recipe.id!,
           servings: servings,
           date: planDate,
         );
+        if (!mounted) return;
+        await load();
+        if (!mounted) return;
+        final selectedPlan = await personalToday.todayPlan(date: planDate);
+        if (selectedPlan != null && selectedPlan.id == planId) {
+          final addCourses = await _askToAddMenuCourses();
+          if (addCourses == true && mounted) {
+            await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MenuBuilderPage(plan: selectedPlan, planDate: planDate),
+              ),
+            );
+            if (mounted) await load();
+          }
+        }
       } else {
         await collaboration.resolveDecisionRequest(
           requestId: widget.decisionRequestId!,
@@ -494,25 +529,17 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
       if (widget.decisionRequestId == null) {
         final navigateToToday = widget.onNavigateToToday;
         if (navigateToToday != null) {
-          // When this flow started on Today, that page already owns the
-          // selected date. Unwind to it without emitting the reset-to-today signal.
           navigateToToday();
           return;
         }
         final navigateToTodayForDate = widget.onNavigateToTodayForDate;
         if (navigateToTodayForDate != null) {
-          // Standalone recipe browsing chooses its own date. Pass that exact
-          // date to the mounted TodayPage instead of triggering the tab's
-          // normal reset-to-current-day behavior.
           navigateToTodayForDate(planDate);
           return;
         }
         if (widget.onNavigateToTab != null) {
           widget.onNavigateToTab!(0);
         }
-        // Bubble success through a pushed recipe-selection flow when one
-        // exists. SavedRecipesPage can also be the root tab itself, where
-        // popping would empty the Navigator history and crash the app.
         final navigator = Navigator.of(context);
         if (navigator.canPop()) {
           navigator.pop(true);
@@ -520,14 +547,13 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
         return;
       }
 
-      AppFeedback.showSnackBar(context, 
+      AppFeedback.showSnackBar(context,
         SnackBar(content: Text('„${recipe.name}“ ist für die gemeinsame Entscheidung ausgewählt.')),
       );
     } catch (error) {
       if (mounted) showAppError(context, error);
     }
   }
-
   Future<void> addRecipeToShoppingList(Recipe recipe) async {
     if (recipe.id == null) return;
 

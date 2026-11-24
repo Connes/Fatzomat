@@ -337,7 +337,7 @@ class _TodayPageState extends State<TodayPage> with WidgetsBindingObserver {
     if (current == null || !current.isRecipe) return;
     final saved = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => MenuBuilderPage(plan: current)),
+      MaterialPageRoute(builder: (_) => MenuBuilderPage(plan: current, planDate: _selectedDate)),
     );
     if (saved == true && mounted) await load();
   }

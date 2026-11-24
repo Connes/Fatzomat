@@ -12,7 +12,8 @@ import '../../data/repositories/recipe_repository.dart';
 
 class MenuBuilderPage extends StatefulWidget {
   final TodayPlan plan;
-  const MenuBuilderPage({super.key, required this.plan});
+  final DateTime? planDate;
+  const MenuBuilderPage({super.key, required this.plan, this.planDate});
 
   @override
   State<MenuBuilderPage> createState() => _MenuBuilderPageState();
@@ -22,6 +23,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
   final _recipes = RecipeRepository();
   final _today = PersonalTodayRepository();
   List<Recipe> _available = const [];
+  String? _mainRecipeId;
   String? _starterId;
   String? _dessertId;
   bool _loading = true;
@@ -30,6 +32,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
   @override
   void initState() {
     super.initState();
+    _mainRecipeId = widget.plan.recipeId;
     for (final course in widget.plan.menuCourses) {
       final id = course['recipe_id']?.toString();
       if (course['course'] == 'starter') _starterId = id;
@@ -78,9 +81,17 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
   }
 
   Future<void> _save() async {
+    if (_mainRecipeId == null) return;
     setState(() => _saving = true);
     try {
-      await _today.saveMenuCourses(widget.plan.id, _courses());
+      final planId = _mainRecipeId == widget.plan.recipeId
+          ? widget.plan.id
+          : await _today.selectRecipeForToday(
+              _mainRecipeId!,
+              servings: widget.plan.servings,
+              date: widget.planDate,
+            );
+      await _today.saveMenuCourses(planId, _courses());
       if (mounted) Navigator.pop(context, true);
     } catch (error) {
       if (mounted) AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
@@ -94,9 +105,12 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
     required String subtitle,
     required String? value,
     required IconData icon,
+    required Set<String> excludedRecipeIds,
     required ValueChanged<String?> onChanged,
   }) {
-    final options = _available.where((recipe) => recipe.id != widget.plan.recipeId).toList();
+    final options = _available.where((recipe) =>
+      recipe.id != null && (!excludedRecipeIds.contains(recipe.id) || recipe.id == value)
+    ).toList();
     return Card(
       color: AppDesign.surface.withValues(alpha: 0.97),
       child: Padding(
@@ -109,7 +123,8 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
               Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
               Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppDesign.secondaryText)),
             ])),
-            if (value != null) IconButton(tooltip: 'Gang entfernen', onPressed: () => onChanged(null), icon: const Icon(Icons.close_rounded)),
+            if (value != null && title != 'Hauptgericht')
+              IconButton(tooltip: 'Gang entfernen', onPressed: () => onChanged(null), icon: const Icon(Icons.close_rounded)),
           ]),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
@@ -138,22 +153,45 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
       child: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 24), children: [
-              Card(
-                color: AppDesign.surface.withValues(alpha: 0.97),
-                child: ListTile(
-                  leading: const Icon(Icons.restaurant_menu_rounded, color: AppDesign.iconGold, size: 30),
-                  title: const Text('Hauptgericht', style: TextStyle(fontWeight: FontWeight.w800)),
-                  subtitle: Text(widget.plan.name),
-                  trailing: const Icon(Icons.check_circle_rounded, color: AppDesign.primaryDark),
-                ),
+              _picker(
+                title: 'Hauptgericht',
+                subtitle: 'Pflichtgang · kann geändert werden',
+                value: _mainRecipeId,
+                icon: Icons.restaurant_menu_rounded,
+                excludedRecipeIds: {_starterId ?? '', _dessertId ?? ''},
+                onChanged: (value) => setState(() {
+                  _mainRecipeId = value;
+                  if (_starterId == value) _starterId = null;
+                  if (_dessertId == value) _dessertId = null;
+                }),
               ),
               const SizedBox(height: 12),
-              _picker(title: 'Vorspeise', subtitle: 'Optional · kann leer bleiben', value: _starterId, icon: Icons.soup_kitchen_rounded, onChanged: (value) => setState(() => _starterId = value)),
+              _picker(
+                title: 'Vorspeise',
+                subtitle: 'Optional · kann leer bleiben',
+                value: _starterId,
+                icon: Icons.soup_kitchen_rounded,
+                excludedRecipeIds: {_mainRecipeId ?? '', _dessertId ?? ''},
+                onChanged: (value) => setState(() {
+                  _starterId = value;
+                  if (value != null && _dessertId == value) _dessertId = null;
+                }),
+              ),
               const SizedBox(height: 10),
-              _picker(title: 'Nachtisch', subtitle: 'Optional · kann leer bleiben', value: _dessertId, icon: Icons.cake_rounded, onChanged: (value) => setState(() => _dessertId = value)),
+              _picker(
+                title: 'Nachtisch',
+                subtitle: 'Optional · kann leer bleiben',
+                value: _dessertId,
+                icon: Icons.cake_rounded,
+                excludedRecipeIds: {_mainRecipeId ?? '', _starterId ?? ''},
+                onChanged: (value) => setState(() {
+                  _dessertId = value;
+                  if (value != null && _starterId == value) _starterId = null;
+                }),
+              ),
               const SizedBox(height: 16),
               FilledButton.icon(
-                onPressed: _saving ? null : _save,
+                onPressed: _saving || _mainRecipeId == null ? null : _save,
                 icon: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_rounded),
                 label: Text(_saving ? 'Wird gespeichert …' : 'Menü speichern'),
                 style: FilledButton.styleFrom(backgroundColor: AppDesign.primaryDark, minimumSize: const Size.fromHeight(54)),
