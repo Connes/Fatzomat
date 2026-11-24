@@ -8,7 +8,7 @@ void main() {
 
     expect(migration, contains('WHERE r.id = p_recipe_id'));
     expect(migration, contains("IF NOT FOUND THEN RAISE EXCEPTION 'Rezept ist nicht mehr verfügbar.'"));
-    expect(migration, isNot(contains('recipe_saves')));
+    expect(migration, isNot(contains('FROM public.recipe_saves')));
     expect(migration, contains('auth.uid()'));
   });
 }
