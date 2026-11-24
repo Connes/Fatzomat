@@ -1779,7 +1779,7 @@ class _TodayDecisionCardActions extends StatelessWidget {
           )
         else
           SizedBox(
-            height: 58,
+            height: 43,
             child: Row(
               children: [
                 Expanded(
@@ -1789,12 +1789,16 @@ class _TodayDecisionCardActions extends StatelessWidget {
                     label: const Text('Teilen'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppDesign.primaryDark,
+                      minimumSize: const Size(0, 43),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
                       textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),
-                Container(width: 1, height: 58, color: AppDesign.divider),
+                Container(width: 1, height: 43, color: AppDesign.divider),
                 Expanded(
                   child: TextButton.icon(
                     onPressed: onCancel,
@@ -1802,6 +1806,10 @@ class _TodayDecisionCardActions extends StatelessWidget {
                     label: const Text('Entfernen'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppDesign.secondaryText,
+                      minimumSize: const Size(0, 43),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
                       textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
