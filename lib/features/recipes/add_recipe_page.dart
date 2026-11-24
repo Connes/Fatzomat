@@ -567,14 +567,13 @@ class _RecipeImportPreviewPageState extends State<RecipeImportPreviewPage> {
       }
 
       if (widget.selectForToday && widget.decisionRequestId == null) {
-        final personalToday = PersonalTodayRepository();
-        final planId = await personalToday.selectRecipeForToday(
+        final planId = await PersonalTodayRepository().selectRecipeForToday(
           recipeId,
           servings: _recipe.servings.clamp(1, 999).toInt(),
           date: widget.planDate,
         );
         if (!mounted) return;
-        final selectedPlan = await personalToday.todayPlan(date: widget.planDate);
+        final selectedPlan = await PersonalTodayRepository().todayPlan(date: widget.planDate);
         if (selectedPlan != null && selectedPlan.id == planId) {
           final addCourses = await _askToAddMenuCourses();
           if (addCourses == true && mounted) {
