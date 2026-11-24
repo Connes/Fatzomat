@@ -548,3 +548,13 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Die Aktionsleiste bleibt außerhalb des flexiblen Inhaltsbereichs und vollständig sichtbar.
 - Regressionstests für identische Kartenhöhen und die kompakte Darstellung aktualisiert.
 - PR #459: Die erste CI-Runde deckte zwei veraltete Regressionserwartungen an die frühere Kartenhöhe/Bildhöhe auf; diese Tests wurden aktualisiert. Neue Pflicht-CI läuft. Kein Geräte-/Simulator-Test durchgeführt.
+
+
+## Heute-Seite: Aktionsleiste um 15 px verkleinern (2026-11-24)
+
+- Rückmeldung vom Android-Gerät: Die Ergebniskarte mit Hauptgericht, Vorspeise und Nachtisch lief trotz PR #459 noch 11 px über.
+- Die untere Aktionsleiste „Teilen“/„Entfernen“ wird von 58 px auf 43 px reduziert. Beide Schaltflächen erhalten kompakte vertikale Abstände, kompakte VisualDensity und eine explizite Mindesthöhe von 43 px; die Trennlinie passt sich ebenfalls an.
+- Dadurch werden genau 15 px zusätzlicher vertikaler Platz im Karteninhalt frei, ohne Scrollbereich und ohne die Kartenhöhe zu verändern.
+- Regressionstest prüft Footerhöhe, Button-Mindesthöhe und kompakte Touch-Target-Konfiguration.
+- Die CI-Runden fanden zwei veraltete 58-Pixel-Erwartungen im Regressionstest `restaurant_decision_completion_and_card_layout_test.dart` (Footerhöhe und Trennlinie); beide auf 43 Pixel aktualisiert.
+- PR/CI und erneuter Android-Gerätetest stehen aus.
