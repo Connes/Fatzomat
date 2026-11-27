@@ -649,3 +649,13 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Filterlogik, Auswahlzustand und Beschriftungen bleiben unverändert; angepasst wurde nur die visuelle Kennzeichnung.
 - Regressionstest `test/regression/recipe_category_filter_icons_test.dart` prüft alle Icons und die Goldfarbe.
 - Branch `feat/recipe-category-filter-icons`; PR/CI ausstehend. Kein Merge ohne vollständige Pflicht-CI.
+
+
+## Rezeptauswahl im Koch-Flow vereinheitlicht (2026-11-27)
+
+- Die Auswahl aus „Wir kochen“ verwendet jetzt dieselbe Rezeptkarten-Komponente/-Darstellung wie „Meine Rezepte“: gleiches Kartenmaß, Bildgröße, Titel, Kategorie/Zutaten-Tags und Aktionszeile.
+- Die beiden Filter (Hauptzutat und Rezeptart) sowie die Suche sind auch im Auswahlmodus verfügbar und sehen identisch aus.
+- Der Auswahlmodus ändert nur die Auswahlaktion („Für heute auswählen“ bzw. „Für diesen Tag auswählen“); Filter und Rezeptdarstellung bleiben einheitlich.
+- Während die Rezeptliste geladen wird, zeigt die Seite den Ladeindikator statt fälschlich „Kein passendes Rezept gefunden“. Der Leerzustand erscheint erst nach abgeschlossenem Laden.
+- Regressionstest in `test/regression/saved_recipes_today_selection_test.dart` erweitert.
+- Branch `fix/unify-saved-recipe-selection-ui`; PR/CI ausstehend. Kein Merge ohne vollständige Pflicht-CI.
