@@ -26,7 +26,9 @@ void main() {
     expect(shell, contains('SavedRecipesPage('));
     expect(shell, contains('onNavigateToTab: _selectTab,'));
     expect(shell, contains('onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),'));
-    expect(shell, contains('void _selectTab(int value)'));
+    expect(shell, contains('Future<void> _selectTab(int value) async'));
+    expect(shell, contains('FlowGuard.instance.confirmAbandon'));
+    expect(shell, contains('canPop: index == 0 && !FlowGuard.instance.isActive'));
   });
 
   test('normal feature navigation uses the shell navigator context', () {
