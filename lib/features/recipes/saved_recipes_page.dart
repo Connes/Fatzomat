@@ -758,8 +758,6 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final selectionActive = hasSelectionFilter;
-
     // Selection mode shares the exact same library layout and filters.
 
     return TogetherScaffold(
