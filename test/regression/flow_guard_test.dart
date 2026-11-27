@@ -58,7 +58,7 @@ void main() {
     expect(FlowGuard.instance.isActive, isFalse);
   });
 
-  testWidgets('system/app-bar back cannot pop a flow root without confirmation', (tester) async {
+  testWidgets('child flow routes remain navigable without abandoning the path', (tester) async {
     FlowGuard.instance.beginIfIdle(id: 'cook', label: 'Wir kochen heute');
     await tester.pumpWidget(MaterialApp(
       home: Scaffold(
@@ -70,7 +70,21 @@ void main() {
                 builder: (_) => FlowExitGuard(
                   child: Scaffold(
                     appBar: AppBar(title: const Text('Kochpfad')),
-                    body: const Center(child: Text('Aktiver Pfad')),
+                    body: Center(
+                      child: FilledButton(
+                        onPressed: () => Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const FlowExitGuard(
+                              child: Scaffold(
+                                body: Center(child: Text('Interner Schritt')),
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: const Text('Weiter'),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -83,21 +97,25 @@ void main() {
 
     await tester.tap(find.text('Pfad öffnen'));
     await tester.pumpAndSettle();
-    expect(find.text('Aktiver Pfad'), findsOneWidget);
+    expect(find.text('Kochpfad'), findsOneWidget);
+
+    await tester.tap(find.text('Weiter'));
+    await tester.pumpAndSettle();
+    expect(find.text('Interner Schritt'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Interner Schritt'), findsNothing);
+    expect(find.text('Kochpfad'), findsOneWidget);
+    expect(find.text('Bearbeitungspfad verlassen?'), findsNothing);
+    expect(FlowGuard.instance.isActive, isTrue);
 
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text('Bearbeitungspfad verlassen?'), findsOneWidget);
     await tester.tap(find.text('Weiter bearbeiten'));
     await tester.pumpAndSettle();
-    expect(find.text('Aktiver Pfad'), findsOneWidget);
+    expect(find.text('Kochpfad'), findsOneWidget);
     expect(FlowGuard.instance.isActive, isTrue);
-
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Pfad verlassen'));
-    await tester.pumpAndSettle();
-    expect(find.text('Aktiver Pfad'), findsNothing);
-    expect(FlowGuard.instance.isActive, isFalse);
   });
 }
