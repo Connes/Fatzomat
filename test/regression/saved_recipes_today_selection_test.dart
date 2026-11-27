@@ -3,38 +3,26 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('recipe library uses date selection instead of a Today-specific state', () {
+  test('recipe selection uses the same library cards, filters and search UI', () {
     final source = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
+    final buildStart = source.indexOf('Widget build(BuildContext context)', source.indexOf('class SavedRecipesPageState'));
+    final build = source.substring(buildStart);
 
-    expect(source, contains("label: const Text('Auswählen')"));
-    expect(source, contains("Key('cook-search-select-recipe-"));
-    expect(source, contains("'Für heute auswählen'"));
+    expect(source, contains("Key('saved-recipe-select-today-${recipe.id}')"));
     expect(source, contains('selectionActive'));
+    expect(source, contains("'Für heute auswählen'"));
     expect(source, contains("'Für diesen Tag auswählen'"));
     expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));
     expect(source, contains("tooltip: 'Nach Rezeptart filtern'"));
-    expect(source, contains('categoryFilter'));
-    expect(source, contains('onPressed: () => selectRecipeForToday(recipe)'));
-    expect(source, contains('Future<DateTime?> _choosePlanDate()'));
-    expect(source, contains('itemCount: 7'));
-    expect(source, contains('enabled: label == null'));
-    expect(source, isNot(contains('todayPlan?.isRecipe == true')));
-    expect(source, isNot(contains('Für heute ausgewählt')));
-    expect(source, isNot(contains('if (hasActiveTodayPlan)')));
+    expect(source, contains("hintText: 'Rezepte suchen'"));
+    expect(source, contains('_RecipeCardImage('));
+    expect(source, contains('recipe.category'));
+    expect(source, contains('...recipe.foodTags'));
 
-    final cookSearchCard = source.substring(
-      source.indexOf("Key('cook-search-select-recipe-") - 1800,
-      source.indexOf("Key('cook-search-select-recipe-") + 900,
-    );
-    expect(cookSearchCard, contains('padding: const EdgeInsets.fromLTRB(14, 10, 12, 8)'));
-    expect(cookSearchCard, contains('crossAxisAlignment: CrossAxisAlignment.center'));
-    expect(cookSearchCard, contains('maxLines: 2'));
-    expect(cookSearchCard, contains('overflow: TextOverflow.ellipsis'));
-    expect(cookSearchCard, contains("label: Text("));
-    expect(cookSearchCard, isNot(contains('Rezept bearbeiten')));
-    expect(cookSearchCard, isNot(contains('Rezept teilen')));
-    expect(cookSearchCard, isNot(contains('Rezept löschen')));
+    expect(build, contains('body: loading'));
+    expect(build, contains('CircularProgressIndicator()'));
+    expect(build, contains('visibleRecipes.isEmpty'));
+    expect(build, isNot(contains('if (selectionActive)')));
+    expect(build, contains('selectionActive'));
   });
 }
-
-
