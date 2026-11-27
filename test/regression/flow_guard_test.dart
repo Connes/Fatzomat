@@ -89,7 +89,7 @@ void main() {
                         onPressed: () => Navigator.push<void>(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (_) => const FlowExitGuard(
+                            builder: (_) => FlowExitGuard(
                               child: Scaffold(
                                 appBar: AppBar(title: const Text('Interner Schritt')),
                                 body: const Center(child: Text('Interner Schritt')),
