@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/flow_guard.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/widgets/together_scaffold.dart';
@@ -488,6 +489,11 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
       if (selectedDate == null || !mounted) return;
     }
     final planDate = selectedDate ?? DateTime.now();
+    final startedHere = !FlowGuard.instance.isActive;
+    FlowGuard.instance.beginIfIdle(
+      id: 'saved_recipe_today_selection',
+      label: 'Rezept für heute auswählen',
+    );
     try {
       if (widget.decisionRequestId == null) {
         final servings = await showDialog<int>(
@@ -498,7 +504,10 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
             confirmLabel: 'Bestätigen',
           ),
         );
-        if (servings == null || !mounted) return;
+        if (servings == null || !mounted) {
+          if (startedHere) FlowGuard.instance.complete();
+          return;
+        }
         final planId = await personalToday.selectRecipeForToday(
           recipe.id!,
           servings: servings,
@@ -532,6 +541,7 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
       if (!mounted) return;
       await load();
       if (!mounted) return;
+      FlowGuard.instance.complete();
 
       if (widget.decisionRequestId == null) {
         final navigateToToday = widget.onNavigateToToday;
