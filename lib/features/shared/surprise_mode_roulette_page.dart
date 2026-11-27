@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/food_mode.dart';
 import '../../core/app_design.dart';
+import '../../core/flow_guard.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
 
@@ -58,6 +59,10 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   @override
   void initState() {
     super.initState();
+    FlowGuard.instance.beginIfIdle(
+      id: 'today_surprise',
+      label: 'Überraschung für heute',
+    );
     _celebration = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400));
     _winnerEntrance = AnimationController(
       vsync: this,
@@ -188,6 +193,7 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
   Widget build(BuildContext context) {
     final result = _resultMode;
     return TogetherScaffold(
+      protectFlowExit: true,
       backgroundType: TogetherBackgroundType.decisionResult,
       appBar: TogetherAppBar(title: const Text('Überrasch mich')),
       body: Stack(
@@ -312,7 +318,10 @@ class _SurpriseModeRoulettePageState extends State<SurpriseModeRoulettePage>
                                           SizedBox(
                                             width: double.infinity,
                                             child: FilledButton.icon(
-                                              onPressed: () => Navigator.pop(context, result),
+                                              onPressed: () {
+                                                FlowGuard.instance.complete();
+                                                Navigator.pop(context, result);
+                                              },
                                               icon: const Icon(Icons.arrow_forward_rounded),
                                               label: Text('WEITER MIT „${_labels[result]}“'),
                                               style: FilledButton.styleFrom(
