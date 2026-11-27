@@ -47,6 +47,10 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
   @override
   void initState() {
     super.initState();
+    FlowGuard.instance.beginIfIdle(
+      id: 'personalized_recipe_surprise',
+      label: 'Persönliche Rezeptüberraschung',
+    );
     _recommendation = widget.recommendation;
   }
 
@@ -101,6 +105,7 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
         );
       }
       if (!mounted) return;
+      FlowGuard.instance.complete();
       Navigator.pop(context, true);
     } catch (error) {
       if (!mounted) return;
@@ -122,6 +127,7 @@ class _PersonalizedSurprisePageState extends State<PersonalizedSurprisePage> {
     final resultsCount = _recommendation.recipes.length;
 
     return TogetherScaffold(
+      protectFlowExit: true,
       backgroundType: TogetherBackgroundType.decisionResult,
       appBar: TogetherAppBar(title: const Text('Deine Überraschung')),
       body: SafeArea(
