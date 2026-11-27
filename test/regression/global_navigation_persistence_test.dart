@@ -31,6 +31,16 @@ void main() {
     expect(shell, contains('canPop: index == 0 && !FlowGuard.instance.isActive'));
   });
 
+  test('system back unwinds nested routes before asking to abandon a flow', () {
+    final shell = source('lib/core/app_shell.dart');
+    final nestedPop = shell.indexOf('if (navigator?.canPop() == true)');
+    final abandon = shell.indexOf('if (FlowGuard.instance.isActive)', nestedPop);
+
+    expect(nestedPop, isNonNegative);
+    expect(abandon, greaterThan(nestedPop));
+    expect(shell.substring(nestedPop, abandon), contains('navigator!.pop()'));
+  });
+
   test('normal feature navigation uses the shell navigator context', () {
     final files = [
       'lib/features/shared/today_page.dart',
