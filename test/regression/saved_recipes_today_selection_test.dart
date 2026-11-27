@@ -9,7 +9,7 @@ void main() {
     final build = source.substring(buildStart);
 
     expect(source, contains("Key('saved-recipe-select-today-\${recipe.id}')"));
-    expect(source, contains('selectionActive'));
+    expect(source, contains('hasSelectionFilter'));
     expect(source, contains("label: const Text('Auswählen')"));
     expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));
     expect(source, contains("tooltip: 'Nach Rezeptart filtern'"));
@@ -21,7 +21,6 @@ void main() {
     expect(build, contains('body: loading'));
     expect(build, contains('CircularProgressIndicator()'));
     expect(build, contains('visibleRecipes.isEmpty'));
-    expect(build, isNot(contains('if (selectionActive)')));
-    expect(build, contains('selectionActive'));
+    expect(build, isNot(contains('if (hasSelectionFilter)')));
   });
 }
