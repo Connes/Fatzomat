@@ -15,6 +15,20 @@ void main() {
     expect(FlowGuard.instance.activeLabel, 'Wir kochen heute');
   });
 
+  test('the first guarded route remains the root until the path ends', () {
+    FlowGuard.instance.beginIfIdle(id: 'cook', label: 'Wir kochen heute');
+    final root = MaterialPageRoute<void>(builder: (_) => const SizedBox.shrink());
+    final child = MaterialPageRoute<void>(builder: (_) => const SizedBox.shrink());
+
+    expect(FlowGuard.instance.isRootRoute(root), isTrue);
+    expect(FlowGuard.instance.isRootRoute(child), isFalse);
+
+    FlowGuard.instance.complete();
+    FlowGuard.instance.beginIfIdle(id: 'order', label: 'Wir bestellen heute');
+
+    expect(FlowGuard.instance.isRootRoute(child), isTrue);
+  });
+
   test('a path ends only when explicitly completed', () {
     FlowGuard.instance.beginIfIdle(id: 'cook', label: 'Wir kochen heute');
     expect(FlowGuard.instance.isActive, isTrue);
