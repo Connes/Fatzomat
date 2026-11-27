@@ -67,10 +67,10 @@ void main() {
             onPressed: () => Navigator.push<void>(
               context,
               MaterialPageRoute<void>(
-                builder: (_) => const FlowExitGuard(
+                builder: (_) => FlowExitGuard(
                   child: Scaffold(
-                    appBar: AppBar(title: Text('Kochpfad')),
-                    body: Center(child: Text('Aktiver Pfad')),
+                    appBar: AppBar(title: const Text('Kochpfad')),
+                    body: const Center(child: Text('Aktiver Pfad')),
                   ),
                 ),
               ),
