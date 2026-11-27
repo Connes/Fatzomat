@@ -101,7 +101,6 @@ Der Befehl ist ein verbindlicher Prüf- und Korrekturauftrag, keine Bitte um blo
 - Wenn ein PR absichtlich nicht gemergt wird, muss der konkrete Grund genannt werden. Keine offene PR stillschweigend als erledigt behandeln. Vor der Abschlussmeldung muss die offene PR-Liste leer sein oder jeder verbleibende PR ausdrücklich mit Grund aufgeführt werden.
 - Abschlussmeldung nur mit verifizierten Fakten: PR-Nummer/Link, Merge-Commit, Ergebnis der CI auf dem aktuellen `main` und gegebenenfalls klar benannter noch laufender Post-Merge-Prüfung. Nie „fertig“ sagen, wenn einer dieser erforderlichen Schritte noch offen ist.
 - Bei mehreren offenen PRs eine klare Reihenfolge verfolgen: ältere unabhängige PRs mit grüner CI zuerst; danach abhängige PRs in Reihenfolge ihrer Voraussetzungen; nach jedem Merge neu validieren.
-
 ## Verbindlicher Abschlussmodus für Änderungsaufträge
 
 Wenn der Nutzer eine konkrete Änderung beauftragt, gilt bis zum verifizierten Abschluss ein durchgehender Arbeitszyklus:
@@ -148,10 +147,339 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
 
 ## Live-Status (verifiziert 2026-10-23)
-
 - Aktueller `main`-Commit: `434120e65be9cf8cf3420a542594f2e7557e589d` (PR [#301 – Fix custom food saving and duplicate prevention](https://github.com/Connes/Fatzomat/pull/301)).
-- Beide Post-Merge-CI-Workflows wurden für diesen Commit erfolgreich ausgeführt.
-- Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
+- Beide Post-Merge-CI-Workflows sind für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39958328215) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39958328233).
+- Die Live-Abfrage offener Pull Requests ergab keine offenen PRs.
+- Die Migration zur Verhinderung normalisierter Duplikate benutzerdefinierter Lebensmittel wurde auf dem Live-Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet und read-only verifiziert. Die Datenbank registrierte sie unter Version `20261023132447`; der Repository-Dateiname verwendete zunächst `20261023150000`. Ein Folge-PR gleicht den Dateinamen an die tatsächlich registrierte Live-Version an.
+- Vor der Migration wurde geprüft, dass keine benutzerdefinierten Lebensmittel mit gleichem kleingeschriebenem, getrimmtem Namen existieren. Der Unique-Index `foods_custom_name_normalized_unique` ist in der Live-Datenbank vorhanden. Keine vorhandenen Datensätze wurden verändert.
+- Geräteprüfung wurde nicht durchgeführt.
+
+## Nächster Schritt
+
+1. Zu Beginn jeder Sitzung `main`, offene PRs und CI live erneut prüfen.
+2. Nur den aktuellen Live-Status in diesem Abschnitt aktualisieren; historische Einzelberichte gehören in die jeweiligen thematischen Abschnitte.
+3. Den nächsten Arbeitspunkt aus einem aktuellen Code-/Testbefund ableiten; geschlossene, nicht gemergte Feature-Branches nicht ungeprüft wiederverwenden.
+
+## Technische Orientierung
+
+- Für Tests und Regressionen die bestehenden Testmuster unter `test/` verwenden.
+- Supabase-Migrationen liegen im Repository unter `supabase/migrations/`; Live-Anwendung und Funktionsdefinitionen müssen separat geprüft werden.
+- Relevante dauerhafte Setup-, Sicherheits-, Test- und Release-Dokumentation liegt unter `docs/`. Diese Dokumente nicht durch historische Einzelberichte ersetzen.
+
+
+## Technische Härtung: Restaurantaktionen und Supabase (2026-10-19)
+
+Die Anwendungshärtung wurde über PR #235 in `main` integriert (Merge-Commit `5967bac43fcd650fc3d545ec59d77850fa5e31ff`). PR #236 gleicht die Dateinamen der beiden Security-Migrationen mit den angewendeten Live-Versionen ab. Dieser Folge-PR richtet zusätzlich die Cloud-Favoritenmigration an der Live-Migrationsversion aus.
+
+- Restaurantdetails-Dialog: Favoriten-Toggle während eines laufenden Requests deaktivieren; Fehler zeigen eine generische Rückmeldung und geben die Aktion wieder frei. Fehler beim Restaurantabschluss werden ebenfalls abgefangen, ohne den Dialog fälschlich als erfolgreich zu schließen.
+- Favoriten-Repository: Datenbank-Unique-Constraint-Fehler `23505` werden als bereits vorhandener Favorit behandelt. Beschädigte Legacy-JSON-Werte werden in einen separaten lokalen Backup-Key verschoben, bevor der aktive Migrationsschlüssel entfernt wird.
+- Neue Widgettests prüfen doppelte Abschluss-Taps, Abschlussfehler, parallel gestartete Favoriten-Taps und Favoriten-Retry nach einem Fehler. Alle vier Tests liefen in der erfolgreichen PR-CI durch.
+- Live-Supabase-Projekt `oidxezjdwqktpxuypbfb` wurde read-only geprüft: `restaurant_favorites` hat RLS aktiviert, eine `authenticated`-Policy mit `user_id = auth.uid()`, einen normalisierten Unique-Index auf Benutzer/Name/Adresse und derzeit keine doppelten normalisierten Identitäten. Das Tabellen-Schema ist im Live-Projekt vorhanden.
+- Die Cloud-Favoritenmigration wurde auf `supabase/migrations/20261018045840_cloud_restaurant_favorites.sql` umbenannt, damit Dateiname und Live-Migrationshistorie dieselbe Version verwenden. Der Regressionstest wurde auf diesen Pfad aktualisiert; es wird keine zweite Tabellenmigration hinzugefügt.
+- Der Supabase Security Advisor meldete `public.recipe_fingerprint(jsonb,jsonb)` mit veränderlichem `search_path`. Die Korrektur setzt ihn auf `pg_catalog, pg_temp`. Die Migration entzieht `anon` unnötige direkte Tabellenprivilegien und entfernt die permissive Policy `recipes global update`, die jedem `authenticated`-Benutzer Updates an beliebigen Rezepten erlaubte. Zusätzlich wurden `connection_member_display_name` und `is_connection_member` so gehärtet, dass sie nur noch Informationen für eine Verbindung zurückgeben, zu der der aufrufende Benutzer selbst gehört. Die globale Rezeptbibliothek bleibt lesbar, Änderungen bleiben auf Eigentümer beschränkt. Die Live-Tabelle `connection_members` enthält derzeit keine Zeilen; deshalb wurde die positive Mitgliedschaftsseite nicht mit realen Mitgliedsdaten getestet. Es wurden dafür keine Testdaten in Produktion angelegt.
+- Die Migrationen wurden nach dem Merge auf das Live-Projekt angewendet und read-only verifiziert: Version `20261019181015` setzt den `search_path`, entfernt `recipes global update` und entzieht `anon` direkte Favoriten-Tabellenrechte; Version `20261019181043` entfernt auch unnötige `authenticated`-Privilegien und lässt nur `SELECT`, `INSERT`, `UPDATE`, `DELETE` übrig. Version `20261019181436` begrenzt die beiden Connection-Helper auf Mitglieder der jeweiligen Verbindung und pinnt auch dort den `search_path`. Die Owner-RLS-Policy bleibt aktiv. Die Funktionskonfiguration zeigt `search_path=pg_catalog, pg_temp`; die breite Rezept-UPDATE-Policy ist nicht mehr vorhanden; es gibt keine direkten `anon`-Tabellenrechte für Favoriten. Es wurden keine Produktionsdaten verändert.
+- Das Live-Projekt hat 19 öffentliche Tabellen, und alle 19 haben RLS aktiviert. Verbleibende Advisor-Hinweise: 37 ausführbare `SECURITY DEFINER`-RPCs (einzeln auf Authentifizierungs- und Eigentümerprüfungen zu prüfen), `pg_net` in `public` und aktivierte anonyme Anmeldung. Anonyme Anmeldung wird von der App tatsächlich für Sitzungen verwendet und wurde deshalb nicht abgeschaltet. Diese Hinweise wurden nicht pauschal durch Änderungen an potenziell legitimen RPCs oder Auth-Einstellungen behandelt.
+- Die PR-CI für PR #235 war erfolgreich: Quality Gate Run `39299597679` und Flutter quality gate Run `39300003522`. Auch beide Post-Merge-Push-Workflows auf Merge-Commit `5967bac43fcd650fc3d545ec59d77850fa5e31ff` waren erfolgreich: [Quality Gate Run 39300256920](https://github.com/Connes/Fatzomat/actions/runs/39300256920) und [Flutter quality gate Run 39300256908](https://github.com/Connes/Fatzomat/actions/runs/39300256908).
+
+
+## UX-Härtung: Rezeptimport bei optionalem Bildfehler (2026-10-20)
+
+- In Arbeit auf Branch `ux/recipe-import-save-feedback`: Wenn ein Rezept bereits erfolgreich gespeichert wurde, der optionale Bild-Upload danach aber fehlschlägt, soll der gesamte Import nicht fälschlich als fehlgeschlagen erscheinen. Das Rezept wird als gespeichert bestätigt, der Bildfehler separat angezeigt und die Vorschau wie im Erfolgsfall geschlossen.
+- Regressionstest ergänzt. Lokale Flutter-Tests wurden über die GitHub-Datei-API nicht ausgeführt; PR-CI muss den aktuellen Stand verifizieren.
+- Kein Accessibility-Refactoring. Kein Release oder Geräte-Test.
+
+
+## UX-Härtung: Standortabfrage mit Timeout (2026-10-20)
+
+- Standortbestimmung für die ChatGPT-Restaurantsuche ist jetzt auf 15 Sekunden begrenzt. Bei Timeout erscheint eine verständliche Fehlermeldung mit erneutem Versuch als nächstem Schritt; die UI bleibt nicht unbegrenzt im Ladezustand.
+- Regressionstest ergänzt. CI muss den aktuellen PR-Head prüfen. Kein Geräte-Test und kein Release.
+
+
+## UX-Härtung: Standortberechtigung erst bei Restaurantsuche (2026-10-20)
+
+- Die Launch-Seite fordert keine Standortberechtigung mehr direkt beim ersten App-Start an. Die Berechtigung wird weiterhin im konkreten Restaurant-Suchablauf angefragt, in dem sie benötigt wird.
+- Regressionstest aktualisiert. Keine Änderung an Berechtigungsmodellen oder Datenschutzkonfiguration. CI-Prüfung und Post-Merge-Verifikation stehen noch aus.
+
+
+## UX-Härtung: Rezeptimport nach Teilerfolg fortsetzen (2026-10-21)
+
+- Befund: `RecipeImportPreviewPage._save()` speichert das Rezept zuerst und verknüpft es danach optional mit „Heute“ oder löst eine gemeinsame Entscheidungsanfrage auf. Schlägt die spätere Verknüpfung fehl, blieb die Vorschau offen; ein erneuter Tap startete vorher erneut die Duplikatprüfung und konnte nicht sauber mit dem bereits gespeicherten Rezept fortfahren.
+- Änderung auf Branch `fix/retry-recipe-import-finalization`: die erfolgreiche Rezept-ID bleibt im Vorschau-State erhalten. Erneute Versuche überspringen den Insert und setzen die nachgelagerte Verknüpfung fort. Das optionale Bild wird nicht bei jedem Retry erneut hochgeladen; ein Bildfehler bleibt in der Rückmeldung erhalten.
+- Regressionstest prüft die Retry-Guard-Bedingung, den einmaligen Insert und die beiden Verknüpfungspfade. CI und Merge sind noch nicht abgeschlossen. Lokale Flutter-Tests und Gerätetests wurden nicht ausgeführt.
+
+
+## Lebensmittel-Auswahl ohne Emojis (2026-10-21)
+
+- In `lib/features/recipes/additional_ingredients_page.dart` wurden die Emoji-Zuordnung und das Emoji-Feld aus den auswählbaren Lebensmittelzeilen entfernt. Der Lebensmittelname beginnt jetzt links im Zeileninhalt; Checkbox und Auswahlverhalten bleiben unverändert.
+- Regressionstest in `test/regression/additional_ingredients_test.dart` prüft, dass Emoji-Zeichen nicht gerendert werden und die Namensspalte links beginnt.
+- Änderung eingereicht über Branch `fix/ingredient-picker-no-emojis`; CI/Merge-Status nach PR-Erstellung prüfen. Keine Geräteprüfung durchgeführt.
+
+
+## Rezeptprompt: Internetfunde plus eigene Ideen (Arbeitsstand 2026-10-26)
+
+- `lib/features/recipes/together_chatgpt_prompt.dart`: Phase 1 ist auf bis zu drei echte Internetrezepte plus genau zwei klar gekennzeichnete eigene Ideen ausgerichtet. Vorgesehene Websites in Reihenfolge: einfachkochen.de, chefkoch.de, emmikochteinfach.de (Emmi kocht einfach), lecker.de und essen-und-trinken.de.
+- Prompt fordert Abbruch der Websuche nach spätestens 30 Sekunden, verbietet erfundene Quellen und jede inhaltliche Änderung an Originalrezepten und weist auf die Grenzen hin, wenn ein geschützter Originaltext nicht vollständig wiedergegeben werden darf.
+- Bei weniger als drei passenden Internetfunden werden keine Treffer erfunden; es erscheinen nur tatsächlich verifizierte Funde plus zwei eigene Ideen. Dadurch kann die Vorschlagsliste 2 bis 5 Einträge enthalten.
+- Das bestehende `together_recipe`-JSON-Schema Version 1 bleibt unverändert. Bei ausgewähltem Internetrezept darf eine JSON-Datei nicht fälschlich als unverändertes Original ausgegeben werden, wenn Quelle/Angaben nicht verlässlich übernommen werden können.
+- Wichtig: Ein Prompt kann die 30-Sekunden-Grenze nur anweisen, nicht technisch garantieren. Eine harte Grenze erfordert Kontrolle durch die tatsächlich verwendete Suchumgebung. Die App übergibt den Prompt weiterhin an eine externe ChatGPT-Sitzung; die Suchfunktion hängt von dieser Sitzung ab.
+- Geräteprüfung nicht durchgeführt. PR und CI-Status nach Einreichung prüfen.
+
+## Restaurant-Suchprompt: Küchenbezeichnung strikt begrenzen (2026-10-26)
+
+- `lib/features/food_modes/chatgpt_restaurant_page.dart`: Der Prompt verlangt jetzt für `restaurant.cuisine` exakt die vom Nutzer angefragte Küchenbezeichnung. Zusätze und Werbetexte wie „gutbürgerlich“, „regional und saisonal“, „authentisch“ oder „mediterran“ sind ausdrücklich verboten.
+- Beispiele im Prompt: deutsche Küche muss als `Deutsch`, griechische Küche als `Griechisch` ausgegeben werden.
+- `test/regression/chatgpt_restaurant_import_test.dart` prüft die verbindliche Regel und Beispiele.
+- Über PR [#329](https://github.com/Connes/Fatzomat/pull/329) gemergt; Merge-Commit `d5e91a5335106f915accd3da78388d220c20bbbe`. Beide PR-CI-Workflows für den Head `8a3c4466b43a55e51c32ca6b114b8f792de2cdbf` erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40301683627) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40301683661). Post-Merge-CI konnte über die verfügbare Abfrage noch nicht bestätigt werden; keine Geräteprüfung durchgeführt.
+
+## Lieblingsrestaurants: Menü-Icons in Gold (2026-10-26)
+
+- In `lib/features/settings/restaurant_favorites_page.dart` nutzen die drei Punkte auf jeder Restaurantkarte und ausschließlich das Bearbeiten-Icon im Popup-Menü `AppDesign.iconGold`.
+- Die Texte bleiben unverändert; insbesondere wird „Bearbeiten“ nicht gold eingefärbt. Das Löschen-Icon und der Löschtext behalten die Fehlerfarbe.
+- Regressionstest: `test/regression/restaurant_favorites_gold_menu_test.dart`.
+- Über PR [#330](https://github.com/Connes/Fatzomat/pull/330) gemergt; Merge-Commit `3c6faf37e6f128881d8d88ce45e366fc33acb5ce`. Beide PR-CI-Workflows für den Head `b8bd0aebd4f54ccfb80aada565d15a08ebff3f91` erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40303638086) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40303638154). Post-Merge-CI über die verfügbare Abfrage noch nicht bestätigt; keine Geräteprüfung durchgeführt.
+
+## Einkaufsliste: alle geplanten Tage und fehlende Zutaten sichtbar machen (2026-10-26)
+
+- `PersonalTodayRepository.plannedShoppingDates()` liefert heute plus alle zukünftigen Datumswerte mit persönlichen Rezeptplänen im Status `planned`; die Einkaufsliste hängt nicht länger an einem Dreitagesfenster.
+- `MultiDayShoppingListPage` lädt Pläne für diese Datumswerte dynamisch. Beim Tageswechsel wird die Liste aktualisiert, ohne geplante Zukunftstage aus einer festen Dreitagesliste zu entfernen.
+- Fehlerquelle in der bisherigen Darstellung: `_activeDays` blendete einen Tag komplett aus, wenn zu einem gespeicherten Rezeptplan keine Einkaufszeilen vorhanden waren. Dadurch sah es so aus, als wäre das Rezept nicht übernommen worden. Solche geplanten Rezepttage bleiben jetzt sichtbar, sodass der fehlende Zutatenbestand nicht mehr stillschweigend den ganzen Tag versteckt.
+- Regressionstests ergänzt für unbegrenzte geplante Datumswerte und sichtbare Rezepttage ohne Einkaufszeilen.
+- Diese Änderung stellt die Anzeige aller geplanten Tage sicher. Sie beweist noch nicht, dass fehlende Zutatenzeilen in der Datenbank automatisch repariert werden; die konkrete Synchronisation beim Speichern/Import des Rezepts muss anhand von Live-Daten und Datenbanktriggern weiter geprüft werden.
+- Über PR [#331](https://github.com/Connes/Fatzomat/pull/331) gemergt; Merge-Commit `ab80c19be1edaf21fbc41eeac578cae53ebec334`. Beide CI-Workflows erfolgreich: [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/40313211551) und [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/40313211889). Keine Geräteprüfung durchgeführt.
+
+
+## Einkaufsliste: nach App-Rückkehr neu laden (2026-10-26)
+
+- `MultiDayShoppingListPage.didChangeAppLifecycleState()` lädt die gespeicherten Pläne und Einkaufsartikel beim Wechsel zurück in den Vordergrund erneut, auch wenn sich das Datum nicht geändert hat. Die Seite kann in der Tab-Navigation gemountet bleiben; ein App-Resume darf daher nicht allein auf den Tageswechsel oder Realtime-Ereignisse vertrauen.
+- Ziel ist, einen veralteten UI-Zustand nach Hintergrundbetrieb zu vermeiden. Das ist eine defensive Verbesserung, keine bestätigte Erklärung des zuvor beobachteten Fehlers; der Fehler war nicht reproduzierbar.
+- Über PR [#332](https://github.com/Connes/Fatzomat/pull/332) gemergt; Merge-Commit `1ad48e585e27f081ce1ed013350783667102cb7d`. Beide PR-CI-Workflows auf dem Head waren erfolgreich: `Quality Gate` und `Flutter quality gate`. Post-Merge-CI und Geräteprüfung separat verifizieren.
+
+
+## Einkaufsliste: leerer Zustand vs. fehlgeschlagener Abruf (2026-10-26)
+
+- `PersonalTodayRepository.plannedShoppingDates()` und `plannedPlansForDate()` werfen jetzt `AuthenticationException`, wenn keine angemeldete Sitzung vorhanden ist, statt eine leere Datums-/Planliste zurückzugeben. Eine abgelaufene Sitzung kann dadurch nicht mehr wie eine wirklich leere Einkaufsliste aussehen.
+- `MultiDayShoppingListPage` zeigt bei fehlender Sitzung eine passende Anmeldeaufforderung. Andere Abruffehler zeigen die normalisierte Fehlerursache und behalten die Schaltfläche „Erneut versuchen“. Die Meldung „Noch keine Einkaufsliste“ bleibt dem erfolgreich geladenen leeren Zustand vorbehalten.
+- Regressionstest ergänzt, der die Trennung zwischen fehlender Sitzung, Abruffehler und echtem Leerzustand absichert.
+- Änderung auf Branch `fix/shopping-list-empty-vs-error`; PR/CI noch ausstehend. Geräteprüfung nicht durchgeführt.
+
+## Rezeptkarten im Kochablauf (Arbeitsstand 2026-10-26)
+
+- Branch `fix/cook-filtered-recipe-card-layout`: Die gefilterte Rezeptliste unter „Wir kochen“ → „Aus meinen Rezepten suchen“ verwendet jetzt die Kartenanordnung der regulären Rezeptbibliothek: Bild und Name nebeneinander, Auswahlaktion darunter, gleiche Innenabstände und zweizeilige Namensbegrenzung.
+- Der kontextabhängige Funktionsumfang bleibt getrennt: Bearbeiten, Teilen und Löschen bleiben ausschließlich in „Meine Rezepte“ verfügbar. Die Kochsuche bietet weiterhin nur „Für heute auswählen“ bzw. „Für diesen Tag auswählen“.
+- Regressionstest ergänzt in `test/regression/saved_recipes_today_selection_test.dart`, um Layout und Trennung der Aktionen abzusichern.
+- PR/CI und Gerätetest sind für diesen Arbeitsstand noch nicht verifiziert.
+
+## Einkaufsliste: Einzelrezept-Kopfzeile (Arbeitsstand 2026-10-26)
+
+- Branch `feat/single-recipe-shopping-list-heading`: Wenn genau ein Rezept für genau einen ausgewählten Tag in der persönlichen Einkaufsliste angezeigt wird, ersetzt das zentrierte Datum und der darunter zentrierte Rezeptname die Überschrift „Zusammengefasste Zutaten“.
+- Bei einer einzelnen Rezept-Einkaufsliste heißt die Zutatenkategorie „Zutaten“ statt „Weitere Zutaten“. Bei mehreren Rezepten bleibt die bisherige zusammengefasste Darstellung mit Kategorien erhalten.
+- Regressionstest in `test/regression/shopping_list_test.dart` ergänzt. PR/CI und Gerätetest noch ausstehend.
+
+
+### Anforderungsänderung: einheitliche Tageskarte (2026-10-26)
+
+Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einkaufsliste soll für einen oder mehrere Tage denselben Aufbau verwenden: immer eine ausklappbare Tageskarte mit Datum und Auswahl-Checkbox; beim Aufklappen stehen Rezeptname und Personenzahl. Nur ausgewählte Tage speisen die Zutatenliste. Ist kein Tag ausgewählt, wird statt der Zutaten der Hinweis „Keine Einkaufsliste ausgewählt …“ angezeigt. Die Überschrift „Zusammengefasste Zutaten“ und die bisherigen Kategorien bleiben einheitlich.
+
+
+## Rezeptdetail aus „Wir kochen“ schreibgeschützt (2026-10-28)
+
+- Wenn ein gespeichertes Rezept aus dem Kochablauf über „Aus meinen Rezepten suchen“ geöffnet wird, zeigt die Rezeptdetailseite weiterhin die zentrierte Überschrift „Rezept“, aber keine Verwaltungsaktionen für Export, Bild, Bearbeiten oder Löschen.
+- Die Verwaltungsaktionen bleiben in der normalen Rezeptbibliothek „Meine Rezepte“ verfügbar. Die Unterscheidung erfolgt über `showManagementActions`, getrennt von `viewingTodaySelection`, damit bestehende Kochschritt-Funktionen nicht unbeabsichtigt verändert werden.
+- Regressionstest in `test/regression/recipe_detail_compact_test.dart` ergänzt. PR/CI und Gerätetest stehen noch aus.
+
+
+## Internetrezepte aus ChatGPT zuverlässig importieren (2026-10-28)
+
+- Ursache des beobachteten Verhaltens: Der Prompt in `lib/features/recipes/together_chatgpt_prompt.dart` verlangte einerseits ein unverändertes Originalrezept, untersagte zugleich aber eine vollständige Übernahme und wies ChatGPT ausdrücklich an, in diesem Fall keine `together_recipe.json` zu erstellen. Das war widersprüchlich und führte zu der Ablehnung im Screenshot.
+- Prompt angepasst: ChatGPT soll die Originalseite tatsächlich öffnen und Zutaten/Mengen prüfen, die Zubereitung in eigenen Worten formulieren, die Quelle mit vollständiger URL in der Beschreibung erhalten und danach eine gültige `together_recipe.json` erzeugen.
+- Wenn die Seite technisch nicht erreichbar oder wichtige Angaben nicht sichtbar sind, soll ChatGPT offen nach dem Rezepttext oder Screenshots fragen, statt zu raten oder pauschal abzulehnen.
+- Regressionstests in `test/together_chatgpt_prompt_test.dart` prüfen diese Regeln.
+- Wichtig: Der Prompt kann keine Browser-/Webzugriffsrechte erzwingen. Die tatsächliche Extraktion hängt davon ab, ob die verwendete ChatGPT-Sitzung Websuche/Browsing nutzen kann und die Quellseite erreichbar ist. CI und Gerätetest stehen noch aus.
+
+## Fallback für nicht erreichbare Rezept-Webseiten (2026-10-28)
+
+- Folgeanalyse des Chefkoch-Screenshots: Die bisherige Prompt-Korrektur forderte zwar, die Originalseite erneut zu öffnen, gab aber keinen konkreten Wiederherstellungsweg vor, wenn Chefkoch den Zugriff blockiert. Dadurch blieb ChatGPT beim Fehler stehen und bat sofort um manuelle Screenshots.
+- Prompt jetzt mit begrenztem Fallback: exakten Rezepttitel suchen, eine alternative zugängliche Quelle mit Zutaten/Mengen prüfen und die tatsächlich verwendete URL angeben. Die blockierte Originalseite darf nicht als gelesen dargestellt werden.
+- Wenn Angaben nicht ausreichend verifizierbar sind, soll ChatGPT nur gezielt fehlende Angaben anfordern, statt Mengen zu erfinden oder Vollständigkeit vorzutäuschen.
+- Regressionstests prüfen die Fallback-Anweisungen.
+- Technische Grenze bleibt: Der App-Prompt selbst kann keinen Webzugriff bereitstellen und eine Webseite nicht aus der App heraus entsperren. Der Fallback verbessert das Verhalten nur, wenn ChatGPT-Websuche eine andere zugängliche Quelle findet. CI und echter ChatGPT-Gerätetest stehen noch aus.
+
+
+## Launch-Artwork: seitliche Bildkante abgesichert (2026-10-29)
+
+- Nach PR #346 liegt die Gemüseillustration auf dem Launchscreen in einem `ClipRect` und wird horizontal mit `scaleX: 1.04` vergrößert, damit eingebettete Randlinien nicht als sichtbare Naht am Bildschirmrand erscheinen.
+- Regressionstest `test/regression/launch_artwork_test.dart` sichert den Clip, den horizontalen Zuschnitt und die unveränderte Bildausrichtung ab.
+- Der Test ist ein Quelltext-Vertragstest und ersetzt keine visuelle Geräteprüfung.
+- Über PR [#347](https://github.com/Connes/Fatzomat/pull/347) gemergt; Merge-Commit `1955241eb8c6a1b283cf5c53ed02a5785f8b7a67`. Der Regressionstest `test/regression/launch_artwork_test.dart` schützt den Zuschnitt. Die beiden PR-Workflows waren erfolgreich; visuelle Geräteprüfung nicht durchgeführt.
+
+
+## Überrasch-mich: Gewinner im Mittelpunkt animieren (Arbeitsstand 2026-10-29)
+
+- In `lib/features/shared/surprise_mode_roulette_page.dart` blendet sich der Fatzomat nach dem Stoppen per Fade-/Scale-Übergang aus, während die Gewinnerkategorie aus nahezu unsichtbarer Größe langsam ins Zentrum wächst.
+- Nach dem Einblenden pulsiert die Gewinnerkarte dezent weiter. Die Buttons „NOCHMAL DREHEN“ und „WEITER MIT …“ bleiben darunter erhalten.
+- „NOCHMAL DREHEN“ setzt Einblend- und Pulsanimation zurück und startet die Walzen neu; die nächste Gewinneranzeige beginnt damit wieder von vorn.
+- Regressionstest: `test/regression/surprise_winner_focus_animation_test.dart`.
+- Über PR [#348](https://github.com/Connes/Fatzomat/pull/348) gemergt; Merge-Commit `b63ca808b46a91918b706da1069725528538d449`. Beide PR-Workflows waren für den Head `9ea8dde4fbc19dc7d8822793321834b9af9d1b17` erfolgreich. Post-Merge-CI wird separat geprüft; visuelle Geräteprüfung nicht durchgeführt.
+
+
+## Überrasch-mich: Aktionen nach Gewinner und Konfetti (2026-10-29)
+
+- Die Gewinnerkarte bekommt nach dem Einblenden zuerst ihren eigenen Auftritt und pulsiert 2,4 Sekunden.
+- Danach läuft die bestehende Konfetti-/Jackpot-Animation für 2,4 Sekunden.
+- Erst nach dem Konfettiregen erscheinen „NOCHMAL DREHEN“ und „WEITER MIT …“. Ein erneuter Dreh setzt die Sequenz zurück.
+- Geräteprüfung und CI für diese Änderung stehen noch aus.
+
+
+## Lebensmittelkatalog: Legacy-Onboarding-IDs konsolidiert (2026-11-02)
+
+- Live-Datenprüfung zeigte zusätzliche Standarddatensätze mit `onb_*`-IDs, die von der Migration aus PR #409 nicht erfasst wurden. Betroffen waren unter anderem Hähnchen, Rindersteak, Schweinefleisch, Putenbrust, Salami, Speck, Würstchen, Garnelen, Champignons, Erbsen, grüne Bohnen, Mango, Pfirsich und Joghurt.
+- PR [#411 – Consolidate legacy onboarding food catalog IDs](https://github.com/Connes/Fatzomat/pull/411) führt diese eindeutig zuordenbaren Datensätze in kanonische IDs über. Vor dem Löschen werden Nutzerpräferenzen und Rezeptzutaten-Referenzen umgehängt. Die Migration arbeitet ausschließlich mit Standarddatensätzen (`created_by IS NULL`) und bricht ab, wenn ein Ziel fehlt.
+- Garnelen werden in der kanonischen Kategorie `Meeresfrüchte` angelegt. Mehrdeutige Einträge wie generisches Hackfleisch und Schinken bleiben unangetastet, statt sie fachlich falsch zuzuordnen.
+- Regressionstest in `test/regression/food_catalog_migration_test.dart` erweitert.
+- PR #411, Folgefix PR #412 und Versionsabgleich PR #413 gemergt; Merge-Commits `e6b31274f495822fce4b77855c413065e690e2e7`, `4c5ee3000f3bbe0d903445da5d3f44439803eb58` und `26599ec3f6352e6e0385602d22872883e718515a`. Beide Post-Merge-Workflows für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/41437756678) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/41437756741).
+- Die Migration `20261102120017_consolidate_legacy_onboarding_foods` ist auf Live-Supabase angewendet und read-only verifiziert. Ergebnis: 0 gemergte Legacy-IDs übrig, 11 kanonische Ziel-IDs vorhanden, Garnelen-Kategorie `Meeresfrüchte`, 0 verwaiste Rezeptzutaten. Die vorhandenen `onb_*`-Datensätze hatten bei der Prüfung keine Präferenz- oder Rezeptreferenzen; die Migration sichert die Referenzübertragung dennoch für spätere bzw. abweichende Datenstände ab.
+- Nach Merge ergab die Live-Abfrage keine offenen PRs. Geräteprüfung nicht durchgeführt.
+
+## Lebensmittelkatalog: vollständige Referenzkonsolidierung (2026-11-03)
+
+- PR [#416 – Complete legacy food catalog reference consolidation](https://github.com/Connes/Fatzomat/pull/416) ist in `main` gemergt. Merge-Commit: `caae31158662459b457ff008a5605e9aba2da7d5`.
+- Die Migration `20261102150000_complete_legacy_food_reference_migration` war nach dem Merge noch nicht auf Live-Supabase registriert. Vor Anwendung wurde der Live-Bestand read-only geprüft: `onb_hackfleisch` und `onb_mais` waren vorhanden, beide ohne Präferenz-, Rezept- oder Einkaufslistenreferenzen; `mixed_minced_meat` war vorhanden, `corn` fehlte.
+- Die Migration `complete_legacy_food_reference_migration` wurde am 2026-11-03 auf dem Live-Projekt `MVP` (`oidxezjdwqktpxuypbfb`) angewendet und in der Datenbank als Version `20261103132309` registriert.
+- Read-only Nachprüfung: 0 verbleibende Legacy-Zeilen (`onb_hackfleisch`, `onb_mais`), beide kanonischen IDs vorhanden, 0 verbliebene Legacy-Referenzen in Präferenzen/Rezeptzutaten/Einkaufsartikeln; Alias `Hackfleisch` ist am kanonischen Eintrag `mixed_minced_meat` vorhanden.
+- GitHub-Liveprüfung: `main` auf `caae31158662459b457ff008a5605e9aba2da7d5`, keine offenen PRs. Der verfügbare Commit-Workflow-Endpunkt lieferte keine Runs und der kombinierte Status keine Statuschecks; Post-Merge-CI ist damit nicht als erfolgreich bestätigt. Keine Geräteprüfung durchgeführt.
+
+## Rezeptauswahl übernimmt das gewählte Plan-Datum (2026-11-03)
+
+- Fehlerbild: Wird ein gespeichertes Rezept direkt aus dem Rezepte-Tab als Tagesentscheidung ausgewählt, speichert der Ablauf zwar das in der Datumsauswahl gewählte Datum, der Rücksprung über den normalen Tab-Wechsel löst jedoch das explizite Zurücksetzen der Heute-Seite auf das aktuelle Datum aus.
+- `SavedRecipesPage` erhält jetzt zusätzlich `onNavigateToTodayForDate`. Bei eigenständiger Rezeptauswahl übergibt sie nach erfolgreicher Speicherung das konkrete Plan-Datum an die Shell. Diese aktiviert „Heute“ über den vorhandenen datumsbewussten Navigationspfad (`_handleNotificationNavigation`) statt über den Reset-Tab-Wechsel.
+- Wird die Rezeptauswahl aus einem bereits datierten Heute-/Kochablauf geöffnet, bleibt der bestehende Rückweg erhalten, da die Heute-Seite das ausgewählte Datum bereits hält.
+- Regressionstest `test/regression/future_date_planning_navigation_test.dart` erweitert. CI und Gerätetest stehen noch aus.
+
+
+## Persönliche History: Empty State besser lesbar (2026-11-04)
+
+- Der Zustand ohne persönliche Entscheidungen wird als zentrierte, nahezu deckend weiße Karte mit abgerundeten Ecken und leichtem Schatten dargestellt, damit der Text nicht mehr im Foto-Hintergrund untergeht.
+- Das History-Icon verwendet das zentrale Gold-Token `AppDesign.iconGold`; der Text nutzt die Inter-Typografie aus dem App-Theme und die zentrale Textfarbe.
+- Umsetzung in `lib/features/settings/personal_history_page.dart`. Regressionstest `test/regression/personal_history_empty_state_test.dart` ergänzt. CI-Prüfungen stehen noch aus.
+
+
+## Gemeinsam nutzen: Verbunden-Ansicht vereinfachen (2026-11-05)
+
+- In der verbundenen Ansicht wurde der redundante Satz „2 Personen nutzen jetzt dieselbe gemeinsame Sammlung.“ entfernt.
+- Die manuelle Aktion „Status prüfen“ wurde entfernt. Die Seite lädt den Status weiterhin beim Öffnen und aktualisiert ihn über Supabase Realtime.
+- „Verbindung trennen“, Namen und Verbindungscode bleiben erhalten.
+- Beim Erstellen einer Verbindung aus „Heute“ bleibt der Nutzer auf der geöffneten „Gemeinsam nutzen“-Unterseite; der vorhandene Navigationsfluss kehrt nicht ins Profil um.
+- Regressionstests: `test/regression/connection_page_simplified_connected_state_test.dart`.
+
+## CI-Strategie: iOS-Build verpflichtend, Simulator gezielt (2026-11-22)
+
+- Bei jedem Pull Request sind Repository-Hygiene, `flutter analyze`, `flutter test` und ein erfolgreicher iOS-Build verpflichtend. Der iOS-Build bestätigt die Kompilierbarkeit für iOS, ersetzt aber keinen gezielten Laufzeittest bei plattformspezifischen Risiken.
+- Der iPhone-Simulator-Smoke-Test (Installation und Start der App im simulierten iPhone) läuft nicht mehr als pauschales Pflicht-Gate bei jeder Änderung. Er wird gezielt bei iOS-spezifischen Änderungen, Änderungen an nativen Plugins/Berechtigungen/Plattformkonfiguration und vor Releases eingesetzt.
+- Der Simulator-Workflow bleibt als zusätzlicher Test erhalten; er wird nicht aus dem Repository entfernt. Seine Ausführung ist unabhängig von den verpflichtenden PR-Checks.
+- Diese Regel ersetzt die frühere Vorgabe, den Simulator bei jeder Änderung an `lib/**`, `assets/**`, `pubspec.yaml` oder `pubspec.lock` zwingend auszuführen. Die iOS-Kompatibilität bleibt für alle Änderungen verbindlich; nur der Umfang der automatischen Laufzeitprüfung wird risikobasiert gewählt.
+- Tatsächliche Workflow-Konfiguration über PR [#437](https://github.com/Connes/Fatzomat/pull/437) umgesetzt und gemergt (Merge-Commit `06bb0d1c67913dbefe21f75b1c04ab4b33a95c19`): `.github/workflows/flutter.yml` enthält jetzt einen verpflichtenden iOS-Simulator-Build im regulären Quality Gate; `.github/workflows/ios-simulator.yml` startet den Installations-/Launch-Smoke-Test automatisch nur noch bei Änderungen an `ios/**`, `pubspec.yaml`, `pubspec.lock` oder am Workflow selbst. `workflow_dispatch` bleibt für manuelle gezielte Läufe erhalten.
+
+## Rezept teilen: Magazin-Cover und separater Rezepttext (2026-11-22)
+
+- PR [#436 – Share recipes with a magazine-style cover and separate text](https://github.com/Connes/Fatzomat/pull/436) ist gemergt; Merge-Commit `ba1e6c65443a7ec030fc9d96b3f1adb0def51e25`.
+- `RecipeShareCardService` erstellt ein quadratisches 1080×1080-PNG-Cover mit Rezeptfoto (inklusive Fallback für ältere Bild-URLs), Rezepttitel, Portionen, Gesamtzeit, Schwierigkeitsgrad und Fatzomat-Branding.
+- Das Teilen verwendet einen einzigen Share-Aufruf mit dem Cover als Bild und Zutaten/Zubereitung als Bildunterschrift. Auf WhatsApp erscheint der Text damit unter dem Bild in derselben Nachricht.
+- Die Bildunterschrift enthält ausschließlich Zutaten (mit Abschnitten) und Zubereitungsschritte. Die Abschnittsüberschriften `*Zutaten*` und `*Zubereitung*` sind für WhatsApp-Fettdruck markiert und stehen jeweils mit einer Leerzeile Abstand vor dem Inhalt.
+- Regressionstests in `test/data/services/recipe_share_card_service_test.dart` prüfen den reinen Inhalt, die formatierten Überschriften, Leerzeilen, Zutatenabschnitte, Mengen und Zubereitung sowie leere optionale Inhalte.
+- Die PR-Workflows für den ursprünglichen PR-Head waren erfolgreich. Für den Merge-Commit lieferte die verfügbare Workflow-/Status-Abfrage keine Post-Merge-Runs bzw. Statuschecks; Post-Merge-CI daher nicht als erfolgreich bestätigt. Keine Geräteprüfung durchgeführt.
+
+
+## Rezept-Share-Layout (Arbeitsstand 2026-11-22)
+
+- Folgeänderung zu PR #439: Cover ohne „REZEPT“-Label, goldenen Strich, „MIT LIEBE ZUBEREITET“ und „Geteilt mit Fatzomat“.
+- Rezeptname steht nun zentriert im Footer anstelle des Slogans; Portions-/Zeit-/Schwierigkeits-Metadaten bleiben darunter erhalten.
+- Zutatenzeilen erhalten bei manuellem Umbruch einen hängenden Einzug mit geschützten Leerzeichen, sodass Folgezeilen optisch unter dem Zutaten-Text statt unter dem Aufzählungspunkt beginnen.
+- Regressionstest für den hängenden Einzug ergänzt. WhatsApp-Darstellung und Umbruchbreite müssen nach dem Merge auf dem Zielgerät geprüft werden.
+
+
+## Rezept-Cover: Bildtitel entfernen und Footer zentrieren (Arbeitsstand 2026-11-23)
+
+- Der Rezeptname wird nicht mehr über das Rezeptfoto gelegt.
+- Im Footer bleiben Rezeptname und Metadaten (Portionen, Gesamtzeit, Schwierigkeitsgrad) erhalten; beide Elemente werden horizontal zentriert.
+- Zutaten-/Zubereitungstext und hängender Einzug bleiben unverändert.
+- WhatsApp-Gerätedarstellung nach dem Merge erneut prüfen.
+
+
+## WhatsApp-Rezeptdarstellung: Zentrierung und Untergruppen (Arbeitsstand 2026-11-23)
+
+- Rezeptname und Metadaten im Cover-Footer verwenden eine TextPainter-Layoutbreite mit gesetzter Mindestbreite, damit die Textausrichtung tatsächlich mittig auf der gesamten Footer-Breite erfolgt.
+- Zutaten-Untergruppen wie „Hauptzutaten“ oder „Soße“ werden in der WhatsApp-Bildunterschrift mit `_...:_` markiert und damit kursiv dargestellt.
+- Regressionstests prüfen die kursiv markierten Gruppenüberschriften.
+
+
+## Einkaufsliste teilen (Arbeitsstand 2026-11-23)
+
+- In der Rezeptkarte gibt es eine Teilen-Aktion für ausschließlich die noch offenen Zutaten dieses Rezepts.
+- Neben „Zusammengefasste Zutaten“ gibt es eine zweite Teilen-Aktion für die offene, zusammengefasste Einkaufsliste aller aktuell ausgewählten und nicht abgeschlossenen Tage/Rezeptpläne.
+- Beide Aktionen verwenden das native Android-/iOS-Share-Sheet (`share_plus`); WhatsApp ist dort als mögliches Ziel auswählbar. Die App sendet nicht automatisch an Kontakte.
+- `ShoppingListShareService` filtert abgehakte Einträge vor der Aggregation heraus, fasst offene Duplikate mit der vorhandenen Aggregationslogik zusammen und erhält Kategorien, Mengen und Einheiten.
+- Regressionstests prüfen offene/abgehakte Zutaten, Mengenaggregation und den Leerzustand ohne offene Zutaten.
+- Der Teilen-Text beginnt mit „🛒 Meine Einkaufsliste“, danach folgen Gericht und bei Einzelrezepten die Personenzahl. „Offene Zutaten“ ist fett, alle Kategorie-Unterüberschriften sind kursiv; ein zusätzlicher Fatzomat-Footer wird nicht ausgegeben.
+- Die Rezeptzeile zeigt den Gerichtsnamen einzeilig, darunter Personenzahl mit Minus/Plus und rechts außen das Teilen-Symbol. Besteck- und Teilen-Symbole verwenden `AppDesign.iconGold`.
+- Formatierungs- und Aggregationstests decken den neuen Textaufbau ab.
+
+
+## Einkaufsliste: Rezept-Teilen-Aktion bündig ausrichten (2026-11-23)
+
+- In der aufgeklappten Tageskarte entfällt das Besteck-Symbol vollständig.
+- Die Teilen-Aktion steht jetzt in derselben Zeile wie der Rezeptname, rechts bündig. Dadurch liegt sie auf derselben horizontalen Achse wie das Teilen-Symbol bei „Zusammengefasste Zutaten“.
+- Personenzahl sowie Minus-/Plus-Aktionen bleiben in der Zeile darunter.
+- Regressionstest in `test/regression/shopping_list_test.dart` sichert das Fehlen des Besteck-Icons und die Positionierung der Teilen-Aktion in der Titelzeile ab.
+- PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Einkaufsliste: Rezeptzeilen mit Kartenabstand ausrichten (2026-11-23)
+
+- Rezeptname und Personenzahl in der aufgeklappten Tageskarte erhalten links und rechts denselben 16-Pixel-Innenabstand wie die Inhaltskarten darunter.
+- Die Teilen-Schaltfläche sitzt innerhalb dieses rechten Innenabstands mit kompakter 40-Pixel-Trefferfläche; ihr Symbol ist auf die rechte Flucht des Ausklapppfeils ausgerichtet.
+- Regressionstest in `test/regression/shopping_list_test.dart` prüft den horizontalen Innenabstand und die kompakte Teilen-Schaltfläche.
+- PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptimport: Einheiten sind optional (2026-11-23)
+
+- Zutaten im `together_recipe`-Import dürfen eine leere oder fehlende `unit` haben. Der Importer übernimmt sie mit leerer Einheit.
+- Die Rezeptprüfung verlangt weiterhin einen gültigen Zutatenname und eine Menge, aber keine Einheit. Die Prüfung in `RecipeImportPreviewPage._missingRequiredFields` enthält bereits keine Einheitenpflicht; sie bleibt bewusst so.
+- ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.- Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
+- PR/CI und Geräteprüfung stehen noch aus.
+
+
+## Rezeptarten und unabhängige Ernährungs-/Hauptzutatenmerkmale (2026-11-23)
+
+- Rezeptart bleibt ein einzelnes Feld `recipes.category`: Hauptgericht, Süßspeise, Beilage, Salat, Suppe, Snack oder Frühstück.
+- Neue unabhängige Spalte `recipes.food_tags text[] not null default '{}'` speichert optionale Merkmale: Schwein, Rind, Huhn, Fisch und Vegetarisch. Vegetarisch wird nicht zusammen mit Fleisch-/Fisch-Tags gespeichert.
+- Supabase-Migrationen `20261123140756_recipe_food_tags` und `20261123141435_backfill_existing_recipe_types` wurden auf Projekt `oidxezjdwqktpxuypbfb` angewendet. Die vorhandenen Rezepte wurden anhand erkennbarer Zutaten konservativ klassifiziert; bekannte Dessertnamen als Süßspeise und klare Mahlzeiten als Hauptgericht.
+- Flutter-Modell, Repository, JSON-Import/-Export und ChatGPT-Prompts lesen bzw. speichern `food_tags` unabhängig von `category`. Das together_recipe-Format Version 1 erhält nur ein optionales Feld, keine neue Pflichtangabe.
+- Manuelle Rezeptbearbeitung bietet Mehrfachauswahl der Merkmale. Rezeptkarten zeigen Rezeptart und Merkmale.
+- Bibliotheksfilter sind getrennt: Rezeptart und Ernährungsart/Hauptzutat. Beide können kombiniert werden (UND-Verknüpfung). Fehlende Tags werden nicht automatisch geraten.
+- Die bisherige Pflichtprüfung auf positive Zutatenmengen wurde im selben Feature-Branch ebenfalls entfernt, damit die offene Korrektur für Eier/Zutaten ohne Menge mit ausgeliefert wird.
+- Fehlende Zutatenmengen aus dem Import werden intern als qualitative Menge mit neutralem Speicherwert 1 behandelt, damit das bestehende positive Mengen-Datenbankschema erhalten bleibt; die Anzeige blendet den Zahlenwert bei qualitativen Zutaten aus.
+- Regressionstests für Modell, Import/Export, kombinierte Filter, Prompt-Regeln und optionale Zutatenmengen hinzugefügt.
+- PR und CI stehen noch aus; Supabase-Schema und Backfill sind live angewendet und per SELECT verifiziert.
+
+
+## CI-Korrektur Rezeptarten-PR #450 (2026-11-23)
+
+- Der erste CI-Lauf auf PR-Head `426cc1c23599e79d2a2e8a1b32eef0fefaece9c6` meldete einen Fehler im Widgettest `Rezept bearbeiten verwendet die bestehende responsive Editor-Struktur`: `scrollUntilVisible` erhielt versehentlich den Finder der `ListView` statt den darin liegenden `Scrollable`.
+- Der Test ermittelt nun den `Scrollable` als Nachfahren der `ListView`, prüft dessen Eindeutigkeit und übergibt diesen Finder an `scrollUntilVisible`.
+- Korrektur-Commit: `49e7710053ba31083070399acf4c7c91285ef727`. CI für diesen neuen Head muss vollständig erneut geprüft werden; bis dahin kein Merge.
+
+- Der nächste Lauf zeigte, dass innerhalb der ListView zusätzlich Scrollables der Textfelder liegen. Der Finder ist deshalb weiter eingegrenzt auf den vertikalen Scrollable und nimmt den ersten Treffer (äußerer Listen-Scroller). Korrektur-Commit `b4ac8b8ec2d2c9402822cb7fb9f68f76c814cae1`; erneute CI-Prüfung läuft.
+
+
+## Rezeptfilter und Rezepteditor: kompaktere Auswahlfelder (2026-11-23)
+
+- Im Ernährungs-/Hauptzutatenfilter ist die Material-Hinterlegung des aktiven Menüeintrags transparent; die bestehende hellgrüne Markierung und der Haken bleiben als einzige Auswahlindikatoren.
+- Filter für Hauptzutat und Rezeptart stehen links nebeneinander vor dem zentrierten Titel. Beide Symbole verwenden das zentrale Gold-Token `AppDesign.iconGold`; der Plus-Button bleibt rechts.
+- Das Beschreibungsfeld im manuellen Rezepteditor verwendet dieselbe einzeilige Feldhöhe wie Rezeptname und Personenzahl; der Beispieltext wird nicht mehr über mehrere Zeilen umbrochen.
+- Ernährungsart/Hauptzutat ist jetzt eine kompakte Auswahlkarte im Stil des Rezeptkategoriefelds. Ein Dropdown-Pfeil öffnet die Mehrfachauswahl; mehrere Tags bleiben auswählbar, und Vegetarisch schließt Fleisch-/Fisch-Tags weiterhin gegenseitig aus.
+- Regressionstests und Pflicht-CI für den Folge-PR stehen noch aus. Keine Geräteprüfung durchgeführt.
+
 
 ## Rezeptfilter: Auswahl sichtbar halten und Icons ausrichten (2026-11-23)
 
@@ -161,12 +489,14 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstest in `test/regression/saved_recipes_menu_test.dart` sichert Verzögerung, Icon-Versatz und Menügestaltung ab.
 - PR/CI und Geräteprüfung stehen noch aus.
 
+
 ## Rezeptfilter: einheitliche Auswahl und Reset beim Verlassen (2026-11-23)
 
 - Der rechte Rezeptartfilter verwendet jetzt exakt dasselbe Interaktionsmuster wie der linke Hauptzutatenfilter: transparente Material-Hover-/Highlight-Zustände, sofortige eigene Auswahlmarkierung mit Häkchen und automatisches Schließen nach 200 ms.
 - Beim Verlassen des Rezepte-Tabs werden Hauptzutaten- und Rezeptartfilter zurückgesetzt. Beim erneuten Öffnen erscheinen dadurch wieder alle gespeicherten Rezepte. Das gilt auch für Navigation über Heute, Einkauf, Profil und die Zurück-Navigation.
 - Regressionstests sichern das einheitliche Menüverhalten und den Reset beider Filter ab.
 - PR/CI und Geräteprüfung stehen noch aus.
+
 
 ## Foto-Rezeptimport: ausschließlich echten Datei-Download ausgeben (2026-11-23)
 
@@ -178,6 +508,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - PR #455 wurde nach vollständig grünen Pflichtprüfungen (Flutter Quality Gate mit iOS Build und Quality Gate mit Analyze/Tests) per Squash-Merge integriert. Merge-Commit auf `main`: `c6d393f519baac9d608228b41e19e3dc4afe43fd`.
 - Die Post-Merge-Workflows auf `main` wurden gestartet; ihren Abschluss/Erfolg vor einer Erledigt-Meldung prüfen. Ein echter Test mit ChatGPT-Fotoimport und Geräteprüfung stehen weiterhin aus.
 
+
 ## Rezepteditor: Ernährungs-Dropdown an Rezeptfilter angleichen (2026-11-23)
 
 - Das Mehrfachauswahl-Dropdown „Ernährungsart / Hauptzutat“ im Rezepteditor verwendet jetzt dieselben goldenen Symbole wie der Hauptzutatenfilter: Schwein, Rind, Huhn, Vegetarisch und Fisch.
@@ -185,6 +516,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Mehrfachauswahl und die bestehende Exklusivregel für „Vegetarisch“ bleiben unverändert.
 - Regressionstest in `test/regression/add_recipe_page_visual_test.dart` prüft Symbole, Häkchen und das Fehlen der Checkboxen.
 - PR/CI und Geräteprüfung stehen noch aus.
+
 
 ## Optionale Menüplanung auf der Heute-Seite (2026-11-23)
 
@@ -196,6 +528,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstest für das Lesen der Menü-Metadaten: `test/data/models/today_plan_menu_test.dart`.
 - CI, Code-Review und Gerätetest stehen noch aus. Nicht mergen, bevor Pflicht-CI vollständig grün ist.
 
+
 ## Heute-Seite: Ergebniskarte an Bildschirmhöhe anpassen (2026-11-23)
 
 - Rückmeldung nach PR #457 mit Android-Screenshots: Die Heute-Ergebniskarte lief bei einem Hauptgericht um 20 px über; bei Vorspeise und Nachtisch war die Karte am unteren Rand abgeschnitten.
@@ -204,6 +537,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstests für die viewportabhängige Kartenhöhe aktualisiert; zwei bestehende Layouttests waren noch auf die frühere feste Höhenfunktion festgelegt und wurden entsprechend angepasst.
 - Feature-Branch: `fix/today-menu-card-overflow`. Pflicht-CI und erneuter Android-Gerätetest stehen aus.
 
+
 ## Heute-Seite: einheitliche Kartenhöhe und kompakter Menüinhalt (2026-11-23)
 
 - Auswahlkarte und Ergebniskarte verwenden dieselbe responsive Höhenfunktion `_todayDecisionCardHeight(context)`; Kochen, Bestellen, Essen gehen und die noch offene Auswahl haben damit dieselbe äußere Kartenhöhe.
@@ -211,6 +545,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Die Aktionsleiste bleibt außerhalb des flexiblen Inhaltsbereichs und vollständig sichtbar.
 - Regressionstests für identische Kartenhöhen und die kompakte Darstellung aktualisiert.
 - PR #459: Die erste CI-Runde deckte zwei veraltete Regressionserwartungen an die frühere Kartenhöhe/Bildhöhe auf; diese Tests wurden aktualisiert. Neue Pflicht-CI läuft. Kein Geräte-/Simulator-Test durchgeführt.
+
 
 ## Heute-Seite: Aktionsleiste um 15 px verkleinern (2026-11-24)
 
@@ -221,6 +556,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Die CI-Runden fanden zwei veraltete 58-Pixel-Erwartungen im Regressionstest `restaurant_decision_completion_and_card_layout_test.dart` (Footerhöhe und Trennlinie); beide auf 43 Pixel aktualisiert.
 - PR/CI und erneuter Android-Gerätetest stehen aus.
 
+
 ## Heute-Seite: Menükarte, Auswahlzentrierung und Rezeptdetails (2026-11-24)
 
 - Die Aktion „Menü bearbeiten“ sitzt als Stift-Schaltfläche oben rechts im Kopf der Heute-Ergebniskarte. Dadurch entfällt die zusätzliche Aktionszeile unter den Gängen.
@@ -228,6 +564,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Bei Bestell- und Restaurantentscheidungen wird die gewählte Kategorie im flexiblen Bereich zwischen Untertitel und Kartenfuß vertikal zentriert. Die Kochansicht bleibt unverändert.
 - Bolt Food verwendet ein stabiles natives Textlogo statt des zuvor fehleranfälligen externen SVG-Abrufs. Beim Öffnen wird ein Fehler eines optionalen App-URL-Schemas abgefangen und anschließend die Webadresse versucht; fehlgeschlagene Webaufrufe zeigen eine verständliche Meldung.
 - Regressionstests wurden für die Kartenstruktur und die klickbaren Gänge erweitert. Pflicht-CI und Geräteprüfung stehen noch aus.
+
 
 ## Vollständige Menüauswahl (2026-11-24)
 
@@ -237,6 +574,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstests prüfen die drei auswählbaren Gänge sowie den zusätzlichen optionalen Abfrageschritt.
 - PR/CI und Geräteprüfung stehen noch aus.
 
+
 ## Menüimport und Menüeditor: Dialog und Kartenlayout (2026-11-24)
 
 - Auch der direkte Ablauf „mit ChatGPT erstelltes Rezept importieren und beim Speichern für Heute festlegen“ fragt nach dem Speichern des persönlichen Plans, ob Vorspeise und/oder Nachtisch ergänzt werden sollen. Bei Zustimmung öffnet sich derselbe Menüeditor; bei Ablehnung läuft der Importabschluss normal weiter. Der bestehende Ablauf über „Für heute auswählen“ in der Rezeptsammlung bleibt ebenfalls erhalten.
@@ -244,6 +582,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Im Menüeditor bleibt die Rezeptauswahl scrollbar; „Menü speichern“ sitzt als fester Footer mit kleinem Abstand direkt oberhalb der unteren Navigation.
 - Wenn ein Heute-Plan ausschließlich aus einem Hauptgericht besteht, wird der Rezeptname im freien Inhaltsbereich der Heute-Karte vertikal zentriert. Sobald Zusatzgänge vorhanden sind, bleibt deren bisherige gemeinsame Darstellung erhalten.
 - Regressionstests und Pflicht-CI für diese Folgeänderung stehen aus; Android-Geräteprüfung nach Merge erforderlich.
+
 
 ## Tagesentscheidung auf der Heute-Karte bearbeiten (2026-11-24)
 
@@ -253,15 +592,16 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstests prüfen die Zuordnung der Entscheidungstypen und die sichtbare Bearbeiten-Aktion.
 - PR/CI und Android-Geräteprüfung stehen noch aus.
 
-## Bestehende Tagesentscheidungen ausdrücklich bearbeiten (2026-11-24)
 
-- Ursache der Meldung „Dieser Tag ist bereits verplant“: Die Live-RPC `set_personal_plan_for_date` wurde durch Migration `20261012100000_prevent_overwriting_planned_days` absichtlich so geändert, dass sie bei jedem bereits belegten persönlichen Tag mit „Dieser Tag ist bereits verplant“ abbricht. Der Menüeditor und die Bearbeiten-Aktion verwendeten bisher denselben RPC wie eine neue Planung.
+## Bestehende Tagesentscheidungen ausdrücklich bearbeiten (2026-11-24)
+- Ursache des gemeldeten Fehlers: Die Live-RPC `set_personal_plan_for_date` wurde durch Migration `20261012100000_prevent_overwriting_planned_days` absichtlich so geändert, dass sie bei jedem bereits belegten persönlichen Tag mit „Dieser Tag ist bereits verplant“ abbricht. Der Menüeditor und die Bearbeiten-Aktion verwendeten bisher denselben RPC wie eine neue Planung.
 - Normale Neuauswahl bleibt weiterhin gegen versehentliches Überschreiben geschützt. Für die explizite Bearbeiten-Aktion gibt es jetzt den separaten RPC `replace_personal_plan_for_date`. Er verlangt eine bereits vorhandene persönliche Entscheidung des angemeldeten Nutzers, sperrt den Datensatz während der Änderung, erhält dessen Plan-ID und synchronisiert die Rezept-Einkaufsliste.
 - Der Menüeditor verwendet den Ersatz-RPC nur dann, wenn das Hauptgericht tatsächlich geändert wird. Bestell- und Restaurantbearbeitung geben den expliziten Bearbeitungsmodus durch die Navigation bis zur Speicherung weiter. Normale Auswahlabläufe verwenden weiterhin die bisherigen geschützten RPCs.
 - Gemeinsame Essenspläne bleiben als Sperrgrund erhalten. Der Ersatz-RPC kann weder einen Tag ohne persönliche Entscheidung anlegen noch einen gemeinsamen Plan überschreiben.
 - Neue Regressionstests prüfen die explizite Ersatzroute für Hauptgericht, Bestellung und Restaurant sowie die Datenbank-Schutzbedingungen.
 - Neue Migration: `20261124170000_replace_existing_personal_decision.sql`. Sie muss auf Supabase-Projekt `oidxezjdwqktpxuypbfb` angewendet und anschließend durch einen Test der RPC-/Schema-Definition verifiziert werden.
 - Branch `fix/edit-existing-today-decisions`; PR und CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
+
 
 ## Rezeptbearbeitung: Verfügbarkeitsprüfung an Rezeptsammlung angleichen (2026-11-24)
 
@@ -272,12 +612,14 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstest test/regression/recipe_edit_availability_test.dart ergänzt.
 - Branch fix/recipe-availability-edit-validation; PR und CI stehen noch aus. Android-Gerätetest nach Merge erforderlich.
 
+
 ## Rezeptbearbeitung: RLS für Menü-Metadaten angleichen (2026-11-24)
 
 - Neuer Live-Fehler „Keine Berechtigung für diese Aktion“ nach erfolgreichem Rezeptwechsel: Postgres-Logs zeigen, dass `replace_personal_plan_for_date` mit HTTP 200 erfolgreich war. Anschließend scheiterte ein separater REST-UPDATE auf `personal_today_plans.decision_value` mit SQLSTATE 42501 („new row violates row-level security policy“).
 - Ursache: Die UPDATE-Policy verlangte weiterhin `recipes.created_by = auth.uid()` oder einen `recipe_saves`-Eintrag. Das blockierte die Metadatenänderung für ein Rezept, das bereits über die validierte Bearbeitungs-RPC dem persönlichen Plan zugeordnet und dadurch für den Nutzer sichtbar war.
 - Die UPDATE-Policy prüft jetzt Eigentümerschaft des Plans und dass das zugeordnete Rezept über die bestehende Rezept-Sichtbarkeits-Policy lesbar ist. Die strengere INSERT-Policy bleibt unverändert; Rezeptwechsel selbst läuft weiter über `replace_personal_plan_for_date`.
 - Migration `20261124184500_allow_visible_recipe_plan_metadata_updates.sql` wurde auf Supabase `oidxezjdwqktpxuypbfb` live angewendet. Schema-/Policy-Definition anschließend prüfen; Regressionstest und CI laufen über PR #466.
+
 
 ## Restaurantadresse auf der Heute-Entscheidungskarte (2026-11-24)
 
@@ -287,12 +629,14 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Regressionstest in `test/regression/today_decision_card_layout_test.dart` erweitert.
 - Branch `feat/today-restaurant-address-card`; PR/CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
 
+
 ## Restaurantadresse immer einzeilig darstellen (2026-11-24)
 
 - Die Adresszeile auf der Heute-Restaurantkarte verwendet jetzt `FittedBox(fit: BoxFit.scaleDown)` mit nicht umbrechendem Text und einer Zeile.
 - Lange Straßen-/Ortsangaben werden dadurch proportional verkleinert, bis sie in die verfügbare Kartenbreite passen; das bisherige Abschneiden mit Auslassungspunkten entfällt.
 - Name und Adresse bleiben als gemeinsamer Block vertikal zentriert. Regressionstest prüft die Skalierungs- und Einzeilen-Konfiguration.
 - Branch `fix/fit-restaurant-address-single-line`; PR/CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
+
 
 ## Icons für Rezeptarten-Filter (2026-11-27)
 
@@ -301,6 +645,7 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Filterlogik, Auswahlzustand und Beschriftungen bleiben unverändert; angepasst wurde nur die visuelle Kennzeichnung.
 - Regressionstest `test/regression/recipe_category_filter_icons_test.dart` prüft alle Icons und die Goldfarbe.
 - Branch `feat/recipe-category-filter-icons`; PR/CI ausstehend. Kein Merge ohne vollständige Pflicht-CI.
+
 
 ## Rezeptauswahl im Koch-Flow vereinheitlicht (2026-11-27)
 
