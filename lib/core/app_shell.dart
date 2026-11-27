@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 
+import 'flow_guard.dart';
 import 'network/network_banner.dart';
 import 'network/network_status.dart';
 
@@ -75,7 +76,15 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
-  void _selectTab(int value) {
+  Future<void> _selectTab(int value) async {
+    const destinations = ['Heute', 'Rezepte', 'Einkauf', 'Profil'];
+    if (FlowGuard.instance.isActive) {
+      final leave = await FlowGuard.instance.confirmAbandon(
+        context,
+        destination: destinations[value],
+      );
+      if (!leave || !mounted) return;
+    }
     _resetRecipeFiltersWhenLeaving(value);
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     if (value == 0) {
@@ -108,9 +117,17 @@ class _AppShellState extends State<AppShell> {
     return ValueListenableBuilder<NetworkStatus>(
       valueListenable: _network.status,
       builder: (context, status, _) => PopScope(
-      canPop: index == 0,
+      canPop: index == 0 && !FlowGuard.instance.isActive,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        if (FlowGuard.instance.isActive) {
+          FlowGuard.instance.confirmAbandon(context).then((leave) {
+            if (!leave || !mounted) return;
+            _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+            if (index != 0) setState(() { index = 0; _contentIndex.value = 0; });
+          });
+          return;
+        }
         final navigator = _contentNavigatorKey.currentState;
         if (navigator?.canPop() == true) {
           navigator!.pop();
