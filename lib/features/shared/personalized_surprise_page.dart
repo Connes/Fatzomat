@@ -4,6 +4,7 @@ import '../../core/app_feedback.dart';
 
 import '../../core/error_text.dart';
 import '../../core/food_mode.dart';
+import '../../core/flow_guard.dart';
 import '../../core/services/surprise_recommendation_service.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/widgets/together_scaffold.dart';
