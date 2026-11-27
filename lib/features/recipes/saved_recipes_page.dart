@@ -1003,9 +1003,18 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
                 constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
                 menuPadding: const EdgeInsets.symmetric(vertical: 8),
                 itemBuilder: (menuContext) {
-                  const values = ['Alle', 'Hauptgericht', 'Süßspeise', 'Beilage', 'Salat', 'Suppe', 'Snack', 'Frühstück'];
+                  final options = <(String, IconData)>[
+                  ('Alle', Icons.grid_view_rounded),
+                  ('Hauptgericht', Icons.restaurant_menu_rounded),
+                  ('Süßspeise', Icons.cake_rounded),
+                  ('Beilage', Icons.dinner_dining_rounded),
+                  ('Salat', Icons.eco_rounded),
+                  ('Suppe', Icons.soup_kitchen_rounded),
+                  ('Snack', Icons.fastfood_rounded),
+                  ('Frühstück', Icons.free_breakfast_rounded),
+                ];
                   final selectedValue = ValueNotifier<String>(categoryFilter ?? 'Alle');
-                  return values.map((value) {
+                  return options.map((option) {\n                    final value = option.$1;
                     return PopupMenuItem<String>(
                       value: value,
                       enabled: false,
@@ -1033,7 +1042,13 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
                               ),
                               child: Row(
                                 children: [
-                                  const SizedBox(width: 24, height: 24),
+                                  SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: Center(
+                                      child: Icon(option.$2, size: 22, color: AppDesign.iconGold),
+                                    ),
+                                  ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
