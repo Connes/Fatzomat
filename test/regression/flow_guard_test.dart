@@ -91,7 +91,8 @@ void main() {
                           MaterialPageRoute<void>(
                             builder: (_) => const FlowExitGuard(
                               child: Scaffold(
-                                body: Center(child: Text('Interner Schritt')),
+                                appBar: AppBar(title: const Text('Interner Schritt')),
+                                body: const Center(child: Text('Interner Schritt')),
                               ),
                             ),
                           ),
