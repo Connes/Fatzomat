@@ -640,3 +640,12 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Lange Straßen-/Ortsangaben werden dadurch proportional verkleinert, bis sie in die verfügbare Kartenbreite passen; das bisherige Abschneiden mit Auslassungspunkten entfällt.
 - Name und Adresse bleiben als gemeinsamer Block vertikal zentriert. Regressionstest prüft die Skalierungs- und Einzeilen-Konfiguration.
 - Branch `fix/fit-restaurant-address-single-line`; PR/CI stehen noch aus. Kein Merge ohne vollständige Pflicht-CI. Android-Gerätetest nach Merge erforderlich.
+
+
+## Icons für Rezeptarten-Filter (2026-11-27)
+
+- Der Filter „Nach Rezeptart“ zeigt für „Alle Rezeptarten“ dasselbe goldene Raster-Icon wie der Hauptzutatenfilter.
+- Jede Rezeptart hat ein eigenes goldenes Icon: Hauptgericht (Besteck), Süßspeise (Kuchen), Beilage (Teller), Salat (Blatt), Suppe (Suppenschüssel), Snack (Fast Food) und Frühstück (Kaffee).
+- Filterlogik, Auswahlzustand und Beschriftungen bleiben unverändert; angepasst wurde nur die visuelle Kennzeichnung.
+- Regressionstest `test/regression/recipe_category_filter_icons_test.dart` prüft alle Icons und die Goldfarbe.
+- Branch `feat/recipe-category-filter-icons`; PR/CI ausstehend. Kein Merge ohne vollständige Pflicht-CI.
