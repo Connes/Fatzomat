@@ -212,7 +212,7 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
           : currentRequest.isResolved
               ? 'Diese Entscheidungsanfrage wurde bereits abgeschlossen.'
               : 'Diese Entscheidungsanfrage ist nicht mehr verfügbar.';
-      return TogetherScaffold(backgroundType: TogetherBackgroundType.decision, 
+      return TogetherScaffold(backgroundType: TogetherBackgroundType.decision, protectFlowExit: true,
         appBar: TogetherAppBar(title: const Text('Du bist dran')),
         body: Center(
           child: Padding(
@@ -232,7 +232,7 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
       );
     }
 
-    return TogetherScaffold(backgroundType: TogetherBackgroundType.decision, 
+    return TogetherScaffold(backgroundType: TogetherBackgroundType.decision, protectFlowExit: true,
       appBar: TogetherAppBar(title: const Text('Du bist dran')),
       body: SafeArea(
         child: ListView(
