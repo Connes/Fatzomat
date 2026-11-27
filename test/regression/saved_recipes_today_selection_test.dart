@@ -8,7 +8,7 @@ void main() {
     final buildStart = source.indexOf('Widget build(BuildContext context)', source.indexOf('class SavedRecipesPageState'));
     final build = source.substring(buildStart);
 
-    expect(source, contains("Key('saved-recipe-select-today-${recipe.id}')"));
+    expect(source, contains("Key('saved-recipe-select-today-\${recipe.id}')"));
     expect(source, contains('selectionActive'));
     expect(source, contains("'Für heute auswählen'"));
     expect(source, contains("'Für diesen Tag auswählen'"));
