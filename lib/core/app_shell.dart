@@ -127,6 +127,15 @@ class _AppShellState extends State<AppShell> {
       canPop: index == 0 && !FlowGuard.instance.isActive,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+
+        // The shell owns a nested Navigator. Let its child routes unwind before
+        // treating system back as an attempt to abandon the active flow.
+        final navigator = _contentNavigatorKey.currentState;
+        if (navigator?.canPop() == true) {
+          navigator!.pop();
+          return;
+        }
+
         if (FlowGuard.instance.isActive) {
           FlowGuard.instance.confirmAbandon(context).then((leave) {
             if (!leave || !mounted) return;
@@ -135,7 +144,7 @@ class _AppShellState extends State<AppShell> {
           });
           return;
         }
-        final navigator = _contentNavigatorKey.currentState;
+
         if (navigator?.canPop() == true) {
           navigator!.pop();
           return;
