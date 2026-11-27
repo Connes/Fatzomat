@@ -123,7 +123,9 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<NetworkStatus>(
       valueListenable: _network.status,
-      builder: (context, status, _) => PopScope(
+      builder: (context, status, _) => ListenableBuilder(
+        listenable: FlowGuard.instance,
+        builder: (context, _) => PopScope(
       canPop: index == 0 && !FlowGuard.instance.isActive,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
@@ -162,7 +164,8 @@ class _AppShellState extends State<AppShell> {
           Expanded(child: _buildShell(context)),
         ],
       ),
-    ),
+        ),
+      ),
     );
   }
 
