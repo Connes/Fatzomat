@@ -659,3 +659,14 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Während die Rezeptliste geladen wird, zeigt die Seite den Ladeindikator statt fälschlich „Kein passendes Rezept gefunden“. Der Leerzustand erscheint erst nach abgeschlossenem Laden.
 - Regressionstest in `test/regression/saved_recipes_today_selection_test.dart` erweitert.
 - Branch `fix/unify-saved-recipe-selection-ui`; PR/CI ausstehend. Kein Merge ohne vollständige Pflicht-CI.
+
+
+## Nicht unterbrechbare Bearbeitungspfade (2026-11-27)
+
+- Neue zentrale Steuerung `lib/core/flow_guard.dart`: ein aktiver Pfad, keine Wiederaufnahme/Drafts. `beginIfIdle` verhindert, dass verschachtelte Schritte den bestehenden Pfad überschreiben; `complete` beendet ihn nach erfolgreicher Speicherung; bestätigtes Verlassen beendet ihn endgültig.
+- Die untere Navigation (Heute, Rezepte, Einkauf, Profil) fragt vor jedem Tabwechsel, der den aktiven Pfad verlassen würde. Erst nach ausdrücklicher Bestätigung wird der interne Navigationsstapel zurückgesetzt und der Ziel-Tab geöffnet.
+- `FlowExitGuard` schützt die Wurzel eines Pfades gegen System-/AppBar-Zurück. Kindseiten innerhalb des Pfades bleiben normal rückwärts navigierbar.
+- Angebundene Pfade: Kochen/Bestellen/Essen gehen für heute, Überraschungsroulette mit Übergabe an den ausgewählten Modus, gemeinsame Entscheidungsanfrage, persönliche Rezeptüberraschung, Rezeptauswahl aus „Meine Rezepte“ für heute sowie direkte Menübearbeitung auf der Heute-Seite.
+- Erfolgreiche Auswahl/Speicherung beendet den Pfad; ein Abbruch im Bestätigungsdialog lässt ihn unverändert aktiv. Es werden keine Zwischenschritte für eine spätere Fortsetzung gespeichert.
+- Regressionstest `test/regression/flow_guard_test.dart` prüft den zentralen Zustand, Bestätigen/Ablehnen und den Back-Schutz. `global_navigation_persistence_test.dart` prüft die Absicherung der unteren Navigation.
+- Branch `feat/guarded-editing-paths`; PR/CI ausstehend. Kein Merge ohne Repository-Hygiene, Analyze, Tests und iOS-Build für den exakten PR-Head. Android-Gerätetest bleibt nach Merge erforderlich.
