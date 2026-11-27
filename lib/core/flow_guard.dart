@@ -12,15 +12,28 @@ class FlowGuard extends ChangeNotifier {
 
   String? _id;
   String? _label;
+  Route<dynamic>? _rootRoute;
 
   bool get isActive => _id != null;
   String? get activeId => _id;
   String? get activeLabel => _label;
 
+  /// Registers the first guarded route as the active path's root.
+  ///
+  /// Further guarded routes are child steps and must remain normally
+  /// navigable. The root is captured lazily because ModalRoute is only
+  /// available from a widget's build context.
+  bool isRootRoute(Route<dynamic>? route) {
+    if (!isActive || route == null) return false;
+    _rootRoute ??= route;
+    return identical(_rootRoute, route);
+  }
+
   void beginIfIdle({required String id, required String label}) {
     if (isActive) return;
     _id = id;
     _label = label;
+    _rootRoute = null;
     notifyListeners();
   }
 
@@ -28,6 +41,7 @@ class FlowGuard extends ChangeNotifier {
     if (!isActive) return;
     _id = null;
     _label = null;
+    _rootRoute = null;
     notifyListeners();
   }
 
@@ -74,17 +88,23 @@ class FlowExitGuard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final route = ModalRoute.of(context);
     return ListenableBuilder(
       listenable: FlowGuard.instance,
-      builder: (context, _) => PopScope<Object?>(
-        canPop: !FlowGuard.instance.isActive,
-        onPopInvokedWithResult: (didPop, result) async {
-          if (didPop || !FlowGuard.instance.isActive || !context.mounted) return;
-          final leave = await FlowGuard.instance.confirmAbandon(context);
-          if (leave && context.mounted) Navigator.of(context).pop();
-        },
-        child: child,
-      ),
+      builder: (context, _) {
+        final isRoot = FlowGuard.instance.isRootRoute(route);
+        return PopScope<Object?>(
+          canPop: !isRoot,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (didPop || !FlowGuard.instance.isRootRoute(route) || !context.mounted) {
+              return;
+            }
+            final leave = await FlowGuard.instance.confirmAbandon(context);
+            if (leave && context.mounted) Navigator.of(context).pop();
+          },
+          child: child,
+        );
+      },
     );
   }
 }
