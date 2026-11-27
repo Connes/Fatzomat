@@ -9,6 +9,7 @@ import '../../core/widgets/together_background.dart';
 
 import '../../core/app_design.dart';
 import '../../core/food_mode.dart';
+import '../../core/flow_guard.dart';
 import '../../core/services/surprise_recommendation_service.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/repositories/recipe_repository.dart';
@@ -43,6 +44,10 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     currentRequest = widget.request;
+    FlowGuard.instance.beginIfIdle(
+      id: 'shared_decision_request',
+      label: 'Gemeinsame Entscheidungsanfrage',
+    );
     _refreshRequest();
     _subscribeDecisionRequest();
   }
@@ -77,6 +82,9 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
       setState(() {
         if (fresh != null) currentRequest = fresh;
         loading = false;
+        if (!currentRequest.isPending && !currentRequest.isAccepted) {
+          FlowGuard.instance.complete();
+        }
       });
     } catch (_) {
       if (mounted && generation == _refreshGeneration) {
@@ -192,7 +200,7 @@ class _DecisionRequestPageState extends State<DecisionRequestPage> with WidgetsB
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return TogetherScaffold(backgroundType: TogetherBackgroundType.decision, 
+      return TogetherScaffold(backgroundType: TogetherBackgroundType.decision, protectFlowExit: true, 
         appBar: TogetherAppBar(title: const Text('Du bist dran')),
         body: const Center(child: CircularProgressIndicator()),
       );
