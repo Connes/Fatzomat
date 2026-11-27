@@ -33,7 +33,8 @@ void main() {
 
   test('active flow delegates pushed-route back handling to its route guard', () {
     final shell = source('lib/core/app_shell.dart');
-    final activeFlow = shell.indexOf('if (FlowGuard.instance.isActive)');
+    final backHandler = shell.indexOf('onPopInvokedWithResult:');
+    final activeFlow = shell.indexOf('if (FlowGuard.instance.isActive)', backHandler);
     final nestedRouteCheck = shell.indexOf('if (navigator?.canPop() == true) return;', activeFlow);
     final abandon = shell.indexOf('FlowGuard.instance.confirmAbandon(context)', activeFlow);
 
