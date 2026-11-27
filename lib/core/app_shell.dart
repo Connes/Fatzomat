@@ -128,15 +128,14 @@ class _AppShellState extends State<AppShell> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
 
-        // The shell owns a nested Navigator. Let its child routes unwind before
-        // treating system back as an attempt to abandon the active flow.
         final navigator = _contentNavigatorKey.currentState;
-        if (navigator?.canPop() == true) {
-          navigator!.pop();
-          return;
-        }
-
         if (FlowGuard.instance.isActive) {
+          // A pushed flow route has its own FlowExitGuard. Let that route decide
+          // whether back leaves an internal step or the actual flow root.
+          if (navigator?.canPop() == true) return;
+
+          // Flows started directly inside a tab (for example recipe selection)
+          // have no pushed route guard, so the shell handles their exit here.
           FlowGuard.instance.confirmAbandon(context).then((leave) {
             if (!leave || !mounted) return;
             _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
