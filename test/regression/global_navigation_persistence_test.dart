@@ -28,6 +28,7 @@ void main() {
     expect(shell, contains('onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),'));
     expect(shell, contains('Future<void> _selectTab(int value) async'));
     expect(shell, contains('FlowGuard.instance.confirmAbandon'));
+    expect(shell, contains('listenable: FlowGuard.instance'));
     expect(shell, contains('canPop: index == 0 && !FlowGuard.instance.isActive'));
   });
 
