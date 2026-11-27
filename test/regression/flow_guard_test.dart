@@ -118,7 +118,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Interner Schritt'), findsOneWidget);
 
-    await tester.pageBack();
+    await tester.tap(find.byTooltip('Back').last);
     await tester.pumpAndSettle();
     expect(find.text('Interner Schritt'), findsNothing);
     expect(find.text('Kochpfad'), findsOneWidget);
