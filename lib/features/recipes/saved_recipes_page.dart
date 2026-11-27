@@ -760,9 +760,7 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
   Widget build(BuildContext context) {
     final selectionActive = hasSelectionFilter;
 
-    if (selectionActive) {
-      if (visibleRecipes.isEmpty) {
-        return TogetherScaffold(
+    return TogetherScaffold(
           backgroundType: TogetherBackgroundType.recipes,
           appBar: const TogetherAppBar(title: Text('Meine Rezepte')),
           body: Center(
@@ -1241,7 +1239,13 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
                                         key: Key('saved-recipe-select-today-${recipe.id}'),
                                         onPressed: () => selectRecipeForToday(recipe),
                                         icon: const Icon(Icons.event_available_rounded, size: 18),
-                                        label: const Text('Auswählen'),
+                                        label: Text(
+                                          selectionActive
+                                              ? (widget.planDate == null || _isSelectedDateToday
+                                                  ? 'Für heute auswählen'
+                                                  : 'Für diesen Tag auswählen')
+                                              : 'Auswählen',
+                                        ),
                                       ),
                                       const Spacer(),
                                       IconButton(
