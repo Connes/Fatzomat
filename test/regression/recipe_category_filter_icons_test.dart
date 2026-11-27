@@ -20,7 +20,7 @@ void main() {
     expect(filter, contains("('Snack', Icons.fastfood_rounded)"));
     expect(filter, contains("('Frühstück', Icons.free_breakfast_rounded)"));
     expect(filter, contains('color: AppDesign.iconGold'));
-    expect(filter, contains('Icon(option.$2'));
+    expect(filter, contains(r'Icon(option.$2'));
     expect(filter, contains("value == 'Alle' ? 'Alle Rezeptarten' : value"));
   });
 }
