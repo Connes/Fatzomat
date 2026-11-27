@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'together_background.dart';
 import '../app_design.dart';
+import '../flow_guard.dart';
 
 
 /// Consistent app bar for all navigable subpages.
@@ -63,6 +64,7 @@ class TogetherScaffold extends StatelessWidget {
   final bool extendBody;
   final bool respectTopSafeArea;
   final Color? topSafeAreaColor;
+  final bool protectFlowExit;
 
   const TogetherScaffold({
     super.key,
@@ -76,11 +78,12 @@ class TogetherScaffold extends StatelessWidget {
     this.extendBody = false,
     this.respectTopSafeArea = false,
     this.topSafeAreaColor,
+    this.protectFlowExit = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final scaffold = Scaffold(
       backgroundColor: Colors.transparent,
       appBar: appBar,
       body: TogetherBackground(
@@ -95,5 +98,6 @@ class TogetherScaffold extends StatelessWidget {
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       extendBody: extendBody,
     );
+    return protectFlowExit ? FlowExitGuard(child: scaffold) : scaffold;
   }
 }
