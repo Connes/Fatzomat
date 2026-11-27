@@ -64,7 +64,8 @@ void main() {
     final saved = File('lib/features/recipes/saved_recipes_page.dart').readAsStringSync();
 
     expect(saved, contains('today = await personalToday.todayPlan(date: widget.planDate);'));
-    expect(RegExp(r'planDate: widget\.planDate').allMatches(saved), hasLength(2));
+    expect(RegExp(r'planDate: widget\.planDate').allMatches(saved), hasLength(1));
+    expect(saved, contains('date: widget.planDate'));
     expect(saved, contains('date: planDate,'));
     expect(saved, contains("label: const Text('Auswählen')"));
   });
