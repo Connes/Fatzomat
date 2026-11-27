@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/widgets/together_scaffold.dart';
 import '../../core/widgets/together_background.dart';
 import '../../core/app_design.dart';
+import '../../core/flow_guard.dart';
 
 import 'cook_next_step_page.dart';
 import '../../data/repositories/collaboration_repository.dart';
@@ -40,6 +41,19 @@ class FoodModePage extends StatefulWidget {
 }
 
 class _FoodModePageState extends State<FoodModePage> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selectForToday || widget.decisionRequestId != null) {
+      final label = switch (widget.mode) {
+        FoodMode.cook => 'Wir kochen heute',
+        FoodMode.order => 'Wir bestellen heute',
+        FoodMode.dineOut => 'Wir gehen heute essen',
+      };
+      FlowGuard.instance.beginIfIdle(id: 'today_${widget.mode.name}', label: label);
+    }
+  }
+
   String get title => switch (widget.mode) {
         FoodMode.cook => 'Was wollen wir kochen?',
         FoodMode.order => 'Was wollen wir bestellen?',
@@ -59,7 +73,10 @@ class _FoodModePageState extends State<FoodModePage> {
         ),
       ),
     );
-    if (selected == true && context.mounted) Navigator.pop(context, true);
+    if (selected == true && context.mounted) {
+      FlowGuard.instance.complete();
+      Navigator.pop(context, true);
+    }
   }
 
   Future<void> _resolveAndOpen(BuildContext context, String choice) async {
@@ -91,6 +108,7 @@ class _FoodModePageState extends State<FoodModePage> {
           );
         }
         if (!context.mounted) return;
+        FlowGuard.instance.complete();
         Navigator.pop(context, true);
       } catch (error) {
         if (!context.mounted) return;
@@ -123,6 +141,7 @@ class _FoodModePageState extends State<FoodModePage> {
       ),
     );
     if (selected == true && context.mounted) {
+      FlowGuard.instance.complete();
       final navigator = Navigator.of(context);
       if (navigator.canPop()) {
         navigator.pop(true);
@@ -151,6 +170,7 @@ class _FoodModePageState extends State<FoodModePage> {
       );
       if (!context.mounted) return;
 
+      FlowGuard.instance.complete();
       // Return the successful decision to the caller. The Today screen owns
       // the next navigation step; popping again here can empty the Navigator
       // history when this flow was opened as the root of a nested route.
@@ -241,6 +261,7 @@ class _FoodModePageState extends State<FoodModePage> {
 
     return TogetherScaffold(
       backgroundType: TogetherBackgroundType.recipes,
+      protectFlowExit: widget.selectForToday || widget.decisionRequestId != null,
       appBar: TogetherAppBar(
         title: Text(!widget.selectForToday && widget.mode == FoodMode.cook
             ? 'Mit ChatGPT erstellen'

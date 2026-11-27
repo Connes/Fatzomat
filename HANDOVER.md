@@ -147,7 +147,6 @@ Keine Zwischenstands- oder Fortschrittsmeldungen während dieses Arbeitszyklus. 
 - Supabase-Live-Status und Geräteverhalten wurden nicht geprüft.
 
 ## Live-Status (verifiziert 2026-10-23)
-
 - Aktueller `main`-Commit: `434120e65be9cf8cf3420a542594f2e7557e589d` (PR [#301 – Fix custom food saving and duplicate prevention](https://github.com/Connes/Fatzomat/pull/301)).
 - Beide Post-Merge-CI-Workflows sind für exakt diesen Commit erfolgreich: [Quality Gate](https://github.com/Connes/Fatzomat/actions/runs/39958328215) und [Flutter quality gate](https://github.com/Connes/Fatzomat/actions/runs/39958328233).
 - Die Live-Abfrage offener Pull Requests ergab keine offenen PRs.
@@ -296,7 +295,6 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Wenn die Seite technisch nicht erreichbar oder wichtige Angaben nicht sichtbar sind, soll ChatGPT offen nach dem Rezepttext oder Screenshots fragen, statt zu raten oder pauschal abzulehnen.
 - Regressionstests in `test/together_chatgpt_prompt_test.dart` prüfen diese Regeln.
 - Wichtig: Der Prompt kann keine Browser-/Webzugriffsrechte erzwingen. Die tatsächliche Extraktion hängt davon ab, ob die verwendete ChatGPT-Sitzung Websuche/Browsing nutzen kann und die Quellseite erreichbar ist. CI und Gerätetest stehen noch aus.
-
 
 ## Fallback für nicht erreichbare Rezept-Webseiten (2026-10-28)
 
@@ -447,8 +445,7 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 
 - Zutaten im `together_recipe`-Import dürfen eine leere oder fehlende `unit` haben. Der Importer übernimmt sie mit leerer Einheit.
 - Die Rezeptprüfung verlangt weiterhin einen gültigen Zutatenname und eine Menge, aber keine Einheit. Die Prüfung in `RecipeImportPreviewPage._missingRequiredFields` enthält bereits keine Einheitenpflicht; sie bleibt bewusst so.
-- ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.
-- Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
+- ChatGPT-Prompts für Internet-/eigene Rezepte und Fotoimporte weisen jetzt ausdrücklich an, fehlende Einheiten als `unit: ""` zu speichern, keine Einheit zu erfinden und die Zutat nicht wegzulassen.- Regressionstests decken Import ohne Einheit und die Prompt-Regeln ab.
 - PR/CI und Geräteprüfung stehen noch aus.
 
 
@@ -597,7 +594,6 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 
 
 ## Bestehende Tagesentscheidungen ausdrücklich bearbeiten (2026-11-24)
-
 - Ursache des gemeldeten Fehlers: Die Live-RPC `set_personal_plan_for_date` wurde durch Migration `20261012100000_prevent_overwriting_planned_days` absichtlich so geändert, dass sie bei jedem bereits belegten persönlichen Tag mit „Dieser Tag ist bereits verplant“ abbricht. Der Menüeditor und die Bearbeiten-Aktion verwendeten bisher denselben RPC wie eine neue Planung.
 - Normale Neuauswahl bleibt weiterhin gegen versehentliches Überschreiben geschützt. Für die explizite Bearbeiten-Aktion gibt es jetzt den separaten RPC `replace_personal_plan_for_date`. Er verlangt eine bereits vorhandene persönliche Entscheidung des angemeldeten Nutzers, sperrt den Datensatz während der Änderung, erhält dessen Plan-ID und synchronisiert die Rezept-Einkaufsliste.
 - Der Menüeditor verwendet den Ersatz-RPC nur dann, wenn das Hauptgericht tatsächlich geändert wird. Bestell- und Restaurantbearbeitung geben den expliziten Bearbeitungsmodus durch die Navigation bis zur Speicherung weiter. Normale Auswahlabläufe verwenden weiterhin die bisherigen geschützten RPCs.
@@ -659,3 +655,14 @@ Die vorherige Sonderdarstellung für genau ein Rezept wurde verworfen. Die Einka
 - Während die Rezeptliste geladen wird, zeigt die Seite den Ladeindikator statt fälschlich „Kein passendes Rezept gefunden“. Der Leerzustand erscheint erst nach abgeschlossenem Laden.
 - Regressionstest in `test/regression/saved_recipes_today_selection_test.dart` erweitert.
 - Branch `fix/unify-saved-recipe-selection-ui`; PR/CI ausstehend. Kein Merge ohne vollständige Pflicht-CI.
+
+## Nicht unterbrechbare Bearbeitungspfade (2026-11-27)
+
+- Neue zentrale Steuerung `lib/core/flow_guard.dart`: ein aktiver Pfad, keine Wiederaufnahme/Drafts. `beginIfIdle` verhindert, dass verschachtelte Schritte den bestehenden Pfad überschreiben; `complete` beendet ihn nach erfolgreicher Speicherung; bestätigtes Verlassen beendet ihn endgültig.
+- Die untere Navigation (Heute, Rezepte, Einkauf, Profil) fragt vor jedem Tabwechsel, der den aktiven Pfad verlassen würde. Erst nach ausdrücklicher Bestätigung wird der interne Navigationsstapel zurückgesetzt und der Ziel-Tab geöffnet.
+- `FlowExitGuard` registriert jetzt die Route des ersten Flow-Schritts als Wurzel. Weitere geschützte Seiten desselben Pfads bleiben intern normal rückwärts navigierbar; nur das Verlassen der tatsächlichen Wurzel fragt nach Bestätigung.
+- Bei verschachtelten Flow-Routen überlässt AppShell die Zurück-Entscheidung dem jeweiligen `FlowExitGuard`; direkt innerhalb eines Tabs gestartete Pfade werden weiterhin vom AppShell abgesichert. So entsteht keine doppelte Abbruchabfrage.
+- Angebundene Pfade: Kochen/Bestellen/Essen gehen für heute, Überraschungsroulette mit Übergabe an den ausgewählten Modus, gemeinsame Entscheidungsanfrage, persönliche Rezeptüberraschung, Rezeptauswahl aus „Meine Rezepte“ für heute sowie direkte Menübearbeitung auf der Heute-Seite.
+- Erfolgreiche Auswahl/Speicherung beendet den Pfad; ein Abbruch im Bestätigungsdialog lässt ihn unverändert aktiv. Es werden keine Zwischenschritte für eine spätere Fortsetzung gespeichert.
+- Regressionstest `test/regression/flow_guard_test.dart` prüft den zentralen Zustand, Bestätigen/Ablehnen, den Schutz der Wurzel und normale Navigation über interne Kindseiten. `global_navigation_persistence_test.dart` prüft die Absicherung der unteren Navigation.
+- Branch `feat/guarded-editing-paths`; PR #471. Pflicht-CI für den aktuellen PR-Head erneut ausführen und vollständig abwarten; kein Merge ohne Repository-Hygiene, Analyze, Tests und iOS-Build. Android-Gerätetest bleibt nach Merge erforderlich.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_design.dart';
+import '../../core/flow_guard.dart';
 import '../../core/app_feedback.dart';
 import '../../core/error_text.dart';
 import '../../core/widgets/together_background.dart';
@@ -13,7 +14,8 @@ import '../../data/repositories/recipe_repository.dart';
 class MenuBuilderPage extends StatefulWidget {
   final TodayPlan plan;
   final DateTime? planDate;
-  const MenuBuilderPage({super.key, required this.plan, this.planDate});
+  final bool isFlowRoot;
+  const MenuBuilderPage({super.key, required this.plan, this.planDate, this.isFlowRoot = false});
 
   @override
   State<MenuBuilderPage> createState() => _MenuBuilderPageState();
@@ -32,6 +34,12 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.isFlowRoot) {
+      FlowGuard.instance.beginIfIdle(
+        id: 'edit_today_menu',
+        label: 'Menü für heute bearbeiten',
+      );
+    }
     _mainRecipeId = widget.plan.recipeId;
     for (final course in widget.plan.menuCourses) {
       final id = course['recipe_id']?.toString();
@@ -93,6 +101,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
               replaceExisting: true,
             );
       await _today.saveMenuCourses(planId, _courses());
+      if (widget.isFlowRoot) FlowGuard.instance.complete();
       if (mounted) Navigator.pop(context, true);
     } catch (error) {
       if (mounted) AppFeedback.showSnackBar(context, SnackBar(content: Text(friendlyError(error))));
@@ -148,6 +157,7 @@ class _MenuBuilderPageState extends State<MenuBuilderPage> {
 
   @override
   Widget build(BuildContext context) => TogetherScaffold(
+    protectFlowExit: widget.isFlowRoot,
     backgroundType: TogetherBackgroundType.recipes,
     appBar: const TogetherAppBar(title: Text('Menü zusammenstellen')),
     body: SafeArea(

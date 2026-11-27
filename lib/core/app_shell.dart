@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 
+import 'flow_guard.dart';
 import 'network/network_banner.dart';
 import 'network/network_status.dart';
 
@@ -31,7 +32,14 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
-  void _handleNotificationNavigation(DateTime? targetDate) {
+  Future<void> _handleNotificationNavigation(DateTime? targetDate) async {
+    if (FlowGuard.instance.isActive) {
+      final leave = await FlowGuard.instance.confirmAbandon(
+        context,
+        destination: 'Heute',
+      );
+      if (!leave || !mounted) return;
+    }
     _resetRecipeFiltersWhenLeaving(0);
     // Close any detail route inside the shell without disposing the IndexedStack.
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
@@ -75,7 +83,15 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
-  void _selectTab(int value) {
+  Future<void> _selectTab(int value) async {
+    const destinations = ['Heute', 'Rezepte', 'Einkauf', 'Profil'];
+    if (FlowGuard.instance.isActive) {
+      final leave = await FlowGuard.instance.confirmAbandon(
+        context,
+        destination: destinations[value],
+      );
+      if (!leave || !mounted) return;
+    }
     _resetRecipeFiltersWhenLeaving(value);
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
     if (value == 0) {
@@ -107,30 +123,49 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<NetworkStatus>(
       valueListenable: _network.status,
-      builder: (context, status, _) => PopScope(
-      canPop: index == 0,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        final navigator = _contentNavigatorKey.currentState;
-        if (navigator?.canPop() == true) {
-          navigator!.pop();
-          return;
-        }
-        if (index != 0) {
-          _resetRecipeFiltersWhenLeaving(0);
-          setState(() {
-            index = 0;
-            _contentIndex.value = 0;
-          });
-        }
-      },
-      child: Column(
-        children: [
-          NetworkBanner(status: status),
-          Expanded(child: _buildShell(context)),
-        ],
+      builder: (context, status, _) => ListenableBuilder(
+        listenable: FlowGuard.instance,
+        builder: (context, _) => PopScope(
+          canPop: index == 0 && !FlowGuard.instance.isActive,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+
+            final navigator = _contentNavigatorKey.currentState;
+            if (FlowGuard.instance.isActive) {
+              // A pushed flow route has its own FlowExitGuard. Let that route decide
+              // whether back leaves an internal step or the actual flow root.
+              if (navigator?.canPop() == true) return;
+
+              // Flows started directly inside a tab (for example recipe selection)
+              // have no pushed route guard, so the shell handles their exit here.
+              FlowGuard.instance.confirmAbandon(context).then((leave) {
+                if (!leave || !mounted) return;
+                _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+                if (index != 0) setState(() { index = 0; _contentIndex.value = 0; });
+              });
+              return;
+            }
+
+            if (navigator?.canPop() == true) {
+              navigator!.pop();
+              return;
+            }
+            if (index != 0) {
+              _resetRecipeFiltersWhenLeaving(0);
+              setState(() {
+                index = 0;
+                _contentIndex.value = 0;
+              });
+            }
+          },
+          child: Column(
+            children: [
+              NetworkBanner(status: status),
+              Expanded(child: _buildShell(context)),
+            ],
+          ),
+        ),
       ),
-    ),
     );
   }
 

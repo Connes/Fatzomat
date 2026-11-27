@@ -26,7 +26,23 @@ void main() {
     expect(shell, contains('SavedRecipesPage('));
     expect(shell, contains('onNavigateToTab: _selectTab,'));
     expect(shell, contains('onNavigateToTodayForDate: (date) => _handleNotificationNavigation(date),'));
-    expect(shell, contains('void _selectTab(int value)'));
+    expect(shell, contains('Future<void> _selectTab(int value) async'));
+    expect(shell, contains('FlowGuard.instance.confirmAbandon'));
+    expect(shell, contains('listenable: FlowGuard.instance'));
+    expect(shell, contains('canPop: index == 0 && !FlowGuard.instance.isActive'));
+  });
+
+  test('active flow delegates pushed-route back handling to its route guard', () {
+    final shell = source('lib/core/app_shell.dart');
+    final backHandler = shell.indexOf('onPopInvokedWithResult:');
+    final activeFlow = shell.indexOf('if (FlowGuard.instance.isActive)', backHandler);
+    final nestedRouteCheck = shell.indexOf('if (navigator?.canPop() == true) return;', activeFlow);
+    final abandon = shell.indexOf('FlowGuard.instance.confirmAbandon(context)', activeFlow);
+
+    expect(activeFlow, isNonNegative);
+    expect(nestedRouteCheck, greaterThan(activeFlow));
+    expect(abandon, greaterThan(nestedRouteCheck));
+    expect(shell.substring(nestedRouteCheck, abandon), isNot(contains('navigator!.pop()')));
   });
 
   test('normal feature navigation uses the shell navigator context', () {

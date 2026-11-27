@@ -120,7 +120,7 @@ void main() {
     expect(saved, contains('navigateToToday();'));
     expect(shell, contains('onNavigateToToday: _returnToTodayPreservingDate,'));
     final returnStart = shell.indexOf('void _returnToTodayPreservingDate()');
-    final returnEnd = shell.indexOf('void _selectTab(int value)', returnStart);
+    final returnEnd = shell.indexOf('Future<void> _selectTab(int value) async', returnStart);
     expect(returnStart, isNonNegative);
     expect(returnEnd, greaterThan(returnStart));
     expect(shell.substring(returnStart, returnEnd), contains('_contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);'));
