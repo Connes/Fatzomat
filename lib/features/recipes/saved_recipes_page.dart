@@ -1122,13 +1122,13 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
                                         key: Key('saved-recipe-select-today-${recipe.id}'),
                                         onPressed: () => selectRecipeForToday(recipe),
                                         icon: const Icon(Icons.event_available_rounded, size: 18),
-                                        label: Text(
-                                          selectionActive
-                                              ? (widget.planDate == null || _isSelectedDateToday
-                                                  ? 'Für heute auswählen'
-                                                  : 'Für diesen Tag auswählen')
-                                              : 'Auswählen',
-                                        ),
+                                        label: selectionActive
+                                            ? Text(
+                                                widget.planDate == null || _isSelectedDateToday
+                                                    ? 'Für heute auswählen'
+                                                    : 'Für diesen Tag auswählen',
+                                              )
+                                            : const Text('Auswählen'),
                                       ),
                                       const Spacer(),
                                       IconButton(
