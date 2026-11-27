@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_feedback.dart';
+import '../../core/flow_guard.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -121,6 +122,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       // to wait for either one to reflect the successful selection.
       await widget.onTodayPlanChanged?.call();
       if (!mounted) return;
+      FlowGuard.instance.complete();
 
       if (widget.onNavigateToToday != null) {
         // Close this detail route first. The AppShell callback then selects
