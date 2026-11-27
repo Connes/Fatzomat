@@ -32,7 +32,14 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
-  void _handleNotificationNavigation(DateTime? targetDate) {
+  Future<void> _handleNotificationNavigation(DateTime? targetDate) async {
+    if (FlowGuard.instance.isActive) {
+      final leave = await FlowGuard.instance.confirmAbandon(
+        context,
+        destination: 'Heute',
+      );
+      if (!leave || !mounted) return;
+    }
     _resetRecipeFiltersWhenLeaving(0);
     // Close any detail route inside the shell without disposing the IndexedStack.
     _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
