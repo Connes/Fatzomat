@@ -1014,7 +1014,8 @@ class SavedRecipesPageState extends State<SavedRecipesPage> {
                   ('Frühstück', Icons.free_breakfast_rounded),
                 ];
                   final selectedValue = ValueNotifier<String>(categoryFilter ?? 'Alle');
-                  return options.map((option) {\n                    final value = option.$1;
+                  return options.map((option) {
+                    final value = option.$1;
                     return PopupMenuItem<String>(
                       value: value,
                       enabled: false,
