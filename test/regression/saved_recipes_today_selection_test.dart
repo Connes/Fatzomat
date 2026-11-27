@@ -10,8 +10,7 @@ void main() {
 
     expect(source, contains("Key('saved-recipe-select-today-\${recipe.id}')"));
     expect(source, contains('selectionActive'));
-    expect(source, contains("'Für heute auswählen'"));
-    expect(source, contains("'Für diesen Tag auswählen'"));
+    expect(source, contains("label: const Text('Auswählen')"));
     expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));
     expect(source, contains("tooltip: 'Nach Rezeptart filtern'"));
     expect(source, contains("hintText: 'Rezepte suchen'"));
