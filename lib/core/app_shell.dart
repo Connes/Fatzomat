@@ -126,44 +126,44 @@ class _AppShellState extends State<AppShell> {
       builder: (context, status, _) => ListenableBuilder(
         listenable: FlowGuard.instance,
         builder: (context, _) => PopScope(
-      canPop: index == 0 && !FlowGuard.instance.isActive,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+          canPop: index == 0 && !FlowGuard.instance.isActive,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
 
-        final navigator = _contentNavigatorKey.currentState;
-        if (FlowGuard.instance.isActive) {
-          // A pushed flow route has its own FlowExitGuard. Let that route decide
-          // whether back leaves an internal step or the actual flow root.
-          if (navigator?.canPop() == true) return;
+            final navigator = _contentNavigatorKey.currentState;
+            if (FlowGuard.instance.isActive) {
+              // A pushed flow route has its own FlowExitGuard. Let that route decide
+              // whether back leaves an internal step or the actual flow root.
+              if (navigator?.canPop() == true) return;
 
-          // Flows started directly inside a tab (for example recipe selection)
-          // have no pushed route guard, so the shell handles their exit here.
-          FlowGuard.instance.confirmAbandon(context).then((leave) {
-            if (!leave || !mounted) return;
-            _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
-            if (index != 0) setState(() { index = 0; _contentIndex.value = 0; });
-          });
-          return;
-        }
+              // Flows started directly inside a tab (for example recipe selection)
+              // have no pushed route guard, so the shell handles their exit here.
+              FlowGuard.instance.confirmAbandon(context).then((leave) {
+                if (!leave || !mounted) return;
+                _contentNavigatorKey.currentState?.popUntil((route) => route.isFirst);
+                if (index != 0) setState(() { index = 0; _contentIndex.value = 0; });
+              });
+              return;
+            }
 
-        if (navigator?.canPop() == true) {
-          navigator!.pop();
-          return;
-        }
-        if (index != 0) {
-          _resetRecipeFiltersWhenLeaving(0);
-          setState(() {
-            index = 0;
-            _contentIndex.value = 0;
-          });
-        }
-      },
-      child: Column(
-        children: [
-          NetworkBanner(status: status),
-          Expanded(child: _buildShell(context)),
-        ],
-      ),
+            if (navigator?.canPop() == true) {
+              navigator!.pop();
+              return;
+            }
+            if (index != 0) {
+              _resetRecipeFiltersWhenLeaving(0);
+              setState(() {
+                index = 0;
+                _contentIndex.value = 0;
+              });
+            }
+          },
+          child: Column(
+            children: [
+              NetworkBanner(status: status),
+              Expanded(child: _buildShell(context)),
+            ],
+          ),
         ),
       ),
     );
