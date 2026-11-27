@@ -8,8 +8,12 @@ void main() {
 
     expect(source, contains("label: const Text('Auswählen')"));
     expect(source, contains("Key('cook-search-select-recipe-"));
-    expect(source, contains("'Für heute auswählen'"));\n    expect(source, contains('selectionActive'));
-    expect(source, contains("'Für diesen Tag auswählen'"));\n    expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));\n    expect(source, contains("tooltip: 'Nach Rezeptart filtern'"));\n    expect(source, contains('categoryFilter'));
+    expect(source, contains("'Für heute auswählen'"));
+    expect(source, contains('selectionActive'));
+    expect(source, contains("'Für diesen Tag auswählen'"));
+    expect(source, contains("tooltip: 'Rezepte nach Hauptzutat filtern'"));
+    expect(source, contains("tooltip: 'Nach Rezeptart filtern'"));
+    expect(source, contains('categoryFilter'));
     expect(source, contains('onPressed: () => selectRecipeForToday(recipe)'));
     expect(source, contains('Future<DateTime?> _choosePlanDate()'));
     expect(source, contains('itemCount: 7'));
